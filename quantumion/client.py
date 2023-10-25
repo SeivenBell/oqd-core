@@ -58,7 +58,7 @@ class Backend:
 
 if __name__ == "__main__":
 
-    # path = pathlib.Path(r'/Users/benjamin/Library/CloudStorage/OneDrive-UniversityofWaterloo/Desktop/1 - Projects/Open Quantum Designs/frontend/qasm_example.qasm')
+    # path = pathlib.Path(r'/Users/benjamin/Library/CloudStorage/OneDrive-UniversityofWaterloo/Desktop/1 - Projects/Open Quantum Designs/quantumion/qasm_example.qasm')
     # with path.open() as file:
     #     file_data = file.read()
 

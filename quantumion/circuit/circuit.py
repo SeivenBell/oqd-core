@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import networkx as nx
 
-from src.circuit.ops import Op, Hadamard
+from quantumion.circuit.ops import Op, Hadamard
 
 
 class CircuitBase:
