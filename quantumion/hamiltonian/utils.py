@@ -1,7 +1,7 @@
 import functools
 import operator
 
-from quantumion.hamiltonian.base import Operator
+from quantumion.hamiltonian.operator import Operator
 
 
 def sum(args) -> Operator:
