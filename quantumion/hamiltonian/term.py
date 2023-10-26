@@ -22,7 +22,15 @@ def validate_qmode_int(v: int):
 class Term(BaseModel):
     coefficient: Union[int, float, Complex] = 1.0
     qreg: List[Annotated[int, AfterValidator(validate_pauli_int)]] = []
-    qmode: List[Annotated[int, AfterValidator(validate_qmode_int)]] = []
+    qmode: List[List[Annotated[int, AfterValidator(validate_qmode_int)]]] = []
+
+    @property
+    def n_qreg(self):
+        return len(self.qreg)
+
+    @property
+    def n_qmode(self):
+        return len(self.qmode)
 
     def __eq__(self, other):
         if not isinstance(other, Term):
@@ -32,7 +40,10 @@ class Term(BaseModel):
         return eq
 
     def __mul__(self, other):
-        if isinstance(other, Term):
+        if isinstance(other, (int, float)):
+            return Term(coefficient=self.coefficient * other, qreg=self.qreg, qmode=self.qmode)
+
+        elif isinstance(other, Term):
             def lc(j, k):
                 if j == 0 or k == 0:
                     return j + k
@@ -53,9 +64,22 @@ class Term(BaseModel):
             phase = reduce(mul, phases, 1)
             coefficient = phase * self.coefficient * other.coefficient
             qreg = [lc(j, k) for (j, k) in zip(self.qreg, other.qreg)]
-            qmode = [0 for (a, b) in zip(self.qmode, other.qmode)]
+            # qmode = [0 for (a, b) in zip(self.qmode, other.qmode)]
+            qmode = [a + b for a, b in zip(self.qmode, other.qmode)]
+            return Term(coefficient=coefficient, qreg=qreg, qmode=qmode)
 
         else:
             return TypeError
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __matmul__(self, other):
+        if not isinstance(other, Term):
+            raise TypeError
+
+        qreg = self.qreg + other.qreg
+        qmode = self.qmode + other.qmode
+        coefficient = self.coefficient * other.coefficient
 
         return Term(coefficient=coefficient, qreg=qreg, qmode=qmode)
