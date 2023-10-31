@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "quantumion"
+version = "0.0.0"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn>=0.23.2",
+    "starlette>=0.27.0",
+    "pydantic",
+    "qutip",
+    "h5py", 
+    "redis",
+    "rq"
+]
+
+
+[tool.setuptools]
+packages = ["quantumion"]
