@@ -20,4 +20,4 @@ dependencies = [
 
 
 [tool.setuptools]
-packages = ["quantumion"]
+packages = ["quantumion", "backends"]
