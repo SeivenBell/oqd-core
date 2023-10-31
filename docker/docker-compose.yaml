@@ -7,7 +7,7 @@ networks:
     name: macvlan
     external: True
   internal:
-    name: FroSt_internal
+    name: frost_internal
 
 ################################################################################
 
@@ -16,8 +16,8 @@ services:
     build:
       context: ../
       dockerfile: docker/Dockerfile
-    image: FroSt
-    container_name: FroSt
+    image: frost
+    container_name: frost
     restart: always
     environment:
       - REDIS_PASSWORD=${REDIS PASSWORD}
