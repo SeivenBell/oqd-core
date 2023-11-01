@@ -6,4 +6,4 @@ ADD . /app
 
 RUN pip install .
 
-CMD python deploy.py
+CMD rq worker --with-scheduler & python deploy.py

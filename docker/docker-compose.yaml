@@ -25,6 +25,7 @@ services:
     networks:
       default:
         ipv4_address: 10.104.3.194
+      internal:
     dns:
       - 10.104.0.1
     depends_on:
