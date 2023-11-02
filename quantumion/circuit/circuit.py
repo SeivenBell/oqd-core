@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
 
+class Register(BaseModel):
+    regs: list[int] = []
+
+
 class Op(BaseModel):
     qreg: list[int] = []
     creg: list[int] = []
@@ -14,11 +18,16 @@ class Circuit(BaseModel):
         self.sequence.append(op)
 
 
-H = Op(gate="h")
-CNOT = Op(gate="h")
+def h(circuit):
+    circuit.add(Op(gate='h'))
+
+
+setattr(Circuit, "h", h)
+# H = Op(gate="h")
+# CNOT = Op(gate="cx")
 
 
 if __name__ == "__main__":
     circ = Circuit()
-    circ.add(H)
+    circ.h()
     print(circ)
