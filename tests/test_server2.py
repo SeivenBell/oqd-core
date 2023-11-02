@@ -4,16 +4,14 @@ import requests
 
 import numpy as np
 
+import argparse
+
 ########################################################################################
 
 from quantumion.hamiltonian.experiment import Experiment
 from quantumion.hamiltonian.operator import *
 
 from backends.base import Submission, Specification, run
-
-########################################################################################
-
-server_url = "http://10.104.3.194:8000"
 
 ########################################################################################
 
@@ -53,6 +51,13 @@ def get_result(result):
 ########################################################################################
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-u", "--url", default="http://127.0.0.1:8000", type=str, help="server URL for job submission")
+
+    args = parser.parse_args()
+
+    server_url = args.url
+
     operator = 0.25 * np.pi * PauliX @ PauliX
     experiment = Experiment()
     experiment.add(operator)
@@ -71,12 +76,15 @@ if __name__ == "__main__":
 
     print("{:=^80}".format(" Results "))
 
+    print("{:<5} {:<12} {}".format("Job", "Status", "Result"))
+
     for n, job in enumerate(jobs):
         status = ""
         while status != "finished":
             status = check_status(job)["status"]
-            print(f"Job {n} status: {status}")
-            time.sleep(1)
-        else:
-            result = get_result(job)
-            print(result)
+
+            if status != "finished":
+                print("\r{:<5} {:<12} {}".format(n, status, ""), end="")
+            else:
+                result = get_result(job)
+                print("\r{:<5} {:<12} {}".format(n, status, result))
