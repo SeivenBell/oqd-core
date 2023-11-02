@@ -4,7 +4,8 @@ import time
 
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import *
-from backends.task import Task, TaskArgs
+from backends.task import Task
+from backends.base import TaskArgs
 
 server_url = "http://localhost:8000"
 

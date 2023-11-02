@@ -19,12 +19,11 @@ class QutipBackend:
         self.qreg_map = {}
         self.qmode_map = {}
 
-    def run(self, task: Task) -> TaskResult:
+    def run(self, task: Task) -> TaskResultAnalog:
         assert isinstance(task.program, AnalogCircuit), "Qutip backend only simulates Experiment objects."
         experiment = task.program
         args = task.args
-        data = Data()
-        result = TaskResult()
+        data = DataAnalog()
 
         self._init_maps(args)
 
@@ -36,15 +35,17 @@ class QutipBackend:
         bitstrings = [''.join(map(str, shot)) for shot in data.shots]
         counts = {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
 
-        result.counts = counts
-        result.expect = data.expect
-        result.times = data.times.tolist()
+        result = TaskResultAnalog(
+            counts=counts,
+            expect=data.expect,
+            times=data.times.tolist()
+        )
         return result
 
     """
     
     """
-    def _init_maps(self, spec: TaskArgs):
+    def _init_maps(self, spec: TaskArgsAnalog):
         self.qreg_map = {
             'i': qt.qeye(2),
             'x': qt.sigmax(),
@@ -60,13 +61,13 @@ class QutipBackend:
     """
     
     """
-    def _initialize(self, experiment: AnalogCircuit, args: TaskArgs, data: Data):
+    def _initialize(self, experiment: AnalogCircuit, args: TaskArgsAnalog, data: DataAnalog):
         # generate initial quantum state as the |00.0> \otimes |00.0> as Qobj
         dims = experiment.n_qreg * [2] + experiment.n_qmode * [args.fock_trunc]
         data.state = qt.tensor([qt.basis(d, 0) for d in dims])
         return
 
-    def _evolve(self, gate: AnalogGate, args: TaskArgs, data: Data):
+    def _evolve(self, gate: AnalogGate, args: TaskArgsAnalog, data: DataAnalog):
         options = qt.solver.Options(store_final_state=True)
         duration = gate.duration
         durations = np.linspace(0, duration, round(duration / args.dt))  # create time vector
@@ -88,7 +89,7 @@ class QutipBackend:
         data.state = result_qobj.final_state
         return
 
-    def _measure(self, experiment: AnalogCircuit, spec: TaskArgs, data: Data):
+    def _measure(self, experiment: AnalogCircuit, spec: TaskArgsAnalog, data: DataAnalog):
         if spec.n_shots is not None:
             state = data.state
             probs = np.power(np.abs(state.full()), 2).squeeze()
@@ -119,7 +120,7 @@ class QutipBackend:
 
         return coefficient * qt.tensor(_operator_qobjs)
 
-    def _map_gate_to_qobj(self, gate: AnalogGate, spec: TaskArgs) -> qt.Qobj:
+    def _map_gate_to_qobj(self, gate: AnalogGate, spec: TaskArgsAnalog) -> qt.Qobj:
         dims = gate.n_qreg * [2] + gate.n_qmode * [spec.fock_trunc]
         _gate_obj = qt.Qobj(dims=2 * [dims])
 
@@ -129,7 +130,7 @@ class QutipBackend:
 
         return _gate_obj
 
-    def _update_observables(self, data: Data, result_qobj, args: TaskArgs):
+    def _update_observables(self, data: DataAnalog, result_qobj, args: TaskArgsAnalog):
         for i, name in enumerate(args.observables.keys()):
             if name not in data.expect.keys():
                 data.expect[name] = list(result_qobj.expect[i])  # add to results

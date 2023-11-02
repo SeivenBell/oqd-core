@@ -6,7 +6,8 @@ from quantumion.analog.operator import PauliX, PauliY, PauliZ
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
 from backends.analog.qutip import QutipBackend
-from backends.task import Task, TaskArgs
+from backends.task import Task, TaskArgsAnalog
+
 
 #%% example of creating an operator
 op = ((PauliY * PauliY) @ (PauliY * PauliX)) #@ (Creation * Annihilation)
@@ -27,7 +28,7 @@ json_str = ex.model_dump()
 ex_parse = AnalogCircuit(**json_str)
 
 #%% need another object that stores keywords about the backend runtime parameters
-args = TaskArgs(n_shots=100, fock_trunc=4, observables={'z': PauliZ, 'x': PauliX, 'y': PauliY}, dt=0.01)
+args = TaskArgsAnalog(n_shots=100, fock_trunc=4, observables={'z': PauliZ, 'x': PauliX, 'y': PauliY}, dt=0.01)
 
 #%% we package the program (i.e. the experiment) and the specification together as one object
 task = Task(program=ex, args=args)

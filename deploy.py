@@ -9,7 +9,8 @@ from rq.job import Job
 ########################################################################################
 
 from backends.analog.qutip import QutipBackend
-from backends.task import Task, TaskArgs, TaskResult
+from backends.task import Task
+from backends.base import TaskArgs, TaskResult
 
 ########################################################################################
 

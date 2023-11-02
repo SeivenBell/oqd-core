@@ -100,7 +100,6 @@ class DigitalCircuit(BaseModel):
 
         if isinstance(v, list):
             ids = [qreg.id for qreg in v]
-            print(ids)
             if len(ids) != len(set(ids)):
                 raise ValidationError("Quantum register identifiers must be unique.")
         return v
@@ -110,8 +109,7 @@ class DigitalCircuit(BaseModel):
 
     def to_qasm(self):
         version = "2.0"
-        qasm_str = f"OPENQASM {version}\n"
-        print(self.qreg)
+        qasm_str = f"OPENQASM {version};\n"
 
         for qreg in self.qreg:
             qasm_str += f"qreg {qreg.id}[{len(qreg.reg)}];\n"
