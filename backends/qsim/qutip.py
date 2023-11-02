@@ -85,8 +85,6 @@ class QutipBackend:
 
         # run the Qutip solver
         result_qobj = qt.mesolve(op_qobj, data.state, durations, [], obs_qobjs, options=options)
-        print(result_qobj)
-        print(result_qobj.expect)
 
         # data.expect = {name: result_qobj.expect[i] for i, name in enumerate(args.observables.keys())}
         if data.times is not None:

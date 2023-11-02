@@ -4,12 +4,16 @@ from pydantic import BaseModel, ValidationError
 from quantumion.analog.gate import AnalogGate
 
 
+class Statement(BaseModel):
+    key: str
+    assignment: Union[AnalogGate]
+
+
 class Experiment(BaseModel):
     definitions: List[int] = []
     registers: List[int] = []
     sequence: List[AnalogGate] = []
 
-    #
     n_qreg: int = None  # todo: change to a property
     n_qmode: int = None
 

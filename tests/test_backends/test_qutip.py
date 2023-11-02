@@ -27,7 +27,7 @@ json_str = ex.model_dump()
 ex_parse = Experiment(**json_str)
 
 #%% need another object that stores keywords about the backend runtime parameters
-args = TaskArgs(n_shots=100, fock_trunc=4, observables={'z': PauliZ}, dt=0.01)
+args = TaskArgs(n_shots=100, fock_trunc=4, observables={'z': PauliZ, 'x': PauliX, 'y': PauliY}, dt=0.01)
 
 #%% we package the program (i.e. the experiment) and the specification together as one object
 task = Task(program=ex, args=args)
@@ -36,7 +36,7 @@ print(task)
 #%% we can now run this using the Qutip simulator
 backend = QutipBackend()
 result = backend.run(task)
-print(result)
+print(result.model_fields_set)
 
 #%%
 fig, ax = plt.subplots()
