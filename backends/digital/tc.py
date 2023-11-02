@@ -16,7 +16,8 @@ class TensorCircuitBackend:
     def run(self, task: Task) -> TaskResultDigital:
         assert isinstance(task.program, DigitalCircuit), "Wrong program type"
         circuit = task.program
-        qasm = circuit.to_qasm()
+        qasm = circuit.qasm
+        print(qasm)
         circ = tc.Circuit.from_openqasm(qasm)
 
         print(circ.state())
