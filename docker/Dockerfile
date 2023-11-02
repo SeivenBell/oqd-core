@@ -4,6 +4,8 @@ WORKDIR /app
 
 ADD . /app
 
+ENV PYTHONPATH /app
+
 RUN pip install .
 
 CMD rq worker --with-scheduler & python deploy.py
