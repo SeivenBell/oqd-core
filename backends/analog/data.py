@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Union
+from typing import Union, List
 from pydantic import BaseModel
+import pydantic_numpy.typing as pnd
 
 import numpy as np
 
@@ -24,5 +25,6 @@ class TaskArgsAnalog(BaseModel):
 
 class TaskResultAnalog(BaseModel):
     counts: dict[int, int] = {}
-    expect: dict[str, Union[float, int]] = {}
+    expect: dict[str, List[Union[float, int]]] = {}
     times: list[float] = []
+    state: pnd.Np1DArray = None

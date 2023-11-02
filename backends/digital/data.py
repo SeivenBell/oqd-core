@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import Union, Optional
+import pydantic_numpy.typing as pnd
 
 
 class TaskArgsDigital(BaseModel):
@@ -7,3 +9,4 @@ class TaskArgsDigital(BaseModel):
 
 class TaskResultDigital(BaseModel):
     counts: dict[int, int] = {}
+    state: pnd.Np1DArray

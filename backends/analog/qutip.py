@@ -38,7 +38,8 @@ class QutipBackend:
         result = TaskResultAnalog(
             counts=counts,
             expect=data.expect,
-            times=data.times.tolist()
+            times=data.times.tolist(),
+            state=data.state.full().squeeze(),
         )
         return result
 

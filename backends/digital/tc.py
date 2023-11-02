@@ -20,11 +20,10 @@ class TensorCircuitBackend:
         print(qasm)
         circ = tc.Circuit.from_openqasm(qasm)
 
-        print(circ.state())
-
         print(circ.draw(output='text'))
 
         result = TaskResultDigital(
-            counts={}
+            counts=circ.sample(batch=task.args.n_shots, allow_state=True, format='count_dict_bin'),
+            state=circ.state(),
         )
         return result
