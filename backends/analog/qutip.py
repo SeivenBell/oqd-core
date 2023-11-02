@@ -1,24 +1,15 @@
 import itertools
 import qutip as qt
 import numpy as np
-from typing import Union
-from dataclasses import dataclass, field
 
-from backends.task import TaskArgs, TaskResult, Task
+from backends.analog.data import DataAnalog, TaskArgsAnalog, TaskResultAnalog
+from backends.task import Task
 
 from quantumion.analog.gate import AnalogGate
 from quantumion.analog.operator import Operator
 from quantumion.analog.coefficient import Complex
-from quantumion.analog.experiment import Experiment
+from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.math import prod
-
-
-@dataclass
-class Data:
-    times: np.array = None
-    state: np.array = None
-    expect: dict[str, Union[int, float]] = field(default_factory=dict)
-    shots: np.array = None
 
 
 class QutipBackend:
@@ -28,10 +19,10 @@ class QutipBackend:
         self.qreg_map = {}
         self.qmode_map = {}
 
-    def run(self, submission: Task) -> TaskResult:
-        assert isinstance(submission.program, Experiment), "Qutip backend only simulates Experiment objects."
-        experiment = submission.program
-        args = submission.args
+    def run(self, task: Task) -> TaskResult:
+        assert isinstance(task.program, AnalogCircuit), "Qutip backend only simulates Experiment objects."
+        experiment = task.program
+        args = task.args
         data = Data()
         result = TaskResult()
 
@@ -69,7 +60,7 @@ class QutipBackend:
     """
     
     """
-    def _initialize(self, experiment: Experiment, args: TaskArgs, data: Data):
+    def _initialize(self, experiment: AnalogCircuit, args: TaskArgs, data: Data):
         # generate initial quantum state as the |00.0> \otimes |00.0> as Qobj
         dims = experiment.n_qreg * [2] + experiment.n_qmode * [args.fock_trunc]
         data.state = qt.tensor([qt.basis(d, 0) for d in dims])
@@ -97,7 +88,7 @@ class QutipBackend:
         data.state = result_qobj.final_state
         return
 
-    def _measure(self, experiment: Experiment, spec: TaskArgs, data: Data):
+    def _measure(self, experiment: AnalogCircuit, spec: TaskArgs, data: Data):
         if spec.n_shots is not None:
             state = data.state
             probs = np.power(np.abs(state.full()), 2).squeeze()

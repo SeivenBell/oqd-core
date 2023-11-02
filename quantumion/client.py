@@ -58,11 +58,11 @@ class Backend:
 
 if __name__ == "__main__":
 
-    # path = pathlib.Path(r'/Users/benjamin/Library/CloudStorage/OneDrive-UniversityofWaterloo/Desktop/1 - Projects/Open Quantum Designs/quantumion/qasm_example.qasm')
+    # path = pathlib.Path(r'/Users/benjamin/Library/CloudStorage/OneDrive-UniversityofWaterloo/Desktop/1 - Projects/Open Quantum Designs/quantumion/qasm_example.digital')
     # with path.open() as file:
     #     file_data = file.read()
 
-    filename = "test_qasm.qasm"
+    filename = "test_qasm.digital"
     file = """
     include "qelib1.inc";
     qreg q[2];
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     """
 
     client = Backend(server='0.0.0.0')
-    job_id = client.submit_job(filename='test.qasm', file=file)
+    job_id = client.submit_job(filename='test.digital', file=file)
 
     while client.get_status(job_id) != "finished":
         time.sleep(0.2)

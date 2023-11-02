@@ -9,7 +9,7 @@ class Statement(BaseModel):
     assignment: Union[AnalogGate]
 
 
-class Experiment(BaseModel):
+class AnalogCircuit(BaseModel):
     definitions: List[int] = []
     registers: List[int] = []
     sequence: List[AnalogGate] = []

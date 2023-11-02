@@ -2,7 +2,7 @@ import requests
 import numpy as np
 import time
 
-from quantumion.analog.experiment import Experiment
+from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import *
 from backends.task import Task, TaskArgs
 
@@ -35,7 +35,7 @@ def get_result(result):
 
 if __name__ == "__main__":
     operator = np.pi * PauliX
-    experiment = Experiment()
+    experiment = AnalogCircuit()
     experiment.add(operator)
 
     spec = TaskArgs(n_shots=10, fock_trunc=4)

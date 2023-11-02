@@ -3,7 +3,7 @@ from redis import Redis
 from rq import Queue
 from rq.job import Job
 
-from backends.qsim.qutip import QutipBackend
+from backends.analog.qutip import QutipBackend
 from backends.task import Task, TaskArgs, TaskResult
 
 
