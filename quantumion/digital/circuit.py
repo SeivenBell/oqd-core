@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator, field_validator, conint, ValidationError
-from typing import List, Union, Literal
+from typing import List, Union, Literal, Optional
 
 
 class QuantumBit(BaseModel):
@@ -24,6 +24,9 @@ class QuantumRegister(BaseModel):
             v = [QuantumBit(id=id, index=i) for i in range(v)]
         return v
 
+    def __getitem__(self, item):
+        return self.reg[item]
+
 
 class ClassicalRegister(BaseModel):
     id: str = 'c'
@@ -37,8 +40,11 @@ class ClassicalRegister(BaseModel):
             v = [ClassicalBit(id=id, index=i) for i in range(v)]
         return v
 
+    def __getitem__(self, item):
+        return self.reg[item]
 
-class Op(BaseModel):
+
+class UnitaryOp(BaseModel):
     id: str
 
 
@@ -47,10 +53,10 @@ class GateParameters(BaseModel):
 
 
 class Gate(BaseModel):
-    op: Op
-    qreg: list[int]
-    creg: list[int]
-    params: GateParameters
+    uop: UnitaryOp
+    qreg: Optional[Union[QuantumRegister, QuantumBit, int, list[int]]] = None
+    creg: Optional[Union[ClassicalRegister, ClassicalBit, int, list[int]]] = None
+    params: Optional[GateParameters] = None
 
 
 class Statement(BaseModel):
@@ -76,7 +82,7 @@ class DigitalCircuit(BaseModel):
     creg: Union[int, ClassicalRegister, list[ClassicalRegister]] = None
 
     declarations: list = []
-    sequence: list[Op] = []
+    sequence: list[Union[Gate, Statement]] = []
 
     @field_validator('creg')
     def convert_creg(cls, v):
@@ -104,7 +110,7 @@ class DigitalCircuit(BaseModel):
                 raise ValidationError("Quantum register identifiers must be unique.")
         return v
 
-    def add(self, op: Op, *args):
+    def add(self, op: Union[Gate, Statement]):
         self.sequence.append(op)
 
     def to_qasm(self):
@@ -117,47 +123,38 @@ class DigitalCircuit(BaseModel):
         for creg in self.creg:
             qasm_str += f"creg {creg.id}[{len(creg.reg)}];\n"
 
-        for decl in self.declarations:
-            qasm_str += ""
+        # for decl in self.declarations:
+        #     qasm_str += ""
 
         for op in self.sequence:
-            qasm_str += ""
+            if isinstance(op, Gate):
+                qasm_str += f"{op.uop.id}"
+                print(op)
+                qasm_str += ",".join([f"{qreg.id}[{qreg.index}]" for qreg in op.qreg])
+                qasm_str += ";\n"
 
         return qasm_str
 
 
-H = Op(id="h")
-CNOT = Op(id="cx")
-CX = Op(id="cx")
-CZ = Op(id="cz")
-X = Op(id="x")
+H = UnitaryOp(id="h")
+CNOT = UnitaryOp(id="cx")
+CX = UnitaryOp(id="cx")
+CZ = UnitaryOp(id="cz")
+X = UnitaryOp(id="x")
 
 
 if __name__ == "__main__":
-    qreg = QuantumRegister(id='q', reg=3)
-    areg = QuantumRegister(id='a', reg=3)
-    creg = ClassicalRegister(id='c', reg=3)
+    qreg = QuantumRegister(id='q', reg=2)
+    creg = ClassicalRegister(id='c', reg=2)
 
-    # circ = Circuit(qreg=2, creg=2)
-    circ = DigitalCircuit(qreg=[qreg, areg], creg=[creg])
+    circ = DigitalCircuit(qreg=qreg, creg=creg)
     print(circ)
 
-    # circ.add()
-    # print(qbits)
-    # print(cbits)
-    # print(circ)
+    circ.add(Gate(uop=H, qreg=qreg[0]))
+    circ.add(Gate(uop=H, qreg=qreg[1]))
+    print(circ.sequence)
 
-    # print(QuantumRegister(regs=2))
-    # print(ClassicalRegister(regs=2))
-    # print(ClassicalRegister(id='a', regs=2))
-
-
-    #
-    # params = GateParameters()
-    # print(params)
-    #
-    #
-    # measure = Measure(qregs=qbits, cregs=cbits)
+    # measure = Measure(qregs=qreg, cregs=cbits)
     # print(measure)
 
     print(circ.to_qasm())

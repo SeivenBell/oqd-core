@@ -6,8 +6,6 @@ from quantumion.digital.circuit import DigitalCircuit
 
 #%%
 circ = DigitalCircuit(qreg=2, creg=2)
-# print(circ)
-# print(circ.to_qasm())
 
 #%%
 args = TaskArgsDigital(n_shots=10)
