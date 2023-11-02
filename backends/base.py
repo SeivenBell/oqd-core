@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import Union
 
-from quantumion.hamiltonian.experiment import Experiment
-from quantumion.hamiltonian.operator import Operator
+from quantumion.analog.experiment import Experiment
+from quantumion.analog.gate import AnalogGate
 from quantumion.circuit.circuit import Circuit
 from quantumion.atomic.schedule import Schedule
 
@@ -10,7 +10,7 @@ from quantumion.atomic.schedule import Schedule
 class Specification(BaseModel):
     n_shots: int = 10
     fock_trunc: int = 4
-    observables: dict[str, Operator] = {}
+    observables: dict[str, AnalogGate] = {}
     dt: float = 0.1
 
 

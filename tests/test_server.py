@@ -2,8 +2,8 @@ import requests
 import numpy as np
 import time
 
-from quantumion.hamiltonian.experiment import Experiment
-from quantumion.hamiltonian.operator import *
+from quantumion.analog.experiment import Experiment
+from quantumion.analog.gate import *
 from backends.base import Submission, Specification
 
 server_url = "http://localhost:8000"

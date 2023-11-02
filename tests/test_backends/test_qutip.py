@@ -1,18 +1,18 @@
 #%%
 import numpy as np
 
-from quantumion.hamiltonian.operator import PauliX, PauliY, PauliZ, PauliI, Annihilation, Creation
-from quantumion.hamiltonian.experiment import Experiment
+from quantumion.analog.operator import PauliX, PauliY, PauliZ, PauliI, Annihilation, Creation
+from quantumion.analog.experiment import Experiment
 from backends.qsim.qutip import QutipBackend, Data
 from backends.base import Submission, Specification, Result
 
 #%% example of creating an operator
-op = np.pi * PauliX @ PauliX @ (Creation * Annihilation)
+op = ((PauliY * PauliY) @ (PauliY * PauliX)) #@ (Creation * Annihilation)
 print(op)
 
 #%% create an experiment to run/simulate
 ex = Experiment()
-ex.add(operator=np.pi/4 * PauliX @ PauliX)
+ex.add(gate=np.pi / 4 * PauliX @ PauliX)
 print(ex)
 
 #%% can serialize this to a JSON format...

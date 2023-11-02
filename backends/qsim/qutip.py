@@ -5,10 +5,10 @@ from dataclasses import dataclass, field
 
 from backends.base import Specification, Result, Submission
 
-from quantumion.hamiltonian.operator import Operator
-from quantumion.hamiltonian.coefficients import Complex
-from quantumion.hamiltonian.experiment import Experiment
-from quantumion.hamiltonian.utils import prod
+from quantumion.analog.gate import AnalogGate
+from quantumion.analog.coefficient import Complex
+from quantumion.analog.experiment import Experiment
+from quantumion.analog.math import prod
 
 
 @dataclass
@@ -108,11 +108,11 @@ class QutipBackend:
             data.shots = shots
         return
 
-    def _map_operator_to_qobj(self, operator: Operator, spec: Specification) -> qt.Qobj:
-        dims = operator.n_qreg * [2] + operator.n_qmode * [spec.fock_trunc]
+    def _map_operator_to_qobj(self, control: AnalogGate, spec: Specification) -> qt.Qobj:
+        dims = control.n_qreg * [2] + control.n_qmode * [spec.fock_trunc]
         op_qobj = qt.Qobj(dims=2 * [dims])
 
-        for term in operator.terms:
+        for term in control.unitary:
             # if not isinstance(c, (float, int, complex)):
             #     raise NotImplementedError("Coefficient type not supported yet for Qutip server.")
 
