@@ -1,31 +1,29 @@
 from fastapi import FastAPI
+
 from redis import Redis
+
 from rq import Queue
 from rq.job import Job
 
-from backends.qsim.qutip import QutipBackend
+########################################################################################
+
+from backends.qsim.qutip import QutipBackend, run
 from backends.base import Submission, Specification, Result
 
+########################################################################################
 
-app = FastAPI()
-redis = Redis()
 r = Redis(host='localhost', port=6379, decode_responses=True)
 queue = Queue(connection=redis)
 
+########################################################################################
+
+app = FastAPI()
 
 @app.post("/qsim_simulator/")
 async def submit(submission: Submission):
     print(f"Queueing {submission} on server backend. {len(queue)} jobs in queue.")
     j = queue.enqueue(run, submission)
     return {"id": j.id, 'status': j.get_status()}
-
-
-def run(submission):
-    print(f"Now running {submission}")
-    backend = QutipBackend()
-    result = backend.run(submission)
-    return result
-
 
 @app.post("/check_status/")
 async def check_status(request: dict):
@@ -41,6 +39,7 @@ async def get_result(request: dict):
     print(job.get_status())
     return job.return_value()
 
+########################################################################################
 
 if __name__ == '__main__':  # local dev
     import uvicorn
