@@ -4,7 +4,7 @@ from rq import Queue
 from rq.job import Job
 
 from backends.qsim.qutip import QutipBackend
-from backends.base import Submission, Specification, Result
+from backends.task import Task, TaskArgs, TaskResult
 
 
 app = FastAPI()
@@ -14,7 +14,7 @@ queue = Queue(connection=redis)
 
 
 @app.post("/qsim_simulator/")
-async def submit(submission: Submission):
+async def submit(submission: Task):
     print(f"Queueing {submission} on server backend. {len(queue)} jobs in queue.")
     j = queue.enqueue(run, submission)
     return {"id": j.id, 'status': j.get_status()}

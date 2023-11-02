@@ -3,21 +3,25 @@ from typing import Union
 
 from quantumion.analog.experiment import Experiment
 from quantumion.analog.gate import AnalogGate
+from quantumion.analog.operator import Operator
+
 from quantumion.circuit.circuit import Circuit
 from quantumion.atomic.schedule import Schedule
 
 
-class Specification(BaseModel):
+class TaskArgs(BaseModel):
     n_shots: int = 10
     fock_trunc: int = 4
-    observables: dict[str, AnalogGate] = {}
+    observables: dict[str, Operator] = {}
     dt: float = 0.1
 
 
-class Result(BaseModel):
+class TaskResult(BaseModel):
     counts: dict[int, int] = {}
+    expect: dict[str, Union[float, int]] = {}
+    times: list[float] = []
 
 
-class Submission(BaseModel):
+class Task(BaseModel):
     program: Union[Experiment, Circuit, Schedule]
-    specification: Specification
+    args: TaskArgs

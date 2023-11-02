@@ -1,5 +1,5 @@
 from typing import List, Union
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from quantumion.analog.gate import AnalogGate
 
@@ -14,6 +14,8 @@ class Experiment(BaseModel):
     n_qmode: int = None
 
     def add(self, gate: AnalogGate):
+        if not isinstance(gate, AnalogGate):
+            raise ValidationError
         if gate.n_qreg != self.n_qreg and self.n_qreg is not None:
             raise ValueError("Inconsistent qreg dimensions.")
         if gate.n_qmode != self.n_qmode and self.n_qmode is not None:

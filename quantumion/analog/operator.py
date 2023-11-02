@@ -8,6 +8,7 @@ from quantumion.analog.coefficient import Complex
 from quantumion.analog.math import levi_civita
 
 __all__ = [
+    "Operator",
     "PauliI",
     "PauliX",
     "PauliY",

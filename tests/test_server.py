@@ -4,12 +4,12 @@ import time
 
 from quantumion.analog.experiment import Experiment
 from quantumion.analog.gate import *
-from backends.base import Submission, Specification
+from backends.task import Task, TaskArgs
 
 server_url = "http://localhost:8000"
 
 
-def submit(submission: Submission):
+def submit(submission: Task):
     url = f"{server_url}/qsim_simulator/"
     response = requests.post(url, json=submission.model_dump())
     if response.status_code == 200:
@@ -38,8 +38,8 @@ if __name__ == "__main__":
     experiment = Experiment()
     experiment.add(operator)
 
-    spec = Specification(n_shots=10, fock_trunc=4)
-    submission = Submission(program=experiment, specification=spec)
+    spec = TaskArgs(n_shots=10, fock_trunc=4)
+    submission = Task(program=experiment, specification=spec)
 
     result = submit(submission)
     print(result)
