@@ -4,6 +4,7 @@ This repo contains code for the frontend and backend of the OQD stack.
 
 ## Table of contents
 - [Quick Start](#quickstart) <br/>
+  - [The Stack](#stack) <br/>
 - [Installation](#installation) <br/>
   - [Client](#client) <br/>
   - [Server](#server) <br/>
@@ -21,6 +22,7 @@ This repo contains code for the frontend and backend of the OQD stack.
 
 
 ## Quick Start <a name="quickstart"></a>
+### The Stack <a name="stack"></a>
 
 ## Installation <a name="installation"></a>
 
@@ -65,6 +67,7 @@ http://{HOST_IP}:8000/redoc
 ## Contents <a name="contents"></a>
 
 ### Frontends <a name="frontends"></a>
+Python packages with [Pydantic](https://docs.pydantic.dev/latest/) support for each layer of the stack.
 
 ### Intermediate Representations <a name="intermediate-representations"></a>
 The semantics defining an experiment for the different layers of the stack is defined by Backus-Naur Form (BNFs) in the following repos:
