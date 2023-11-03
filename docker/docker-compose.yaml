@@ -3,9 +3,6 @@ version: "3.9"
 ################################################################################
 
 networks:
-  default:
-    name: macvlan
-    external: True
   internal:
     name: frost_internal
 
@@ -21,12 +18,10 @@ services:
     restart: always
     environment:
       - REDIS_HOST=redis
+    ports:
+      - "8000:8000"
     networks:
-      default:
-        ipv4_address: 10.104.3.194
       internal:
-    dns:
-      - 10.104.0.1
     depends_on:
      redis:
       condition: service_healthy
