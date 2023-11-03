@@ -12,6 +12,8 @@ This repo contains code for the frontend and backend of the OQD stack.
   - [Frontends](#frontends) <br/>
   - [Intermediate Representations](#intermediate-representations) <br/>
   - [Backends](#backends) <br/>
+    - [Software](#software) <br/>
+    - [Hardware](#hardware) <br/>
 - [Documentation](#documentation) <br/>
 - [Acknowledgements](#acknowledgements) <br/>
 - [References](#references) <br/>
@@ -70,13 +72,20 @@ The semantics defining an experiment for the different layers of the stack is de
 - [OpenAPL](https://github.com/OpenQuantumDesign/openapl)
 
 ### Backends <a name="backends"></a>
-Planned supported backends include:
+
+#### Software <a name="software"></a>
+Planned supported software backends include:
 - Digital Circuit
   - [Tensor Circuit](https://github.com/tencent-quantum-lab/tensorcircuit)
 - Analog Circuit
   - [Qutip](https://qutip.org/)
-- Trapped-ion Physics Experiment
+- Trapped-ion Physics Simulator
   - [IonSim.jl](https://www.ionsim.org/)
+#### Hardware <a name="hardware"></a>
+Planned supported hardware backends include:
+- [Quantum Information with Trapped-ions (QITI Lab)](https://qiti.iqc.uwaterloo.ca/publications/) Blade Trap $\left( ^{171}\mathrm{Yb}^+ \right)$
+- [QuantumIon](https://tqt.uwaterloo.ca/project-details/quantumion-an-open-access-quantum-computing-platform/) $\left( ^{138}\mathrm{Ba}^+ \right)$
+
 
 ## Documentation <a name="documentation"></a>
 
