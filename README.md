@@ -37,6 +37,11 @@ The webserver is a [Uvicorn](https://www.uvicorn.org/) ASGI webserver with a [RE
 The webserver handles queuing jobs with a [Redis](https://redis.io/) cache and [Redis Queue (RQ)](https://python-rq.org/) worker.
 
 #### Docker Compose <a name="docker-compose"></a>
+Clone the repository using the following command :
+```bash
+git clone https://github.com/OpenQuantumDesign/quantumion
+```
+Deploy with docker compose:
 ```bash
 cd docker
 docker compose up -d
