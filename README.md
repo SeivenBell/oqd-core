@@ -23,6 +23,7 @@ This repo contains code for the frontend and backend of the OQD stack.
 
 ## Quick Start <a name="quickstart"></a>
 ### The Stack <a name="stack"></a>
+![Stack](https://github.com/OpenQuantumDesign/quantumion/blob/main/resources/OQD_stack.png)
 
 ## Installation <a name="installation"></a>
 
