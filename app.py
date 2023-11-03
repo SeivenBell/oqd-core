@@ -8,8 +8,8 @@ from rq.job import Job
 
 ########################################################################################
 
-from backends.qsim.qutip import QutipBackend
-from backends.base import Submission, Specification, Result, run
+from backends.analog.qutip import QutipBackend
+from backends.task import Task
 
 ########################################################################################
 
@@ -22,9 +22,9 @@ app = FastAPI()
 
 
 @app.post("/qsim_simulator/")
-async def submit(submission: Submission):
+async def submit(submission: Task):
     print(f"Queueing {submission} on server backend. {len(queue)} jobs in queue.")
-    job = queue.enqueue(run, submission)
+    job = queue.enqueue(QutipBackend().run, submission)
     return {"id": job.id, "status": job.get_status()}
 
 
@@ -39,4 +39,5 @@ async def check_status(request: dict):
 async def get_result(request: dict):
     print(f"Requesting result for job {request['id']}")
     job = Job.fetch(id=request["id"], connection=redis_client)
+    print(job.get_status())
     return job.return_value()
