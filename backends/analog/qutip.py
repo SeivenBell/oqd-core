@@ -30,10 +30,9 @@ class QutipBackend(BackendBase):
         self.qmode_map = {}
 
     def run(self, task: Task) -> TaskResultAnalog:
-        # assert isinstance(
-        #     task.program, AnalogCircuit
-        # ), "Qutip backend only simulates Experiment objects."
-
+        assert isinstance(
+            task.program, AnalogCircuit
+        ), "Qutip backend only simulates Experiment objects."
         experiment = task.program
         args = task.args
         data = DataAnalog()
@@ -56,10 +55,6 @@ class QutipBackend(BackendBase):
         )
         return result
 
-    """
-
-    """
-
     def _init_maps(self, spec: TaskArgsAnalog):
         self.qreg_map = {
             "i": qt.qeye(2),
@@ -72,10 +67,6 @@ class QutipBackend(BackendBase):
             1: qt.create(spec.fock_trunc),
             -1: qt.destroy(spec.fock_trunc),
         }
-
-    """
-
-    """
 
     def _initialize(
         self, experiment: AnalogCircuit, args: TaskArgsAnalog, data: DataAnalog

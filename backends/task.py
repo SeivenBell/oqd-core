@@ -14,7 +14,6 @@ from quantumion.analog.circuit import AnalogCircuit
 from quantumion.digital.circuit import DigitalCircuit
 from quantumion.atomic.schedule import Schedule
 
-
 ########################################################################################
 
 

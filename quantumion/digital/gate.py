@@ -18,6 +18,7 @@ from quantumion.digital.register import (
 
 ########################################################################################
 
+
 class GateParameters(BaseModel):
     vals: List[Union[int, float]] = []
 

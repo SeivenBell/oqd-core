@@ -66,6 +66,8 @@ if __name__ == "__main__":
 
     server_url = args.url
 
+    ########################################################################################
+
     ex = AnalogCircuit()
     gate = AnalogGate(duration=1.0, unitary=[np.pi / 4 * PauliX], dissipation=[])
     ex.add(gate=gate)
@@ -81,6 +83,8 @@ if __name__ == "__main__":
         job_id = job["id"]
         jobs.append(job)
         print(f"Job {n} submitted with ID: {job_id}")
+
+    ########################################################################################
 
     print("{:=^80}".format(" Results "))
 
