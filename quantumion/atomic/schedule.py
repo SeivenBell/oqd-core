@@ -1,5 +1,9 @@
+# External imports
+
 from pydantic import BaseModel
 from typing import Union
+
+########################################################################################
 
 
 class Pulse(BaseModel):
