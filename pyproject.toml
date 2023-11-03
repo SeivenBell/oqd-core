@@ -16,7 +16,8 @@ dependencies = [
     "h5py", 
     "redis",
     "rq",
-    "matplotlib"
+    "matplotlib",
+    "pydantic-numpy"
 ]
 
 
