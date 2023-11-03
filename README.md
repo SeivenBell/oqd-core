@@ -81,6 +81,7 @@ The semantics defining an experiment for the different layers of the stack is de
 Planned supported software backends include:
 - Digital Circuit
   - [Tensor Circuit](https://github.com/tencent-quantum-lab/tensorcircuit)
+  - [Yao](https://yaoquantum.org/)
 - Analog Circuit
   - [Qutip](https://qutip.org/)
 - Trapped-ion Physics Simulator
