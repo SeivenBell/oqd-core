@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 # Internal imports
 
-from backends.backend import BackendBase
+from backends.base import BackendBase
 from backends.task import Task
 from backends.digital.data import TaskArgsDigital, TaskResultDigital
 
