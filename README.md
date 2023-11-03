@@ -46,8 +46,19 @@ Deploy with docker compose:
 cd docker
 docker compose up -d
 ```
-By default, the webserver is deployed to `http://{HOST_IP}:8000`. \
-Automatically generated API documentation can be found on `http://{HOST_IP}:8000/docs`([Swagger UI](https://swagger.io/tools/swagger-ui/)) or `http://{HOST_IP}:8000/redoc`([Redoc](https://redocly.com/redoc/)).
+By default, the webserver is deployed to:
+```
+http://{HOST_IP}:8000
+```
+Automatically generated API documentation can be found at:
+- [Swagger UI](https://swagger.io/tools/swagger-ui/)
+```
+http://{HOST_IP}:8000/docs
+```
+- [Redoc](https://redocly.com/redoc/)
+```
+http://{HOST_IP}:8000/redoc
+```
 
 ## Contents <a name="contents"></a>
 
