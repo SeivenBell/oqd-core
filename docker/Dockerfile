@@ -8,4 +8,4 @@ ENV PYTHONPATH /app
 
 RUN pip install .
 
-CMD rq worker --with-scheduler & python deploy.py
+CMD rq worker --with-scheduler & python main.py
