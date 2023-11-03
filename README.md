@@ -1,5 +1,6 @@
 
-# Frontend for the Open Quantum Design (OQD) Stack
+# Open Quantum Design (OQD) Stack
+This repo contains code for the frontend and backend of the OQD stack.
 
 ## Table of contents
 - [Quick Start](#quickstart) <br/>
