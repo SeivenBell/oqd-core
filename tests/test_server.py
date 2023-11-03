@@ -67,9 +67,9 @@ if __name__ == "__main__":
     server_url = args.url
 
     ########################################################################################
-
+    op = np.pi * PauliX
+    gate = AnalogGate(duration=1 / 4, unitary=[op], dissipation=[])
     ex = AnalogCircuit()
-    gate = AnalogGate(duration=1.0, unitary=[np.pi / 4 * PauliX], dissipation=[])
     ex.add(gate=gate)
 
     spec = TaskArgsAnalog(n_shots=10)
