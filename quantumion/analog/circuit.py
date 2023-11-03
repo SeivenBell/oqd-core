@@ -1,7 +1,16 @@
+# External imports
+
 from typing import List, Union
+
 from pydantic import BaseModel, ValidationError
 
+########################################################################################
+
+# Internal exports
+
 from quantumion.analog.gate import AnalogGate
+
+########################################################################################
 
 
 class Statement(BaseModel):

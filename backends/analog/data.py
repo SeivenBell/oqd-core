@@ -1,11 +1,22 @@
+# External imports
+
 from dataclasses import dataclass, field
+
 from typing import Union, List
+
 from pydantic import BaseModel
+
 import pydantic_numpy.typing as pnd
 
 import numpy as np
 
+########################################################################################
+
+# Internal imports
+
 from quantumion.analog.operator import Operator
+
+########################################################################################
 
 
 @dataclass

@@ -1,8 +1,22 @@
+# External imports
+
 from typing import List, Union, Optional, Literal
 
 from pydantic import BaseModel
 
-from quantumion.digital.register import QuantumRegister, ClassicalRegister, QuantumBit, ClassicalBit
+
+########################################################################################
+
+# Internal exports
+
+from quantumion.digital.register import (
+    QuantumRegister,
+    ClassicalRegister,
+    QuantumBit,
+    ClassicalBit,
+)
+
+########################################################################################
 
 
 class GateParameters(BaseModel):
@@ -27,8 +41,8 @@ class Gate(BaseModel):
 
 
 class H(Gate):
-    name: Literal['h'] = 'h'
+    name: Literal["h"] = "h"
 
 
 class CNOT(Gate):
-    name: Literal['h'] = 'cx'
+    name: Literal["h"] = "cx"

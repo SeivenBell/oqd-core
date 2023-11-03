@@ -1,9 +1,18 @@
+# External imports
+
 from pydantic import BaseModel, field_validator, ValidationError
 from typing import List, Union
+
+
+########################################################################################
+
+# Internal exports
 
 from quantumion.digital.gate import Gate
 from quantumion.digital.register import QuantumBit, QuantumRegister, ClassicalRegister
 from quantumion.digital.statement import Statement, Measure, Barrier
+
+########################################################################################
 
 
 class DigitalCircuit(BaseModel):
@@ -13,7 +22,7 @@ class DigitalCircuit(BaseModel):
     declarations: List = []
     sequence: List[Union[Gate, Statement]] = []
 
-    @field_validator('creg', mode='before')
+    @field_validator("creg", mode="before")
     def convert_creg(cls, v):
         if isinstance(v, int):
             v = [ClassicalRegister(reg=v)]
@@ -25,7 +34,7 @@ class DigitalCircuit(BaseModel):
                 raise ValidationError("Classical register identifiers must be unique.")
         return v
 
-    @field_validator('qreg', mode='before')
+    @field_validator("qreg", mode="before")
     def convert_qreg(cls, v):
         if isinstance(v, int):
             v = QuantumRegister(reg=v)
@@ -70,8 +79,8 @@ class DigitalCircuit(BaseModel):
 if __name__ == "__main__":
     from quantumion.digital.gate import H, CNOT
 
-    qreg = QuantumRegister(id='q', reg=4)
-    creg = ClassicalRegister(id='c', reg=2)
+    qreg = QuantumRegister(id="q", reg=4)
+    creg = ClassicalRegister(id="c", reg=2)
 
     circ = DigitalCircuit(qreg=qreg, creg=creg)
     print(circ)

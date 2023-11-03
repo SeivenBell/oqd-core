@@ -1,9 +1,19 @@
+# External imports
+
 import itertools
-from typing import List, Union
+
+from typing import List, Union, Optional
+
 from pydantic import BaseModel, ValidationError
+
+########################################################################################
+
+# Internal exports
 
 from quantumion.analog.operator import Operator
 from quantumion.analog.dissipation import Dissipation
+
+########################################################################################
 
 __all__ = [
     "AnalogGate",
@@ -13,12 +23,16 @@ __all__ = [
 class AnalogGate(BaseModel):
     duration: Union[float, int] = None
     unitary: list[Operator] = []
-    dissipation: list[Dissipation] = None
+    dissipation: list[Dissipation] = []
 
     def check(self):
         # check that the two addends have the same number of qregs, qmodes
-        assert len(set([term.n_qreg for term in self.unitary])) == 1, "Inconsistent number of qregs."
-        assert len(set([term.n_qmode for term in self.unitary])) == 1, "Inconsistent number of qmodes."
+        assert (
+            len(set([term.n_qreg for term in self.unitary])) == 1
+        ), "Inconsistent number of qregs."
+        assert (
+            len(set([term.n_qmode for term in self.unitary])) == 1
+        ), "Inconsistent number of qmodes."
 
     @property
     def n_qreg(self):
@@ -38,7 +52,6 @@ class AnalogGate(BaseModel):
 
         terms = []
         for i, term in enumerate(self.unitary + other.unitary):
-
             if term not in terms:
                 terms.append(term)
             else:

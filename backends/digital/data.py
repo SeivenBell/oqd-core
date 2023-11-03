@@ -1,6 +1,12 @@
-from pydantic import BaseModel
+# External imports
+
 from typing import Union, Optional
+
+from pydantic import BaseModel
+
 import pydantic_numpy.typing as pnd
+
+########################################################################################
 
 
 class TaskArgsDigital(BaseModel):

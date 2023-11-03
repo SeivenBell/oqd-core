@@ -1,16 +1,25 @@
+# External imports
+
 import tensorcircuit as tc
 # from tensorcircuit.translation import
-from quantumion.digital.circuit import DigitalCircuit
-from backends.task import Task
-from backends.digital.data import TaskArgsDigital, TaskResultDigital
 
 import matplotlib.pyplot as plt
 
+########################################################################################
 
-class TensorCircuitBackend:
+# Internal imports
 
+from backends.base import BackendBase
+from backends.task import Task
+from backends.digital.data import TaskArgsDigital, TaskResultDigital
+
+from quantumion.digital.circuit import DigitalCircuit
+
+########################################################################################
+
+
+class TensorCircuitBackend(BackendBase):
     def __init__(self):
-
         self.kwargs = {}
 
     def run(self, task: Task) -> TaskResultDigital:
@@ -20,10 +29,12 @@ class TensorCircuitBackend:
         print(qasm)
         circ = tc.Circuit.from_openqasm(qasm)
 
-        print(circ.draw(output='text'))
+        print(circ.draw(output="text"))
 
         result = TaskResultDigital(
-            counts=circ.sample(batch=task.args.n_shots, allow_state=True, format='count_dict_bin'),
+            counts=circ.sample(
+                batch=task.args.n_shots, allow_state=True, format="count_dict_bin"
+            ),
             state=circ.state(),
         )
         return result

@@ -1,7 +1,16 @@
+# External imports
+
 import functools
+
 import operator
 
+########################################################################################
+
+# Internal exports
+
 from quantumion.analog.coefficient import Complex
+
+########################################################################################
 
 
 def sum(args):
@@ -17,25 +26,22 @@ def tensor(args):
 
 
 _lc = {
-    'ii': ('i', +1),
-    'ix': ('x', +1),
-    'iy': ('y', +1),
-    'iz': ('z', +1),
-
-    'xi': ('x', +1),
-    'xx': ('i', +1),
-    'xy': ('z', Complex(real=0, imag=-1)),
-    'xz': ('y', Complex(real=0, imag=+1)),
-
-    'yi': ('y', +1),
-    'yx': ('z',  Complex(real=0, imag=-1)),
-    'yy': ('i', +1),
-    'yz': ('x', Complex(real=0, imag=+1)),
-
-    'zi': ('z', +1),
-    'zx': ('y',  Complex(real=0, imag=+1)),
-    'zy': ('x', Complex(real=0, imag=-1)),
-    'zz': ('i', +1),
+    "ii": ("i", +1),
+    "ix": ("x", +1),
+    "iy": ("y", +1),
+    "iz": ("z", +1),
+    "xi": ("x", +1),
+    "xx": ("i", +1),
+    "xy": ("z", Complex(real=0, imag=-1)),
+    "xz": ("y", Complex(real=0, imag=+1)),
+    "yi": ("y", +1),
+    "yx": ("z", Complex(real=0, imag=-1)),
+    "yy": ("i", +1),
+    "yz": ("x", Complex(real=0, imag=+1)),
+    "zi": ("z", +1),
+    "zx": ("y", Complex(real=0, imag=+1)),
+    "zy": ("x", Complex(real=0, imag=-1)),
+    "zz": ("i", +1),
 }
 
 

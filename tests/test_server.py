@@ -1,13 +1,21 @@
-import requests
-import numpy as np
 import time
+
+import requests
+
+import numpy as np
+
+import argparse
+
+########################################################################################
+
+from backends.task import Task
+from backends.analog.data import TaskArgsAnalog
 
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import *
-from backends.task import Task
-from backends.base import TaskArgs
+from quantumion.analog.operator import *
 
-server_url = "http://localhost:8000"
+########################################################################################
 
 
 def submit(submission: Task):
@@ -22,6 +30,14 @@ def submit(submission: Task):
         return None
 
 
+def check_status(result):
+    url = f"{server_url}/check_status/"
+    response = requests.post(url, json=result)
+    if response.status_code == 200:
+        result = response.json()
+        return result
+
+
 def get_result(result):
     url = f"{server_url}/get_result/"
     response = requests.post(url, json=result)
@@ -34,19 +50,56 @@ def get_result(result):
         return None
 
 
+########################################################################################
+
 if __name__ == "__main__":
-    operator = np.pi * PauliX
-    experiment = AnalogCircuit()
-    experiment.add(operator)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-u",
+        "--url",
+        default="http://127.0.0.1:8000",
+        type=str,
+        help="server URL for job submission",
+    )
 
-    spec = TaskArgs(n_shots=10, fock_trunc=4)
-    submission = Task(program=experiment, specification=spec)
+    args = parser.parse_args()
 
-    result = submit(submission)
-    print(result)
+    server_url = args.url
 
-    print("Just chillin, waiting for the queue to finish.")
-    time.sleep(3)
+    ########################################################################################
 
-    result = get_result(result)
-    print(result)
+    ex = AnalogCircuit()
+    gate = AnalogGate(duration=1.0, unitary=[np.pi / 4 * PauliX], dissipation=[])
+    ex.add(gate=gate)
+
+    spec = TaskArgsAnalog(n_shots=10)
+    submission = Task(program=ex, args=spec)
+
+    print("{:=^80}".format(" Submitting Jobs "))
+
+    jobs = []
+    for n in range(10):
+        job = submit(submission)
+        job_id = job["id"]
+        jobs.append(job)
+        print(f"Job {n} submitted with ID: {job_id}")
+
+    ########################################################################################
+
+    print("{:=^80}".format(" Results "))
+
+    print("{:<5} {:<12} {}".format("Job", "Status", "Result"))
+
+    for n, job in enumerate(jobs):
+        status = ""
+        while status not in ["finished", "failed"]:
+            status = check_status(job)["status"]
+
+            if status == "finished":
+                result = get_result(job)
+                print("\r{:<5} {:<12} {}".format(n, status, result))
+            elif status == "failed":
+                result = get_result(job)
+                print("\r{:<5} {:<12} {}".format(n, status, ""))
+            else:
+                print("\r{:<5} {:<12} {}".format(n, status, ""), end="")

@@ -1,11 +1,21 @@
+# External imports
+
 from operator import mul
+
 from functools import reduce
+
 from typing import Dict, List, Literal, Tuple, Union
 
 from pydantic import BaseModel
 
+########################################################################################
+
+# Internal exports
+
 from quantumion.analog.coefficient import Complex
 from quantumion.analog.math import levi_civita
+
+########################################################################################
 
 __all__ = [
     "Operator",
@@ -15,13 +25,13 @@ __all__ = [
     "PauliZ",
     "Creation",
     "Annihilation",
-    "Identity"
+    "Identity",
 ]
 
 
 class Operator(BaseModel):
     coefficient: Union[int, float, Complex] = 1.0
-    qreg: List[Literal['x', 'y', 'z', 'i']] = []
+    qreg: List[Literal["x", "y", "z", "i"]] = []
     qmode: List[List[Literal[-1, 0, 1]]] = []
 
     @property
@@ -41,7 +51,9 @@ class Operator(BaseModel):
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            return Operator(coefficient=self.coefficient * other, qreg=self.qreg, qmode=self.qmode)
+            return Operator(
+                coefficient=self.coefficient * other, qreg=self.qreg, qmode=self.qmode
+            )
 
         elif isinstance(other, Operator):
             qreg, phases = list(zip(*list(map(levi_civita, self.qreg, other.qreg))))
@@ -70,10 +82,10 @@ class Operator(BaseModel):
         return other @ self
 
 
-PauliX = Operator(qreg=['x'])
-PauliY = Operator(qreg=['y'])
-PauliZ = Operator(qreg=['z'])
-PauliI = Operator(qreg=['i'])
+PauliX = Operator(qreg=["x"])
+PauliY = Operator(qreg=["y"])
+PauliZ = Operator(qreg=["z"])
+PauliI = Operator(qreg=["i"])
 
 Creation = Operator(qmode=[[-1]])
 Annihilation = Operator(qmode=[[+1]])
@@ -81,7 +93,7 @@ Identity = Operator(qmode=[[0]])
 
 
 if __name__ == "__main__":
-    op = Operator(qreg=['x'], qmode=[[-1, 1]])
+    op = Operator(qreg=["x"], qmode=[[-1, 1]])
     print(op)
 
     print((PauliI * PauliX) @ (Creation * Annihilation))

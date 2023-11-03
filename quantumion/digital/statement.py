@@ -1,8 +1,16 @@
+# External imports
+
 from typing import Literal, Union
 
 from pydantic import BaseModel
 
+########################################################################################
+
+# Internal exports
+
 from quantumion.digital.register import QuantumRegister, ClassicalRegister
+
+########################################################################################
 
 
 class Statement(BaseModel):
@@ -10,12 +18,12 @@ class Statement(BaseModel):
 
 
 class Barrier(Statement):
-    statement: Literal['barrier'] = 'barrier'
+    statement: Literal["barrier"] = "barrier"
     reg: Union[QuantumRegister, ClassicalRegister]
 
 
 class Measure(Statement):
-    statement: Literal['measure'] = 'measure'
+    statement: Literal["measure"] = "measure"
     qreg: QuantumRegister = None
 
     @property

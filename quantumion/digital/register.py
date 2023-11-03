@@ -1,6 +1,10 @@
+# External imports
+
 from typing import List
 
 from pydantic import BaseModel, conint, field_validator
+
+########################################################################################
 
 
 class QuantumBit(BaseModel):
@@ -14,13 +18,13 @@ class ClassicalBit(BaseModel):
 
 
 class QuantumRegister(BaseModel):
-    id: str = 'q'
+    id: str = "q"
     reg: List[QuantumBit]
 
-    @field_validator('reg', mode="before")
+    @field_validator("reg", mode="before")
     def convert_reg(cls, v, values):
         if isinstance(v, int):
-            id = values.data.get('id')
+            id = values.data.get("id")
             v = [QuantumBit(id=id, index=i) for i in range(v)]
         return v
 
@@ -36,13 +40,13 @@ class QuantumRegister(BaseModel):
 
 
 class ClassicalRegister(BaseModel):
-    id: str = 'c'
+    id: str = "c"
     reg: List[ClassicalBit]
 
-    @field_validator('reg', mode="before")
+    @field_validator("reg", mode="before")
     def convert_reg(cls, v, values):
         if isinstance(v, int):
-            id = values.data.get('id')
+            id = values.data.get("id")
             v = [ClassicalBit(id=id, index=i) for i in range(v)]
         return v
 
