@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-from quantumion.analog.operator import PauliX, PauliY, PauliZ, PauliI
+from quantumion.analog.operator import PauliX, PauliY, PauliZ
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
 from backends.analog.qutip import QutipBackend
 from backends.task import Task, TaskArgsAnalog
+
+from backends.provider import Provider
 
 
 #%% create an experiment to run/simulate
@@ -22,6 +24,7 @@ ex.add(gate=gate)
 
 #%% can serialize this to a JSON format...
 json_str = ex.model_dump()
+pprint(json_str)
 
 #%% ... and then easily parse back into data tree
 ex_parse = AnalogCircuit(**json_str)
@@ -44,6 +47,21 @@ result = backend.run(task)
 
 #%%
 pprint(result)
+
+#%%
+provider = Provider()
+
+#%%
+job = provider.submit(task)
+print(job)
+
+#%%
+job = provider.check_status(job)
+print(job)
+
+#%%
+results = provider.get_result(job)
+print(results)
 
 #%%
 fig, ax = plt.subplots()
