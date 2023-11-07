@@ -1,15 +1,15 @@
-Welcome to the Kiave Quantum Measurement System documentation!
+Welcome to the Open Quantum Design documentation!
 ==================================================================
 
 .. toctree::
     :maxdepth: 1
     :caption: Contents:
 
-    installation
-    notebooks/example_interferometer
-    notebooks/example_system
-    kiave_api
-    kiave_gui
+    install
+
+    api/analog
+    api/digital
+    api/atomic
 
 ..
     Indices and tables

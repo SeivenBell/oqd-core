@@ -32,7 +32,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinxcontrib.napoleon",
+    # "sphinxcontrib.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "nbsphinx",
