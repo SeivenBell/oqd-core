@@ -12,11 +12,11 @@ from backends.digital.data import TaskArgsDigital
 
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.digital.circuit import DigitalCircuit
-from quantumion.atomic.schedule import Schedule
+from quantumion.atomic.schedule import AtomicProgram
 
 ########################################################################################
 
 
 class Task(BaseModel):
-    program: Union[AnalogCircuit, DigitalCircuit, Schedule]
+    program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
     args: Union[TaskArgsAnalog, TaskArgsDigital]

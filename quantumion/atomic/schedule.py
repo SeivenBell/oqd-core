@@ -132,7 +132,7 @@ class Apply(BaseModel):
 ########################################################################################
 
 
-class Schedule(BaseModel):
+class AtomicProgram(BaseModel):
     statements: List[Apply]
 
 
