@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-from quantumion.analog.operator import PauliX, PauliY, PauliZ
+from quantumion.analog.operator import PauliX, PauliY, PauliZ, Creation, Annihilation
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
 from backends.analog.qo.quantumoptics import QuantumOpticsBackend
@@ -15,18 +15,18 @@ from backends.task import Task, TaskArgsAnalog
 ex = AnalogCircuit()
 gate = AnalogGate(
     duration=1.0,
-    unitary=[np.pi * PauliX],
+    unitary=[np.pi * PauliX @ PauliX @ Creation],
     dissipation=[]
 )
 ex.add(gate=gate)
-pprint(ex)
+pprint(type(ex.model_dump()))
 
 
 #%%
 args = TaskArgsAnalog(
     n_shots=100,
     fock_trunc=4,
-    observables={'z': PauliZ, 'x': PauliX, 'y': PauliY},
+    # observables={'z': PauliZ, 'x': PauliX, 'y': PauliY},
     dt=0.1
 )
 
