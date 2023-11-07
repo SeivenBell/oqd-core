@@ -1,19 +1,10 @@
-# External imports
-
 import itertools
-
 from typing import List, Union, Optional
-
 from pydantic import BaseModel, ValidationError
-
-########################################################################################
-
-# Internal exports
 
 from quantumion.analog.operator import Operator
 from quantumion.analog.dissipation import Dissipation
 
-########################################################################################
 
 __all__ = [
     "AnalogGate",
