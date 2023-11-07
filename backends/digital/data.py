@@ -14,5 +14,5 @@ class TaskArgsDigital(BaseModel):
 
 
 class TaskResultDigital(BaseModel):
-    counts: dict[int, int] = {}
+    counts: dict[str, int] = {}
     state: pnd.Np1DArray
