@@ -14,6 +14,8 @@ from quantumion.analog.math import prod
 
 
 class QutipBackend(BackendBase):
+    name = "qutip"
+
     def __init__(self):
         super().__init__()
         self.qreg_map = {}

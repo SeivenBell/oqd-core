@@ -48,6 +48,16 @@ class Operator(BaseModel):
         eq = (self.qreg == other.qreg) and (self.qmode == other.qmode)
         return eq
 
+    # def __add__(self, other):
+    #     if not isinstance(other, Operator):
+    #         raise TypeError(f"unsupported operand types for '{type(self)}' and '{type(other)}'")
+    #
+    #     assert (self.n_qreg == other.n_qreg) and (self.n_qmode == self.n_qmode)
+    #
+    #     if (self.qreg == other.qreg) and (self.qmode == other.qmode):
+    #         coefficient = self.coefficient + other.coefficient
+    #         return Operator(coefficient=coefficient, qreg=self.qreg, qmode=self.qmode)
+
     def __mul__(self, other):
         if isinstance(other, (int, float)):
             return Operator(
@@ -87,7 +97,7 @@ PauliZ = Operator(qreg=["z"])
 PauliI = Operator(qreg=["i"])
 
 Creation = Operator(qmode=[[-1]])
-Annihilation = Operator(qmode=[[+1]])
+Annihilation = Operator(qmode=[[1]])
 Identity = Operator(qmode=[[0]])
 
 
