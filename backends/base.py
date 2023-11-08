@@ -1,9 +1,8 @@
-from abc import ABC, abstractmethod
-
+from abc import abstractmethod
 from pydantic import BaseModel
 
 
-class BackendBase(ABC):
+class BackendBase(BaseModel):
     @abstractmethod
     def run(self, task):
         pass

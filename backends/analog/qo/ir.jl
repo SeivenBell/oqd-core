@@ -31,3 +31,25 @@ end
     n_qreg::Union{Nothing, Int} = nothing
     n_qmode::Union{Nothing, Int} = nothing
  end
+
+
+@option struct TaskArgsAnalog
+    n_shots::Int = 1
+    fock_cutoff::Int = 1
+    observables::Dict{String, Operator} = Dict()
+    dt::Float64 = 0.1
+end
+
+
+@option mutable struct TaskResultAnalog
+    counts::Dict{Int, Int} = Dict()
+    expect::Dict{String, Vector{Union{Int, Float64}}} = Dict()
+    times::Vector{Float64} = []
+end
+
+
+@option struct Task
+    program::AnalogCircuit
+    args::TaskArgsAnalog
+ end
+

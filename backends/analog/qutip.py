@@ -63,16 +63,16 @@ class QutipBackend(BackendBase):
             "z": qt.sigmaz(),
         }
         self.qmode_map = {
-            0: qt.qeye(spec.fock_trunc),
-            1: qt.create(spec.fock_trunc),
-            -1: qt.destroy(spec.fock_trunc),
+            0: qt.qeye(spec.fock_cutoff),
+            1: qt.create(spec.fock_cutoff),
+            -1: qt.destroy(spec.fock_cutoff),
         }
 
     def _initialize(
         self, experiment: AnalogCircuit, args: TaskArgsAnalog, data: DataAnalog
     ):
         # generate initial quantum state as the |00.0> \otimes |00.0> as Qobj
-        dims = experiment.n_qreg * [2] + experiment.n_qmode * [args.fock_trunc]
+        dims = experiment.n_qreg * [2] + experiment.n_qmode * [args.fock_cutoff]
         data.state = qt.tensor([qt.basis(d, 0) for d in dims])
         return
 
@@ -113,7 +113,7 @@ class QutipBackend(BackendBase):
             probs = np.power(np.abs(state.full()), 2).squeeze()
             inds = np.random.choice(len(probs), size=spec.n_shots, p=probs)
             opts = experiment.n_qreg * [[0, 1]] + experiment.n_qmode * [
-                list(range(spec.fock_trunc))
+                list(range(spec.fock_cutoff))
             ]
             bases = list(itertools.product(*opts))
             shots = np.array([bases[ind] for ind in inds])
@@ -143,7 +143,7 @@ class QutipBackend(BackendBase):
         return coefficient * qt.tensor(_operator_qobjs)
 
     def _map_gate_to_qobj(self, gate: AnalogGate, spec: TaskArgsAnalog) -> qt.Qobj:
-        dims = gate.n_qreg * [2] + gate.n_qmode * [spec.fock_trunc]
+        dims = gate.n_qreg * [2] + gate.n_qmode * [spec.fock_cutoff]
         _gate_obj = qt.Qobj(dims=2 * [dims])
 
         for operator in gate.unitary:

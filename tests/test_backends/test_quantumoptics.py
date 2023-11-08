@@ -25,7 +25,7 @@ pprint(type(ex.model_dump()))
 #%%
 args = TaskArgsAnalog(
     n_shots=100,
-    fock_trunc=4,
+    fock_cutoff=4,
     # observables={'z': PauliZ, 'x': PauliX, 'y': PauliY},
     dt=0.1
 )
@@ -38,5 +38,8 @@ backend = QuantumOpticsBackend()
 #%%
 result = backend.run(task)
 pprint(result)
+
+#%%
+result
 
 #%%

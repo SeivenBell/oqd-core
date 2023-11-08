@@ -1,5 +1,6 @@
 #%%
 import pathlib
+import json
 from rich import print as pprint
 import numpy as np
 from juliacall import Main as jl
@@ -7,6 +8,7 @@ from juliacall import convert
 
 from backends.base import BackendBase
 from backends.task import Task, TaskArgsAnalog
+from backends.analog.data import TaskResultAnalog
 from quantumion.analog.circuit import AnalogCircuit
 
 
@@ -18,13 +20,12 @@ class QuantumOpticsBackend(BackendBase):
         jl.seval(p)
         return
 
-    def run(self, task):
+    def run(self, task: Task) -> TaskResultAnalog:
         assert isinstance(task.program, AnalogCircuit), "Must be AnalogCircuit"
 
         circuit = task.program
         args = task.args
         print(circuit)
-        # c = convert(circuit.model_dump())
-        # result = jl.run(c)
-        result = jl.run(circuit.model_dump_json())
+        result_json = jl.run(task.model_dump_json())
+        result = TaskResultAnalog(**json.loads(result_json))
         return result
