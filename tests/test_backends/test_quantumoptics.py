@@ -7,7 +7,7 @@ import numpy as np
 from quantumion.analog.operator import PauliX, PauliY, PauliZ, Creation, Annihilation
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
-from backends.analog.qo.quantumoptics import QuantumOpticsBackend
+from backends.analog.julia.quantumoptics import QuantumOpticsBackend
 from backends.task import Task, TaskArgsAnalog
 
 

@@ -8,8 +8,8 @@ from quantumion.analog.operator import PauliX, PauliY, PauliZ
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
 
-from backends.analog.qutip import QutipBackend, TaskArgsAnalog
-from backends.task import Task
+from backends.analog.python.qutip import QutipBackend
+from backends.task import Task, TaskArgsAnalog
 
 ########################################################################################
 

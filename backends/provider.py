@@ -2,9 +2,7 @@ from pydantic import BaseModel
 import requests
 from typing import Union
 
-from backends.task import Task
-from backends.analog.data import TaskArgsAnalog, TaskResultAnalog
-from backends.digital.data import TaskArgsDigital, TaskResultDigital
+from backends.task import Task, TaskArgsAnalog, TaskResultAnalog, TaskArgsDigital, TaskResultDigital
 
 
 class Provider(BaseModel):

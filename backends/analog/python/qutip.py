@@ -1,26 +1,15 @@
-# External imports
-
 import itertools
-
 import qutip as qt
-
 import numpy as np
 
-########################################################################################
-
-# Internal imports
-
 from backends.base import BackendBase
-from backends.task import Task
-from backends.analog.data import DataAnalog, TaskArgsAnalog, TaskResultAnalog
+from backends.task import Task, DataAnalog, TaskArgsAnalog, TaskResultAnalog
 
 from quantumion.analog.gate import AnalogGate
 from quantumion.analog.operator import Operator
 from quantumion.analog.coefficient import Complex
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.math import prod
-
-########################################################################################
 
 
 class QutipBackend(BackendBase):

@@ -7,11 +7,10 @@ import numpy as np
 from quantumion.analog.operator import PauliX, PauliY, PauliZ
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
-from backends.analog.qutip import QutipBackend
+from backends.analog.python.qutip import QutipBackend
 from backends.task import Task, TaskArgsAnalog
 
 from backends.provider import Provider
-
 
 #%% create an experiment to run/simulate
 ex = AnalogCircuit()

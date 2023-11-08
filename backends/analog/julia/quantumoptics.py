@@ -7,8 +7,7 @@ from juliacall import Main as jl
 from juliacall import convert
 
 from backends.base import BackendBase
-from backends.task import Task, TaskArgsAnalog
-from backends.analog.data import TaskResultAnalog
+from backends.task import Task, TaskArgsAnalog, TaskResultAnalog
 from quantumion.analog.circuit import AnalogCircuit
 
 

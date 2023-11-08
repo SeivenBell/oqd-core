@@ -1,12 +1,11 @@
 #%%
 from rich import print
 
-from backends.digital.tc import TensorCircuitBackend
+from backends.digital.python.tc import TensorCircuitBackend
 from backends.task import Task, TaskArgsDigital
 
 from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import Gate, H, CNOT
-from quantumion.digital.statement import Statement, Measure, Barrier
+from quantumion.digital.gate import H, CNOT
 from quantumion.digital.register import QuantumRegister, ClassicalRegister
 
 #%%

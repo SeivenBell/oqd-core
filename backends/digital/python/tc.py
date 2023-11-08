@@ -1,21 +1,10 @@
-# External imports
-
 import tensorcircuit as tc
-# from tensorcircuit.translation import
-
 import matplotlib.pyplot as plt
 
-########################################################################################
-
-# Internal imports
-
 from backends.base import BackendBase
-from backends.task import Task
-from backends.digital.data import TaskArgsDigital, TaskResultDigital
+from backends.task import Task, TaskArgsDigital, TaskResultDigital
 
 from quantumion.digital.circuit import DigitalCircuit
-
-########################################################################################
 
 
 class TensorCircuitBackend(BackendBase):

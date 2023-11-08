@@ -8,8 +8,7 @@ import argparse
 
 ########################################################################################
 
-from backends.task import Task
-from backends.analog.data import TaskArgsAnalog
+from backends.task import Task, TaskArgsAnalog
 
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import *

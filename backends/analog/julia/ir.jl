@@ -19,10 +19,12 @@ end
     dissipation::Vector{Dissipation} = []
 end
 
+
 @option struct Statement
     key::String
     assignment::Union{AnalogGate}
 end
+
 
 @option struct AnalogCircuit
     definitions::Vector{Int} = []
