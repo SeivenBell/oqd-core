@@ -43,6 +43,12 @@ end
 end
 
 
+@option mutable struct DataAnalog
+    times::Vector{Float64} = []
+    expect::Dict{String, Vector{Float64}} = Dict()
+end
+
+
 @option mutable struct TaskResultAnalog
     counts::Dict{Int, Int} = Dict()
     expect::Dict{String, Vector{Union{Int, Float64}}} = Dict()
