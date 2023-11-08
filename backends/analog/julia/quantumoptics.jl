@@ -17,76 +17,81 @@ function run(task_json::String)
 end
 
 function evolve(task::Task)
-    circ = task.program;
-    args = task.args;
+    runtime = @elapsed begin
+        circ = task.program;
+        args = task.args;
 
-    b = SpinBasis(1//2);
-    f = FockBasis(args.fock_cutoff);
+        b = SpinBasis(1//2);
+        f = FockBasis(args.fock_cutoff);
 
-    _map_qreg = Dict(
-        "i" => identityoperator(b),
-        "x" => sigmax(b),
-        "y" => sigmay(b),
-        "z" => sigmaz(b)
-    );
+        _map_qreg = Dict(
+            "i" => identityoperator(b),
+            "x" => sigmax(b),
+            "y" => sigmay(b),
+            "z" => sigmaz(b)
+        );
 
-    _map_qmode = Dict(
-        0 => identityoperator(f),
-        -1 => destroy(f),
-        +1 => create(f),
-    );
+        _map_qmode = Dict(
+            0 => identityoperator(f),
+            -1 => destroy(f),
+            +1 => create(f),
+        );
 
-    function _map_operator_to_qo(operator::Operator)
-        _hs = []
-        if !isempty(operator.qreg)
-            _h_qreg = [_map_qreg[qreg] for qreg in operator.qreg]
-            _hs = vcat(_hs, _h_qreg);
+        function _map_operator_to_qo(operator::Operator)
+            _hs = []
+            if !isempty(operator.qreg)
+                _h_qreg = [_map_qreg[qreg] for qreg in operator.qreg]
+                _hs = vcat(_hs, _h_qreg);
+            end
+            if !isempty(operator.qreg)
+                _h_qmode = [prod([_map_qmode[qmode_op] for qmode_op in mode]) for mode in operator.qmode]
+                _hs = vcat(_hs, _h_qmode);
+            end
+            op = operator.coefficient * tensor(_hs...)
+            return op
         end
-        if !isempty(operator.qreg)
-            _h_qmode = [prod([_map_qmode[qmode_op] for qmode_op in mode]) for mode in operator.qmode]
-            _hs = vcat(_hs, _h_qmode);
+
+        function _initialize()
+            state_qreg = [spinup(b) for qreg in 1:circ.n_qreg];
+            state_qmode = [fockstate(f, 0) for qmode in 1:circ.n_qmode];
+            psi = tensor(vcat(state_qreg, state_qmode)...);
+            return psi
         end
-        op = operator.coefficient * tensor(_hs...)
-        return op
-    end
 
-    function _initialize()
-        state_qreg = [spinup(b) for qreg in 1:circ.n_qreg];
-        state_qmode = [fockstate(f, 0) for qmode in 1:circ.n_qmode];
-        psi = tensor(vcat(state_qreg, state_qmode)...);
-        return psi
-    end
+        psi = _initialize();
+        data = DataAnalog(
+            state=psi,
+            expect=Dict(name => [] for (name, op) in args.observables)
+        );
 
-    psi = _initialize();
-    data = DataAnalog(
-        expect=Dict(name => [] for (name, op) in args.observables)
-    );
+#         println("Intial state:   ", data.state)
 
-    println("Intial state:   ", psi)
+        exp_observable = Dict(
+            name => _map_operator_to_qo(op) for (name, op) in args.observables
+        )
 
-    exp_observable = Dict(
-        name => _map_operator_to_qo(op) for (name, op) in args.observables
-    )
-
-    function fout(t, psi)
-        push!(data.times, t);
-        for (name, op) in exp_observable
-            push!(data.expect[name], expect(op, psi));
+        function fout(t, psi)
+            data.state = psi;
+            push!(data.times, t);
+            for (name, op) in exp_observable
+                push!(data.expect[name], expect(op, psi));
+            end
         end
-    end
 
-    for gate in circ.sequence
-        tspan = range(0, stop=gate.duration, step=args.dt);
-        H = sum([_map_operator_to_qo(operator) for operator in gate.unitary]);
-        tout, psi_t = timeevolution.schroedinger(tspan, psi, H; fout=fout);
-        println(data);
+        for gate in circ.sequence
+            tspan = range(0, stop=gate.duration, step=args.dt);
+            H = sum([_map_operator_to_qo(operator) for operator in gate.unitary]);
+            timeevolution.schroedinger(tspan, psi, H; fout=fout);
+        end
     end
 
     result = TaskResultAnalog(
         expect=data.expect,
         times=data.times,
+        runtime=runtime,
+        state=data.state.data,
     )
 
-    println(result);
+#     println(result);
     return JSON.json(to_dict(result))
 end

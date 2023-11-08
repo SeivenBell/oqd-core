@@ -1,6 +1,7 @@
 import itertools
 import qutip as qt
 import numpy as np
+import time
 
 from backends.base import BackendBase
 from backends.task import Task, DataAnalog, TaskArgsAnalog, TaskResultAnalog
@@ -19,6 +20,8 @@ class QutipBackend(BackendBase):
         self.qmode_map = {}
 
     def run(self, task: Task) -> TaskResultAnalog:
+        t0 = time.time()
+
         assert isinstance(
             task.program, AnalogCircuit
         ), "Qutip backend only simulates Experiment objects."
@@ -33,6 +36,8 @@ class QutipBackend(BackendBase):
             self._evolve(gate, args, data)
         self._measure(circuit, args, data)
 
+        runtime = time.time() - t0
+
         bitstrings = ["".join(map(str, shot)) for shot in data.shots]
         counts = {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
 
@@ -41,6 +46,7 @@ class QutipBackend(BackendBase):
             expect=data.expect,
             times=data.times.tolist(),
             state=data.state.full().squeeze(),
+            runtime=runtime,
         )
         return result
 

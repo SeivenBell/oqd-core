@@ -46,6 +46,7 @@ end
 @option mutable struct DataAnalog
     times::Vector{Float64} = []
     expect::Dict{String, Vector{Float64}} = Dict()
+    state::Ket
 end
 
 
@@ -53,6 +54,8 @@ end
     counts::Dict{Int, Int} = Dict()
     expect::Dict{String, Vector{Union{Int, Float64}}} = Dict()
     times::Vector{Float64} = []
+    state::Vector{ComplexF64}
+    runtime::Float64
 end
 
 
