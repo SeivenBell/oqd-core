@@ -16,7 +16,14 @@ circ = AnalogCircuit(
     n_qmode = 0
 )
 
-args = TaskArgsAnalog(n_shots=10, fock_cutoff=2, dt=0.1)
+args = TaskArgsAnalog(
+    n_shots=10, fock_cutoff=2, dt=0.1,
+    observables=Dict(
+        "x" => Operator(coefficient=1.0, qreg=["x"], qmode=[]),
+        "y" => Operator(coefficient=1.0, qreg=["y"], qmode=[]),
+        "z" => Operator(coefficient=1.0, qreg=["z"], qmode=[]),
+    ),
+)
 task = Task(program=circ, args=args)
 
 println(circ)

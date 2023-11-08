@@ -22,16 +22,16 @@ class QutipBackend(BackendBase):
         assert isinstance(
             task.program, AnalogCircuit
         ), "Qutip backend only simulates Experiment objects."
-        experiment = task.program
+        circuit = task.program
         args = task.args
         data = DataAnalog()
 
         self._init_maps(args)
 
-        self._initialize(experiment, args, data)
-        for gate in experiment.sequence:
+        self._initialize(circuit, args, data)
+        for gate in circuit.sequence:
             self._evolve(gate, args, data)
-        self._measure(experiment, args, data)
+        self._measure(circuit, args, data)
 
         bitstrings = ["".join(map(str, shot)) for shot in data.shots]
         counts = {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
