@@ -15,7 +15,7 @@ from backends.task import Task, TaskArgsAnalog
 ex = AnalogCircuit()
 gate = AnalogGate(
     duration=1.0,
-    unitary=[np.pi * PauliX @ PauliX @ Creation],
+    unitary=[np.pi * PauliX],
     dissipation=[]
 )
 ex.add(gate=gate)
