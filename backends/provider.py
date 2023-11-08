@@ -2,7 +2,13 @@ from pydantic import BaseModel
 import requests
 from typing import Union
 
-from backends.task import Task, TaskArgsAnalog, TaskResultAnalog, TaskArgsDigital, TaskResultDigital
+from backends.task import (
+    Task,
+    TaskArgsAnalog,
+    TaskResultAnalog,
+    TaskArgsDigital,
+    TaskResultDigital,
+)
 
 
 class Provider(BaseModel):
@@ -13,13 +19,12 @@ class Provider(BaseModel):
         response = requests.post(url, json=task.model_dump())
         return response.json()
 
-    def get_result(self, task: Task):
+    def get_result(self, job: dict):
         url = f"{self.url}/get_result/"
-        response = requests.post(url, json=task)
+        response = requests.post(url, json=job)
         return response.json()
 
-    def check_status(self, task: Task) -> Union[TaskResultDigital, TaskResultAnalog]:
+    def check_status(self, job: dict) -> Union[TaskResultDigital, TaskResultAnalog]:
         url = f"{self.url}/check_status/"
-        response = requests.post(url, json=task)
+        response = requests.post(url, json=job)
         return response.json()
-

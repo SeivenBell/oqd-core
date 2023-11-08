@@ -9,45 +9,11 @@ import argparse
 ########################################################################################
 
 from backends.task import Task, TaskArgsAnalog
+from backends.provider import Provider
 
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import *
 from quantumion.analog.operator import *
-
-########################################################################################
-
-
-def submit(submission: Task):
-    url = f"{server_url}/qsim_simulator/"
-    response = requests.post(url, json=submission.model_dump())
-    if response.status_code == 200:
-        result = response.json()
-        return result
-
-    else:
-        print(f"Error: {response.status_code}")
-        return None
-
-
-def check_status(result):
-    url = f"{server_url}/check_status/"
-    response = requests.post(url, json=result)
-    if response.status_code == 200:
-        result = response.json()
-        return result
-
-
-def get_result(result):
-    url = f"{server_url}/get_result/"
-    response = requests.post(url, json=result)
-    if response.status_code == 200:
-        result = response.json()
-        return result
-
-    else:
-        print(f"Error: {response.status_code}")
-        return None
-
 
 ########################################################################################
 
@@ -62,8 +28,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
     server_url = args.url
+    client = Provider(url=server_url)
 
     ########################################################################################
     op = np.pi * PauliX
@@ -78,7 +44,7 @@ if __name__ == "__main__":
 
     jobs = []
     for n in range(10):
-        job = submit(submission)
+        job = client.submit(submission)
         job_id = job["id"]
         jobs.append(job)
         print(f"Job {n} submitted with ID: {job_id}")
@@ -92,13 +58,13 @@ if __name__ == "__main__":
     for n, job in enumerate(jobs):
         status = ""
         while status not in ["finished", "failed"]:
-            status = check_status(job)["status"]
+            status = client.check_status(job)["status"]
 
             if status == "finished":
-                result = get_result(job)
+                result = client.get_result(job)
                 print("\r{:<5} {:<12} {}".format(n, status, result))
             elif status == "failed":
-                result = get_result(job)
+                result = client.get_result(job)
                 print("\r{:<5} {:<12} {}".format(n, status, ""))
             else:
                 print("\r{:<5} {:<12} {}".format(n, status, ""), end="")
