@@ -116,7 +116,6 @@ class QutipBackend(BackendBase):
             ]
             bases = list(itertools.product(*opts))
             shots = np.array([bases[ind] for ind in inds])
-            # data.bases = bases
             data.shots = shots
         return
 
@@ -188,3 +187,5 @@ def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
         psi, qreg + [n_qreg + m for m in qmode]  # canonical index for each local Hilbert space
     )
     return qt.entropy_vn(rho)
+
+

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Literal, List, TypedDict, Union
+from pydantic.types import NonNegativeInt
 
 from quantumion.analog.operator import Operator
 
@@ -9,14 +10,18 @@ class Expectation(BaseModel):
 
 
 class EntanglementEntropyVN(BaseModel):
-    qreg: List[int] = []
-    qmode: List[int] = []
+    qreg: List[NonNegativeInt] = []
+    qmode: List[NonNegativeInt] = []
 
 
 class EntanglementEntropyReyni(BaseModel):
-    alpha: int = 1
-    qreg: List[int] = []
-    qmode: List[int] = []
+    alpha: NonNegativeInt = 1
+    qreg: List[NonNegativeInt] = []
+    qmode: List[NonNegativeInt] = []
 
 
-Metric = Union[EntanglementEntropyVN, EntanglementEntropyReyni, Expectation]
+Metric = Union[
+    EntanglementEntropyVN,
+    EntanglementEntropyReyni,
+    Expectation
+]
