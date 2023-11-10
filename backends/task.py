@@ -36,6 +36,7 @@ class TaskResultAnalog(BaseModel):
     expect: dict[str, List[Union[float, int]]] = {}
     times: list[float] = []
     state: pnd.Np1DArray = None
+    runtime: float = None
 
 
 class TaskArgsDigital(BaseModel):
