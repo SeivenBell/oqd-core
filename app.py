@@ -21,23 +21,22 @@ queue = Queue(connection=redis_client)
 app = FastAPI()
 
 
-@app.post("/qsim_simulator/")
+@app.post("/submit/")
 async def submit(submission: Task):
     print(f"Queueing {submission} on server backend. {len(queue)} jobs in queue.")
     job = queue.enqueue(QutipBackend().run, submission)
     return {"id": job.id, "status": job.get_status()}
 
 
-@app.post("/check_status/")
-async def check_status(request: dict):
-    print(f"Requesting status of job {request['id']}")
-    job = Job.fetch(id=request["id"], connection=redis_client)
-    return {"id": job.id, "status": job.get_status()}
+@app.get("/job/{job_id}")
+async def retrieve_job(job_id: str):
+    print(f"Requesting status of job {job_id}")
+    job = Job.fetch(id=job_id, connection=redis_client)
 
+    status = job.get_status()
+    if status != "finished":
+        return {"id": job_id, "status": status}
 
-@app.post("/get_result/")
-async def get_result(request: dict):
-    print(f"Requesting result for job {request['id']}")
-    job = Job.fetch(id=request["id"], connection=redis_client)
-    print(job.get_status())
-    return job.return_value()
+    result = job.return_value()
+
+    return {"id": job_id, "status": status, "result": result}
