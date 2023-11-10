@@ -2,12 +2,14 @@ import itertools
 import qutip as qt
 import numpy as np
 import time
+from rich import print as pprint
 
 from backends.base import BackendBase
 from backends.task import Task, DataAnalog, TaskArgsAnalog, TaskResultAnalog
+from backends.metric import *
 
 from quantumion.analog.gate import AnalogGate
-from quantumion.analog.operator import Operator
+from quantumion.analog.operator import Operator, PauliX
 from quantumion.analog.coefficient import Complex
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.math import prod
@@ -20,6 +22,7 @@ class QutipBackend(BackendBase):
         super().__init__()
         self.qreg_map = {}
         self.qmode_map = {}
+        self.fmetrics = []
 
     def run(self, task: Task) -> TaskResultAnalog:
         t0 = time.time()
@@ -29,13 +32,20 @@ class QutipBackend(BackendBase):
         ), "Qutip backend only simulates Experiment objects."
         circuit = task.program
         args = task.args
-        data = DataAnalog()
+        data = DataAnalog(
+            metrics={key: np.empty(0) for key in args.metrics.keys()}
+        )
+        # pprint(data)
 
         self._init_maps(args)
-
         self._initialize(circuit, args, data)
+
+        self.fmetrics = {key: self._map_metric(metric, circuit) for (key, metric) in args.metrics.items()}
+        print(self.fmetrics)
+
         for gate in circuit.sequence:
             self._evolve(gate, args, data)
+
         self._measure(circuit, args, data)
 
         runtime = time.time() - t0
@@ -45,7 +55,8 @@ class QutipBackend(BackendBase):
 
         result = TaskResultAnalog(
             counts=counts,
-            expect=data.expect,
+            # expect=data.expect,
+            metrics=data.metrics,
             times=data.times.tolist(),
             state=data.state.full().squeeze(),
             runtime=runtime,
@@ -76,29 +87,20 @@ class QutipBackend(BackendBase):
     def _evolve(self, gate: AnalogGate, args: TaskArgsAnalog, data: DataAnalog):
         options = qt.solver.Options(store_final_state=True)
         duration = gate.duration
-        durations = np.linspace(
+        tspan = np.linspace(
             0, duration, round(duration / args.dt)
         )  # create time vector
 
-        obs_qobjs = {
-            key: self._map_operator_to_qobj(obs)
-            for key, obs in args.observables.items()
-        }
-        op_qobj = self._map_gate_to_qobj(gate, args)
+        op_qobj = self._map_gate_to_qobj(gate)
 
         # run the Qutip solver
-        result_qobj = qt.mesolve(
-            op_qobj, data.state, durations, [], obs_qobjs, options=options
+        # todo: switch to mesolve if using dissipative terms
+        result_qobj = qt.sesolve(
+            op_qobj, data.state, tspan, e_ops=self.fmetrics, options=options
         )
 
-        # data.expect = {name: result_qobj.expect[i] for i, name in enumerate(args.observables.keys())}
-        if data.times is not None:
-            data.times += list(durations + data.times[-1])
-        else:
-            data.times = np.array(durations)
-
-        self._update_observables(data, result_qobj, args)
-
+        data.times = np.hstack([data.times, tspan])
+        data.metrics = {key: np.hstack([data.metrics[key], result_qobj.expect[key]]) for key in data.metrics.keys()}
         data.state = result_qobj.final_state
         return
 
@@ -114,15 +116,25 @@ class QutipBackend(BackendBase):
             ]
             bases = list(itertools.product(*opts))
             shots = np.array([bases[ind] for ind in inds])
-            data.bases = bases
+            # data.bases = bases
             data.shots = shots
         return
 
     def _map_operator_to_qobj(self, operator: Operator) -> qt.Qobj:
+        """
+        Maps an operator to the matching numerical Qutip QObj.
+
+        Args:
+            operator:
+
+        Returns:
+
+        """
         _operator_qobjs = []
 
         if operator.qreg:
             _operator_qobjs.append(qt.tensor([self.qreg_map[i] for i in operator.qreg]))
+
         if operator.qmode:
             _operator_qobjs.append(
                 qt.tensor(
@@ -139,20 +151,40 @@ class QutipBackend(BackendBase):
 
         return coefficient * qt.tensor(_operator_qobjs)
 
-    def _map_gate_to_qobj(self, gate: AnalogGate, spec: TaskArgsAnalog) -> qt.Qobj:
-        dims = gate.n_qreg * [2] + gate.n_qmode * [spec.fock_cutoff]
-        _gate_obj = qt.Qobj(dims=2 * [dims])
+    def _sum_operators(self, operators: List[Operator]):
+        return sum([self._map_operator_to_qobj(operator) for operator in operators])
 
-        for operator in gate.unitary:
-            _operator_qobj = self._map_operator_to_qobj(operator)
-            _gate_obj += _operator_qobj
+    def _map_gate_to_qobj(self, gate: AnalogGate) -> qt.Qobj:
+        return self._sum_operators(gate.unitary)
 
-        return _gate_obj
+    # # todo: change to update metrics
+    # def _update_metrics(self, data: DataAnalog, result_qobj, args: TaskArgsAnalog):
+    #     for i, name in enumerate(args.metrics.keys()):
+    #         if name not in data.expect.keys():
+    #             data.expect[name] = list(result_qobj.expect[i])  # add to results
+    #         else:
+    #             data.expect[name] += list(result_qobj.expect[i])  # update results
+    #     return
 
-    def _update_observables(self, data: DataAnalog, result_qobj, args: TaskArgsAnalog):
-        for i, name in enumerate(args.observables.keys()):
-            if name not in data.expect.keys():
-                data.expect[name] = list(result_qobj.expect[i])  # add to results
-            else:
-                data.expect[name] += list(result_qobj.expect[i])  # update results
-        return
+    def _map_metric(self, metric: Metric, circuit: AnalogCircuit):
+        # print(metric, type(metric))
+        if isinstance(metric, EntanglementEntropyVN):
+            f = lambda t, psi: entanglement_entropy_vn(
+                t, psi, metric.qreg, metric.qmode, circuit.n_qreg, circuit.n_qmode
+            )
+
+        elif isinstance(metric, Expectation):
+            f = lambda t, psi: qt.expect(self._sum_operators(metric.operator), psi)
+
+        else:
+            raise ValueError("Not a valid Metric for the Qutip backend.")
+
+        return f
+
+
+# todo: define all metrics to track during dynamics
+def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
+    rho = qt.ptrace(
+        psi, qreg + [n_qreg + m for m in qmode]  # canonical index for each local Hilbert space
+    )
+    return qt.entropy_vn(rho)
