@@ -84,6 +84,7 @@ Planned supported software backends include:
   - [Yao](https://yaoquantum.org/)
 - Analog Circuit
   - [Qutip](https://qutip.org/)
+  - [QuantumOptics.jl](https://docs.qojulia.org/search/?q=calcium)
 - Trapped-ion Physics Simulator
   - [IonSim.jl](https://www.ionsim.org/)
 #### Hardware <a name="hardware"></a>

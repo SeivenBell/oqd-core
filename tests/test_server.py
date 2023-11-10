@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     jobs = []
     for n in range(10):
-        job = client.submit(submission)
+        job = client.submit(submission, backend="qutip")
         job_id = job["id"]
         jobs.append(job)
         print(f"Job {n} submitted with ID: {job_id}")
@@ -58,13 +58,12 @@ if __name__ == "__main__":
     for n, job in enumerate(jobs):
         status = ""
         while status not in ["finished", "failed"]:
-            status = client.check_status(job)["status"]
+            job = client.retrieve_job(job)
+            status = job["status"]
 
             if status == "finished":
-                result = client.get_result(job)
-                print("\r{:<5} {:<12} {}".format(n, status, result))
+                print("\r{:<5} {:<12} {}".format(n, status, job["result"]))
             elif status == "failed":
-                result = client.get_result(job)
                 print("\r{:<5} {:<12} {}".format(n, status, ""))
             else:
                 print("\r{:<5} {:<12} {}".format(n, status, ""), end="")

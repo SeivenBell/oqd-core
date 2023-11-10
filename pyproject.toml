@@ -17,7 +17,8 @@ dependencies = [
     "redis",
     "rq",
     "matplotlib",
-    "pydantic-numpy"
+    "pydantic-numpy",
+    "tensorcircuit"
 ]
 
 
