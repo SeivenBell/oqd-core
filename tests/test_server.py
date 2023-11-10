@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     jobs = []
     for n in range(10):
-        job = client.submit(submission)
+        job = client.submit(submission, backend="qutip")
         job_id = job["id"]
         jobs.append(job)
         print(f"Job {n} submitted with ID: {job_id}")

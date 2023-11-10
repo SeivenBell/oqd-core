@@ -1,5 +1,7 @@
 import os
 
+from typing import Literal
+
 from fastapi import FastAPI
 
 from redis import Redis
@@ -9,6 +11,7 @@ from rq.job import Job
 ########################################################################################
 
 from backends.analog.python.qutip import QutipBackend
+from backends.digital.python.tc import TensorCircuitBackend
 from backends.task import Task
 
 ########################################################################################
@@ -21,10 +24,13 @@ queue = Queue(connection=redis_client)
 app = FastAPI()
 
 
-@app.post("/submit/")
-async def submit(submission: Task):
-    print(f"Queueing {submission} on server backend. {len(queue)} jobs in queue.")
-    job = queue.enqueue(QutipBackend().run, submission)
+@app.post("/submit/{backend}")
+async def submit(submission: Task, backend: Literal["qutip","tensorcircuit"]):
+    backends = {"qutip":QutipBackend, "tensorcircuit":TensorCircuitBackend}
+
+    print(f"Queueing {submission} on server {backend} backend. {len(queue)} jobs in queue.")
+
+    job = queue.enqueue(backends[backend]().run, submission)
     return {"id": job.id, "status": job.get_status()}
 
 
