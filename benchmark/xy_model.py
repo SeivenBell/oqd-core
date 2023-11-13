@@ -24,9 +24,9 @@ def graph_to_operator(g):
     ops = []
     for edge in g.edges:
         op_x = tensor([PauliX if i in edge else PauliI for i in range(n_qreg)])
-        op_y = tensor([PauliZ if i in edge else PauliI for i in range(n_qreg)])
+        # op_y = tensor([PauliZ if i in edge else PauliI for i in range(n_qreg)])
         ops.append(op_x)
-        ops.append(op_y)
+        # ops.append(op_y)
     return ops
 
 
@@ -39,7 +39,7 @@ ops = graph_to_operator(gz)
 #%%
 circuit = AnalogCircuit()
 gate = AnalogGate(
-    duration=20.0,
+    duration=4.0,
     unitary=ops,
     dissipation=[]
 )
@@ -51,7 +51,7 @@ args = TaskArgsAnalog(
     n_shots=100,
     fock_cutoff=4,
     metrics={
-        "ee_vn": EntanglementEntropyVN(qreg=[0, 1]),
+        "ee_vn": EntanglementEntropyVN(qreg=[0]),
         "z": Expectation(operator=z)
     },
     dt=0.01

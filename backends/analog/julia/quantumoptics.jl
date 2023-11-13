@@ -2,6 +2,8 @@ using JSON
 using QuantumOptics
 
 include("ir.jl")
+include("task.jl")
+
 
 
 function convert(task_json::String)
