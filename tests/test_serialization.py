@@ -2,6 +2,8 @@ import numpy as np
 
 from pydantic import BaseModel
 
+import argparse
+
 ########################################################################################
 
 from backends.task import Task, TaskArgsAnalog, TaskArgsDigital
@@ -17,21 +19,31 @@ from quantumion.digital.register import QuantumRegister, ClassicalRegister
 ########################################################################################
 
 
-def serialization_test(x):
-    x_json = x.model_dump()
-    x_reserialized = x.__class__(**x_json)
+def serialization_test(key, value, *, verbose=False):
+    value_json = value.model_dump()
+    value_reserialized = value.__class__(**value_json)
 
-    if x != x_reserialized:
+    if value != value_reserialized:
         print(
-            "{:<48}: {:<8}".format(
-                "Serialization Test of {}".format(x.__class__.__name__), "Failed"
+            "Serialization Test: {:^24}  {:^32} {:^8}".format(
+                key,
+                value.__class__.__name__,
+                "Failed",
             )
         )
+        if verbose:
+            print("{:-^80}".format(" Original "))
+            print(value)
+            print("{:-^80}".format(" Reserialized "))
+            print(value_reserialized)
+            print("{:-^80}".format(""))
         return 0
     else:
         print(
-            "{:<48}: {:<8}".format(
-                "Serialization Test of {}".format(x.__class__.__name__), "Passed"
+            "Serialization Test: {:^24}  {:^32} {:^8}".format(
+                key,
+                value.__class__.__name__,
+                "Passed",
             )
         )
         return 1
@@ -40,6 +52,20 @@ def serialization_test(x):
 ########################################################################################
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="verbosity",
+    )
+
+    args = parser.parse_args()
+
+    verbose = args.verbose
+
+    ########################################################################################
+
     op = np.pi * PauliX
     gate = AnalogGate(duration=1 / 4, unitary=[op], dissipation=[])
     ex = AnalogCircuit()
@@ -62,6 +88,6 @@ if __name__ == "__main__":
 
     g = globals().copy()
 
-    for k, v in g.items():
-        if isinstance(v, BaseModel):
-            serialization_test(v)
+    for i in g.items():
+        if isinstance(i[-1], BaseModel):
+            serialization_test(*i, verbose=verbose)
