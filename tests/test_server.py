@@ -54,19 +54,19 @@ if __name__ == "__main__":
 
     ########################################################################################
 
-    # op = np.pi * PauliX
-    # gate = AnalogGate(duration=1 / 4, unitary=[op], dissipation=[])
-    # ex = AnalogCircuit()
-    # ex.add(gate=gate)
+    op = np.pi * PauliX
+    gate = AnalogGate(duration=1 / 4, unitary=[op], dissipation=[])
+    ex = AnalogCircuit()
+    ex.add(gate=gate)
 
-    # analog_args = TaskArgsAnalog(n_shots=10)
-    # analog_task = Task(program=ex, args=analog_args)
-    # for n in range(N):
-    #     job = client.submit(analog_task, backend="qutip")
-    #     job_id = job["id"]
-    #     jobs.append(job)
-    #     print(f"Job {n} submitted with ID: {job_id}")
-    #     n += 1
+    analog_args = TaskArgsAnalog(n_shots=10)
+    analog_task = Task(program=ex, args=analog_args)
+    for n in range(N):
+        job = client.submit(analog_task, backend="qutip")
+        job_id = job["id"]
+        jobs.append(job)
+        print(f"Job {n} submitted with ID: {job_id}")
+        n += 1
 
     ########################################################################################
 
