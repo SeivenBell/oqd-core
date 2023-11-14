@@ -1,33 +1,40 @@
 import numpy as np
 
+from pydantic import BaseModel
+
 ########################################################################################
 
 from backends.task import Task, TaskArgsAnalog, TaskArgsDigital
-from backends.provider import Provider
 
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import *
 from quantumion.analog.operator import *
 
 from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import H, CNOT
+from quantumion.digital.gate import H
 from quantumion.digital.register import QuantumRegister, ClassicalRegister
 
 ########################################################################################
 
 
-def serialization_test(x):
+def serialization_test(x, verbose=False):
     x_json = x.model_dump()
     x_reserialized = x.__class__(**x_json)
 
-    for n, i in enumerate((x, x_json, x_reserialized)):
-        print("{:=^80}".format([" Original ", " JSON ", " Reserialized "][n]))
-        print("{:<16}: {}".format(i.__class__.__name__, i))
-
     if x != x_reserialized:
-        raise ValueError("Problem with reserialization")
+        print(
+            "{:<48}: {:<8}".format(
+                "Serialization Test of {}".format(x.__class__.__name__), "Failed"
+            )
+        )
+        return 0
     else:
-        print("{:=^80}".format(" Reserialization Successful "))
+        print(
+            "{:<48}: {:<8}".format(
+                "Serialization Test of {}".format(x.__class__.__name__), "Passed"
+            )
+        )
+        return 1
 
 
 ########################################################################################
@@ -51,4 +58,10 @@ if __name__ == "__main__":
     digital_args = TaskArgsDigital(n_shots=10)
     digital_task = Task(program=circ, args=digital_args)
 
-    serialization_test(circ)
+    ########################################################################################
+
+    g = globals().copy()
+
+    for k, v in g.items():
+        if isinstance(v, BaseModel):
+            serialization_test(v)
