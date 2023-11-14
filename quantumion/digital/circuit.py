@@ -16,8 +16,8 @@ from quantumion.digital.statement import Statement, Measure, Barrier
 
 
 class DigitalCircuit(BaseModel):
-    qreg: List[QuantumRegister] = None
-    creg: List[ClassicalRegister] = None
+    qreg: List[QuantumRegister] = []
+    creg: List[ClassicalRegister] = []
 
     declarations: List = []
     sequence: List[Union[Gate, Statement]] = []
@@ -29,7 +29,11 @@ class DigitalCircuit(BaseModel):
         elif isinstance(v, ClassicalRegister):
             v = [v]
         if isinstance(v, list):
-            ids = [creg.id for creg in v]
+            ids = []
+            for creg in v:
+                if isinstance(creg, dict):
+                    creg = ClassicalRegister(**creg)
+                ids.append(creg.id)
             if len(ids) != len(set(ids)):
                 raise ValidationError("Classical register identifiers must be unique.")
         return v
@@ -41,7 +45,11 @@ class DigitalCircuit(BaseModel):
         elif isinstance(v, QuantumRegister):
             v = [v]
         if isinstance(v, list):
-            ids = [qreg.id for qreg in v]
+            ids = []
+            for qreg in v:
+                if isinstance(qreg, dict):
+                    qreg = QuantumRegister(**qreg)
+                ids.append(qreg.id)
             if len(ids) != len(set(ids)):
                 raise ValidationError("Quantum register identifiers must be unique.")
 
