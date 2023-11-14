@@ -30,10 +30,20 @@ if __name__ == "__main__":
         type=str,
         help="server URL for job submission",
     )
+    parser.add_argument(
+        "-N",
+        default=1,
+        type=int,
+        help="Number of repetitions",
+    )
 
     args = parser.parse_args()
-    server_url = args.url
-    client = Provider(url=server_url)
+    URL = args.url
+    N = args.N
+
+    ########################################################################################
+
+    client = Provider(url=URL)
 
     ########################################################################################
 
@@ -51,7 +61,7 @@ if __name__ == "__main__":
 
     # analog_args = TaskArgsAnalog(n_shots=10)
     # analog_task = Task(program=ex, args=analog_args)
-    # for n in range(1):
+    # for n in range(N):
     #     job = client.submit(analog_task, backend="qutip")
     #     job_id = job["id"]
     #     jobs.append(job)
@@ -68,7 +78,7 @@ if __name__ == "__main__":
     digital_args = TaskArgsDigital(n_shots=10)
     digital_task = Task(program=circ, args=digital_args)
 
-    for n in range(1):
+    for n in range(N):
         job = client.submit(digital_task, backend="tensorcircuit")
         job_id = job["id"]
         jobs.append(job)
