@@ -22,6 +22,9 @@ class DigitalCircuit(BaseModel):
     declarations: List = []
     sequence: List[Union[Gate, Statement]] = []
 
+    class Config:
+        extra = "forbid"
+
     @field_validator("creg", mode="before")
     @classmethod
     def convert_creg(cls, v):

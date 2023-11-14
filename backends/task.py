@@ -30,6 +30,9 @@ class TaskArgsAnalog(BaseModel):
     observables: dict[str, Operator] = {}
     dt: float = 0.1
 
+    class Config:
+        extra = "forbid"
+
 
 class TaskResultAnalog(BaseModel):
     counts: dict[int, int] = {}
@@ -42,6 +45,9 @@ class TaskResultAnalog(BaseModel):
 class TaskArgsDigital(BaseModel):
     n_shots: int = 10
 
+    class Config:
+        extra = "forbid"
+
 
 class TaskResultDigital(BaseModel):
     counts: dict[str, int] = {}
@@ -50,5 +56,4 @@ class TaskResultDigital(BaseModel):
 
 class Task(BaseModel):
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
-    args: Union[TaskArgsAnalog, TaskArgsDigital]
-
+    args: Union[TaskArgsDigital, TaskArgsAnalog]

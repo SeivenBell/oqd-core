@@ -17,6 +17,9 @@ class AnalogCircuit(BaseModel):
     n_qreg: int = None  # todo: change to a property
     n_qmode: int = None
 
+    class Config:
+        extra = "forbid"
+
     def add(self, gate: AnalogGate):
         if not isinstance(gate, AnalogGate):
             raise ValidationError
