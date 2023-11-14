@@ -74,6 +74,7 @@ if __name__ == "__main__":
     creg = ClassicalRegister(id="c", reg=2)
     circ = DigitalCircuit(qreg=qreg, creg=creg)
     circ.add(H(qreg=qreg[0]))
+    circ.add(CNOT(qreg=qreg[0:2]))
 
     digital_args = TaskArgsDigital(repetitions=10)
     digital_task = Task(program=circ, args=digital_args)
