@@ -2,7 +2,7 @@
 
 from typing import List
 
-from pydantic import BaseModel, conint, field_validator
+from pydantic import BaseModel, conint, field_validator, ValidationInfo
 
 ########################################################################################
 
@@ -22,9 +22,10 @@ class QuantumRegister(BaseModel):
     reg: List[QuantumBit]
 
     @field_validator("reg", mode="before")
-    def convert_reg(cls, v, values):
+    @classmethod
+    def convert_reg(cls, v, info: ValidationInfo):
         if isinstance(v, int):
-            id = values.data.get("id")
+            id = info.data.get("id")
             v = [QuantumBit(id=id, index=i) for i in range(v)]
         return v
 
@@ -44,11 +45,16 @@ class ClassicalRegister(BaseModel):
     reg: List[ClassicalBit]
 
     @field_validator("reg", mode="before")
-    def convert_reg(cls, v, values):
+    @classmethod
+    def convert_reg(cls, v, info: ValidationInfo):
         if isinstance(v, int):
-            id = values.data.get("id")
+            id = info.data.get("id")
             v = [ClassicalBit(id=id, index=i) for i in range(v)]
         return v
 
-    def __getitem__(self, item):
-        return ClassicalRegister(id=self.id, reg=[self.reg[item]])
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            start, stop, step = key.start, key.stop, key.step
+            return ClassicalRegister(id=self.id, reg=self.reg[start:stop:step])
+        else:
+            return self.reg[key]
