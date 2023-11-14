@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 from pydantic import BaseModel, ValidationError
 
 from quantumion.analog.gate import AnalogGate
@@ -6,7 +6,7 @@ from quantumion.analog.gate import AnalogGate
 
 class Statement(BaseModel):
     key: str
-    assignment: Union[AnalogGate]
+    assignment: AnalogGate
 
 
 class AnalogCircuit(BaseModel):
