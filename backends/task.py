@@ -43,7 +43,7 @@ class TaskResultAnalog(BaseModel):
 
 
 class TaskArgsDigital(BaseModel):
-    n_shots: int = 10
+    repetitions: int = 10
 
     class Config:
         extra = "forbid"
@@ -56,4 +56,4 @@ class TaskResultDigital(BaseModel):
 
 class Task(BaseModel):
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
-    args: Union[TaskArgsDigital, TaskArgsAnalog]
+    args: Union[TaskArgsAnalog, TaskArgsDigital]

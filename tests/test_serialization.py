@@ -81,7 +81,7 @@ if __name__ == "__main__":
     circ = DigitalCircuit(qreg=qreg, creg=creg)
     circ.add(H(qreg=qreg[0]))
 
-    digital_args = TaskArgsDigital(n_shots=10)
+    digital_args = TaskArgsDigital(repetitions=10)
     digital_task = Task(program=circ, args=digital_args)
 
     ########################################################################################
