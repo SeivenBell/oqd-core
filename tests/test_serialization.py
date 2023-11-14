@@ -17,7 +17,7 @@ from quantumion.digital.register import QuantumRegister, ClassicalRegister
 ########################################################################################
 
 
-def serialization_test(x, verbose=False):
+def serialization_test(x):
     x_json = x.model_dump()
     x_reserialized = x.__class__(**x_json)
 
