@@ -40,9 +40,17 @@ class Gate(BaseModel):
         return _str
 
 
-class H(Gate):
-    name: Literal["h"] = "h"
+def H(**kwargs):
+    return Gate(name="h", **kwargs)
 
 
-class CNOT(Gate):
-    name: Literal["h"] = "cx"
+def CNOT(**kwargs):
+    return Gate(name="cx", **kwargs)
+
+
+# class H(Gate):
+#     name: Literal["h"] = "h"
+
+
+# class CNOT(Gate):
+#     name: Literal["h"] = "cx"
