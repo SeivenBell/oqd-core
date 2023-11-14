@@ -21,8 +21,8 @@ dependencies = [
 
 [project.optional-dependencies]
 qutip = ["qutip"]
-tensorcircuit = ["tensorcircuit", "matplotlib"]
-all = ["qutip", "tensorcircuit", "matplotlib"]
+tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
+all = ["qutip", "tensorcircuit", "matplotlib", "qiskit"]
 
 
 [tool.setuptools]
