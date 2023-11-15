@@ -59,9 +59,9 @@ if __name__ == "__main__":
     ex = AnalogCircuit()
     ex.add(gate=gate)
 
-    analog_args = TaskArgsAnalog(n_shots=10)
+    analog_args = TaskArgsAnalog(n_shots=100)
     analog_task = Task(program=ex, args=analog_args)
-    for n in range(N):
+    for _ in range(N):
         job = client.submit(analog_task, backend="qutip")
         job_id = job["id"]
         jobs.append(job)
@@ -76,10 +76,10 @@ if __name__ == "__main__":
     circ.add(H(qreg=qreg[0]))
     circ.add(CNOT(qreg=qreg[0:2]))
 
-    digital_args = TaskArgsDigital(repetitions=10)
+    digital_args = TaskArgsDigital(repetitions=100)
     digital_task = Task(program=circ, args=digital_args)
 
-    for n in range(N):
+    for _ in range(N):
         job = client.submit(digital_task, backend="tensorcircuit")
         job_id = job["id"]
         jobs.append(job)
