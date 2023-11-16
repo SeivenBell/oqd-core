@@ -63,16 +63,14 @@ function evolve(task::Task)
             return _sum_operators(gate.unitary)
         end
 
-        function _map_metric(metric::Metric, circ::AnalogCircuit)
+        function _map_metric(metric::Metric, circ::AnalogCircuit)::Function
             if isa(metric, EntanglementEntropyVN)
-                f = (t, psi) -> entanglement_entropy_vn(t, psi, metric.qreg, metric.qmode, circ.n_qreg, circ.n_qmode);
+                return (t, psi) -> entanglement_entropy_vn(psi, metric.qreg, metric.qmode, circ.n_qreg, circ.n_qmode);
             elseif isa(metric, Expectation)
-                f = (t, psi) -> expect(_sum_operators(metric.operator, psi));
+                return (t, psi) -> expect(_sum_operators(metric.operator), psi)
             else
                 println("Not a valid metric type.")
             end
-            println("fmetric 1", typeof(f))
-            return f
         end
 
         function _initialize()
@@ -83,8 +81,7 @@ function evolve(task::Task)
         end
 
         psi = _initialize();
-        println(args.metrics);
-        fmetrics = Dict(key => _map_metric(metric, circ) for (key, metric) in args.metrics)
+        fmetrics = Dict{String, Function}(key => _map_metric(metric, circ) for (key, metric) in args.metrics)
 
         data = DataAnalog(
             state=psi,
@@ -94,7 +91,8 @@ function evolve(task::Task)
         function fout(t, psi)
             data.state = psi;
             for (key, fmetric) in fmetrics
-                push!(data.metrics[key], fmetric(t, psi));
+                val = fmetric(t, psi)
+                push!(data.metrics[key], val);
             end
         end
         
@@ -105,10 +103,7 @@ function evolve(task::Task)
             append!(data.times, collect(tspan) .+ t0);
             
             H = _map_gate_to_qobj(gate);
-            println("type of H", typeof(H))
-            println("type of psi", typeof(psi))
-            
-            timeevolution.schroedinger(tspan, psi, H); #; fout=fout);
+            timeevolution.schroedinger(tspan, psi, H; fout=fout);
         end
     end
 
@@ -126,7 +121,7 @@ end
 
 
 
-function entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode)
+function entanglement_entropy_vn(psi, qreg, qmode, n_qreg, n_qmode)
     rho = ptrace(psi, qreg + [n_qreg + m for m in qmode])
     return entropy_vn(rho)
 end

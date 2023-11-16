@@ -1,10 +1,11 @@
 using QuantumOptics
 using Configurations
 
+include("ir.jl")
+
 
 @option struct Expectation
-    operator::Vector{Int}
-    qmode::Vector{Int}
+    operator::Vector{Operator}
 end
 
 
