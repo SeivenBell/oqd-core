@@ -30,18 +30,17 @@ class QutipBackend(BackendBase):
         assert isinstance(
             task.program, AnalogCircuit
         ), "Qutip backend only simulates Experiment objects."
+
         circuit = task.program
         args = task.args
         data = DataAnalog(
             metrics={key: np.empty(0) for key in args.metrics.keys()}
         )
-        # pprint(data)
 
+        # initialize and step through analog gates
         self._init_maps(args)
         self._initialize(circuit, args, data)
-
         self.fmetrics = {key: self._map_metric(metric, circuit) for (key, metric) in args.metrics.items()}
-        print(self.fmetrics)
 
         for gate in circuit.sequence:
             self._evolve(gate, args, data)
@@ -50,12 +49,13 @@ class QutipBackend(BackendBase):
 
         runtime = time.time() - t0
 
+        # get measurement data
         bitstrings = ["".join(map(str, shot)) for shot in data.shots]
         counts = {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
 
+        # create result object to return
         result = TaskResultAnalog(
             counts=counts,
-            # expect=data.expect,
             metrics=data.metrics,
             times=data.times.tolist(),
             state=data.state.full().squeeze(),
@@ -156,17 +156,7 @@ class QutipBackend(BackendBase):
     def _map_gate_to_qobj(self, gate: AnalogGate) -> qt.Qobj:
         return self._sum_operators(gate.unitary)
 
-    # # todo: change to update metrics
-    # def _update_metrics(self, data: DataAnalog, result_qobj, args: TaskArgsAnalog):
-    #     for i, name in enumerate(args.metrics.keys()):
-    #         if name not in data.expect.keys():
-    #             data.expect[name] = list(result_qobj.expect[i])  # add to results
-    #         else:
-    #             data.expect[name] += list(result_qobj.expect[i])  # update results
-    #     return
-
     def _map_metric(self, metric: Metric, circuit: AnalogCircuit):
-        # print(metric, type(metric))
         if isinstance(metric, EntanglementEntropyVN):
             f = lambda t, psi: entanglement_entropy_vn(
                 t, psi, metric.qreg, metric.qmode, circuit.n_qreg, circuit.n_qmode

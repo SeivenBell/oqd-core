@@ -19,7 +19,6 @@ circ = AnalogCircuit(
 
 ee_vn = EntanglementEntropyVN(qreg=[0, 1], qmode=[])
 
-
 args = TaskArgsAnalog(
     n_shots=10, fock_cutoff=2, dt=0.1,
     metrics=Dict(

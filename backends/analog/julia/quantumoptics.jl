@@ -51,12 +51,28 @@ function evolve(task::Task)
                 _h_qmode = [prod([_map_qmode[qmode_op] for qmode_op in mode]) for mode in operator.qmode]
                 _hs = vcat(_hs, _h_qmode);
             end
-            op = operator.coefficient * tensor(_hs...)
+            op = operator.coefficient * tensor(_hs...);
             return op
         end
 
-        function _map_metric(metric::Metric, circuit::AnalogCircuit)
-            
+        function _sum_operators(operators::Vector{Operator})
+            return sum([_map_operator_to_qo(operator) for operator in operators])
+        end
+
+        function _map_gate_to_qobj(gate::AnalogGate)
+            return _sum_operators(gate.unitary)
+        end
+
+        function _map_metric(metric::Metric, circ::AnalogCircuit)
+            if isa(metric, EntanglementEntropyVN)
+                f = (t, psi) -> entanglement_entropy_vn(t, psi, metric.qreg, metric.qmode, circ.n_qreg, circ.n_qmode);
+            elseif isa(metric, Expectation)
+                f = (t, psi) -> expect(_sum_operators(metric.operator, psi));
+            else
+                println("Not a valid metric type.")
+            end
+            println("fmetric 1", typeof(f))
+            return f
         end
 
         function _initialize()
@@ -67,33 +83,32 @@ function evolve(task::Task)
         end
 
         psi = _initialize();
-
-        fmetrics = 
+        println(args.metrics);
+        fmetrics = Dict(key => _map_metric(metric, circ) for (key, metric) in args.metrics)
 
         data = DataAnalog(
             state=psi,
-            expect=Dict(name => [] for (name, op) in args.observables)
-            metrics=Dict(name => [] for (name))
+            metrics=Dict(key => [] for (key, metric) in args.metrics),
         );
-
-#         println("Intial state:   ", data.state)
-
-        exp_observable = Dict(
-            name => _map_operator_to_qo(op) for (name, op) in args.observables
-        )
 
         function fout(t, psi)
             data.state = psi;
-            push!(data.times, t);
-            for (name, op) in exp_observable
-                push!(data.expect[name], expect(op, psi));
+            for (key, fmetric) in fmetrics
+                push!(data.metrics[key], fmetric(t, psi));
             end
         end
-
+        
+        t0 = 0.0
         for gate in circ.sequence
             tspan = range(0, stop=gate.duration, step=args.dt);
-            H = sum([_map_operator_to_qo(operator) for operator in gate.unitary]);
-            timeevolution.schroedinger(tspan, psi, H; fout=fout);
+            t0 = gate.duration
+            append!(data.times, collect(tspan) .+ t0);
+            
+            H = _map_gate_to_qobj(gate);
+            println("type of H", typeof(H))
+            println("type of psi", typeof(psi))
+            
+            timeevolution.schroedinger(tspan, psi, H); #; fout=fout);
         end
     end
 
@@ -108,7 +123,6 @@ function evolve(task::Task)
 #     println(result);
     return JSON.json(to_dict(result))
 end
-
 
 
 
