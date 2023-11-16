@@ -15,7 +15,7 @@ end
 function run(task_json::String)
     task = convert(task_json);
     result = evolve(task);
-    return result
+    return JSON.json(to_dict(result))
 end
 
 function evolve(task::Task)
@@ -39,8 +39,6 @@ function evolve(task::Task)
             +1 => create(f),
         );
 
-
-        # todo: change to Metrics, rather than operator
         function _map_operator_to_qo(operator::Operator)
             _hs = []
             if !isempty(operator.qreg)
@@ -99,8 +97,8 @@ function evolve(task::Task)
         t0 = 0.0
         for gate in circ.sequence
             tspan = range(0, stop=gate.duration, step=args.dt);
-            t0 = gate.duration
             append!(data.times, collect(tspan) .+ t0);
+            t0 = gate.duration
             
             H = _map_gate_to_qobj(gate);
             timeevolution.schroedinger(tspan, psi, H; fout=fout);
@@ -108,21 +106,20 @@ function evolve(task::Task)
     end
 
     result = TaskResultAnalog(
-        # expect=data.expect,
         times=data.times,
         runtime=runtime,
         state=data.state.data,
         metrics=data.metrics,
     )
 
-#     println(result);
-    return JSON.json(to_dict(result))
+    return result
 end
 
 
 
 function entanglement_entropy_vn(psi, qreg, qmode, n_qreg, n_qmode)
-    rho = ptrace(psi, qreg + [n_qreg + m for m in qmode])
+    # note: element-wise +1 accounts for different starting indices between openQSIM/Python & Julia
+    rho = ptrace(psi, vcat(qreg .+ 1, qmode .+ n_qreg .+ 1)) 
     return entropy_vn(rho)
 end
 

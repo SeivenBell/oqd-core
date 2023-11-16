@@ -15,7 +15,6 @@ end
 
 @option mutable struct DataAnalog
     times::Vector{Float64} = []
-    # expect::Dict{String, Vector{Float64}} = Dict()
     state::Ket
     metrics:: Dict{String, Vector{Union{Float64, Int64}}} = Dict()
 end
