@@ -27,6 +27,9 @@ class TaskArgsAnalog(BaseModel):
     dt: float = 0.1
     metrics: Dict[str, Metric] = {}
 
+    class Config:
+        extra = "forbid"
+
 
 class TaskResultAnalog(BaseModel):
     counts: dict[int, int] = {}
@@ -37,7 +40,10 @@ class TaskResultAnalog(BaseModel):
 
 
 class TaskArgsDigital(BaseModel):
-    n_shots: int = 10
+    repetitions: int = 10
+
+    class Config:
+        extra = "forbid"
 
 
 class TaskResultDigital(BaseModel):
@@ -48,4 +54,3 @@ class TaskResultDigital(BaseModel):
 class Task(BaseModel):
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
     args: Union[TaskArgsAnalog, TaskArgsDigital]
-

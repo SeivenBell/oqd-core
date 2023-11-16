@@ -22,7 +22,7 @@ class TensorCircuitBackend(BackendBase):
 
         result = TaskResultDigital(
             counts=circ.sample(
-                batch=task.args.n_shots, allow_state=True, format="count_dict_bin"
+                batch=task.args.repetitions, allow_state=True, format="count_dict_bin"
             ),
             state=circ.state(),
         )

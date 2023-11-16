@@ -1,6 +1,6 @@
 # External imports
 
-from pydantic import BaseModel, field_validator, ValidationError
+from pydantic import BaseModel, field_validator, model_validator
 from typing import List, Union
 
 
@@ -9,43 +9,55 @@ from typing import List, Union
 # Internal exports
 
 from quantumion.digital.gate import Gate
-from quantumion.digital.register import QuantumBit, QuantumRegister, ClassicalRegister
+from quantumion.digital.register import QuantumRegister, ClassicalRegister
 from quantumion.digital.statement import Statement, Measure, Barrier
 
 ########################################################################################
 
 
 class DigitalCircuit(BaseModel):
-    qreg: List[QuantumRegister] = None
-    creg: List[ClassicalRegister] = None
+    qreg: List[QuantumRegister] = []
+    creg: List[ClassicalRegister] = []
 
     declarations: List = []
     sequence: List[Union[Gate, Statement]] = []
 
+    class Config:
+        extra = "forbid"
+
     @field_validator("creg", mode="before")
+    @classmethod
     def convert_creg(cls, v):
         if isinstance(v, int):
             v = [ClassicalRegister(reg=v)]
         elif isinstance(v, ClassicalRegister):
             v = [v]
-        if isinstance(v, list):
-            ids = [creg.id for creg in v]
-            if len(ids) != len(set(ids)):
-                raise ValidationError("Classical register identifiers must be unique.")
         return v
 
     @field_validator("qreg", mode="before")
+    @classmethod
     def convert_qreg(cls, v):
         if isinstance(v, int):
-            v = QuantumRegister(reg=v)
+            v = [QuantumRegister(reg=v)]
         elif isinstance(v, QuantumRegister):
             v = [v]
-        if isinstance(v, list):
-            ids = [qreg.id for qreg in v]
-            if len(ids) != len(set(ids)):
-                raise ValidationError("Quantum register identifiers must be unique.")
-
         return v
+
+    @model_validator(mode="after")
+    @classmethod
+    def validate_ids(cls, data):
+        ids = []
+        for creg in data.creg:
+            ids.append(creg.id)
+        for qreg in data.qreg:
+            ids.append(qreg.id)
+
+        if len(ids) != len(set(ids)):
+            raise ValueError(
+                "Found multiple registers with the same identifier, register identifier must be unique"
+            )
+
+        return data
 
     def add(self, op: Union[Gate, Statement]):
         self.sequence.append(op)

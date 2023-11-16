@@ -25,12 +25,14 @@ app = FastAPI()
 
 
 @app.post("/submit/{backend}")
-async def submit(submission: Task, backend: Literal["qutip","tensorcircuit"]):
-    backends = {"qutip":QutipBackend, "tensorcircuit":TensorCircuitBackend}
+async def submit(task: Task, backend: Literal["qutip", "tensorcircuit"]):
+    backends = {"qutip": QutipBackend(), "tensorcircuit": TensorCircuitBackend()}
 
-    print(f"Queueing {submission} on server {backend} backend. {len(queue)} jobs in queue.")
+    print(
+        f"Queueing {task} on server {backend} backend. {len(queue)} jobs in queue."
+    )
 
-    job = queue.enqueue(backends[backend]().run, submission)
+    job = queue.enqueue(backends[backend].run, task)
     return {"id": job.id, "status": job.get_status()}
 
 

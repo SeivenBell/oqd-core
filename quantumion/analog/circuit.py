@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 from pydantic import BaseModel, ValidationError
 
 from quantumion.analog.gate import AnalogGate
@@ -6,7 +6,7 @@ from quantumion.analog.gate import AnalogGate
 
 class Statement(BaseModel):
     key: str
-    assignment: Union[AnalogGate]
+    assignment: AnalogGate
 
 
 class AnalogCircuit(BaseModel):
@@ -16,6 +16,9 @@ class AnalogCircuit(BaseModel):
 
     n_qreg: int = None  # todo: change to a property
     n_qmode: int = None
+
+    class Config:
+        extra = "forbid"
 
     def add(self, gate: AnalogGate):
         if not isinstance(gate, AnalogGate):
