@@ -39,6 +39,8 @@ function evolve(task::Task)
             +1 => create(f),
         );
 
+
+        # todo: change to Metrics, rather than operator
         function _map_operator_to_qo(operator::Operator)
             _hs = []
             if !isempty(operator.qreg)
@@ -53,6 +55,10 @@ function evolve(task::Task)
             return op
         end
 
+        function _map_metric(metric::Metric, circuit::AnalogCircuit)
+            
+        end
+
         function _initialize()
             state_qreg = [spinup(b) for qreg in 1:circ.n_qreg];
             state_qmode = [fockstate(f, 0) for qmode in 1:circ.n_qmode];
@@ -61,9 +67,13 @@ function evolve(task::Task)
         end
 
         psi = _initialize();
+
+        fmetrics = 
+
         data = DataAnalog(
             state=psi,
             expect=Dict(name => [] for (name, op) in args.observables)
+            metrics=Dict(name => [] for (name))
         );
 
 #         println("Intial state:   ", data.state)
@@ -88,12 +98,22 @@ function evolve(task::Task)
     end
 
     result = TaskResultAnalog(
-        expect=data.expect,
+        # expect=data.expect,
         times=data.times,
         runtime=runtime,
         state=data.state.data,
+        metrics=data.metrics,
     )
 
 #     println(result);
     return JSON.json(to_dict(result))
 end
+
+
+
+
+function entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode)
+    rho = ptrace(psi, qreg + [n_qreg + m for m in qmode])
+    return entropy_vn(rho)
+end
+
