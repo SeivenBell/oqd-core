@@ -1,23 +1,23 @@
-using QuantumOptics
 using Configurations
 
 include("ir.jl")
 
 
-@option struct Expectation
+@option "expectation" struct Expectation
+    # type::Reflect
     operator::Vector{Operator}
 end
 
 
-@option struct EntanglementEntropyVN
+@option "entanglement_entropy_vn" struct EntanglementEntropyVN
+    # type::Reflect
     qreg::Vector{Int}
     qmode::Vector{Int}
 end
 
 
-Metric = Union{Expectation, EntanglementEntropyVN}
+# @option struct Metrics
+#     metrics::Dict{String, Union{Expectation, EntanglementEntropyVN}}
+# end
 
-
-function entanglement_entropy_vn(t, psi)
-    return
-end
+Metric = Union{EntanglementEntropyVN, Expectation}

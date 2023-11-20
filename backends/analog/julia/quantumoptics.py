@@ -24,5 +24,7 @@ class QuantumOpticsBackend(BackendBase):
     def run(self, task: Task) -> TaskResultAnalog:
         assert isinstance(task.program, AnalogCircuit), "Must be AnalogCircuit"
         result_json = jl.run(task.model_dump_json())
+        print(result_json)
         result = TaskResultAnalog(**json.loads(result_json))
+        # result = TaskResultAnalog()
         return result

@@ -45,6 +45,7 @@ gate = AnalogGate(
 )
 circuit.add(gate=gate)
 
+pprint(circuit)
 #%%
 z = [(1/n_qreg) * tensor([PauliZ if i==ind else PauliI for i in range(n_qreg)]) for ind in range(n_qreg)]
 args = TaskArgsAnalog(
@@ -54,17 +55,24 @@ args = TaskArgsAnalog(
         "ee_vn": EntanglementEntropyVN(qreg=[0, 1]),
         "z": Expectation(operator=z)
     },
-    dt=0.001
+    dt=0.01
 )
 
 task = Task(program=circuit, args=args)
 
 #%%
-backend = QutipBackend()
-result = backend.run(task)
+backends = [
+    # QutipBackend(),
+    QuantumOpticsBackend()
+]
 
 #%%
-pprint(result)
+results = {}
+for backend in backends:
+    results[backend.name] = backend.run(task)
+
+#%%
+pprint(results)
 
 #%%
 sns.set_theme(style="whitegrid")

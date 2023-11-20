@@ -10,7 +10,7 @@ from quantumion.digital.circuit import DigitalCircuit
 from quantumion.atomic.schedule import AtomicProgram
 
 from backends.metric import Metric
-# from backends.metric import Expectation, EntanglementEntropyVN, EntanglementEntropyReyni
+from backends.metric import Expectation, EntanglementEntropyVN, EntanglementEntropyReyni
 
 
 @dataclass
@@ -25,7 +25,7 @@ class TaskArgsAnalog(BaseModel):
     n_shots: int = 10
     fock_cutoff: int = 4
     dt: float = 0.1
-    metrics: Dict[str, Metric] = {}
+    metrics: Dict[str, Union[EntanglementEntropyVN, Expectation]] = {}
 
     class Config:
         extra = "forbid"

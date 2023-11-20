@@ -1,4 +1,5 @@
-using JSON
+# using JSON
+using JSON3
 using QuantumOptics
 
 include("ir.jl")
@@ -7,15 +8,21 @@ include("task.jl")
 
 
 function convert(task_json::String)
-    d = JSON.parse(task_json);
-    task = from_dict(Task, d);
+    # d = JSON.parse(task_json);
+    # task = from_dict(Task, d);
+
+    task = JSON3.read(task_json, Task);
+    println(task)
     return task
 end
 
 function run(task_json::String)
     task = convert(task_json);
     result = evolve(task);
-    return JSON.json(to_dict(result))
+    # println("asdasdpijnapsojqnwpejnqpoijnqpsidjnqpwijdnqpwojdn")
+    # result = TaskResultAnalog()
+
+    return JSON3.write(to_dict(result))
 end
 
 function evolve(task::Task)
@@ -108,7 +115,7 @@ function evolve(task::Task)
     result = TaskResultAnalog(
         times=data.times,
         runtime=runtime,
-        state=data.state.data,
+        # state=data.state.data,
         metrics=data.metrics,
     )
 
