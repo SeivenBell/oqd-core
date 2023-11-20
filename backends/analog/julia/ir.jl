@@ -1,6 +1,16 @@
 using Configurations
 
 
+@option struct ComplexFloat
+    re::Float64
+    im::Float64
+end
+
+function complexf64_to_complexfloat(cf::ComplexF64)
+    return ComplexFloat(reim(cf)...)
+end
+
+
 @option struct Operator
     coefficient::Union{Int, Float64} = 1.0
     qreg::Vector{String} = []
@@ -35,32 +45,6 @@ end
  end
 
 
-@option struct TaskArgsAnalog
-    n_shots::Int = 1
-    fock_cutoff::Int = 1
-    observables::Dict{String, Operator} = Dict()
-    dt::Float64 = 0.1
-end
 
 
-@option mutable struct DataAnalog
-    times::Vector{Float64} = []
-    expect::Dict{String, Vector{Float64}} = Dict()
-    state::Ket
-end
-
-
-@option mutable struct TaskResultAnalog
-    counts::Dict{Int, Int} = Dict()
-    expect::Dict{String, Vector{Union{Int, Float64}}} = Dict()
-    times::Vector{Float64} = []
-    state::Vector{ComplexF64}
-    runtime::Float64
-end
-
-
-@option struct Task
-    program::AnalogCircuit
-    args::TaskArgsAnalog
- end
 

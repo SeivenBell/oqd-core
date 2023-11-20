@@ -1,10 +1,12 @@
-using JSON
+# using JSON
+using JSON3
 using QuantumOptics
 using Plots 
+using Configurations
 
 include("ir.jl")
 include("task.jl")
-include("quantumoptics.jl")
+# include("quantumoptics.jl")
 
 
 circ = AnalogCircuit(
@@ -26,22 +28,38 @@ z = Expectation(
     ]
 )
 
+# ee_vn = 10
+# z = 1.0
+
+metrics=Dict(
+    "ee_vn" => ee_vn,
+    "z" => z
+)
 
 args = TaskArgsAnalog(
     n_shots=10, fock_cutoff=2, dt=0.01,
-    metrics=Dict(
-        "ee_vn" => ee_vn,
-        "z" => z,
-    ),
+    metrics=metrics,
 )
 task = Task(program=circ, args=args)
 
-println(circ)
-result = evolve(task);
-println(result.metrics)
-println(result.metrics["ee_vn"])
-println(result.times)
+# d = to_dict(task)
+# println(d)
 
-p1 = plot(result.times, result.metrics["ee_vn"], xlabel="Time [arb.]", ylabel="S(ρ)", reuse=false)
-display(p1)
-p2 = plot(result.times, result.metrics["z"], xlabel="Time [arb.]", ylabel="<z>", reuse=false)
+# json_string = JSON3.write(d)
+# # json_string = JSON.json(d)
+# # println(json_string)
+
+# d1 = JSON3.read(json_string);
+# # d1 = JSON.parse(json_string);
+# println(d1)
+
+# task_parse = from_dict(Task, d)
+# println(task_parse)
+
+
+# task_parse1 = JSON3.read(json_string, Task);
+# println(task_parse1)
+a = [1-2.0im, 3+3im]
+d = Dict("cfloat" => a)
+
+str = JSON3.write(d)

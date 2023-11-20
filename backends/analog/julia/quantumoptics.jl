@@ -1,19 +1,21 @@
-using JSON
+using JSON3
 using QuantumOptics
 
 include("ir.jl")
+include("task.jl")
+
 
 
 function convert(task_json::String)
-    d = JSON.parse(task_json);
-    task = from_dict(Task, d);
+    task = JSON3.read(task_json, Task);
     return task
 end
 
 function run(task_json::String)
     task = convert(task_json);
+    print(task)
     result = evolve(task);
-    return result
+    return JSON3.write(to_dict(result))
 end
 
 function evolve(task::Task)
@@ -47,8 +49,26 @@ function evolve(task::Task)
                 _h_qmode = [prod([_map_qmode[qmode_op] for qmode_op in mode]) for mode in operator.qmode]
                 _hs = vcat(_hs, _h_qmode);
             end
-            op = operator.coefficient * tensor(_hs...)
+            op = operator.coefficient * tensor(_hs...);
             return op
+        end
+
+        function _sum_operators(operators::Vector{Operator})
+            return sum([_map_operator_to_qo(operator) for operator in operators])
+        end
+
+        function _map_gate_to_qobj(gate::AnalogGate)
+            return _sum_operators(gate.unitary)
+        end
+
+        function _map_metric(metric::Metric, circ::AnalogCircuit)::Function
+            if isa(metric, EntanglementEntropyVN)
+                return (t, psi) -> entanglement_entropy_vn(psi, metric.qreg, metric.qmode, circ.n_qreg, circ.n_qmode);
+            elseif isa(metric, Expectation)
+                return (t, psi) -> expect(_sum_operators(metric.operator), psi)
+            else
+                println("Not a valid metric type.")
+            end
         end
 
         function _initialize()
@@ -59,39 +79,48 @@ function evolve(task::Task)
         end
 
         psi = _initialize();
+        fmetrics = Dict{String, Function}(key => _map_metric(metric, circ) for (key, metric) in args.metrics)
+
         data = DataAnalog(
             state=psi,
-            expect=Dict(name => [] for (name, op) in args.observables)
+            metrics=Dict(key => [] for (key, metric) in args.metrics),
         );
-
-#         println("Intial state:   ", data.state)
-
-        exp_observable = Dict(
-            name => _map_operator_to_qo(op) for (name, op) in args.observables
-        )
 
         function fout(t, psi)
             data.state = psi;
-            push!(data.times, t);
-            for (name, op) in exp_observable
-                push!(data.expect[name], expect(op, psi));
+            for (key, fmetric) in fmetrics
+                val = fmetric(t, psi)
+                push!(data.metrics[key], val);
             end
         end
-
+        
+        t0 = 0.0
         for gate in circ.sequence
             tspan = range(0, stop=gate.duration, step=args.dt);
-            H = sum([_map_operator_to_qo(operator) for operator in gate.unitary]);
+            append!(data.times, collect(tspan) .+ t0);
+            t0 = gate.duration
+            
+            H = _map_gate_to_qobj(gate);
             timeevolution.schroedinger(tspan, psi, H; fout=fout);
         end
     end
 
     result = TaskResultAnalog(
-        expect=data.expect,
         times=data.times,
         runtime=runtime,
-        state=data.state.data,
+        # state=data.state.data,
+        state=map(complexf64_to_complexfloat, data.state.data),
+        metrics=data.metrics,
     )
 
-#     println(result);
-    return JSON.json(to_dict(result))
+    return result
 end
+
+
+
+function entanglement_entropy_vn(psi, qreg, qmode, n_qreg, n_qmode)
+    # note: element-wise +1 accounts for different starting indices between openQSIM/Python & Julia
+    rho = ptrace(psi, vcat(qreg .+ 1, qmode .+ n_qreg .+ 1)) 
+    return entropy_vn(rho)
+end
+

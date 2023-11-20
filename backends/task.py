@@ -1,34 +1,32 @@
-# External imports
 from dataclasses import dataclass, field
-
 import numpy as np
 from pydantic import BaseModel
-from typing import Union, List
-
+from typing import Union, List, Optional, Dict
 from pydantic_numpy import typing as pnd
 
-
+from quantumion.types import ComplexFloat
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.operator import Operator
-
 from quantumion.digital.circuit import DigitalCircuit
-
 from quantumion.atomic.schedule import AtomicProgram
+
+from backends.metric import Metric
+from backends.metric import Expectation, EntanglementEntropyVN, EntanglementEntropyReyni
 
 
 @dataclass
 class DataAnalog:
-    times: np.array = None
-    state: np.array = None
-    expect: dict[str, Union[int, float]] = field(default_factory=dict)
-    shots: np.array = None
+    times: np.array = field(default_factory=lambda: np.empty(0))
+    state: np.array = field(default_factory=lambda: np.empty(0))
+    metrics: dict[str, List[Union[float, int]]] = field(default_factory=dict)
+    shots: np.array = field(default_factory=lambda: np.empty(0))
 
 
 class TaskArgsAnalog(BaseModel):
     n_shots: int = 10
     fock_cutoff: int = 4
-    observables: dict[str, Operator] = {}
     dt: float = 0.1
+    metrics: Dict[str, Union[EntanglementEntropyVN, Expectation]] = {}
 
     class Config:
         extra = "forbid"
@@ -36,10 +34,10 @@ class TaskArgsAnalog(BaseModel):
 
 class TaskResultAnalog(BaseModel):
     counts: dict[int, int] = {}
-    expect: dict[str, List[Union[float, int]]] = {}
     times: list[float] = []
-    state: pnd.Np1DArray = None
+    state: list[ComplexFloat] = None
     runtime: float = None
+    metrics: dict[str, List[Union[float, int]]] = {}
 
 
 class TaskArgsDigital(BaseModel):

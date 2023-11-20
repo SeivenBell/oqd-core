@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-from quantumion.analog.operator import PauliX, PauliY, PauliZ
+from quantumion.analog.operator import PauliX, PauliY, PauliZ, PauliI
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
 from backends.analog.python.qutip import QutipBackend
 from backends.task import Task, TaskArgsAnalog
+from backends.metric import EntanglementEntropyVN, Expectation
 
 from backends.provider import Provider
 
@@ -16,7 +17,7 @@ from backends.provider import Provider
 ex = AnalogCircuit()
 gate = AnalogGate(
     duration=1.0,
-    unitary=[np.pi / 4 * PauliX],
+    unitary=[np.pi / 4 * PauliX @ PauliX],
     dissipation=[]
 )
 ex.add(gate=gate)
@@ -32,7 +33,10 @@ ex_parse = AnalogCircuit(**json_str)
 args = TaskArgsAnalog(
     n_shots=100,
     fock_cutoff=4,
-    observables={'z': PauliZ, 'x': PauliX, 'y': PauliY},
+    metrics={
+        'ee_vn': EntanglementEntropyVN(qreg=[0]),
+        'z': Expectation(operator=[0.5 * PauliZ @ PauliI, 0.5 * PauliI @ PauliZ])
+    },
     dt=0.1
 )
 
