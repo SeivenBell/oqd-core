@@ -1,6 +1,16 @@
 using Configurations
 
 
+@option struct ComplexFloat
+    re::Float64
+    im::Float64
+end
+
+function complexf64_to_complexfloat(cf::ComplexF64)
+    return ComplexFloat(reim(cf)...)
+end
+
+
 @option struct Operator
     coefficient::Union{Int, Float64} = 1.0
     qreg::Vector{String} = []

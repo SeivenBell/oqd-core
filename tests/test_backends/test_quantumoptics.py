@@ -38,7 +38,7 @@ args = TaskArgsAnalog(
 task = Task(program=ex, args=args)
 
 s = task.model_dump()
-pprint(s)
+pprint(task)
 c = Task(**s)
 
 #%%
@@ -47,9 +47,4 @@ backend = QuantumOpticsBackend()
 
 #%%
 result = backend.run(task)
-# pprint(result)
-#
-# #%%
-# result
-#
-#%%
+pprint(result)

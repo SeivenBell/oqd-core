@@ -24,7 +24,8 @@ end
 @option mutable struct TaskResultAnalog
     counts::Dict{Int, Int} = Dict()
     times::Vector{Float64} = []
-    state::Vector{ComplexF64} = []
+    # state::Vector{Complex{Float64}} = []
+    state::Vector{ComplexFloat} = []
     runtime::Float64 = 1.0
     metrics::Dict{String, Vector{Union{Int64, Float64}}} = Dict()
 end

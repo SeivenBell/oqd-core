@@ -42,20 +42,24 @@ args = TaskArgsAnalog(
 )
 task = Task(program=circ, args=args)
 
-d = to_dict(task)
-println(d)
+# d = to_dict(task)
+# println(d)
 
-json_string = JSON3.write(d)
-# json_string = JSON.json(d)
-# println(json_string)
+# json_string = JSON3.write(d)
+# # json_string = JSON.json(d)
+# # println(json_string)
 
-d1 = JSON3.read(json_string);
-# d1 = JSON.parse(json_string);
-println(d1)
+# d1 = JSON3.read(json_string);
+# # d1 = JSON.parse(json_string);
+# println(d1)
 
-task_parse = from_dict(Task, d)
-println(task_parse)
+# task_parse = from_dict(Task, d)
+# println(task_parse)
 
 
-task_parse1 = JSON3.read(json_string, Task);
-println(task_parse1)
+# task_parse1 = JSON3.read(json_string, Task);
+# println(task_parse1)
+a = [1-2.0im, 3+3im]
+d = Dict("cfloat" => a)
+
+str = JSON3.write(d)

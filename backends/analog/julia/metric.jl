@@ -15,9 +15,4 @@ end
     qmode::Vector{Int}
 end
 
-
-# @option struct Metrics
-#     metrics::Dict{String, Union{Expectation, EntanglementEntropyVN}}
-# end
-
 Metric = Union{EntanglementEntropyVN, Expectation}

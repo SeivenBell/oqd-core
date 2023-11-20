@@ -1,10 +1,7 @@
 #%%
 import pathlib
 import json
-from rich import print as pprint
-import numpy as np
 from juliacall import Main as jl
-from juliacall import convert
 
 from backends.base import BackendBase
 from backends.task import Task, TaskArgsAnalog, TaskResultAnalog
@@ -26,5 +23,4 @@ class QuantumOpticsBackend(BackendBase):
         result_json = jl.run(task.model_dump_json())
         print(result_json)
         result = TaskResultAnalog(**json.loads(result_json))
-        # result = TaskResultAnalog()
         return result

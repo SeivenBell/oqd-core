@@ -8,6 +8,7 @@ from backends.base import BackendBase
 from backends.task import Task, DataAnalog, TaskArgsAnalog, TaskResultAnalog
 from backends.metric import *
 
+from quantumion.types import ComplexFloat
 from quantumion.analog.gate import AnalogGate
 from quantumion.analog.operator import Operator, PauliX
 from quantumion.analog.coefficient import Complex
@@ -58,7 +59,8 @@ class QutipBackend(BackendBase):
             counts=counts,
             metrics=data.metrics,
             times=data.times.tolist(),
-            state=data.state.full().squeeze(),
+            # todo: improve mapping between custom ComplexFloat type and numpy
+            state=list(map(ComplexFloat.from_np_complex128, data.state.full().squeeze())),
             runtime=runtime,
         )
         return result

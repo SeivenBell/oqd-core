@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import Union, List, Optional, Dict
 from pydantic_numpy import typing as pnd
 
+from quantumion.types import ComplexFloat
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.operator import Operator
 from quantumion.digital.circuit import DigitalCircuit
@@ -34,7 +35,7 @@ class TaskArgsAnalog(BaseModel):
 class TaskResultAnalog(BaseModel):
     counts: dict[int, int] = {}
     times: list[float] = []
-    state: pnd.Np1DArray = None
+    state: list[ComplexFloat] = None
     runtime: float = None
     metrics: dict[str, List[Union[float, int]]] = {}
 
