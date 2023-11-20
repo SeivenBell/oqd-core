@@ -22,17 +22,15 @@ gate = AnalogGate(
 )
 ex.add(gate=gate)
 
-
-
 #%%
 args = TaskArgsAnalog(
     n_shots=100,
     fock_cutoff=4,
     metrics={
-        'a': EntanglementEntropyVN(qreg=[0]),
-        'b': Expectation(operator=[PauliX @ PauliI])
+        'ee_vn': EntanglementEntropyVN(qreg=[0]),
+        'z': Expectation(operator=[0.5 * PauliZ @ PauliI, 0.5 * PauliI @ PauliZ])
     },
-    dt=0.1
+    dt=0.01
 )
 
 task = Task(program=ex, args=args)
@@ -42,9 +40,25 @@ pprint(task)
 c = Task(**s)
 
 #%%
-backend = QuantumOpticsBackend()
-# backend = QutipBackend()
+backends = {
+    "quantumoptics": QuantumOpticsBackend(),
+    "qutip": QutipBackend()
+}
+results = {}
+
+for key, backend in backends.items():
+    for i in range(2):
+        result = backend.run(task)
+        results[key] = result
 
 #%%
-result = backend.run(task)
-pprint(result)
+fig, axs = plt.subplots(2, 1)
+for key, result in results.items():
+    axs[0].plot(result.times, result.metrics['ee_vn'], label=key)
+    axs[1].plot(result.times, result.metrics['z'], label=key)
+
+axs[0].set(ylabel=r"$S(\rho_A)$")
+axs[1].set(ylabel=r"$\langle \sigma_z \rangle$")
+axs[-1].set(xlabel='Time []')
+axs[0].legend()
+plt.show()
