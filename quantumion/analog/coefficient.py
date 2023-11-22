@@ -2,12 +2,13 @@
 
 from typing import Union
 
-from pydantic import BaseModel
+
+from quantumion.base import TypeReflectBaseModel
 
 ########################################################################################
 
 
-class Complex(BaseModel):
+class Complex(TypeReflectBaseModel):
     real: Union[int, float]
     imag: Union[int, float]
 
@@ -40,5 +41,5 @@ class Complex(BaseModel):
         return self * other
 
 
-class Function(BaseModel):
+class Function(TypeReflectBaseModel):
     string: str

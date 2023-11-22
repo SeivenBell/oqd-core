@@ -2,13 +2,12 @@
 
 from typing import List, Union, Optional, Literal
 
-from pydantic import BaseModel
-
 
 ########################################################################################
 
 # Internal exports
 
+from quantumion.base import TypeReflectBaseModel
 from quantumion.digital.register import (
     QuantumRegister,
     ClassicalRegister,
@@ -19,11 +18,11 @@ from quantumion.digital.register import (
 ########################################################################################
 
 
-class GateParameters(BaseModel):
+class GateParameters(TypeReflectBaseModel):
     vals: List[Union[int, float]] = []
 
 
-class Gate(BaseModel):
+class Gate(TypeReflectBaseModel):
     name: str
     qreg: Optional[Union[QuantumRegister, QuantumBit]] = None
     creg: Optional[Union[ClassicalRegister, ClassicalBit]] = None
