@@ -1,5 +1,9 @@
 using JSON3
 using QuantumOptics
+# using Distributions
+using StatsBase
+using DataStructures
+using Base.Iterators
 
 include("ir.jl")
 include("task.jl")
@@ -77,6 +81,25 @@ function _run(task::Task)
             return psi
         end
 
+        function _measure(psi, circuit::AnalogCircuit, n_shots::Int)
+            a = repeat([(0, 1)], circuit.n_qreg)  # qreg bases
+            b = repeat([(0:args.fock_cutoff)], circuit.n_qmode)  # qmodes bases
+            
+            opts_str = vec([join(string(p...)) for p in product(vcat(a, b)...)])
+            probabilities = broadcast(abs, psi.data) .^2  # probability vector from the complex prob. amplitudes
+            
+            opts = 1:length(probabilities)
+            w = Weights(probabilities)
+            indices = zeros(Int, n_shots)
+            for i in 1:n_shots
+                indices[i] = sample(opts, w)
+                # indices[i] = rand(Categorical(probabilities))
+            end
+            counts = Dict{String, Int}(opts_str[index] => count for (index, count) in counter(indices))
+            return counts
+
+        end
+
         psi = _initialize();
         fmetrics = Dict{String, Function}(key => _map_metric(metric, circ) for (key, metric) in args.metrics)
 
@@ -108,6 +131,8 @@ function _run(task::Task)
                 continue  # todo
             end
         end
+        counts = _measure(data.state, circ, args.n_shots)
+
     end
 
     result = TaskResultAnalog(
@@ -115,6 +140,7 @@ function _run(task::Task)
         runtime=runtime,
         state=map(complexf64_to_complexfloat, data.state.data),
         metrics=data.metrics,
+        counts=counts,
     )
 
     return result

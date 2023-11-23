@@ -49,6 +49,8 @@ backends = {
     "quantumoptics": QuantumOpticsBackend(),
     "qutip": QutipBackend()
 }
+
+#%%
 results = {}
 
 for key, backend in backends.items():
@@ -57,10 +59,17 @@ for key, backend in backends.items():
         results[key] = result
 
 #%%
+bases = result.counts.keys()
+for basis in bases:
+    print(f"Basis {basis} | Qutip {results['qutip'].counts[basis]} | QO {results['quantumoptics'].counts[basis]}")
+
+
+#%%
 fig, axs = plt.subplots(2, 1)
 for key, result in results.items():
     axs[0].plot(result.times, result.metrics['ee_vn'], label=key)
     axs[1].plot(result.times, result.metrics['z'], label=key)
+    print(f"Backend {key} | counts = {result.counts}")
 
 axs[0].set(ylabel=r"$S(\rho_A)$")
 axs[1].set(ylabel=r"$\langle \sigma_z \rangle$")
