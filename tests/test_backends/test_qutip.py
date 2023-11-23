@@ -2,20 +2,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from rich import print as pprint
 
-from quantumion.analog.operator import PauliX, PauliY, PauliZ
+from quantumion.analog.operator import PauliX, PauliY, PauliZ, PauliI
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.gate import AnalogGate
 
 from backends.analog.python.qutip import QutipBackend
 from backends.task import Task, TaskArgsAnalog
-
+from backends.metric import EntanglementEntropyVN, Expectation
 
 # %% example of creating an operator
 op = (PauliY * PauliY) @ (PauliY * PauliX)  # @ (Creation * Annihilation)
 
 # %% create an experiment to run/simulate
 ex = AnalogCircuit()
-gate = AnalogGate(duration=2.0, hamiltonian=[np.pi / 4 * PauliX], dissipation=[])
+gate = AnalogGate(duration=1.1223542, hamiltonian=[np.pi / 4 * PauliX @ PauliX], dissipation=[])
+ex.evolve(gate=gate)
+gate = AnalogGate(duration=1.1223542, hamiltonian=[PauliX @ PauliI], dissipation=[])
 ex.evolve(gate=gate)
 pprint(ex)
 
@@ -26,13 +28,17 @@ pprint(json_str)
 #%% ... and then easily parse back into data tree
 ex_parse = AnalogCircuit.model_validate(ex.model_dump())
 pprint(ex_parse)
+
 #%%
-# ex_parse = AnalogCircuit.model_validate(json_str)
+ex_parse = AnalogCircuit.model_validate(json_str)
 
 # %% need another object that stores keywords about the backend runtime parameters
 args = TaskArgsAnalog(
     n_shots=100,
     fock_cutoff=4,
+    metrics={
+        'ee_vn': EntanglementEntropyVN(qreg=[0])
+    },
     dt=0.01,
 )
 
@@ -47,9 +53,10 @@ print(result.model_fields_set)
 
 # %%
 fig, ax = plt.subplots()
-for name, expect in result.expect.items():
-    ax.plot(result.times, expect, label=name)
+for name, metric in result.metrics.items():
+    ax.plot(result.times, metric, label=name)
 ax.legend()
 plt.show()
 
 # %%
+print(result.counts)

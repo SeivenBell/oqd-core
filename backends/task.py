@@ -35,7 +35,7 @@ class TaskArgsAnalog(BaseModel):
 
 class TaskResultAnalog(BaseModel):
     layer: Literal['analog'] = 'analog'
-    counts: dict[int, int] = {}
+    counts: dict[str, int] = {}
     times: list[float] = []
     state: list[ComplexFloat] = None
     runtime: float = None

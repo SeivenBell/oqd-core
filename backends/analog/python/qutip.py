@@ -25,7 +25,7 @@ class QutipBackend(BackendBase):
         self.fmetrics = []
 
     def run(self, task: Task) -> TaskResultAnalog:
-        t0 = time.time()
+        start = time.time()
 
         assert isinstance(
             task.program, AnalogCircuit
@@ -42,19 +42,21 @@ class QutipBackend(BackendBase):
         self._initialize(circuit, args, data)
         self.fmetrics = {key: self._map_metric(metric, circuit) for (key, metric) in args.metrics.items()}
 
+        t0 = 0.0
         for statement in circuit.sequence:
             if statement.key == "initialize":
                 continue  # todo: implement simulation logic of initializing/measuring qregs/qmodes
 
             elif statement.key == 'evolve':
-                self._evolve(statement.gate, args, data)
+                self._evolve(statement.gate, args, data, t0)
+                t0 += statement.gate.duration
 
             elif statement.key == 'measure':
-                continue
+                continue  # todo
 
         self._measure(circuit, args, data)
 
-        runtime = time.time() - t0
+        runtime = time.time() - start
 
         # get measurement data
         bitstrings = ["".join(map(str, shot)) for shot in data.shots]
@@ -92,7 +94,7 @@ class QutipBackend(BackendBase):
         data.state = qt.tensor([qt.basis(d, 0) for d in dims])
         return
 
-    def _evolve(self, gate: AnalogGate, args: TaskArgsAnalog, data: DataAnalog):
+    def _evolve(self, gate: AnalogGate, args: TaskArgsAnalog, data: DataAnalog, t0: float):
         options = qt.solver.Options(store_final_state=True)
         duration = gate.duration
         tspan = np.linspace(
@@ -107,7 +109,7 @@ class QutipBackend(BackendBase):
             op_qobj, data.state, tspan, e_ops=self.fmetrics, options=options
         )
 
-        data.times = np.hstack([data.times, tspan])
+        data.times = np.hstack([data.times, t0 + tspan])
         data.metrics = {key: np.hstack([data.metrics[key], result_qobj.expect[key]]) for key in data.metrics.keys()}
         data.state = result_qobj.final_state
         return

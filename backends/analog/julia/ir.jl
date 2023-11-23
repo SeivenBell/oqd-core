@@ -13,8 +13,8 @@ end
 
 @option struct Operator
     coefficient::Union{Int, Float64} = 1.0
-    qreg::Vector{String} = []
-    qmode::Vector{Vector{Int}} = []
+    pauli::Vector{String} = []
+    ladder::Vector{Vector{Int}} = []
 end
 
 
@@ -24,8 +24,8 @@ end
 
 
 @option struct AnalogGate
-    duration::Union{Int, Float64, Nothing} = nothing
-    unitary::Vector{Operator} = []
+    duration::Union{Int, Float64, Nothing}
+    hamiltonian::Vector{Operator} = []
     dissipation::Vector{Dissipation} = []
 end
 
