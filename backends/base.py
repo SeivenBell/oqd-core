@@ -17,7 +17,7 @@ class BackendBase(ABC):
 
 
 class TypeReflectBaseModel(BaseModel):
-    class_: Optional[str]
+    type_: Optional[str]
 
     @model_validator(mode="before")
     @classmethod

@@ -3,7 +3,7 @@ from pydantic import BaseModel, model_validator
 
 
 class TypeReflectBaseModel(BaseModel):
-    class_: Optional[str]
+    type_: Optional[str]
 
     @model_validator(mode="before")
     @classmethod
