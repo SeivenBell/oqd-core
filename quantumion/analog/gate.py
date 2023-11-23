@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-class AnalogGate(BaseModel):
+class AnalogGate(TypeReflectBaseModel):
     duration: float = None
     hamiltonian: list[Operator] = []
     dissipation: list[Dissipation] = []

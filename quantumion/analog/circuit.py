@@ -6,25 +6,25 @@ from quantumion.analog.gate import AnalogGate
 from quantumion.base import TypeReflectBaseModel
 
 
-class Evolve(BaseModel):
+class Evolve(TypeReflectBaseModel):
     key: Literal['evolve'] = 'evolve'
     gate: Union[AnalogGate, str]
 
 
-class Measure(BaseModel):
+class Measure(TypeReflectBaseModel):
     key: Literal['measure'] = 'measure'
     qreg: List[NonNegativeInt] = None
     qmode: List[NonNegativeInt] = None
 
 
-class Initialize(BaseModel):
+class Initialize(TypeReflectBaseModel):
     key: Literal['initialize'] = 'initialize'
 
 
 Statement = Union[Initialize, Evolve, Measure]
 
 
-class AnalogCircuit(BaseModel):
+class AnalogCircuit(TypeReflectBaseModel):
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []
 

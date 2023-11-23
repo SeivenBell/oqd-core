@@ -1,10 +1,6 @@
-# External imports
-
 from typing import Union
 
 from quantumion.base import TypeReflectBaseModel
-
-########################################################################################
 
 
 class Dissipation(TypeReflectBaseModel):
