@@ -49,7 +49,7 @@ class DigitalCircuit(BaseModel):
         ids = []
         for creg in data.creg:
             ids.append(creg.id)
-        for qreg in data.qreg:
+        for qreg in data.pauli:
             ids.append(qreg.id)
 
         if len(ids) != len(set(ids)):

@@ -133,13 +133,13 @@ class QutipBackend(BackendBase):
         """
         _operator_qobjs = []
 
-        if operator.qreg:
-            _operator_qobjs.append(qt.tensor([self.qreg_map[i] for i in operator.qreg]))
+        if operator.pauli:
+            _operator_qobjs.append(qt.tensor([self.qreg_map[i] for i in operator.pauli]))
 
-        if operator.qmode:
+        if operator.ladder:
             _operator_qobjs.append(
                 qt.tensor(
-                    [prod([self.qmode_map[j] for j in tf]) for tf in operator.qmode]
+                    [prod([self.qmode_map[j] for j in tf]) for tf in operator.ladder]
                 )
             )
 
@@ -156,7 +156,7 @@ class QutipBackend(BackendBase):
         return sum([self._map_operator_to_qobj(operator) for operator in operators])
 
     def _map_gate_to_qobj(self, gate: AnalogGate) -> qt.Qobj:
-        return self._sum_operators(gate.unitary)
+        return self._sum_operators(gate.hamiltonian)
 
     def _map_metric(self, metric: Metric, circuit: AnalogCircuit):
         if isinstance(metric, EntanglementEntropyVN):

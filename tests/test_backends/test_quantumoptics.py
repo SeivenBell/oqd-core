@@ -16,11 +16,11 @@ from backends.metric import Expectation, EntanglementEntropyVN
 #%%
 ex = AnalogCircuit()
 gate = AnalogGate(
-    duration=1.0,
-    unitary=[np.pi * PauliX @ PauliX],
+    duration=3.0,
+    hamiltonian=[np.pi * PauliX @ PauliY, np.pi * PauliI @ PauliX],
     dissipation=[]
 )
-ex.add(gate=gate)
+ex.evolve(gate=gate)
 
 #%%
 args = TaskArgsAnalog(

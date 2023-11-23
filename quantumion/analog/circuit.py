@@ -1,18 +1,34 @@
-from typing import List
+from typing import List, Tuple, Literal, Union
 from pydantic import BaseModel, ValidationError
+from pydantic.types import NonNegativeInt
 
 from quantumion.analog.gate import AnalogGate
 
 
-class Statement(BaseModel):
-    key: str
-    assignment: AnalogGate
+class Evolve(BaseModel):
+    key: Literal['evolve'] = 'evolve'
+    gate: Union[AnalogGate, str]
+
+
+class Measure(BaseModel):
+    key: Literal['measure'] = 'measure'
+    qreg: List[NonNegativeInt] = None
+    qmode: List[NonNegativeInt] = None
+
+
+class Initialize(BaseModel):
+    key: Literal['initialize'] = 'initialize'
+
+
+Statement = Union[Initialize, Evolve, Measure]
 
 
 class AnalogCircuit(BaseModel):
-    definitions: List[int] = []
-    registers: List[int] = []
-    sequence: List[AnalogGate] = []
+    qreg: List[NonNegativeInt] = []
+    qmode: List[NonNegativeInt] = []
+
+    definitions: List[Tuple[str, AnalogGate]] = []
+    sequence: List[Statement] = []
 
     n_qreg: int = None  # todo: change to a property
     n_qmode: int = None
@@ -20,7 +36,10 @@ class AnalogCircuit(BaseModel):
     class Config:
         extra = "forbid"
 
-    def add(self, gate: AnalogGate):
+    def define(self, id: str, gate: AnalogGate):
+        self.definitions.append((id, gate))
+
+    def evolve(self, gate: AnalogGate):
         if not isinstance(gate, AnalogGate):
             raise ValidationError
         if gate.n_qreg != self.n_qreg and self.n_qreg is not None:
@@ -28,6 +47,13 @@ class AnalogCircuit(BaseModel):
         if gate.n_qmode != self.n_qmode and self.n_qmode is not None:
             raise ValueError("Inconsistent qmode dimensions.")
 
-        self.sequence.append(gate)
+        self.sequence.append(Evolve(gate=gate))
         self.n_qreg = gate.n_qreg
         self.n_qmode = gate.n_qmode
+
+    def measure(self, qreg: List[NonNegativeInt], qmode: List[NonNegativeInt]):
+        self.sequence.append(Measure(qreg=qreg, qmode=qmode))
+
+
+if __name__ == "__main__":
+    circuit = AnalogCircuit()

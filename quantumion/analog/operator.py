@@ -1,18 +1,9 @@
-# External imports
-
 from operator import mul
-
 from functools import reduce
-
 from typing import Dict, List, Literal, Tuple, Union
-
 from pydantic import BaseModel
 
-########################################################################################
-
-# Internal exports
-
-from quantumion.analog.coefficient import Complex
+from quantumion.types import ComplexFloat
 from quantumion.analog.math import levi_civita
 
 
@@ -29,23 +20,23 @@ __all__ = [
 
 
 class Operator(BaseModel):
-    coefficient: Union[int, float, Complex] = 1.0
-    qreg: List[Literal["x", "y", "z", "i"]] = []
-    qmode: List[List[Literal[-1, 0, 1]]] = []
+    coefficient: Union[int, float, ComplexFloat] = 1.0
+    pauli: List[Literal["x", "y", "z", "i"]] = []
+    ladder: List[List[Literal[-1, 0, 1]]] = []
 
     @property
     def n_qreg(self):
-        return len(self.qreg)
+        return len(self.pauli)
 
     @property
     def n_qmode(self):
-        return len(self.qmode)
+        return len(self.ladder)
 
     def __eq__(self, other):
         if not isinstance(other, Operator):
             raise TypeError
 
-        eq = (self.qreg == other.qreg) and (self.qmode == other.qmode)
+        eq = (self.pauli == other.pauli) and (self.ladder == other.ladder)
         return eq
 
     # def __add__(self, other):
@@ -61,15 +52,15 @@ class Operator(BaseModel):
     def __mul__(self, other):
         if isinstance(other, (int, float)):
             return Operator(
-                coefficient=self.coefficient * other, qreg=self.qreg, qmode=self.qmode
+                coefficient=self.coefficient * other, pauli=self.pauli, ladder=self.ladder
             )
 
         elif isinstance(other, Operator):
-            qreg, phases = list(zip(*list(map(levi_civita, self.qreg, other.qreg))))
+            qreg, phases = list(zip(*list(map(levi_civita, self.pauli, other.pauli))))
             phase = reduce(mul, phases, 1)
             coefficient = phase * self.coefficient * other.coefficient
-            qmode = [a + b for a, b in zip(self.qmode, other.qmode)]
-            return Operator(coefficient=coefficient, qreg=qreg, qmode=qmode)
+            qmode = [a + b for a, b in zip(self.ladder, other.ladder)]
+            return Operator(coefficient=coefficient, pauli=qreg, ladder=qmode)
 
         else:
             return TypeError
@@ -81,28 +72,28 @@ class Operator(BaseModel):
         if not isinstance(other, Operator):
             raise TypeError
 
-        qreg = self.qreg + other.qreg
-        qmode = self.qmode + other.qmode
+        qreg = self.pauli + other.pauli
+        qmode = self.ladder + other.ladder
         coefficient = self.coefficient * other.coefficient
 
-        return Operator(coefficient=coefficient, qreg=qreg, qmode=qmode)
+        return Operator(coefficient=coefficient, pauli=qreg, ladder=qmode)
 
     def __rmatmul__(self, other):
         return other @ self
 
 
-PauliX = Operator(qreg=["x"])
-PauliY = Operator(qreg=["y"])
-PauliZ = Operator(qreg=["z"])
-PauliI = Operator(qreg=["i"])
+PauliX = Operator(pauli=["x"])
+PauliY = Operator(pauli=["y"])
+PauliZ = Operator(pauli=["z"])
+PauliI = Operator(pauli=["i"])
 
-Creation = Operator(qmode=[[-1]])
-Annihilation = Operator(qmode=[[1]])
-Identity = Operator(qmode=[[0]])
+Creation = Operator(ladder=[[-1]])
+Annihilation = Operator(ladder=[[1]])
+Identity = Operator(ladder=[[0]])
 
 
 if __name__ == "__main__":
-    op = Operator(qreg=["x"], qmode=[[-1, 1]])
+    op = Operator(pauli=["x"], ladder=[[-1, 1]])
     print(op)
 
     print((PauliI * PauliX) @ (Creation * Annihilation))

@@ -55,9 +55,9 @@ if __name__ == "__main__":
     ########################################################################################
 
     op = np.pi * PauliX
-    gate = AnalogGate(duration=1 / 4, unitary=[op], dissipation=[])
+    gate = AnalogGate(duration=1 / 4, hamiltonian=[op], dissipation=[])
     ex = AnalogCircuit()
-    ex.add(gate=gate)
+    ex.evolve(gate=gate)
 
     analog_args = TaskArgsAnalog(n_shots=100)
     analog_task = Task(program=ex, args=analog_args)

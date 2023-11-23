@@ -40,10 +40,10 @@ ops = graph_to_operator(gz)
 circuit = AnalogCircuit()
 gate = AnalogGate(
     duration=10.0,
-    unitary=ops,
+    hamiltonian=ops,
     dissipation=[]
 )
-circuit.add(gate=gate)
+circuit.evolve(gate=gate)
 
 pprint(circuit)
 #%%

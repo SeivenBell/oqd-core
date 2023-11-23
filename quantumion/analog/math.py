@@ -1,16 +1,7 @@
-# External imports
-
 import functools
-
 import operator
 
-########################################################################################
-
-# Internal exports
-
-from quantumion.analog.coefficient import Complex
-
-########################################################################################
+from quantumion.types import ComplexFloat
 
 
 def sum(args):
@@ -32,15 +23,15 @@ _lc = {
     "iz": ("z", +1),
     "xi": ("x", +1),
     "xx": ("i", +1),
-    "xy": ("z", Complex(real=0, imag=-1)),
-    "xz": ("y", Complex(real=0, imag=+1)),
+    "xy": ("z", ComplexFloat(real=0, imag=-1)),
+    "xz": ("y", ComplexFloat(real=0, imag=+1)),
     "yi": ("y", +1),
-    "yx": ("z", Complex(real=0, imag=-1)),
+    "yx": ("z", ComplexFloat(real=0, imag=-1)),
     "yy": ("i", +1),
-    "yz": ("x", Complex(real=0, imag=+1)),
+    "yz": ("x", ComplexFloat(real=0, imag=+1)),
     "zi": ("z", +1),
-    "zx": ("y", Complex(real=0, imag=+1)),
-    "zy": ("x", Complex(real=0, imag=-1)),
+    "zx": ("y", ComplexFloat(real=0, imag=+1)),
+    "zy": ("x", ComplexFloat(real=0, imag=-1)),
     "zz": ("i", +1),
 }
 

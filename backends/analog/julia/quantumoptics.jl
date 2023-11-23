@@ -13,7 +13,6 @@ end
 
 function run(task_json::String)
     task = convert(task_json);
-    print(task)
     result = evolve(task);
     return JSON3.write(to_dict(result))
 end
@@ -108,7 +107,6 @@ function evolve(task::Task)
     result = TaskResultAnalog(
         times=data.times,
         runtime=runtime,
-        # state=data.state.data,
         state=map(complexf64_to_complexfloat, data.state.data),
         metrics=data.metrics,
     )

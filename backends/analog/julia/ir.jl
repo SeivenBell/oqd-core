@@ -2,8 +2,8 @@ using Configurations
 
 
 @option struct ComplexFloat
-    re::Float64
-    im::Float64
+    real::Float64
+    imag::Float64
 end
 
 function complexf64_to_complexfloat(cf::ComplexF64)

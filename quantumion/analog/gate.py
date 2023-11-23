@@ -12,28 +12,28 @@ __all__ = [
 
 
 class AnalogGate(BaseModel):
-    duration: Union[float, int] = None
-    unitary: list[Operator] = []
+    duration: float = None
+    hamiltonian: list[Operator] = []
     dissipation: list[Dissipation] = []
 
     def check(self):
         # check that the two addends have the same number of qregs, qmodes
         assert (
-            len(set([term.n_qreg for term in self.unitary])) == 1
+                len(set([term.n_qreg for term in self.hamiltonian])) == 1
         ), "Inconsistent number of qregs."
         assert (
-            len(set([term.n_qmode for term in self.unitary])) == 1
+                len(set([term.n_qmode for term in self.hamiltonian])) == 1
         ), "Inconsistent number of qmodes."
 
     @property
     def n_qreg(self):
-        n = list(set([term.n_qreg for term in self.unitary]))
+        n = list(set([term.n_qreg for term in self.hamiltonian]))
         assert len(n) == 1
         return n[0]
 
     @property
     def n_qmode(self):
-        n = list(set([term.n_qmode for term in self.unitary]))
+        n = list(set([term.n_qmode for term in self.hamiltonian]))
         assert len(n) == 1
         return n[0]
 
@@ -42,24 +42,24 @@ class AnalogGate(BaseModel):
             raise TypeError
 
         terms = []
-        for i, term in enumerate(self.unitary + other.unitary):
+        for i, term in enumerate(self.hamiltonian + other.hamiltonian):
             if term not in terms:
                 terms.append(term)
             else:
                 ind = terms.index(term)
                 terms[ind].coefficient += term.coefficient
 
-        out = AnalogGate(terms=terms)
+        out = AnalogGate(terms=terms)  # todo: fix dunder operators on AnalogGate
         out.check()
         return out
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            terms = [other * term for term in self.unitary]
+            terms = [other * term for term in self.hamiltonian]
 
         elif isinstance(other, AnalogGate):
             terms = []
-            for term1, term2 in itertools.product(self.unitary, other.unitary):
+            for term1, term2 in itertools.product(self.hamiltonian, other.hamiltonian):
                 term = term1 * term2
                 terms.append(term)
         else:
@@ -74,7 +74,7 @@ class AnalogGate(BaseModel):
             raise TypeError
 
         terms = []
-        for term1, term2 in itertools.product(self.unitary, other.unitary):
+        for term1, term2 in itertools.product(self.hamiltonian, other.hamiltonian):
             term = term1 @ term2
             terms.append(term)
         return AnalogGate(terms=terms)

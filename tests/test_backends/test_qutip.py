@@ -18,8 +18,8 @@ op = (PauliY * PauliY) @ (PauliY * PauliX)  # @ (Creation * Annihilation)
 
 # %% create an experiment to run/simulate
 ex = AnalogCircuit()
-gate = AnalogGate(duration=2.0, unitary=[np.pi / 4 * PauliX], dissipation=[])
-ex.add(gate=gate)
+gate = AnalogGate(duration=2.0, hamiltonian=[np.pi / 4 * PauliX], dissipation=[])
+ex.evolve(gate=gate)
 
 # %% can serialize this to a JSON format...
 json_str = ex.model_dump()
