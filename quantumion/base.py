@@ -1,17 +1,5 @@
-from abc import ABC, abstractmethod
 from typing import Optional
 from pydantic import BaseModel, model_validator
-
-########################################################################################
-
-
-class BackendBase(ABC):
-    @abstractmethod
-    def run(self, task):
-        pass
-
-    pass
-
 
 ########################################################################################
 

@@ -6,12 +6,12 @@ from functools import reduce
 
 from typing import Dict, List, Literal, Tuple, Union
 
-from pydantic import BaseModel
 
 ########################################################################################
 
 # Internal exports
 
+from quantumion.base import TypeReflectBaseModel
 from quantumion.analog.coefficient import Complex
 from quantumion.analog.math import levi_civita
 
@@ -28,7 +28,7 @@ __all__ = [
 ]
 
 
-class Operator(BaseModel):
+class Operator(TypeReflectBaseModel):
     coefficient: Union[int, float, Complex] = 1.0
     qreg: List[Literal["x", "y", "z", "i"]] = []
     qmode: List[List[Literal[-1, 0, 1]]] = []

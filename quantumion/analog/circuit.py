@@ -1,15 +1,16 @@
 from typing import List
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from quantumion.analog.gate import AnalogGate
+from quantumion.base import TypeReflectBaseModel
 
 
-class Statement(BaseModel):
+class Statement(TypeReflectBaseModel):
     key: str
     assignment: AnalogGate
 
 
-class AnalogCircuit(BaseModel):
+class AnalogCircuit(TypeReflectBaseModel):
     definitions: List[int] = []
     registers: List[int] = []
     sequence: List[AnalogGate] = []
