@@ -8,13 +8,15 @@ class TypeReflectBaseModel(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def reflect(cls, data):
+        if isinstance(data, BaseModel):
+            return data
+
         if "class_" in data.keys():
             if data["class_"] != cls.__name__:
-                raise TypeReflectError(
-                    f'"class_" field {data["class_"]} and model type {cls.__name__} do not match.'
-                )
+                raise ValueError('discrepency between "class_" field and model type')
 
         data["class_"] = cls.__name__
+
         return data
 
 
