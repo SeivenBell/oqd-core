@@ -1,14 +1,7 @@
 # External imports
-
-from pydantic import BaseModel
-from typing import Union
-
-########################################################################################
-
 from typing import List, Tuple, Dict, Optional, Callable, Union, Literal
 from typing_extensions import Annotated
 from pydantic import (
-    BaseModel,
     PositiveInt,
     NonNegativeInt,
     validator,
@@ -18,6 +11,10 @@ from pydantic import (
     field_validator,
     ValidationError,
 )
+
+########################################################################################
+
+from quantumion.base import TypeReflectBaseModel
 
 ########################################################################################
 
@@ -39,7 +36,7 @@ NonNegativeAngularMomentumNumber = Annotated[
 # ########################################################################################
 
 
-class Level(BaseModel):
+class Level(TypeReflectBaseModel):
     principal: NonNegativeInt
     spin: NonNegativeAngularMomentumNumber
     orbital: NonNegativeAngularMomentumNumber
@@ -84,12 +81,12 @@ class Level(BaseModel):
         return self
 
 
-class Multipole(BaseModel):
+class Multipole(TypeReflectBaseModel):
     field: Literal["E", "M"]
     pole: PositiveInt
 
 
-class Transition(BaseModel):
+class Transition(TypeReflectBaseModel):
     level1: Level
     level2: Level
     multipole: Multipole
@@ -97,7 +94,7 @@ class Transition(BaseModel):
     pass
 
 
-class Ion(BaseModel):
+class Ion(TypeReflectBaseModel):
     mass: float
     charge: float
     levels: List[Level]
@@ -108,7 +105,7 @@ class Ion(BaseModel):
 ########################################################################################
 
 
-class Pulse(BaseModel):
+class Pulse(TypeReflectBaseModel):
     ion: Ion
     transition: Transition
     rabi: Union[float, Callable[[float], float]]
@@ -117,14 +114,14 @@ class Pulse(BaseModel):
     wavevector: Union[List[float], Callable[[float], List[float]]]
 
 
-class Protocol(BaseModel):
+class Protocol(TypeReflectBaseModel):
     pulses: List[Pulse]
 
 
 ########################################################################################
 
 
-class Apply(BaseModel):
+class Apply(TypeReflectBaseModel):
     protocol: Protocol
     time: float
 
@@ -132,14 +129,13 @@ class Apply(BaseModel):
 ########################################################################################
 
 
-class AtomicProgram(BaseModel):
+class AtomicProgram(TypeReflectBaseModel):
     statements: List[Apply]
 
 
 ########################################################################################
 
 if __name__ == "__main__":
-
     try:
         level1 = Level(
             principal=6,

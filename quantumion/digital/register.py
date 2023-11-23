@@ -2,22 +2,26 @@
 
 from typing import List
 
-from pydantic import BaseModel, conint, field_validator, ValidationInfo
+from pydantic import conint, field_validator, ValidationInfo
+
+########################################################################################
+
+from quantumion.base import TypeReflectBaseModel
 
 ########################################################################################
 
 
-class QuantumBit(BaseModel):
+class QuantumBit(TypeReflectBaseModel):
     id: str
     index: conint(ge=0)  # a non-negative integer
 
 
-class ClassicalBit(BaseModel):
+class ClassicalBit(TypeReflectBaseModel):
     id: str
     index: conint(ge=0)  # a non-negative integer
 
 
-class QuantumRegister(BaseModel):
+class QuantumRegister(TypeReflectBaseModel):
     id: str = "q"
     reg: List[QuantumBit]
 
@@ -40,7 +44,7 @@ class QuantumRegister(BaseModel):
             return self.reg[key]
 
 
-class ClassicalRegister(BaseModel):
+class ClassicalRegister(TypeReflectBaseModel):
     id: str = "c"
     reg: List[ClassicalBit]
 

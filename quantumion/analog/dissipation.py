@@ -2,10 +2,10 @@
 
 from typing import Union
 
-from pydantic import BaseModel
+from quantumion.base import TypeReflectBaseModel
 
 ########################################################################################
 
 
-class Dissipation(BaseModel):
+class Dissipation(TypeReflectBaseModel):
     jumps: int = None  # todo: discuss ir for dissipation

@@ -1,6 +1,6 @@
 # External imports
 
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import field_validator, model_validator
 from typing import List, Union
 
 
@@ -8,6 +8,7 @@ from typing import List, Union
 
 # Internal exports
 
+from quantumion.base import TypeReflectBaseModel
 from quantumion.digital.gate import Gate
 from quantumion.digital.register import QuantumRegister, ClassicalRegister
 from quantumion.digital.statement import Statement, Measure, Barrier
@@ -15,7 +16,7 @@ from quantumion.digital.statement import Statement, Measure, Barrier
 ########################################################################################
 
 
-class DigitalCircuit(BaseModel):
+class DigitalCircuit(TypeReflectBaseModel):
     qreg: List[QuantumRegister] = []
     creg: List[ClassicalRegister] = []
 

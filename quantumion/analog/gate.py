@@ -1,9 +1,10 @@
 import itertools
 from typing import List, Union, Optional
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from quantumion.analog.operator import Operator
 from quantumion.analog.dissipation import Dissipation
+from quantumion.base import TypeReflectBaseModel
 
 
 __all__ = [

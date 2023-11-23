@@ -3,6 +3,7 @@ from pydantic import BaseModel, ValidationError
 from pydantic.types import NonNegativeInt
 
 from quantumion.analog.gate import AnalogGate
+from quantumion.base import TypeReflectBaseModel
 
 
 class Evolve(BaseModel):
