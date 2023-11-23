@@ -18,7 +18,12 @@ ex = AnalogCircuit()
 gate = AnalogGate(
     duration=3.0,
     hamiltonian=[np.pi * PauliX @ PauliY, np.pi * PauliI @ PauliX],
-    dissipation=[]
+)
+ex.evolve(gate=gate)
+
+gate = AnalogGate(
+    duration=1.23,
+    hamiltonian=[PauliX @ PauliI, PauliI @ PauliY],
 )
 ex.evolve(gate=gate)
 
@@ -42,12 +47,12 @@ c = Task(**s)
 #%%
 backends = {
     "quantumoptics": QuantumOpticsBackend(),
-    # "qutip": QutipBackend()
+    "qutip": QutipBackend()
 }
 results = {}
 
 for key, backend in backends.items():
-    for i in range(1):
+    for i in range(2):
         result = backend.run(task)
         results[key] = result
 

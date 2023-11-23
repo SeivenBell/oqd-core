@@ -12,9 +12,7 @@ function convert(task_json::String)
 end
 
 function run(task_json::String)
-    println(task_json)
     task = convert(task_json);
-    println(task)
     result = _run(task);
     return JSON3.write(to_dict(result))
 end
@@ -105,7 +103,7 @@ function _run(task::Task)
                 t0 = statement.gate.duration
                 
                 H = _map_gate_to_qobj(statement.gate);
-                timeevolution.schroedinger(tspan, psi, H; fout=fout);
+                timeevolution.schroedinger(tspan, data.state, H; fout=fout);
             elseif statement.key == "measure"
                 continue  # todo
             end

@@ -35,12 +35,18 @@ end
     gate::Union{AnalogGate, String}
 end
 
+
 @option struct Initialize
     key::String = "initialize"
 end
 
 
-Statement = Union{Evolve, Initialize}
+@option struct Measure
+    key::String = "measure"
+end
+
+
+Statement = Union{Initialize, Evolve, Measure}
 
 
 @option struct AnalogCircuit
@@ -49,7 +55,7 @@ Statement = Union{Evolve, Initialize}
 
     definitions::Vector{Tuple{String, AnalogGate}} = []
     sequence::Vector{Statement} = []
-    
+
     n_qreg::Maybe{Int} = nothing
     n_qmode::Maybe{Int} = nothing
  end
