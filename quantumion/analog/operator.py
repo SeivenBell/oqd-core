@@ -3,7 +3,6 @@ from functools import reduce
 from typing import Dict, List, Literal, Tuple, Union
 from pydantic import BaseModel
 
-from quantumion.types import TypeReflectBaseModel
 from quantumion.types import ComplexFloat
 from quantumion.analog.math import levi_civita
 
@@ -20,7 +19,7 @@ __all__ = [
 ]
 
 
-class Operator(TypeReflectBaseModel):
+class Operator(BaseModel):
     coefficient: Union[int, float, ComplexFloat] = 1.0
     pauli: List[Literal["x", "y", "z", "i"]] = []
     ladder: List[List[Literal[-1, 0, 1]]] = []

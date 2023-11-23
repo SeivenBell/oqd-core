@@ -3,33 +3,32 @@ from pydantic import BaseModel, ValidationError
 from pydantic.types import NonNegativeInt
 
 from quantumion.analog.gate import AnalogGate
-from quantumion.base import TypeReflectBaseModel
 
 
-class Evolve(TypeReflectBaseModel):
+class Evolve(BaseModel):
     key: Literal['evolve'] = 'evolve'
     gate: Union[AnalogGate, str]
 
 
-class Measure(TypeReflectBaseModel):
+class Measure(BaseModel):
     key: Literal['measure'] = 'measure'
     qreg: Union[List[NonNegativeInt], None] = None
     qmode: Union[List[NonNegativeInt], None] = None
 
 
-class Initialize(TypeReflectBaseModel):
+class Initialize(BaseModel):
     key: Literal['initialize'] = 'initialize'
 
 
-# Statement = Union[Measure, Evolve, Initialize]
+Statement = Union[Measure, Evolve, Initialize]
 
 
-class AnalogCircuit(TypeReflectBaseModel):
+class AnalogCircuit(BaseModel):
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []
 
     definitions: List[Tuple[str, AnalogGate]] = []
-    sequence: List[Union[Measure, Evolve, Initialize]] = []
+    sequence: List[Statement] = []
 
     n_qreg: int = 0  # todo: change to a property
     n_qmode: int = 0

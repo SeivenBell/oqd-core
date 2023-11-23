@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 import numpy as np
-from typing import Union, List, Optional, Dict
+from typing import Union, List, Optional, Dict, Literal
 from pydantic_numpy import typing as pnd
+from pydantic import BaseModel
 
 from quantumion.types import ComplexFloat
 from quantumion.analog.circuit import AnalogCircuit
@@ -9,7 +10,6 @@ from quantumion.analog.operator import Operator
 from quantumion.digital.circuit import DigitalCircuit
 from quantumion.atomic.schedule import AtomicProgram
 
-from backends.base import TypeReflectBaseModel
 from backends.metric import Metric
 from backends.metric import Expectation, EntanglementEntropyVN, EntanglementEntropyReyni
 
@@ -25,14 +25,16 @@ class DataAnalog:
 ########################################################################################sss
 
 
-class TaskArgsAnalog(TypeReflectBaseModel):
+class TaskArgsAnalog(BaseModel):
+    layer: Literal['analog'] = 'analog'
     n_shots: int = 10
     fock_cutoff: int = 4
     dt: float = 0.1
     metrics: Dict[str, Union[EntanglementEntropyVN, Expectation]] = {}
 
 
-class TaskResultAnalog(TypeReflectBaseModel):
+class TaskResultAnalog(BaseModel):
+    layer: Literal['analog'] = 'analog'
     counts: dict[int, int] = {}
     times: list[float] = []
     state: list[ComplexFloat] = None
@@ -43,11 +45,13 @@ class TaskResultAnalog(TypeReflectBaseModel):
 ########################################################################################
 
 
-class TaskArgsDigital(TypeReflectBaseModel):
+class TaskArgsDigital(BaseModel):
+    layer: Literal['digital'] = 'digital'
     repetitions: int = 10
 
 
-class TaskResultDigital(TypeReflectBaseModel):
+class TaskResultDigital(BaseModel):
+    layer: Literal['digital'] = 'digital'
     counts: dict[str, int] = {}
     state: pnd.Np1DArray
 
@@ -55,13 +59,15 @@ class TaskResultDigital(TypeReflectBaseModel):
 ########################################################################################
 
 
-class TaskArgsAtomic(TypeReflectBaseModel):
+class TaskArgsAtomic(BaseModel):
+    layer: Literal['atomic'] = 'atomic'
     n_shots: int = 10
     fock_trunc: int = 4
     dt: float = 0.1
 
 
-class TaskResultAtomic(TypeReflectBaseModel):
+class TaskResultAtomic(BaseModel):
+    layer: Literal['atomic'] = 'atomic'
     # Hardware results
     collated_state_readout: dict[int, int] = {}
     state_readout: dict[int, int] = {}
@@ -71,6 +77,6 @@ class TaskResultAtomic(TypeReflectBaseModel):
 ########################################################################################
 
 
-class Task(TypeReflectBaseModel):
+class Task(BaseModel):
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]

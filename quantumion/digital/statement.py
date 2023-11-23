@@ -1,18 +1,10 @@
-# External imports
-
 from typing import Literal, Union
+from pydantic import BaseModel
 
-########################################################################################
-
-# Internal exports
-
-from quantumion.base import TypeReflectBaseModel
 from quantumion.digital.register import QuantumRegister, ClassicalRegister
 
-########################################################################################
 
-
-class Statement(TypeReflectBaseModel):
+class Statement(BaseModel):
     statement: str
 
 

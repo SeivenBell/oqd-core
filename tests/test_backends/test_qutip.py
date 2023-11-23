@@ -25,9 +25,9 @@ pprint(json_str)
 
 #%% ... and then easily parse back into data tree
 ex_parse = AnalogCircuit.model_validate(ex.model_dump())
-
+pprint(ex_parse)
 #%%
-ex_parse = AnalogCircuit.model_validate(json_str)
+# ex_parse = AnalogCircuit.model_validate(json_str)
 
 # %% need another object that stores keywords about the backend runtime parameters
 args = TaskArgsAnalog(

@@ -1,20 +1,20 @@
 from typing import Literal, List, TypedDict, Union
+from pydantic import BaseModel
 from pydantic.types import NonNegativeInt
 
-from backends.base import TypeReflectBaseModel
 from quantumion.analog.operator import Operator
 
 
-class Expectation(TypeReflectBaseModel):
+class Expectation(BaseModel):
     operator: List[Operator]
 
 
-class EntanglementEntropyVN(TypeReflectBaseModel):
+class EntanglementEntropyVN(BaseModel):
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []
 
 
-class EntanglementEntropyReyni(TypeReflectBaseModel):
+class EntanglementEntropyReyni(BaseModel):
     alpha: NonNegativeInt = 1
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []

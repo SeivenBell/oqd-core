@@ -1,10 +1,9 @@
 import itertools
 from typing import List, Union, Optional
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from quantumion.analog.operator import Operator
 from quantumion.analog.dissipation import Dissipation
-from quantumion.base import TypeReflectBaseModel
 
 
 __all__ = [
@@ -12,7 +11,7 @@ __all__ = [
 ]
 
 
-class AnalogGate(TypeReflectBaseModel):
+class AnalogGate(BaseModel):
     duration: float = None
     hamiltonian: list[Operator] = []
     dissipation: list[Dissipation] = []

@@ -42,8 +42,15 @@ class QutipBackend(BackendBase):
         self._initialize(circuit, args, data)
         self.fmetrics = {key: self._map_metric(metric, circuit) for (key, metric) in args.metrics.items()}
 
-        for gate in circuit.sequence:
-            self._evolve(gate, args, data)
+        for statement in circuit.sequence:
+            if statement.key == "initialize":
+                continue  # todo: implement simulation logic of initializing/measuring qregs/qmodes
+
+            elif statement.key == 'evolve':
+                self._evolve(statement.gate, args, data)
+
+            elif statement.key == 'measure':
+                continue
 
         self._measure(circuit, args, data)
 

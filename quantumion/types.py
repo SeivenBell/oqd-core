@@ -1,9 +1,8 @@
 import numpy as np
+from pydantic import BaseModel
 
-from quantumion.base import TypeReflectBaseModel
 
-
-class ComplexFloat(TypeReflectBaseModel):
+class ComplexFloat(BaseModel):
     real: float
     imag: float
 

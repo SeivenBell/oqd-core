@@ -1,13 +1,6 @@
-# External imports
-
 from typing import List, Union, Optional, Literal
+from pydantic import BaseModel
 
-
-########################################################################################
-
-# Internal exports
-
-from quantumion.base import TypeReflectBaseModel
 from quantumion.digital.register import (
     QuantumRegister,
     ClassicalRegister,
@@ -15,14 +8,12 @@ from quantumion.digital.register import (
     ClassicalBit,
 )
 
-########################################################################################
 
-
-class GateParameters(TypeReflectBaseModel):
+class GateParameters(BaseModel):
     vals: List[Union[int, float]] = []
 
 
-class Gate(TypeReflectBaseModel):
+class Gate(BaseModel):
     name: str
     qreg: Optional[Union[QuantumRegister, QuantumBit]] = None
     creg: Optional[Union[ClassicalRegister, ClassicalBit]] = None
