@@ -1,8 +1,6 @@
-# %%
 import numpy as np
 import matplotlib.pyplot as plt
-
-########################################################################################
+from rich import print as pprint
 
 from quantumion.analog.operator import PauliX, PauliY, PauliZ
 from quantumion.analog.circuit import AnalogCircuit
@@ -11,7 +9,6 @@ from quantumion.analog.gate import AnalogGate
 from backends.analog.python.qutip import QutipBackend
 from backends.task import Task, TaskArgsAnalog
 
-########################################################################################
 
 # %% example of creating an operator
 op = (PauliY * PauliY) @ (PauliY * PauliX)  # @ (Creation * Annihilation)
@@ -20,18 +17,22 @@ op = (PauliY * PauliY) @ (PauliY * PauliX)  # @ (Creation * Annihilation)
 ex = AnalogCircuit()
 gate = AnalogGate(duration=2.0, hamiltonian=[np.pi / 4 * PauliX], dissipation=[])
 ex.evolve(gate=gate)
+pprint(ex)
 
 # %% can serialize this to a JSON format...
 json_str = ex.model_dump()
+pprint(json_str)
 
-# %% ... and then easily parse back into data tree
-ex_parse = AnalogCircuit(**json_str)
+#%% ... and then easily parse back into data tree
+ex_parse = AnalogCircuit.model_validate(ex.model_dump())
+
+#%%
+ex_parse = AnalogCircuit.model_validate(json_str)
 
 # %% need another object that stores keywords about the backend runtime parameters
 args = TaskArgsAnalog(
     n_shots=100,
     fock_cutoff=4,
-    observables={"z": PauliZ, "x": PauliX, "y": PauliY},
     dt=0.01,
 )
 

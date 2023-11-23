@@ -2,7 +2,8 @@ import numpy as np
 
 from quantumion.base import TypeReflectBaseModel
 
-class ComplexFloat(BaseModel):
+
+class ComplexFloat(TypeReflectBaseModel):
     real: float
     imag: float
 

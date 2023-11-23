@@ -11,7 +11,6 @@ from backends.metric import *
 from quantumion.types import ComplexFloat
 from quantumion.analog.gate import AnalogGate
 from quantumion.analog.operator import Operator, PauliX
-from quantumion.analog.coefficient import Complex
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.math import prod
 
@@ -143,7 +142,7 @@ class QutipBackend(BackendBase):
                 )
             )
 
-        if isinstance(operator.coefficient, Complex):
+        if isinstance(operator.coefficient, ComplexFloat):
             coefficient = operator.coefficient.real + 1j * operator.coefficient.imag
         elif isinstance(operator.coefficient, (int, float)):
             coefficient = operator.coefficient

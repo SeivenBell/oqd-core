@@ -1,4 +1,4 @@
-from typing import List, Tuple, Literal, Union
+from typing import List, Tuple, Literal, Union, Optional
 from pydantic import BaseModel, ValidationError
 from pydantic.types import NonNegativeInt
 
@@ -13,15 +13,15 @@ class Evolve(TypeReflectBaseModel):
 
 class Measure(TypeReflectBaseModel):
     key: Literal['measure'] = 'measure'
-    qreg: List[NonNegativeInt] = None
-    qmode: List[NonNegativeInt] = None
+    qreg: Union[List[NonNegativeInt], None] = None
+    qmode: Union[List[NonNegativeInt], None] = None
 
 
 class Initialize(TypeReflectBaseModel):
     key: Literal['initialize'] = 'initialize'
 
 
-Statement = Union[Initialize, Evolve, Measure]
+# Statement = Union[Measure, Evolve, Initialize]
 
 
 class AnalogCircuit(TypeReflectBaseModel):
@@ -29,10 +29,10 @@ class AnalogCircuit(TypeReflectBaseModel):
     qmode: List[NonNegativeInt] = []
 
     definitions: List[Tuple[str, AnalogGate]] = []
-    sequence: List[Statement] = []
+    sequence: List[Union[Measure, Evolve, Initialize]] = []
 
-    n_qreg: int = None  # todo: change to a property
-    n_qmode: int = None
+    n_qreg: int = 0  # todo: change to a property
+    n_qmode: int = 0
 
     class Config:
         extra = "forbid"
@@ -43,9 +43,9 @@ class AnalogCircuit(TypeReflectBaseModel):
     def evolve(self, gate: AnalogGate):
         if not isinstance(gate, AnalogGate):
             raise ValidationError
-        if gate.n_qreg != self.n_qreg and self.n_qreg is not None:
+        if self.n_qreg != 0 and gate.n_qreg != self.n_qreg:
             raise ValueError("Inconsistent qreg dimensions.")
-        if gate.n_qmode != self.n_qmode and self.n_qmode is not None:
+        if self.n_qmode != 0 and gate.n_qmode != self.n_qmode:
             raise ValueError("Inconsistent qmode dimensions.")
 
         self.sequence.append(Evolve(gate=gate))
