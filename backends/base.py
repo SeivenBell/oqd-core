@@ -17,18 +17,18 @@ class BackendBase(ABC):
 
 
 class TypeReflectBaseModel(BaseModel):
-    class_: Optional[str]
+    type_: Optional[str]
 
     @model_validator(mode="before")
     @classmethod
     def reflect(cls, data):
-        if "class_" in data.keys():
-            if data["class_"] != cls.__name__:
+        if "type_" in data.keys():
+            if data["type_"] != cls.__name__:
                 raise TypeReflectError(
-                    'discrepency between "class_" field and model type'
+                    'discrepency between "type_" field and model type'
                 )
 
-        data["class_"] = cls.__name__
+        data["type_"] = cls.__name__
         return data
 
 
