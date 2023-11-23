@@ -12,12 +12,14 @@ function convert(task_json::String)
 end
 
 function run(task_json::String)
+    println(task_json)
     task = convert(task_json);
-    result = evolve(task);
+    println(task)
+    result = _run(task);
     return JSON3.write(to_dict(result))
 end
 
-function evolve(task::Task)
+function _run(task::Task)
     runtime = @elapsed begin
         circ = task.program;
         args = task.args;
@@ -25,14 +27,14 @@ function evolve(task::Task)
         b = SpinBasis(1//2);
         f = FockBasis(args.fock_cutoff);
 
-        _map_qreg = Dict(
+        _map_pauli = Dict(
             "i" => identityoperator(b),
             "x" => sigmax(b),
             "y" => sigmay(b),
             "z" => sigmaz(b)
         );
 
-        _map_qmode = Dict(
+        _map_ladder = Dict(
             0 => identityoperator(f),
             -1 => destroy(f),
             +1 => create(f),
@@ -40,12 +42,12 @@ function evolve(task::Task)
 
         function _map_operator_to_qo(operator::Operator)
             _hs = []
-            if !isempty(operator.qreg)
-                _h_qreg = [_map_qreg[qreg] for qreg in operator.qreg]
+            if !isempty(operator.pauli)
+                _h_qreg = [_map_pauli[pauli] for pauli in operator.pauli]
                 _hs = vcat(_hs, _h_qreg);
             end
-            if !isempty(operator.qreg)
-                _h_qmode = [prod([_map_qmode[qmode_op] for qmode_op in mode]) for mode in operator.qmode]
+            if !isempty(operator.ladder)
+                _h_qmode = [prod([_map_ladder[ladder_op] for ladder_op in mode]) for mode in operator.ladder]
                 _hs = vcat(_hs, _h_qmode);
             end
             op = operator.coefficient * tensor(_hs...);
@@ -57,7 +59,7 @@ function evolve(task::Task)
         end
 
         function _map_gate_to_qobj(gate::AnalogGate)
-            return _sum_operators(gate.unitary)
+            return _sum_operators(gate.hamiltonian)
         end
 
         function _map_metric(metric::Metric, circ::AnalogCircuit)::Function
@@ -94,13 +96,19 @@ function evolve(task::Task)
         end
         
         t0 = 0.0
-        for gate in circ.sequence
-            tspan = range(0, stop=gate.duration, step=args.dt);
-            append!(data.times, collect(tspan) .+ t0);
-            t0 = gate.duration
-            
-            H = _map_gate_to_qobj(gate);
-            timeevolution.schroedinger(tspan, psi, H; fout=fout);
+        for statement in circ.sequence
+            if statement.key == "initialize"
+                continue  # todo
+            elseif statement.key == "evolve"
+                tspan = range(0, stop=statement.gate.duration, step=args.dt);
+                append!(data.times, collect(tspan) .+ t0);
+                t0 = statement.gate.duration
+                
+                H = _map_gate_to_qobj(statement.gate);
+                timeevolution.schroedinger(tspan, psi, H; fout=fout);
+            elseif statement.key == "measure"
+                continue  # todo
+            end
         end
     end
 

@@ -3,14 +3,12 @@ using Configurations
 include("ir.jl")
 
 
-@option "expectation" struct Expectation
-    # type::Reflect
+@option struct Expectation
     operator::Vector{Operator}
 end
 
 
-@option "entanglement_entropy_vn" struct EntanglementEntropyVN
-    # type::Reflect
+@option struct EntanglementEntropyVN
     qreg::Vector{Int}
     qmode::Vector{Int}
 end

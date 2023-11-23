@@ -15,9 +15,9 @@ op = (PauliY * PauliY) @ (PauliY * PauliX)  # @ (Creation * Annihilation)
 
 # %% create an experiment to run/simulate
 ex = AnalogCircuit()
-gate = AnalogGate(duration=1.1223542, hamiltonian=[np.pi / 4 * PauliX @ PauliX], dissipation=[])
+gate = AnalogGate(duration=1.234, hamiltonian=[np.pi / 4 * PauliX @ PauliX, PauliY @ PauliY], dissipation=[])
 ex.evolve(gate=gate)
-gate = AnalogGate(duration=1.1223542, hamiltonian=[PauliX @ PauliI], dissipation=[])
+gate = AnalogGate(duration=1.234, hamiltonian=[PauliX @ PauliI], dissipation=[])
 ex.evolve(gate=gate)
 pprint(ex)
 
@@ -37,7 +37,10 @@ args = TaskArgsAnalog(
     n_shots=100,
     fock_cutoff=4,
     metrics={
-        'ee_vn': EntanglementEntropyVN(qreg=[0])
+        'ee_vn': EntanglementEntropyVN(qreg=[0]),
+        'z': Expectation(operator=[0.5 * PauliZ @ PauliI, 0.5 * PauliI @ PauliZ]),
+        'z1': Expectation(operator=[PauliZ @ PauliI]),
+        'z2': Expectation(operator=[PauliI @ PauliZ]),
     },
     dt=0.01,
 )

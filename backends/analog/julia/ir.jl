@@ -12,7 +12,7 @@ end
 
 
 @option struct Operator
-    coefficient::Union{Int, Float64} = 1.0
+    coefficient::Union{Int, Float64, ComplexFloat} = 1.0
     pauli::Vector{String} = []
     ladder::Vector{Vector{Int}} = []
 end
@@ -24,24 +24,34 @@ end
 
 
 @option struct AnalogGate
-    duration::Union{Int, Float64, Nothing}
+    duration::Float64
     hamiltonian::Vector{Operator} = []
     dissipation::Vector{Dissipation} = []
 end
 
 
-@option struct Statement
-    key::String
-    assignment::Union{AnalogGate}
+@option struct Evolve
+    key::String = "evolve"
+    gate::Union{AnalogGate, String}
+end
+
+@option struct Initialize
+    key::String = "initialize"
 end
 
 
+Statement = Union{Evolve, Initialize}
+
+
 @option struct AnalogCircuit
-    definitions::Vector{Int} = []
-    registers::Vector{Int} = []
-    sequence::Vector{AnalogGate} = []
-    n_qreg::Union{Nothing, Int} = nothing
-    n_qmode::Union{Nothing, Int} = nothing
+    qreg::Vector{Int}
+    qmode::Vector{Int}
+
+    definitions::Vector{Tuple{String, AnalogGate}} = []
+    sequence::Vector{Statement} = []
+    
+    n_qreg::Maybe{Int} = nothing
+    n_qmode::Maybe{Int} = nothing
  end
 
 

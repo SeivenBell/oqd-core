@@ -42,12 +42,12 @@ c = Task(**s)
 #%%
 backends = {
     "quantumoptics": QuantumOpticsBackend(),
-    "qutip": QutipBackend()
+    # "qutip": QutipBackend()
 }
 results = {}
 
 for key, backend in backends.items():
-    for i in range(2):
+    for i in range(1):
         result = backend.run(task)
         results[key] = result
 
