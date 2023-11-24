@@ -24,6 +24,16 @@ Statement = Union[Measure, Evolve, Initialize]
 
 
 class AnalogCircuit(BaseModel):
+    """
+    The AnalogCircuit docstrings
+
+    Examples:
+        >>> AnalogCircuit().evolve(AnalogGate(duration=1.0, hamiltonian=[PauliX]))
+
+    Args:
+
+    """
+
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []
 

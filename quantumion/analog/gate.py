@@ -12,6 +12,17 @@ __all__ = [
 
 
 class AnalogGate(BaseModel):
+    """
+    The AnalogCircuit docstrings
+
+    Examples:
+        >>> AnalogGate(duration=1.0, hamiltonian=[PauliX])
+
+    Args:
+        duration (float): the duration in microseconds to apply this analog gate
+        hamiltonian (list[Operator]): the Hamiltonian to evolve the state under unitarily
+        dissipation (list[Dissipation]): the dissipation terms to apply, represented as jump operators
+    """
     duration: float
     hamiltonian: list[Operator] = []
     dissipation: list[Dissipation] = []
