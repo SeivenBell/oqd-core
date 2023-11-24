@@ -1,5 +1,8 @@
 using JSON3
 using QuantumOptics
+using StatsBase
+using DataStructures
+using Base.Iterators
 
 include("ir.jl")
 include("task.jl")
@@ -13,12 +16,11 @@ end
 
 function run(task_json::String)
     task = convert(task_json);
-    print(task)
-    result = evolve(task);
+    result = _run(task);
     return JSON3.write(to_dict(result))
 end
 
-function evolve(task::Task)
+function _run(task::Task)
     runtime = @elapsed begin
         circ = task.program;
         args = task.args;
@@ -26,14 +28,14 @@ function evolve(task::Task)
         b = SpinBasis(1//2);
         f = FockBasis(args.fock_cutoff);
 
-        _map_qreg = Dict(
+        _map_pauli = Dict(
             "i" => identityoperator(b),
             "x" => sigmax(b),
             "y" => sigmay(b),
             "z" => sigmaz(b)
         );
 
-        _map_qmode = Dict(
+        _map_ladder = Dict(
             0 => identityoperator(f),
             -1 => destroy(f),
             +1 => create(f),
@@ -41,12 +43,12 @@ function evolve(task::Task)
 
         function _map_operator_to_qo(operator::Operator)
             _hs = []
-            if !isempty(operator.qreg)
-                _h_qreg = [_map_qreg[qreg] for qreg in operator.qreg]
+            if !isempty(operator.pauli)
+                _h_qreg = [_map_pauli[pauli] for pauli in operator.pauli]
                 _hs = vcat(_hs, _h_qreg);
             end
-            if !isempty(operator.qreg)
-                _h_qmode = [prod([_map_qmode[qmode_op] for qmode_op in mode]) for mode in operator.qmode]
+            if !isempty(operator.ladder)
+                _h_qmode = [prod([_map_ladder[ladder_op] for ladder_op in mode]) for mode in operator.ladder]
                 _hs = vcat(_hs, _h_qmode);
             end
             op = operator.coefficient * tensor(_hs...);
@@ -58,7 +60,7 @@ function evolve(task::Task)
         end
 
         function _map_gate_to_qobj(gate::AnalogGate)
-            return _sum_operators(gate.unitary)
+            return _sum_operators(gate.hamiltonian)
         end
 
         function _map_metric(metric::Metric, circ::AnalogCircuit)::Function
@@ -78,6 +80,25 @@ function evolve(task::Task)
             return psi
         end
 
+        function _measure(psi, circuit::AnalogCircuit, n_shots::Int)
+            a = repeat([(0, 1)], circuit.n_qreg)  # qreg bases
+            b = repeat([(0:args.fock_cutoff)], circuit.n_qmode)  # qmodes bases
+            
+            opts_str = vec([join(string(p...)) for p in product(vcat(a, b)...)])
+            probabilities = broadcast(abs, psi.data) .^2  # probability vector from the complex prob. amplitudes
+            
+            opts = 1:length(probabilities)
+            w = Weights(probabilities)
+            indices = zeros(Int, n_shots)
+            for i in 1:n_shots
+                indices[i] = sample(opts, w)
+                # indices[i] = rand(Categorical(probabilities))
+            end
+            counts = Dict{String, Int}(opts_str[index] => count for (index, count) in counter(indices))
+            return counts
+
+        end
+
         psi = _initialize();
         fmetrics = Dict{String, Function}(key => _map_metric(metric, circ) for (key, metric) in args.metrics)
 
@@ -95,22 +116,30 @@ function evolve(task::Task)
         end
         
         t0 = 0.0
-        for gate in circ.sequence
-            tspan = range(0, stop=gate.duration, step=args.dt);
-            append!(data.times, collect(tspan) .+ t0);
-            t0 = gate.duration
-            
-            H = _map_gate_to_qobj(gate);
-            timeevolution.schroedinger(tspan, psi, H; fout=fout);
+        for statement in circ.sequence
+            if statement.key == "initialize"
+                continue  # todo
+            elseif statement.key == "evolve"
+                tspan = range(0, stop=statement.gate.duration, step=args.dt);
+                append!(data.times, collect(tspan) .+ t0);
+                t0 = statement.gate.duration
+                
+                H = _map_gate_to_qobj(statement.gate);
+                timeevolution.schroedinger(tspan, data.state, H; fout=fout);
+            elseif statement.key == "measure"
+                continue  # todo
+            end
         end
+        counts = _measure(data.state, circ, args.n_shots)
+
     end
 
     result = TaskResultAnalog(
         times=data.times,
         runtime=runtime,
-        # state=data.state.data,
         state=map(complexf64_to_complexfloat, data.state.data),
         metrics=data.metrics,
+        counts=counts,
     )
 
     return result

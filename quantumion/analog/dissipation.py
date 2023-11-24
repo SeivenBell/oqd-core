@@ -1,11 +1,6 @@
-# External imports
-
 from typing import Union
-
-from quantumion.base import TypeReflectBaseModel
-
-########################################################################################
+from pydantic import BaseModel
 
 
-class Dissipation(TypeReflectBaseModel):
+class Dissipation(BaseModel):
     jumps: int = None  # todo: discuss ir for dissipation

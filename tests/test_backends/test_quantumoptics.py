@@ -16,11 +16,16 @@ from backends.metric import Expectation, EntanglementEntropyVN
 #%%
 ex = AnalogCircuit()
 gate = AnalogGate(
-    duration=1.0,
-    unitary=[np.pi * PauliX @ PauliX],
-    dissipation=[]
+    duration=3.0,
+    hamiltonian=[np.pi * PauliX @ PauliY, np.pi * PauliI @ PauliX],
 )
-ex.add(gate=gate)
+ex.evolve(gate=gate)
+
+gate = AnalogGate(
+    duration=1.23,
+    hamiltonian=[PauliX @ PauliI, PauliI @ PauliY],
+)
+ex.evolve(gate=gate)
 
 #%%
 args = TaskArgsAnalog(
@@ -44,6 +49,8 @@ backends = {
     "quantumoptics": QuantumOpticsBackend(),
     "qutip": QutipBackend()
 }
+
+#%%
 results = {}
 
 for key, backend in backends.items():
@@ -52,10 +59,17 @@ for key, backend in backends.items():
         results[key] = result
 
 #%%
+bases = result.counts.keys()
+for basis in bases:
+    print(f"Basis {basis} | Qutip {results['qutip'].counts[basis]} | QO {results['quantumoptics'].counts[basis]}")
+
+
+#%%
 fig, axs = plt.subplots(2, 1)
 for key, result in results.items():
     axs[0].plot(result.times, result.metrics['ee_vn'], label=key)
     axs[1].plot(result.times, result.metrics['z'], label=key)
+    print(f"Backend {key} | counts = {result.counts}")
 
 axs[0].set(ylabel=r"$S(\rho_A)$")
 axs[1].set(ylabel=r"$\langle \sigma_z \rangle$")

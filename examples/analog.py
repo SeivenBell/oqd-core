@@ -17,10 +17,10 @@ from backends.provider import Provider
 ex = AnalogCircuit()
 gate = AnalogGate(
     duration=1.0,
-    unitary=[np.pi / 4 * PauliX @ PauliX],
+    hamiltonian=[np.pi / 4 * PauliX @ PauliX],
     dissipation=[]
 )
-ex.add(gate=gate)
+ex.evolve(gate=gate)
 
 #%% can serialize this to a JSON format...
 json_str = ex.model_dump()

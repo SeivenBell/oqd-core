@@ -11,7 +11,6 @@ from backends.metric import *
 from quantumion.types import ComplexFloat
 from quantumion.analog.gate import AnalogGate
 from quantumion.analog.operator import Operator, PauliX
-from quantumion.analog.coefficient import Complex
 from quantumion.analog.circuit import AnalogCircuit
 from quantumion.analog.math import prod
 
@@ -26,7 +25,7 @@ class QutipBackend(BackendBase):
         self.fmetrics = []
 
     def run(self, task: Task) -> TaskResultAnalog:
-        t0 = time.time()
+        start = time.time()
 
         assert isinstance(
             task.program, AnalogCircuit
@@ -43,12 +42,21 @@ class QutipBackend(BackendBase):
         self._initialize(circuit, args, data)
         self.fmetrics = {key: self._map_metric(metric, circuit) for (key, metric) in args.metrics.items()}
 
-        for gate in circuit.sequence:
-            self._evolve(gate, args, data)
+        t0 = 0.0
+        for statement in circuit.sequence:
+            if statement.key == "initialize":
+                continue  # todo: implement simulation logic of initializing/measuring qregs/qmodes
+
+            elif statement.key == 'evolve':
+                self._evolve(statement.gate, args, data, t0)
+                t0 += statement.gate.duration
+
+            elif statement.key == 'measure':
+                continue  # todo
 
         self._measure(circuit, args, data)
 
-        runtime = time.time() - t0
+        runtime = time.time() - start
 
         # get measurement data
         bitstrings = ["".join(map(str, shot)) for shot in data.shots]
@@ -79,14 +87,14 @@ class QutipBackend(BackendBase):
         }
 
     def _initialize(
-        self, experiment: AnalogCircuit, args: TaskArgsAnalog, data: DataAnalog
+        self, circuit: AnalogCircuit, args: TaskArgsAnalog, data: DataAnalog
     ):
         # generate initial quantum state as the |00.0> \otimes |00.0> as Qobj
-        dims = experiment.n_qreg * [2] + experiment.n_qmode * [args.fock_cutoff]
+        dims = circuit.n_qreg * [2] + circuit.n_qmode * [args.fock_cutoff]
         data.state = qt.tensor([qt.basis(d, 0) for d in dims])
         return
 
-    def _evolve(self, gate: AnalogGate, args: TaskArgsAnalog, data: DataAnalog):
+    def _evolve(self, gate: AnalogGate, args: TaskArgsAnalog, data: DataAnalog, t0: float):
         options = qt.solver.Options(store_final_state=True)
         duration = gate.duration
         tspan = np.linspace(
@@ -101,20 +109,20 @@ class QutipBackend(BackendBase):
             op_qobj, data.state, tspan, e_ops=self.fmetrics, options=options
         )
 
-        data.times = np.hstack([data.times, tspan])
+        data.times = np.hstack([data.times, t0 + tspan])
         data.metrics = {key: np.hstack([data.metrics[key], result_qobj.expect[key]]) for key in data.metrics.keys()}
         data.state = result_qobj.final_state
         return
 
     def _measure(
-        self, experiment: AnalogCircuit, spec: TaskArgsAnalog, data: DataAnalog
+        self, circuit: AnalogCircuit, args: TaskArgsAnalog, data: DataAnalog
     ):
-        if spec.n_shots is not None:
+        if args.n_shots is not None:
             state = data.state
             probs = np.power(np.abs(state.full()), 2).squeeze()
-            inds = np.random.choice(len(probs), size=spec.n_shots, p=probs)
-            opts = experiment.n_qreg * [[0, 1]] + experiment.n_qmode * [
-                list(range(spec.fock_cutoff))
+            inds = np.random.choice(len(probs), size=args.n_shots, p=probs)
+            opts = circuit.n_qreg * [[0, 1]] + circuit.n_qmode * [
+                list(range(args.fock_cutoff))
             ]
             bases = list(itertools.product(*opts))
             shots = np.array([bases[ind] for ind in inds])
@@ -133,17 +141,17 @@ class QutipBackend(BackendBase):
         """
         _operator_qobjs = []
 
-        if operator.qreg:
-            _operator_qobjs.append(qt.tensor([self.qreg_map[i] for i in operator.qreg]))
+        if operator.pauli:
+            _operator_qobjs.append(qt.tensor([self.qreg_map[i] for i in operator.pauli]))
 
-        if operator.qmode:
+        if operator.ladder:
             _operator_qobjs.append(
                 qt.tensor(
-                    [prod([self.qmode_map[j] for j in tf]) for tf in operator.qmode]
+                    [prod([self.qmode_map[j] for j in tf]) for tf in operator.ladder]
                 )
             )
 
-        if isinstance(operator.coefficient, Complex):
+        if isinstance(operator.coefficient, ComplexFloat):
             coefficient = operator.coefficient.real + 1j * operator.coefficient.imag
         elif isinstance(operator.coefficient, (int, float)):
             coefficient = operator.coefficient
@@ -156,7 +164,7 @@ class QutipBackend(BackendBase):
         return sum([self._map_operator_to_qobj(operator) for operator in operators])
 
     def _map_gate_to_qobj(self, gate: AnalogGate) -> qt.Qobj:
-        return self._sum_operators(gate.unitary)
+        return self._sum_operators(gate.hamiltonian)
 
     def _map_metric(self, metric: Metric, circuit: AnalogCircuit):
         if isinstance(metric, EntanglementEntropyVN):

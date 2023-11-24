@@ -2,8 +2,8 @@ using Configurations
 
 
 @option struct ComplexFloat
-    re::Float64
-    im::Float64
+    real::Float64
+    imag::Float64
 end
 
 function complexf64_to_complexfloat(cf::ComplexF64)
@@ -12,9 +12,9 @@ end
 
 
 @option struct Operator
-    coefficient::Union{Int, Float64} = 1.0
-    qreg::Vector{String} = []
-    qmode::Vector{Vector{Int}} = []
+    coefficient::Union{Int, Float64, ComplexFloat} = 1.0
+    pauli::Vector{String} = []
+    ladder::Vector{Vector{Int}} = []
 end
 
 
@@ -24,24 +24,40 @@ end
 
 
 @option struct AnalogGate
-    duration::Union{Int, Float64, Nothing} = nothing
-    unitary::Vector{Operator} = []
+    duration::Float64
+    hamiltonian::Vector{Operator} = []
     dissipation::Vector{Dissipation} = []
 end
 
 
-@option struct Statement
-    key::String
-    assignment::Union{AnalogGate}
+@option struct Evolve
+    key::String = "evolve"
+    gate::Union{AnalogGate, String}
 end
 
 
+@option struct Initialize
+    key::String = "initialize"
+end
+
+
+@option struct Measure
+    key::String = "measure"
+end
+
+
+Statement = Union{Initialize, Evolve, Measure}
+
+
 @option struct AnalogCircuit
-    definitions::Vector{Int} = []
-    registers::Vector{Int} = []
-    sequence::Vector{AnalogGate} = []
-    n_qreg::Union{Nothing, Int} = nothing
-    n_qmode::Union{Nothing, Int} = nothing
+    qreg::Vector{Int}
+    qmode::Vector{Int}
+
+    definitions::Vector{Tuple{String, AnalogGate}} = []
+    sequence::Vector{Statement} = []
+
+    n_qreg::Maybe{Int} = nothing
+    n_qmode::Maybe{Int} = nothing
  end
 
 

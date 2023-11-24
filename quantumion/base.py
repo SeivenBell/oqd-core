@@ -1,8 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, model_validator
 
-########################################################################################
-
 
 class TypeReflectBaseModel(BaseModel):
     type_: Optional[str]
@@ -10,13 +8,15 @@ class TypeReflectBaseModel(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def reflect(cls, data):
-        if "type_" in data.keys():
-            if data["type_"] != cls.__name__:
-                raise TypeReflectError(
-                    'discrepency between "type_" field and model type'
-                )
+        if isinstance(data, BaseModel):
+            return data
 
-        data["type_"] = cls.__name__
+        if "class_" in data.keys():
+            if data["class_"] != cls.__name__:
+                raise ValueError('discrepency between "class_" field and model type')
+
+        data["class_"] = cls.__name__
+
         return data
 
 
