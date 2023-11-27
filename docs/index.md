@@ -14,10 +14,10 @@ Open Quantum Design full-stack quantum computer.
 
 ```mermaid
 flowchart LR
+    Digital[Digital Circuit] --> openQASM(openQASM) 
     Analog[Analog Circuit] --> openQSIM(openQSIM)
-    Digital[Digital Circuit] --> openQASM(openQSIM) 
     Atomic[Atomic Protocol] ---> openAPL(openAPL)
-
+  
     openQSIM --> |compile| openAPL
     openQASM --> |compile| openAPL
 
@@ -26,6 +26,7 @@ flowchart LR
 
     openQASM ----> TensorCircuit
     openQASM ----> PastaQ.jl
+    
+    openAPL ---> Hardware{Bare metal}
+    openAPL ---> IonSim.jl
 ```
-
-[//]: # (Bob-->>John: Jolly good!)

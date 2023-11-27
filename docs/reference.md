@@ -10,3 +10,5 @@
 ::: quantumion.analog.circuit.AnalogCircuit
 
 ::: quantumion.analog.gate.AnalogGate
+
+::: quantumion.analog.operator.Operator

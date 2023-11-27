@@ -25,12 +25,15 @@ Statement = Union[Measure, Evolve, Initialize]
 
 class AnalogCircuit(BaseModel):
     """
-    The AnalogCircuit docstrings
 
     Examples:
         >>> AnalogCircuit().evolve(AnalogGate(duration=1.0, hamiltonian=[PauliX]))
 
     Args:
+        qreg (list[NonNegativeInt]): indices of the qubit registers
+        qmode (list[NonNegativeInt]): indices of the bosonic mode registers
+        definitions (list[tuple[str, AnalogGate]]): definitions of gates to unique string identifiers
+        sequence (list[Statement]): sequence of statements, including initialize, evolve, measure
 
     """
 

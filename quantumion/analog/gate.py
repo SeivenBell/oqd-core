@@ -13,8 +13,6 @@ __all__ = [
 
 class AnalogGate(BaseModel):
     """
-    The AnalogCircuit docstrings
-
     Examples:
         >>> AnalogGate(duration=1.0, hamiltonian=[PauliX])
 

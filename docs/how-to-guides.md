@@ -1,3 +1,4 @@
+# How-to: A hands on guide
 !!! note
 
     This part of the project documentation focuses on a
@@ -5,38 +6,53 @@
     tasks that you might have, with the help of the code
     provided in this project.
 
-## How To Add Two Numbers?
+## Analog
+Let's implement our favourite Hamiltonian -- the transverse-field Ising model.
+The general Hamiltonian looks like,
+$$
+H = \sum_{\langle ij \rangle} \sigma^x_i \sigma^x_j + h \sum_i \sigma^z_i
+$$
 
-You have two numbers and you need to add them together.
-You're in luck! The `calculator` package can help you
-get this done.
+Let's implement it with two qubits and with $h=1$.
+$$
+H = \sigma^x_1 \sigma^x_2 + \sigma^z_1 + \sigma^z_2
+$$
 
-Download the code from this GitHub repository and place
-the `calculator/` folder in the same directory as your
-Python script:
+Our analog circuit will have one gate, which describes this Hamiltonian.
+``` py
+from quantumion.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
 
-    your_project/
-    │
-    ├── calculator/
-    │   ├── __init__.py
-    │   └── calculations.py
-    │
-    └── your_script.py
+circuit = AnalogCircuit()
+circuit.evolve(
+    AnalogGate(
+        duration=1.0, 
+        hamiltonian=[PauliX @ PauliX, PauliZ @ PauliI, PauliI @ PauliZ],
+    )
+)    
+```
 
-Inside of `your_script.py` you can now import the
-`add()` function from the `calculator.calculations`
-module:
+Let's now generalize this to 
+``` py
+from quantumion.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
 
-    # your_script.py
-    from calculator.calculations import add
+n = 10
+circuit = AnalogCircuit()
+hamiltonian = []
+for i in range(n):
+    interaction = tensor([PauliX if i in (i, (i+1)%n) else PauliI for i in range(n)])
+    field = tensor([PauliZ if i in (i, (i+1)%n) else PauliI for i in range(n)])
+    hamiltonian += [interaction, field]
 
-After you've imported the function, you can use it
-to add any two numbers that you need to add:
+circuit.evolve(
+    AnalogGate(
+        duration=1.0, 
+        hamiltonian=hamiltonian
+    )
+)    
+```
 
-    # your_script.py
-    from calculator.calculations import add
 
-    print(add(20, 22))  # OUTPUT: 42.0
+## Digital
 
-You're now able to add any two numbers, and you'll
-always get a `float` as a result.
+
+## Atomic

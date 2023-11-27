@@ -15,16 +15,7 @@
 - Provide the minimum necessary explanation
 - Avoid any distractions
 
-``` py
-from quantumion.analog.circuit import AnalogCircuit
-from backends.analog import QutipBackend
 
-circuit = AnalogCircuit()
-circuit.evolve(
-    AnalogGate(
-        duration=1.0, 
-        hamiltonian=[PauliX @ PauliX, PauliZ @ PauliI, PauliI @ PauliZ],
-    )
-)    
-```
+## Analog
+
 
