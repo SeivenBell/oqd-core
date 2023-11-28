@@ -3,9 +3,10 @@ site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
 #site_url: http://0.0.0.0:8000
 
+use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
+
 theme:
   name: material
-#  custom_dir: ../en/overrides
 
   logo: img/oqd-logo.png
 
@@ -35,14 +36,14 @@ theme:
   - content.code.annotate
   - content.code.copy
   - content.code.select
-  - navigation.tabs
+#  - navigation.tabs
 
 plugins:
   - mkdocstrings
 
 
 nav:
-  - Open Quantum Design: index.md
+  - Introduction: index.md
   - Tutorials: tutorials.md
   - How to guides: how-to-guides.md
   - Reference: reference.md
@@ -50,6 +51,10 @@ nav:
 
 
 markdown_extensions:
+  - toc:
+      permalink: true
+      toc_depth: 4
+
   # for code snippets/syntax highlighting
   - pymdownx.highlight:
       anchor_linenums: true

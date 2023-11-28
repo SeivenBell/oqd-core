@@ -1,9 +1,10 @@
 # Welcome to Open Quantum Design
+!!! note
+    Welcome to the Open Quantum Design frameowkr for programming quantum computers. 
+    This documentation is still under development, please feel to contribute! © Open Quantum Design
 
-This site contains the project documentation for the
-Open Quantum Design full-stack quantum computer. 
 
-## Table Of Contents
+## Contents
 1. [Tutorials](tutorials.md)
 2. [How-To Guides](how-to-guides.md)
 3. [Reference](reference.md)
@@ -11,10 +12,12 @@ Open Quantum Design full-stack quantum computer.
 
 
 ## The stack
+    
 
 ```mermaid
 flowchart LR
     Digital[Digital Circuit] --> openQASM(openQASM) 
+    
     Analog[Analog Circuit] --> openQSIM(openQSIM)
     Atomic[Atomic Protocol] ---> openAPL(openAPL)
   
@@ -29,4 +32,6 @@ flowchart LR
     
     openAPL ---> Hardware{Bare metal}
     openAPL ---> IonSim.jl
+    
+    
 ```
