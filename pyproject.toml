@@ -17,6 +17,7 @@ dependencies = [
     "redis",
     "rq",
     "requests",
+    "rich"
 ]
 
 [project.optional-dependencies]

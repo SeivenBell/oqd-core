@@ -8,7 +8,7 @@ RUN \
 
 ENV PATH "$PATH:/opt/julia-1.9.3/bin"
 
-RUN julia -e 'using Pkg; Pkg.add(["QuantumOptics", "Configurations", "StatsBase", "DataStructures", "JSON3"])'
+RUN julia -e 'using Pkg; Pkg.add(["QuantumOptics", "Configurations", "StatsBase", "DataStructures", "JSON3", "IonSim"])'
 
 WORKDIR /app
 ADD . /app

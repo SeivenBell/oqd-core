@@ -36,10 +36,17 @@ if __name__ == "__main__":
         type=int,
         help="Number of repetitions",
     )
+    parser.add_argument(
+        "-B",
+        default=1,
+        type=int,
+        help="Number of samples per repetition",
+    )
 
     args = parser.parse_args()
     URL = args.url
     N = args.N
+    B = args.B
 
     ########################################################################################
 
@@ -54,12 +61,12 @@ if __name__ == "__main__":
 
     ########################################################################################
 
-    op = np.pi * PauliX
+    op = np.pi * PauliX @ PauliX
     gate = AnalogGate(duration=1 / 4, hamiltonian=[op], dissipation=[])
     ex = AnalogCircuit()
     ex.evolve(gate=gate)
 
-    analog_args = TaskArgsAnalog(n_shots=100)
+    analog_args = TaskArgsAnalog(n_shots=B)
     analog_task = Task(program=ex, args=analog_args)
     for _ in range(N):
         job = client.submit(analog_task, backend="qutip")
@@ -76,7 +83,7 @@ if __name__ == "__main__":
     circ.add(H(qreg=qreg[0]))
     circ.add(CNOT(qreg=qreg[0:2]))
 
-    digital_args = TaskArgsDigital(repetitions=100)
+    digital_args = TaskArgsDigital(repetitions=B)
     digital_task = Task(program=circ, args=digital_args)
 
     for _ in range(N):
