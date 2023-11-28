@@ -93,3 +93,22 @@ from quantumion.digital.gate import Gate, H, CNOT
 circuit = DigitalCircuit()
 circuit.add(H)
 ```
+
+
+## Atomic mode
+
+## Classical emulators
+Each mode has a suite of backend classical emulators for designing, 
+benchmarking, and studying programs run on quantum computers.
+
+```py
+from backends.analog import QutipBackend
+from backends.task import Task, TaskArgsAnalog
+
+backend = QutipBackend()
+backend.run(task)
+```
+
+
+
+

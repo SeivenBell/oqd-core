@@ -31,17 +31,17 @@ circuit.evolve(
 )    
 ```
 
-Let's now generalize this to 
+Let's now generalize this to a quantum system with `n` qubits.
 ``` py
 from quantumion.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
+from quantumion.analog.math import tensor
 
 n = 10
 circuit = AnalogCircuit()
-hamiltonian = []
-for i in range(n):
-    interaction = tensor([PauliX if i in (i, (i+1)%n) else PauliI for i in range(n)])
-    field = tensor([PauliZ if i in (i, (i+1)%n) else PauliI for i in range(n)])
-    hamiltonian += [interaction, field]
+
+field = [tensor([PauliZ if i == j else PauliI for i in range(n)]) for j in range(n)]
+interaction = [tensor([PauliX if i in (i, (i+1)%n) else PauliI for i in range(n)])]
+hamiltonian = interaction + field
 
 circuit.evolve(
     AnalogGate(
@@ -50,7 +50,45 @@ circuit.evolve(
     )
 )    
 ```
+We will emulate this quantum evolution on two classical backends. 
+The first is a wrapper around Qutip, the second a wrapper around the QuantumOptics.jl package.
+```py
+from backends.analog.python.qutip import QutipBackend
+from backends.analog.julia.quantumoptics import QuantumOpticsBackend
+from backends.task import Task, TaskArgsAnalog
 
+args = TaskArgsAnalog(
+    n_shots=100,
+    fock_cutoff=4,
+    dt=0.01,
+)
+task = Task(program=circuit, args=args)
+backend = QutipBackend()
+result = backend.run(task)
+```
+
+````py 
+import matplotlib.pyplot as plt
+from backends.metric import Expectation, EntanglementEntropyVN
+
+metrics = {
+    'entanglement_entropy': EntanglementEntropyVN(qreg=[i for i in range(n//2)]),
+    'expectation_z': Expectation(operator=field)
+}
+args = TaskArgsAnalog(
+    n_shots=100,
+    fock_cutoff=4,
+    metrics=metrics,
+)
+task = Task(program=circuit, args=args)
+backend = QutipBackend()
+result = backend.run(task)
+
+plt.plot(result.times, result.metrics['entanglement_entropy'])
+
+````
+
+![Entropy of entanglement](img/plots/entropy_entanglement.png) 
 
 ## Digital
 
