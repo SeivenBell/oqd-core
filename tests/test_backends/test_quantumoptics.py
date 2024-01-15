@@ -21,11 +21,9 @@ gate = AnalogGate(
 )
 ex.evolve(gate=gate)
 
-gate = AnalogGate(
-    duration=1.23,
-    hamiltonian=[PauliX @ PauliI, PauliI @ PauliY],
-)
-ex.evolve(gate=gate)
+
+ex.model_dump_json()
+
 
 #%%
 args = TaskArgsAnalog(

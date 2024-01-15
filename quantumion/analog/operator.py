@@ -20,6 +20,18 @@ __all__ = [
 
 
 class Operator(BaseModel):
+    """
+    Examples:
+        >>> PauliX = Operator(coefficient=1.0, pauli=["x"])
+        >>> Destroy = Operator(coefficient=1.0, ladder=[[-1]])
+        >>> Create = Operator(coefficient=1.0, ladder=[[1]])
+
+    Args:
+        coefficient (int, float, ComplexFloat): time-independent coefficient of the operator
+        pauli (list["x", "y", "z", "i"]): Pauli operator on qubit index
+        ladder (list[list[-1, 0, +1]]): Ladder operator(s) on mode index
+    """
+
     coefficient: Union[int, float, ComplexFloat] = 1.0
     pauli: List[Literal["x", "y", "z", "i"]] = []
     ladder: List[List[Literal[-1, 0, 1]]] = []
