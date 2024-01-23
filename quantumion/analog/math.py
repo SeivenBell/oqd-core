@@ -23,7 +23,7 @@ _lc = {
     "iz": ("z", +1),
     "xi": ("x", +1),
     "xx": ("i", +1),
-    "xy": ("z", ComplexFloat(real=0, imag=1)),
+    "xy": ("z", ComplexFloat(real=0, imag=+1)),
     "xz": ("y", ComplexFloat(real=0, imag=-1)),
     "yi": ("y", +1),
     "yx": ("z", ComplexFloat(real=0, imag=+1)),
