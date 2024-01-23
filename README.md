@@ -95,7 +95,7 @@ Planned supported hardware backends include:
 
 ## Documentation <a name="documentation"></a>
 
-Documentation is implemented with [MkDocs]([https://github.com/OpenQuantumDesign/openqsim](https://www.mkdocs.org/) and can be read from the docs folder.
+Documentation is implemented with [MkDocs]([https://github.com/OpenQuantumDesign/openqsim](https://www.mkdocs.org/) and can be read from the [docs](https://github.com/OpenQuantumDesign/quantumion/tree/main/docs) folder.
 
 ## Acknowledgements <a name="acknowledgements"></a>
 
