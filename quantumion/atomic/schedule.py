@@ -1,5 +1,5 @@
 # External imports
-from typing import List, Tuple, Dict, Optional, Callable, Union, Literal
+from typing import List, Tuple, Dict, Optional, Callable, Union, Literal, Any
 from typing_extensions import Annotated
 from pydantic import (
     PositiveInt,
@@ -15,6 +15,7 @@ from pydantic import (
 ########################################################################################
 
 from quantumion.base import TypeReflectBaseModel
+from quantumion.compiler.visitor import Visitor, Transform
 
 ########################################################################################
 
@@ -106,16 +107,24 @@ class Ion(TypeReflectBaseModel):
 
 
 class Pulse(TypeReflectBaseModel):
-    ion: Ion
     transition: Transition
     rabi: Union[float, Callable[[float], float]]
     detuning: Union[float, Callable[[float], float]]
+    phase: Union[float, Callable[[float], float]]
     polarization: Union[List[float], Callable[[float], List[float]]]
     wavevector: Union[List[float], Callable[[float], List[float]]]
+    targets: List[int]
 
 
 class Protocol(TypeReflectBaseModel):
     pulses: List[Pulse]
+
+
+########################################################################################
+
+
+class Register(TypeReflectBaseModel):
+    configuration: List[Ion]
 
 
 ########################################################################################
@@ -130,7 +139,33 @@ class Apply(TypeReflectBaseModel):
 
 
 class AtomicProgram(TypeReflectBaseModel):
-    statements: List[Apply]
+    statements: List[Union[Apply, Register]]
+
+    def accept(self, visitor: Visitor):
+        visitor.reset()
+        return visitor.visit(self)
+
+
+########################################################################################
+
+
+class AtomicProgramVisitor(Visitor):
+    pass
+
+
+class AtomicProgramTransform(Transform):
+    pass
+
+
+class CountIonsAnalysis(AtomicProgramVisitor):
+    def __init__(self):
+        self.ions = 0
+
+    def reset(self):
+        self.ions = 0
+
+    def visit_Register(self, model: Register) -> Register:
+        self.ions += len(model.configuration)
 
 
 ########################################################################################
@@ -199,28 +234,45 @@ if __name__ == "__main__":
             transitions=[transition_1, transition_2],
         )
 
+        reg = Register(configuration=[yb171plus, yb171plus])
+        reg2 = Register(configuration=[yb171plus, yb171plus])
+
         raman1 = Pulse(
-            ion=yb171plus,
             transition=yb171plus.transitions[0],
             rabi=1e6 * 2 * np.pi,
             detuning=1e9,
+            phase=np.pi / 2,
             polarization=[1, 0, 0],
             wavevector=[0, 0, 1],
+            targets=[0, 1],
         )
         raman2 = Pulse(
-            ion=yb171plus,
             transition=yb171plus.transitions[1],
             rabi=1e6 * 2 * np.pi,
             detuning=1e9,
+            phase=np.pi / 2,
             polarization=[0, 0, 1],
             wavevector=[0, 0, 1],
+            targets=[0, 1],
         )
 
         twophotonraman = Protocol(pulses=[raman1, raman2])
 
         program = AtomicProgram(
-            statements=[Apply(protocol=twophotonraman, time=0.5e-6)]
+            statements=[
+                reg,
+                reg2,
+                Apply(protocol=twophotonraman, time=0.5e-6),
+            ]
         )
+
+        countions = CountIonsAnalysis()
+        program.accept(countions)
+
+        print(countions.ions)
+        program.accept(countions)
+
+        print(countions.ions)
 
     except ValidationError as e:
         print(e)
