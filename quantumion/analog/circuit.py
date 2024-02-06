@@ -1,29 +1,30 @@
 from typing import List, Tuple, Literal, Union, Optional
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from pydantic.types import NonNegativeInt
 
 from quantumion.analog.gate import AnalogGate
+from quantumion.base import VisitableBaseModel
 
 
-class Evolve(BaseModel):
-    key: Literal['evolve'] = 'evolve'
+class Evolve(VisitableBaseModel):
+    key: Literal["evolve"] = "evolve"
     gate: Union[AnalogGate, str]
 
 
-class Measure(BaseModel):
-    key: Literal['measure'] = 'measure'
+class Measure(VisitableBaseModel):
+    key: Literal["measure"] = "measure"
     qreg: Union[List[NonNegativeInt], None] = None
     qmode: Union[List[NonNegativeInt], None] = None
 
 
-class Initialize(BaseModel):
-    key: Literal['initialize'] = 'initialize'
+class Initialize(VisitableBaseModel):
+    key: Literal["initialize"] = "initialize"
 
 
 Statement = Union[Measure, Evolve, Initialize]
 
 
-class AnalogCircuit(BaseModel):
+class AnalogCircuit(VisitableBaseModel):
     """
 
     Examples:

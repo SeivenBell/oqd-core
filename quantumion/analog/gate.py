@@ -1,17 +1,17 @@
 import itertools
 from typing import List, Union, Optional
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from quantumion.analog.operator import Operator
 from quantumion.analog.dissipation import Dissipation
-
+from quantumion.base import VisitableBaseModel
 
 __all__ = [
     "AnalogGate",
 ]
 
 
-class AnalogGate(BaseModel):
+class AnalogGate(VisitableBaseModel):
     """
     Examples:
         >>> AnalogGate(duration=1.0, hamiltonian=[PauliX])
@@ -21,6 +21,7 @@ class AnalogGate(BaseModel):
         hamiltonian (list[Operator]): the Hamiltonian to evolve the state under unitarily
         dissipation (list[Dissipation]): the dissipation terms to apply, represented as jump operators
     """
+
     duration: float
     hamiltonian: list[Operator] = []
     dissipation: list[Dissipation] = []
@@ -28,10 +29,10 @@ class AnalogGate(BaseModel):
     def check(self):
         # check that the two addends have the same number of qregs, qmodes
         assert (
-                len(set([term.n_qreg for term in self.hamiltonian])) == 1
+            len(set([term.n_qreg for term in self.hamiltonian])) == 1
         ), "Inconsistent number of qregs."
         assert (
-                len(set([term.n_qmode for term in self.hamiltonian])) == 1
+            len(set([term.n_qmode for term in self.hamiltonian])) == 1
         ), "Inconsistent number of qmodes."
 
     @property

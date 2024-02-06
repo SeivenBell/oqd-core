@@ -1,6 +1,7 @@
 from typing import Union
-from pydantic import BaseModel
+
+from quantumion.base import VisitableBaseModel
 
 
-class Dissipation(BaseModel):
+class Dissipation(VisitableBaseModel):
     jumps: int = None  # todo: discuss ir for dissipation

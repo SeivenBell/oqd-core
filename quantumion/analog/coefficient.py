@@ -1,6 +1,7 @@
 from typing import Union
-from pydantic import BaseModel
+
+from quantumion.base import VisitableBaseModel
 
 
-class Function(BaseModel):
+class Function(VisitableBaseModel):
     string: str

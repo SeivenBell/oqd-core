@@ -1,11 +1,10 @@
 from operator import mul
 from functools import reduce
 from typing import Dict, List, Literal, Tuple, Union
-from pydantic import BaseModel
 
 from quantumion.types import ComplexFloat
 from quantumion.analog.math import levi_civita
-
+from quantumion.base import VisitableBaseModel
 
 __all__ = [
     "Operator",
@@ -19,7 +18,7 @@ __all__ = [
 ]
 
 
-class Operator(BaseModel):
+class Operator(VisitableBaseModel):
     """
     Examples:
         >>> PauliX = Operator(coefficient=1.0, pauli=["x"])
@@ -64,7 +63,9 @@ class Operator(BaseModel):
     def __mul__(self, other):
         if isinstance(other, (int, float)):
             return Operator(
-                coefficient=self.coefficient * other, pauli=self.pauli, ladder=self.ladder
+                coefficient=self.coefficient * other,
+                pauli=self.pauli,
+                ladder=self.ladder,
             )
 
         elif isinstance(other, Operator):
