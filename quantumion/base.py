@@ -8,6 +8,7 @@ from quantumion.compiler.visitor import Visitor
 
 class VisitableBaseModel(BaseModel):
     def accept(self, visitor: Visitor):
+        visitor.reset()
         return visitor.visit(self)
 
     def reset(self):

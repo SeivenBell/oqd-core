@@ -15,7 +15,6 @@ from pydantic import (
 ########################################################################################
 
 from quantumion.base import TypeReflectBaseModel
-from quantumion.compiler.visitor import Visitor, Transform
 
 ########################################################################################
 
@@ -141,32 +140,6 @@ class Apply(TypeReflectBaseModel):
 class AtomicProgram(TypeReflectBaseModel):
     statements: List[Union[Apply, Register]]
 
-    def accept(self, visitor: Visitor):
-        visitor.reset()
-        return visitor.visit(self)
-
-
-########################################################################################
-
-
-class AtomicProgramVisitor(Visitor):
-    pass
-
-
-class AtomicProgramTransform(Transform):
-    pass
-
-
-class CountIonsAnalysis(AtomicProgramVisitor):
-    def __init__(self):
-        self.ions = 0
-
-    def reset(self):
-        self.ions = 0
-
-    def visit_Register(self, model: Register) -> Register:
-        self.ions += len(model.configuration)
-
 
 ########################################################################################
 
@@ -265,14 +238,6 @@ if __name__ == "__main__":
                 Apply(protocol=twophotonraman, time=0.5e-6),
             ]
         )
-
-        countions = CountIonsAnalysis()
-        program.accept(countions)
-
-        print(countions.ions)
-        program.accept(countions)
-
-        print(countions.ions)
 
     except ValidationError as e:
         print(e)
