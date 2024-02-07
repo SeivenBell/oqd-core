@@ -24,6 +24,9 @@ class Visitor:
             for key in model.model_fields.keys():
                 new_fields[key] = self.visit(model.__dict__[key])
 
+    def reset(self):
+        pass
+
 
 class Transform(Visitor):
     def _visit(self, model: Any) -> Any:

@@ -11,9 +11,6 @@ class VisitableBaseModel(BaseModel):
         visitor.reset()
         return visitor.visit(self)
 
-    def reset(self):
-        pass
-
 
 class TypeReflectBaseModel(VisitableBaseModel):
     class_: Optional[str]
