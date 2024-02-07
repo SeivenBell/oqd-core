@@ -1,6 +1,8 @@
 from typing import Any
 
-from pydantic import BaseModel
+########################################################################################
+
+from quantumion.datastruct.base import VisitableBaseModel
 
 ########################################################################################
 
@@ -19,7 +21,7 @@ class Visitor:
         ):
             [self.visit(element) for element in model]
 
-        if isinstance(model, BaseModel):
+        if isinstance(model, VisitableBaseModel):
             new_fields = {}
             for key in model.model_fields.keys():
                 new_fields[key] = self.visit(model.__dict__[key])
@@ -38,7 +40,7 @@ class Transform(Visitor):
         ):
             new_model = model.__class__([self.visit(element) for element in model])
 
-        if isinstance(model, BaseModel):
+        if isinstance(model, VisitableBaseModel):
             new_fields = {}
             for key in model.model_fields.keys():
                 new_fields[key] = self.visit(model.__dict__[key])
@@ -48,7 +50,7 @@ class Transform(Visitor):
 
 
 if __name__ == "__main__":
-    from quantumion.base import TypeReflectBaseModel
+    from quantumion.datastruct.base import TypeReflectBaseModel
 
     class A(TypeReflectBaseModel):
         value: int

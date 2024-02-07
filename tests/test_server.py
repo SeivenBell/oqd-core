@@ -1,23 +1,14 @@
-import time
-
-import requests
-
 import numpy as np
 
 import argparse
 
 ########################################################################################
 
-from backends.task import Task, TaskArgsAnalog, TaskArgsDigital
-from backends.provider import Provider
+from quantumion.backend.task import Task, TaskArgsAnalog, TaskArgsDigital
+from quantumion.backend.provider import Provider
 
-from quantumion.analog.circuit import AnalogCircuit
-from quantumion.analog.gate import *
-from quantumion.analog.operator import *
-
-from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import H, CNOT
-from quantumion.digital.register import QuantumRegister, ClassicalRegister
+from quantumion.datastruct.analog import *
+from quantumion.datastruct.digital import *
 
 ########################################################################################
 
@@ -68,12 +59,12 @@ if __name__ == "__main__":
 
     analog_args = TaskArgsAnalog(n_shots=B)
     analog_task = Task(program=ex, args=analog_args)
-    for _ in range(N):
-        job = client.submit(analog_task, backend="qutip")
-        job_id = job["id"]
-        jobs.append(job)
-        print(f"Job {n} submitted with ID: {job_id}")
-        n += 1
+    # for _ in range(N):
+    #     job = client.submit(analog_task, backend="qutip")
+    #     job_id = job["id"]
+    #     jobs.append(job)
+    #     print(f"Job {n} submitted with ID: {job_id}")
+    #     n += 1
 
     ########################################################################################
 
@@ -86,28 +77,28 @@ if __name__ == "__main__":
     digital_args = TaskArgsDigital(repetitions=B)
     digital_task = Task(program=circ, args=digital_args)
 
-    for _ in range(N):
-        job = client.submit(digital_task, backend="tensorcircuit")
-        job_id = job["id"]
-        jobs.append(job)
-        print(f"Job {n} submitted with ID: {job_id}")
-        n += 1
+    # for _ in range(N):
+    #     job = client.submit(digital_task, backend="tensorcircuit")
+    #     job_id = job["id"]
+    #     jobs.append(job)
+    #     print(f"Job {n} submitted with ID: {job_id}")
+    #     n += 1
 
     ########################################################################################
 
-    print("{:=^80}".format(" Results "))
+    # print("{:=^80}".format(" Results "))
 
-    print("{:<5} {:<12} {}".format("Job", "Status", "Result"))
+    # print("{:<5} {:<12} {}".format("Job", "Status", "Result"))
 
-    for n, job in enumerate(jobs):
-        status = ""
-        while status not in ["finished", "failed"]:
-            job = client.retrieve_job(job)
-            status = job["status"]
+    # for n, job in enumerate(jobs):
+    #     status = ""
+    #     while status not in ["finished", "failed"]:
+    #         job = client.retrieve_job(job)
+    #         status = job["status"]
 
-            if status == "finished":
-                print("\r{:<5} {:<12} {}".format(n, status, job["result"]))
-            elif status == "failed":
-                print("\r{:<5} {:<12} {}".format(n, status, ""))
-            else:
-                print("\r{:<5} {:<12} {}".format(n, status, ""), end="")
+    #         if status == "finished":
+    #             print("\r{:<5} {:<12} {}".format(n, status, job["result"]))
+    #         elif status == "failed":
+    #             print("\r{:<5} {:<12} {}".format(n, status, ""))
+    #         else:
+    #             print("\r{:<5} {:<12} {}".format(n, status, ""), end="")

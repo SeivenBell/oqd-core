@@ -1,5 +1,5 @@
 from quantumion.compiler.visitor import Visitor, Transform
-from quantumion.atomic.schedule import Register
+from quantumion.datastruct.atomic.register import Register
 
 ########################################################################################
 

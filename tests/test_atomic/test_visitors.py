@@ -1,6 +1,6 @@
 import numpy as np
 
-from quantumion.atomic.schedule import (
+from quantumion.datastruct.atomic import (
     Level,
     Transition,
     Multipole,
