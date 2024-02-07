@@ -12,7 +12,7 @@ class AtomicProgramTransform(Transform):
     pass
 
 
-class CountIonsAnalysis(AtomicProgramVisitor):
+class AtomicProgramIonsAnalysis(AtomicProgramVisitor):
     def __init__(self):
         self.ions = 0
 

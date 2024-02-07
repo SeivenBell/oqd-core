@@ -11,7 +11,7 @@ from quantumion.atomic.schedule import (
     Apply,
     AtomicProgram,
 )
-from quantumion.compiler.atomic import CountIonsAnalysis
+from quantumion.compiler.atomic import AtomicProgramIonsAnalysis
 
 ########################################################################################
 
@@ -107,6 +107,6 @@ if __name__ == "__main__":
         ]
     )
 
-    N_ions = CountIonsAnalysis()
-    program.accept(N_ions)
-    print(N_ions.ions)
+    apia = AtomicProgramIonsAnalysis()
+    program.accept(apia)
+    print(apia.ions)
