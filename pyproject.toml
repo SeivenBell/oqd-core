@@ -17,7 +17,7 @@ dependencies = [
     "redis",
     "rq",
     "requests",
-    "rich"
+    "rich",
 ]
 
 [project.optional-dependencies]
@@ -27,4 +27,4 @@ all = ["qutip", "tensorcircuit", "matplotlib", "qiskit"]
 
 
 [tool.setuptools]
-packages = ["quantumion", "backends"]
+packages = ["quantumion"]
