@@ -19,7 +19,8 @@ class CountIonsAnalysis(AtomicProgramVisitor):
     def reset(self):
         self.ions = 0
 
-    def visit_Register(self, model: Register) -> Register:
+    def visit_Register(self, model: Register) -> None:
+        assert isinstance(model, Register)
         self.ions += len(model.configuration)
 
 
