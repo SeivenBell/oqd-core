@@ -4,7 +4,7 @@ from typing import Any
 
 from quantumion.compiler.visitor import Transform
 
-from quantumion.datastruct.math import (
+from quantumion.interface.math import (
     Unaries,
     MathStr,
     MathVar,
