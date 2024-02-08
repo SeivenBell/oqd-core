@@ -2,9 +2,9 @@ import itertools
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel
-from quantumion.datastruct.analog.operator import Operator
-from quantumion.datastruct.analog.dissipation import Dissipation
+from quantumion.interfaces.base import VisitableBaseModel
+from quantumion.interfaces.analog.operator import Operator
+from quantumion.interfaces.analog.dissipation import Dissipation
 
 ########################################################################################
 

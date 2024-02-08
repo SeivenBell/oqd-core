@@ -1,4 +1,4 @@
-from quantumion.datastruct.analog import *
+from quantumion.interfaces.analog import *
 
 
 print(PauliX * PauliY)

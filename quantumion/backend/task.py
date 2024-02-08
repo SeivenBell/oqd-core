@@ -6,10 +6,10 @@ from pydantic import BaseModel
 
 ########################################################################################
 
-from quantumion.datastruct.math import ComplexFloat
-from quantumion.datastruct.analog.circuit import AnalogCircuit
-from quantumion.datastruct.digital.circuit import DigitalCircuit
-from quantumion.datastruct.atomic.program import AtomicProgram
+from quantumion.interfaces.math import ComplexFloat
+from quantumion.interfaces.analog.circuit import AnalogCircuit
+from quantumion.interfaces.digital.circuit import DigitalCircuit
+from quantumion.interfaces.atomic.program import AtomicProgram
 
 from quantumion.backend.metric import Metric
 

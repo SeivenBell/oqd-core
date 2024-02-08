@@ -3,8 +3,8 @@ from typing import Literal, Union
 ########################################################################################
 
 
-from quantumion.datastruct.base import VisitableBaseModel
-from quantumion.datastruct.digital.register import QuantumRegister, ClassicalRegister
+from quantumion.interfaces.base import VisitableBaseModel
+from quantumion.interfaces.digital.register import QuantumRegister, ClassicalRegister
 
 ########################################################################################
 

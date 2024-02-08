@@ -9,10 +9,10 @@ from quantumion.backend.base import BackendBase
 from quantumion.backend.task import Task, DataAnalog, TaskArgsAnalog, TaskResultAnalog
 from quantumion.backend.metric import *
 
-from quantumion.datastruct.math import ComplexFloat
-from quantumion.datastruct.analog.gate import AnalogGate
-from quantumion.datastruct.analog.operator import Operator
-from quantumion.datastruct.analog.circuit import AnalogCircuit
+from quantumion.interfaces.math import ComplexFloat
+from quantumion.interfaces.analog.gate import AnalogGate
+from quantumion.interfaces.analog.operator import Operator
+from quantumion.interfaces.analog.circuit import AnalogCircuit
 from quantumion.utils.math import prod
 
 ########################################################################################

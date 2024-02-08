@@ -3,7 +3,7 @@ from pydantic import conint, field_validator, ValidationInfo
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel
+from quantumion.interfaces.base import VisitableBaseModel
 
 ########################################################################################
 

@@ -2,7 +2,7 @@ import numpy as np
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel
+from quantumion.interfaces.base import VisitableBaseModel
 
 ########################################################################################
 

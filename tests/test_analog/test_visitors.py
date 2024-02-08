@@ -2,7 +2,7 @@ import numpy as np
 
 ########################################################################################
 
-from quantumion.datastruct.analog import *
+from quantumion.interfaces.analog import *
 from quantumion.compiler.analog import AnalogCircuitIonsAnalysis
 
 ########################################################################################

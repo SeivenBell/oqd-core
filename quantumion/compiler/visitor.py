@@ -2,7 +2,7 @@ from typing import Any
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel
+from quantumion.interfaces.base import VisitableBaseModel
 
 ########################################################################################
 
@@ -50,7 +50,7 @@ class Transform(Visitor):
 
 
 if __name__ == "__main__":
-    from quantumion.datastruct.base import TypeReflectBaseModel
+    from quantumion.interfaces.base import TypeReflectBaseModel
 
     class A(TypeReflectBaseModel):
         value: int

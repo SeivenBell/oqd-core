@@ -5,7 +5,7 @@ import tensorcircuit as tc
 from quantumion.backend.base import BackendBase
 from quantumion.backend.task import Task, TaskResultDigital
 
-from quantumion.datastruct.digital.circuit import DigitalCircuit
+from quantumion.interfaces.digital.circuit import DigitalCircuit
 
 ########################################################################################
 

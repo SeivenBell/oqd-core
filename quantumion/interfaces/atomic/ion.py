@@ -11,7 +11,7 @@ from pydantic import (
 
 ########################################################################################
 
-from quantumion.datastruct.base import TypeReflectBaseModel
+from quantumion.interfaces.base import TypeReflectBaseModel
 
 ########################################################################################
 
