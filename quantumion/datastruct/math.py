@@ -1,11 +1,10 @@
-from typing import Union, Literal, Annotated, Any
+from typing import Union, Literal, Annotated
 
 from pydantic import AfterValidator
 
 ########################################################################################
 
 from quantumion.datastruct.base import VisitableBaseModel, TypeReflectBaseModel
-from quantumion.compiler.visitor import Transform
 
 ########################################################################################
 
@@ -71,12 +70,11 @@ Unaries = Literal["-", "sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"
 
 
 class MathExpr(TypeReflectBaseModel):
-
-    @classmethod
-    def from_string(cls, string: str):
-        raise NotImplementedError
-
     pass
+
+
+class MathStr(MathExpr):
+    string: str
 
 
 class MathVar(MathExpr):
@@ -123,92 +121,6 @@ class MathDiv(MathExpr):
 class MathPow(MathExpr):
     expr1: MathExpr
     expr2: MathExpr
-
-
-########################################################################################
-
-
-class PrintMathExpr(Transform):
-    def _visit(self, model: Any):
-        raise TypeError("Incompatible type for input model")
-
-    def visit_MathVar(self, model: MathVar):
-        string = "{}".format(model.name)
-        return string
-
-    def visit_MathProtectedVar(self, model: MathProtectedVar):
-        string = "{}".format(model.name)
-        return string
-
-    def visit_MathNum(self, model: MathNum):
-        string = "{}".format(model.value)
-        return string
-
-    def visit_MathImag(self, model: MathImag):
-        string = "{}".format(model.name)
-        return string
-
-    def visit_MathUnary(self, model: MathUnary):
-        if model.func == "-" and not isinstance(
-            model.arg, (MathAdd, MathDiv, MathMul, MathDiv, MathPow)
-        ):
-            string = "{}{}".format(model.func, self.visit(model.arg))
-        else:
-            string = "{}({})".format(model.func, self.visit(model.arg))
-        return string
-
-    def visit_MathAdd(self, model: MathAdd):
-        string = "{} + {}".format(self.visit(model.expr1), self.visit(model.expr2))
-        return string
-
-    def visit_MathSub(self, model: MathSub):
-        string = "{} - {}".format(self.visit(model.expr1), self.visit(model.expr2))
-        return string
-
-    def visit_MathMul(self, model: MathMul):
-        s1 = (
-            f"({self.visit(model.expr1)})"
-            if isinstance(model.expr1, (MathAdd, MathSub))
-            else self.visit(model.expr1)
-        )
-        s2 = (
-            f"({self.visit(model.expr2)})"
-            if isinstance(model.expr2, (MathAdd, MathSub))
-            else self.visit(model.expr2)
-        )
-
-        string = "{} * {}".format(s1, s2)
-        return string
-
-    def visit_MathDiv(self, model: MathDiv):
-        s1 = (
-            f"({self.visit(model.expr1)})"
-            if isinstance(model.expr1, (MathAdd, MathSub))
-            else self.visit(model.expr1)
-        )
-        s2 = (
-            f"({self.visit(model.expr2)})"
-            if isinstance(model.expr2, (MathAdd, MathSub))
-            else self.visit(model.expr2)
-        )
-
-        string = "{} / {}".format(s1, s2)
-        return string
-
-    def visit_MathPow(self, model: MathPow):
-        s1 = (
-            f"({self.visit(model.expr1)})"
-            if isinstance(model.expr1, (MathAdd, MathSub, MathMul, MathDiv))
-            else self.visit(model.expr1)
-        )
-        s2 = (
-            f"({self.visit(model.expr2)})"
-            if isinstance(model.expr2, (MathAdd, MathSub, MathMul, MathDiv))
-            else self.visit(model.expr2)
-        )
-
-        string = "{} ^ {}".format(s1, s2)
-        return string
 
 
 ########################################################################################
