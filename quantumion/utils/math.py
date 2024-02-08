@@ -1,7 +1,11 @@
 import functools
 import operator
 
-from quantumion.datastruct.math import ComplexFloat
+########################################################################################
+
+from quantumion.interface.math import ComplexFloat
+
+########################################################################################
 
 
 def sum(args):

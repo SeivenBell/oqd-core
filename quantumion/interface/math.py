@@ -4,7 +4,12 @@ from pydantic import AfterValidator
 
 ########################################################################################
 
+<<<<<<< HEAD:quantumion/datastruct/math.py
 from quantumion.datastruct.base import VisitableBaseModel, TypeReflectBaseModel
+=======
+from quantumion.interface.base import VisitableBaseModel, TypeReflectBaseModel
+from quantumion.compiler.visitor import Transform
+>>>>>>> 05a4230cf4bc2d01fcf208e2d63e4b9cbdec76e1:quantumion/interface/math.py
 
 ########################################################################################
 

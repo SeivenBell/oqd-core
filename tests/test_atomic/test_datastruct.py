@@ -1,4 +1,4 @@
-from quantumion.datastruct.atomic import (
+from quantumion.interface.atomic import (
     Level,
     Transition,
     Multipole,

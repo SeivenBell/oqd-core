@@ -1,12 +1,11 @@
 # External imports
 from typing import List, Union
-from pydantic import ValidationError
 
 ########################################################################################
 
-from quantumion.datastruct.base import TypeReflectBaseModel
-from quantumion.datastruct.atomic.protocol import Protocol
-from quantumion.datastruct.atomic.register import Register
+from quantumion.interface.base import TypeReflectBaseModel
+from quantumion.interface.atomic.protocol import Protocol
+from quantumion.interface.atomic.register import Register
 
 ########################################################################################
 

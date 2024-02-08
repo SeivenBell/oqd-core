@@ -6,8 +6,8 @@ import argparse
 
 ########################################################################################
 
-from quantumion.datastruct.analog import *
-from quantumion.datastruct.digital import *
+from quantumion.interface.analog import *
+from quantumion.interface.digital import *
 
 from quantumion.backend.task import Task, TaskArgsAnalog, TaskArgsDigital
 
