@@ -1,4 +1,4 @@
-from typing import Union, Literal, Annotated
+from typing import Union, Literal, Annotated, Any
 
 from pydantic import AfterValidator
 
@@ -129,8 +129,8 @@ class MathPow(MathExpr):
 
 
 class PrintMathExpr(Transform):
-    def _visit(self):
-        raise TypeError()
+    def _visit(self, model: Any):
+        raise TypeError("Incompatible type for input model")
 
     def visit_MathVar(self, model: MathVar):
         string = "{}".format(model.name)
@@ -239,3 +239,8 @@ if __name__ == "__main__":
     print(expr1.accept(pme))
     print(expr2.accept(pme))
     print(expr3.accept(pme))
+
+    try:
+        pme.visit("hi")
+    except Exception as e:
+        print(e)
