@@ -3,9 +3,9 @@ from typing import List, Union
 
 ########################################################################################
 
-from quantumion.interfaces.base import TypeReflectBaseModel
-from quantumion.interfaces.atomic.protocol import Protocol
-from quantumion.interfaces.atomic.register import Register
+from quantumion.interface.base import TypeReflectBaseModel
+from quantumion.interface.atomic.protocol import Protocol
+from quantumion.interface.atomic.register import Register
 
 ########################################################################################
 

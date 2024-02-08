@@ -6,7 +6,7 @@ import numpy as np
 
 ########################################################################################
 
-from quantumion.interfaces.digital import (
+from quantumion.interface.digital import (
     DigitalCircuit,
     H,
     CNOT,

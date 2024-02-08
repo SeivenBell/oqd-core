@@ -7,7 +7,7 @@ from juliacall import Main as jl
 
 from quantumion.backend.base import BackendBase
 from quantumion.backend.task import Task, TaskResultAnalog
-from quantumion.interfaces.analog.circuit import AnalogCircuit
+from quantumion.interface.analog.circuit import AnalogCircuit
 
 ########################################################################################
 

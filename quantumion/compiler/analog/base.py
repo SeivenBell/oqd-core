@@ -1,5 +1,5 @@
 from quantumion.compiler.visitor import Visitor, Transform
-from quantumion.interfaces.analog.circuit import AnalogCircuit
+from quantumion.interface.analog.circuit import AnalogCircuit
 
 ########################################################################################
 

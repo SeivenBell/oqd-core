@@ -4,8 +4,8 @@ from pydantic.types import NonNegativeInt
 
 ########################################################################################
 
-from quantumion.interfaces.base import VisitableBaseModel
-from quantumion.interfaces.analog.gate import AnalogGate
+from quantumion.interface.base import VisitableBaseModel
+from quantumion.interface.analog.gate import AnalogGate
 
 ########################################################################################
 

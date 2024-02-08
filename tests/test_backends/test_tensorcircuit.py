@@ -3,7 +3,7 @@ from rich import print
 
 ########################################################################################
 
-from quantumion.interfaces.digital import (
+from quantumion.interface.digital import (
     DigitalCircuit,
     H,
     CNOT,

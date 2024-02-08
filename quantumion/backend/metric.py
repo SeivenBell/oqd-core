@@ -4,7 +4,7 @@ from pydantic.types import NonNegativeInt
 
 ########################################################################################
 
-from quantumion.interfaces.analog.operator import Operator
+from quantumion.interface.analog.operator import Operator
 
 ########################################################################################
 

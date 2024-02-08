@@ -3,10 +3,10 @@ from typing import List, Union
 
 ########################################################################################
 
-from quantumion.interfaces.base import VisitableBaseModel
-from quantumion.interfaces.digital.gate import Gate
-from quantumion.interfaces.digital.register import QuantumRegister, ClassicalRegister
-from quantumion.interfaces.digital.statement import Statement, Measure
+from quantumion.interface.base import VisitableBaseModel
+from quantumion.interface.digital.gate import Gate
+from quantumion.interface.digital.register import QuantumRegister, ClassicalRegister
+from quantumion.interface.digital.statement import Statement, Measure
 
 ########################################################################################
 
@@ -91,7 +91,7 @@ class DigitalCircuit(VisitableBaseModel):
 
 
 if __name__ == "__main__":
-    from quantumion.interfaces.digital.gate import H, CNOT
+    from quantumion.interface.digital.gate import H, CNOT
 
     qreg = QuantumRegister(id="q", reg=4)
     creg = ClassicalRegister(id="c", reg=2)

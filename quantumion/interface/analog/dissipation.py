@@ -1,4 +1,4 @@
-from quantumion.interfaces.base import VisitableBaseModel
+from quantumion.interface.base import VisitableBaseModel
 
 ########################################################################################
 

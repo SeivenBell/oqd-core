@@ -3,7 +3,7 @@ import operator
 
 ########################################################################################
 
-from quantumion.interfaces.math import ComplexFloat
+from quantumion.interface.math import ComplexFloat
 
 ########################################################################################
 

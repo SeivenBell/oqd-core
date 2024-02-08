@@ -2,7 +2,7 @@ from typing import Any
 
 ########################################################################################
 
-from quantumion.interfaces.base import VisitableBaseModel
+from quantumion.interface.base import VisitableBaseModel
 
 ########################################################################################
 
@@ -50,7 +50,7 @@ class Transform(Visitor):
 
 
 if __name__ == "__main__":
-    from quantumion.interfaces.base import TypeReflectBaseModel
+    from quantumion.interface.base import TypeReflectBaseModel
 
     class A(TypeReflectBaseModel):
         value: int

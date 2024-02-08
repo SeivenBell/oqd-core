@@ -6,7 +6,7 @@ import numpy as np
 
 ########################################################################################
 
-from quantumion.interfaces.analog import (
+from quantumion.interface.analog import (
     PauliX,
     PauliY,
     PauliZ,

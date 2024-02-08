@@ -1,5 +1,5 @@
 from quantumion.compiler.visitor import Visitor, Transform
-from quantumion.interfaces.atomic.register import Register
+from quantumion.interface.atomic.register import Register
 
 ########################################################################################
 

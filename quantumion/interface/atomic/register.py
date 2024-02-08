@@ -2,8 +2,8 @@ from typing import List
 
 ########################################################################################
 
-from quantumion.interfaces.base import TypeReflectBaseModel
-from quantumion.interfaces.atomic import Ion
+from quantumion.interface.base import TypeReflectBaseModel
+from quantumion.interface.atomic import Ion
 
 ########################################################################################
 
