@@ -4,7 +4,7 @@ from pydantic import AfterValidator
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel
+from quantumion.datastruct.base import VisitableBaseModel, TypeReflectBaseModel
 from quantumion.compiler.visitor import Transform
 
 ########################################################################################
@@ -70,7 +70,7 @@ Unaries = Literal["-", "sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"
 ########################################################################################
 
 
-class MathExpr(VisitableBaseModel):
+class MathExpr(TypeReflectBaseModel):
 
     @classmethod
     def from_string(cls, string: str):
