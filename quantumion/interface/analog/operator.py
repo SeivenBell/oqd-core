@@ -4,8 +4,8 @@ from typing import List, Literal, Union
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel
-from quantumion.datastruct.math import ComplexFloat
+from quantumion.interface.base import VisitableBaseModel
+from quantumion.interface.math import ComplexFloat
 from quantumion.utils.math import levi_civita
 
 ########################################################################################

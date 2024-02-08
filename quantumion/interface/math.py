@@ -4,7 +4,7 @@ from pydantic import AfterValidator
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel, TypeReflectBaseModel
+from quantumion.interface.base import VisitableBaseModel, TypeReflectBaseModel
 from quantumion.compiler.visitor import Transform
 
 ########################################################################################

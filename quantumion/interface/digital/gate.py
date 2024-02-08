@@ -2,8 +2,8 @@ from typing import List, Union, Optional
 
 ########################################################################################
 
-from quantumion.datastruct.base import VisitableBaseModel
-from quantumion.datastruct.digital.register import (
+from quantumion.interface.base import VisitableBaseModel
+from quantumion.interface.digital.register import (
     QuantumRegister,
     ClassicalRegister,
     QuantumBit,

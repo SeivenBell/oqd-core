@@ -4,7 +4,7 @@ from rich import print as pprint
 
 ########################################################################################
 
-from quantumion.datastruct.analog import (
+from quantumion.interface.analog import (
     PauliX,
     PauliY,
     PauliZ,
