@@ -57,7 +57,14 @@ def is_varname(v: str) -> str:
     return v
 
 
+def is_protectedvarname(v: str) -> str:
+    if v[0] != "%" or not v[1:].isidentifier():
+        raise ValueError
+    return v
+
+
 VarName = Annotated[str, AfterValidator(is_varname)]
+ProtectedVarName = Annotated[str, AfterValidator(is_protectedvarname)]
 Unaries = Literal["-", "sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
 
 ########################################################################################
@@ -74,6 +81,10 @@ class MathExpression(VisitableBaseModel):
 
 class MathVar(MathExpression):
     name: VarName
+
+
+class MathProtectedVar(MathExpression):
+    name: ProtectedVarName
 
 
 class MathNum(MathExpression):
@@ -119,6 +130,10 @@ class MathPow(MathExpression):
 
 class PrintMathExpression(Visitor):
     def visit_MathVar(self, model: MathVar):
+        string = "{}".format(model.name)
+        return string
+
+    def visit_MathProtectedVar(self, model: MathProtectedVar):
         string = "{}".format(model.name)
         return string
 
@@ -196,7 +211,7 @@ class PrintMathExpression(Visitor):
 ########################################################################################
 
 if __name__ == "__main__":
-    expr1 = MathSub(expr1=MathVar(name="a"), expr2=MathVar(name="b"))
+    expr1 = MathSub(expr1=MathProtectedVar(name="%t"), expr2=MathVar(name="b"))
     expr2 = MathSub(
         expr1=MathMul(expr1=MathVar(name="a"), expr2=MathVar(name="b")),
         expr2=MathVar(name="c"),
