@@ -1,23 +1,14 @@
-import time
-
-import requests
-
 import numpy as np
 
 import argparse
 
 ########################################################################################
 
-from backends.task import Task, TaskArgsAnalog, TaskArgsDigital
-from backends.provider import Provider
+from quantumion.backend.task import Task, TaskArgsAnalog, TaskArgsDigital
+from quantumion.backend.provider import Provider
 
-from quantumion.analog.circuit import AnalogCircuit
-from quantumion.analog.gate import *
-from quantumion.analog.operator import *
-
-from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import H, CNOT
-from quantumion.digital.register import QuantumRegister, ClassicalRegister
+from quantumion.interface.analog import *
+from quantumion.interface.digital import *
 
 ########################################################################################
 
@@ -93,7 +84,7 @@ if __name__ == "__main__":
         print(f"Job {n} submitted with ID: {job_id}")
         n += 1
 
-    ########################################################################################
+    #######################################################################################
 
     print("{:=^80}".format(" Results "))
 

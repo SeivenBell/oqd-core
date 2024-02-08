@@ -4,7 +4,7 @@ version: "3.9"
 
 networks:
   internal:
-    name: frost_internal
+    name: quantumion_internal
 
 ################################################################################
 
@@ -13,8 +13,8 @@ services:
     build:
       context: ../
       dockerfile: docker/Dockerfile
-    image: frost
-    container_name: frost
+    image: quantumion
+    container_name: quantumion
     restart: always
     environment:
       - REDIS_HOST=redis

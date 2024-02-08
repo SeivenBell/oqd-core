@@ -1,4 +1,4 @@
-from quantumion.analog.operator import *
+from quantumion.interface.analog import *
 
 
 print(PauliX * PauliY)

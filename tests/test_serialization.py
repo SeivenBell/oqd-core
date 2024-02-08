@@ -6,15 +6,10 @@ import argparse
 
 ########################################################################################
 
-from backends.task import Task, TaskArgsAnalog, TaskArgsDigital
+from quantumion.interface.analog import *
+from quantumion.interface.digital import *
 
-from quantumion.analog.circuit import AnalogCircuit
-from quantumion.analog.gate import *
-from quantumion.analog.operator import *
-
-from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import H
-from quantumion.digital.register import QuantumRegister, ClassicalRegister
+from quantumion.backend.task import Task, TaskArgsAnalog, TaskArgsDigital
 
 ########################################################################################
 

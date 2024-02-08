@@ -1,12 +1,20 @@
 # %%
 from rich import print
 
-from backends.digital.python.tc import TensorCircuitBackend
-from backends.task import Task, TaskArgsDigital
+########################################################################################
 
-from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import H, CNOT
-from quantumion.digital.register import QuantumRegister, ClassicalRegister
+from quantumion.interface.digital import (
+    DigitalCircuit,
+    H,
+    CNOT,
+    QuantumRegister,
+    ClassicalRegister,
+)
+
+from quantumion.backend.digital.python.tc import TensorCircuitBackend
+from quantumion.backend.task import Task, TaskArgsDigital
+
+########################################################################################
 
 # %%
 qreg = QuantumRegister(id="q", reg=2)
