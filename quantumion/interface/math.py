@@ -5,7 +5,6 @@ from pydantic import AfterValidator
 ########################################################################################
 
 from quantumion.interface.base import VisitableBaseModel, TypeReflectBaseModel
-from quantumion.compiler.math import PrintMathExpr
 
 ########################################################################################
 
@@ -122,38 +121,3 @@ class MathDiv(MathExpr):
 class MathPow(MathExpr):
     expr1: MathExpr
     expr2: MathExpr
-
-
-########################################################################################
-
-if __name__ == "__main__":
-    expr1 = MathSub(expr1=MathProtectedVar(name="%t"), expr2=MathVar(name="b"))
-    expr2 = MathSub(
-        expr1=MathMul(expr1=MathVar(name="a"), expr2=MathVar(name="b")),
-        expr2=MathVar(name="c"),
-    )
-    expr2 = MathUnary(
-        func="-",
-        arg=MathUnary(
-            func="sin", arg=MathPow(expr1=MathNum(value=1), expr2=MathImag())
-        ),
-    )
-    expr3 = MathPow(
-        expr1=MathMul(
-            expr1=MathVar(name="a"),
-            expr2=MathSub(expr1=MathVar(name="b"), expr2=MathVar(name="c")),
-        ),
-        expr2=MathUnary(
-            func="sin", arg=MathPow(expr1=MathNum(value=1), expr2=MathImag())
-        ),
-    )
-
-    pme = PrintMathExpr()
-    print(expr1.accept(pme))
-    print(expr2.accept(pme))
-    print(expr3.accept(pme))
-
-    try:
-        pme.visit("hi")
-    except Exception as e:
-        print(e)

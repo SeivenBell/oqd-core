@@ -201,5 +201,5 @@ if __name__ == "__main__":
     model = expr.accept(ParseMathStr())
 
     # print(model)
-
+    print(expr.string)
     print(model.accept(PrintMathExpr()))
