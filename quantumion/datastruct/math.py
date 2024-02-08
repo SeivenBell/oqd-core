@@ -5,7 +5,7 @@ from pydantic import AfterValidator
 ########################################################################################
 
 from quantumion.datastruct.base import VisitableBaseModel
-from quantumion.compiler.visitor import Visitor
+from quantumion.compiler.visitor import Transform
 
 ########################################################################################
 
@@ -70,65 +70,68 @@ Unaries = Literal["-", "sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"
 ########################################################################################
 
 
-class MathExpression(VisitableBaseModel):
+class MathExpr(VisitableBaseModel):
 
     @classmethod
-    def convert_string(cls, string: str):
+    def from_string(cls, string: str):
         raise NotImplementedError
 
     pass
 
 
-class MathVar(MathExpression):
+class MathVar(MathExpr):
     name: VarName
 
 
-class MathProtectedVar(MathExpression):
+class MathProtectedVar(MathExpr):
     name: ProtectedVarName
 
 
-class MathNum(MathExpression):
+class MathNum(MathExpr):
     value: Union[int, float]
 
 
-class MathImag(MathExpression):
+class MathImag(MathExpr):
     name: Literal["1j"] = "1j"
 
 
-class MathUnary(MathExpression):
+class MathUnary(MathExpr):
     func: Unaries
-    arg: MathExpression
+    arg: MathExpr
 
 
-class MathAdd(MathExpression):
-    expr1: MathExpression
-    expr2: MathExpression
+class MathAdd(MathExpr):
+    expr1: MathExpr
+    expr2: MathExpr
 
 
-class MathSub(MathExpression):
-    expr1: MathExpression
-    expr2: MathExpression
+class MathSub(MathExpr):
+    expr1: MathExpr
+    expr2: MathExpr
 
 
-class MathMul(MathExpression):
-    expr1: MathExpression
-    expr2: MathExpression
+class MathMul(MathExpr):
+    expr1: MathExpr
+    expr2: MathExpr
 
 
-class MathDiv(MathExpression):
-    expr1: MathExpression
-    expr2: MathExpression
+class MathDiv(MathExpr):
+    expr1: MathExpr
+    expr2: MathExpr
 
 
-class MathPow(MathExpression):
-    expr1: MathExpression
-    expr2: MathExpression
+class MathPow(MathExpr):
+    expr1: MathExpr
+    expr2: MathExpr
 
 
 ########################################################################################
 
 
-class PrintMathExpression(Visitor):
+class PrintMathExpr(Transform):
+    def _visit(self):
+        raise TypeError()
+
     def visit_MathVar(self, model: MathVar):
         string = "{}".format(model.name)
         return string
@@ -232,7 +235,7 @@ if __name__ == "__main__":
         ),
     )
 
-    pme = PrintMathExpression()
+    pme = PrintMathExpr()
     print(expr1.accept(pme))
     print(expr2.accept(pme))
     print(expr3.accept(pme))
