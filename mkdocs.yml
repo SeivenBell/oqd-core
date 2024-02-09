@@ -5,7 +5,6 @@ site_description: Open Quantum Design - the world's first open-source quantum co
 
 nav:
   - Introduction: index.md
-  - Roadmap: roadmap.md
   - Tutorials: tutorials.md
   - How to guides: how-to-guides.md
   - Reference: reference.md
