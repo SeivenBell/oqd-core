@@ -14,6 +14,8 @@ from quantumion.backend.analog.python.qutip import QutipBackend
 from quantumion.backend.digital.python.tc import TensorCircuitBackend
 from quantumion.backend.task import Task
 
+from quantumion.server import auth
+
 ########################################################################################
 
 redis_client = Redis(host=os.environ["REDIS_HOST"], port=6379, decode_responses=False)
@@ -22,6 +24,7 @@ queue = Queue(connection=redis_client)
 ########################################################################################
 
 app = FastAPI()
+app.include_router(auth.router)
 
 
 @app.post("/submit/{backend}")

@@ -9,24 +9,6 @@ networks:
 ################################################################################
 
 services:
-  app:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile
-    image: quantumion
-    container_name: quantumion
-    restart: always
-    environment:
-      - REDIS_HOST=redis
-    ports:
-      - "8000:8000"
-    networks:
-      internal:
-    depends_on:
-     redis:
-      condition: service_healthy
-
-
   redis:
     image: redis
     container_name: redis
@@ -42,8 +24,57 @@ services:
     networks:
       internal:
     volumes:
-      - cache:/data
+      - redis_volume:/data
+
+  postgresql:
+    image: postgres
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: QC4xn6MU9^69xzm!cYNT
+      POSTGRES_USER: postgresql_admin
+      POSTGRES_DB: db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d db -U postgresql_admin"]
+      start_period: 10s
+      interval: 5s
+      retries: 5
+      timeout: 25s
+    expose:
+      - "5432"
+    networks:
+      internal:
+    volumes:
+      - postgresql_volume:/var/lib/postgresql/data 
+
+  app:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    image: quantumion
+    container_name: quantumion
+    restart: always
+    environment:
+      REDIS_HOST: redis
+      POSTGRES_HOST: postgresql
+      POSTGRES_USER: postgresql_admin
+      POSTGRES_DB: db
+      POSTGRES_PASSWORD: QC4xn6MU9^69xzm!cYNT
+      JWT_SECRET_KEY: 8&S!FB8&%m*VZmYp3NvG
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 30
+    ports:
+      - "8000:8000"
+    networks:
+      internal:
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
 
 volumes:
-  cache:
+  redis_volume:
+    driver: local
+  postgresql_volume:
     driver: local

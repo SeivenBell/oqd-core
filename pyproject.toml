@@ -7,23 +7,37 @@ build-backend = "setuptools.build_meta"
 name = "quantumion"
 version = "0.0.0"
 requires-python = ">=3.10"
-dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.23.2",
-    "starlette>=0.27.0",
-    "pydantic>=2.4",
-    "pydantic-numpy",
-    "h5py",
-    "redis",
-    "rq",
-    "requests",
-    "rich",
-]
+dependencies = ["pydantic>=2.4", "pydantic-numpy", "h5py", "requests", "rich"]
 
 [project.optional-dependencies]
 qutip = ["qutip"]
 tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
-all = ["qutip", "tensorcircuit", "matplotlib", "qiskit"]
+server = [
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "uvicorn[standard]>=0.23.2",
+    "starlette>=0.27.0",
+    "redis",
+    "rq",
+    "fastapi>=0.104.0",
+    "sqlalchemy",
+    "psycopg2-binary",
+]
+all = [
+    "qutip",
+    "tensorcircuit",
+    "matplotlib",
+    "qiskit",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "uvicorn[standard]>=0.23.2",
+    "starlette>=0.27.0",
+    "redis",
+    "rq",
+    "fastapi>=0.104.0",
+    "sqlalchemy",
+    "psycopg2-binary",
+]
 
 
 [tool.setuptools]
