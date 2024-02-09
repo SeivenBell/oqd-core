@@ -7,8 +7,10 @@ import numpy as np
 from quantumion.backend.client import Client
 from quantumion.backend.provider import Provider
 
-from quantumion.backend.task import Task, TaskArgsAnalog
+from quantumion.backend.task import Task, TaskArgsAnalog, TaskArgsDigital
+
 from quantumion.interface.analog import *
+from quantumion.interface.digital import *
 
 ########################################################################################
 
@@ -40,13 +42,25 @@ if __name__ == "__main__":
     ex = AnalogCircuit()
     ex.evolve(gate=gate)
 
-    analog_args = TaskArgsAnalog(n_shots=10)
+    analog_args = TaskArgsAnalog(n_shots=1)
     analog_task = Task(program=ex, args=analog_args)
 
     ########################################################################################
 
-    for i in range(10):
+    qreg = QuantumRegister(id="q", reg=2)
+    creg = ClassicalRegister(id="c", reg=2)
+    circ = DigitalCircuit(qreg=qreg, creg=creg)
+    circ.add(H(qreg=qreg[0]))
+    circ.add(CNOT(qreg=qreg[0:2]))
+
+    digital_args = TaskArgsDigital(repetitions=1)
+    digital_task = Task(program=circ, args=digital_args)
+
+    ########################################################################################
+
+    for i in range(3):
         client.submit_job(analog_task, backend="qutip")
+        client.submit_job(digital_task, backend="tensorcircuit")
 
     ########################################################################################
 
@@ -54,6 +68,8 @@ if __name__ == "__main__":
         print("\rJobs Pending ...", end="")
         client.status_update()
 
-    print(client.jobs)
+    print("\n{:<48} {:<16} {}".format("Job ID", "Status", "Results"))
+    for job in client.jobs.values():
+        print("{:<48} {:<16} {}".format(job.job_id, job.status, job.result))
 
     ########################################################################################
