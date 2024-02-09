@@ -11,3 +11,8 @@ class UserRegistrationForm(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class User(BaseModel):
+    userid: int
+    username: str

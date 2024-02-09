@@ -16,4 +16,4 @@ ENV PYTHONPATH /app
 
 RUN pip install .[all]
 
-CMD python ./quantumion/server/main.py
+CMD rq worker --with-scheduler & python ./quantumion/server/main.py

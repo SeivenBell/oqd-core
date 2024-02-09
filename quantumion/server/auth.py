@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from quantumion.server.database import SessionLocal
 
-from quantumion.server.model import UserRegistrationForm, Token
+from quantumion.server.model import UserRegistrationForm, Token, User
 
 from quantumion.server.database import UserInDB
 
@@ -77,15 +77,15 @@ async def current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         username = payload.get("sub")
         userid = payload.get("id")
-        if not username and not userid:
-            return {"username": username, "userid": userid}
+        if not username is None and not userid is None:
+            return User(username=username, userid=userid)
         raise JWTError
 
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
-user_dependency = Annotated[dict, Depends(current_user)]
+user_dependency = Annotated[User, Depends(current_user)]
 
 # ########################################################################################
 

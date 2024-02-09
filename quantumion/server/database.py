@@ -29,4 +29,12 @@ class UserInDB(Base):
     hashed_password = Column(String, nullable=False)
 
 
+class JobInDB(Base):
+    __tablename__ = "jobs"
+
+    jobid = Column(String, primary_key=True, index=True)
+    userid = Column(Integer, nullable=False)
+    username = Column(String, nullable=False)
+
+
 Base.metadata.create_all(engine)
