@@ -1,9 +1,4 @@
 import requests
-from typing import Literal
-
-########################################################################################
-
-from quantumion.backend.task import Task
 
 ########################################################################################
 
@@ -12,12 +7,24 @@ class Provider:
     def __init__(self, url: str = "http://localhost:8000"):
         self.url = url
 
-    def submit(self, task: Task, backend: Literal["qutip", "tensorcircuit"]):
-        url = f"{self.url}/submit/{backend}"
-        response = requests.post(url, json=task.model_dump())
-        return response.json()
+    @property
+    def available_backends(self):
+        if hasattr(self, "_available_backends"):
+            return self._available_backends
+        else:
+            return ["qutip", "tensorcircuit"]
 
-    def retrieve_job(self, job: dict):
-        url = "{}/job/{}".format(self.url, job["id"])
-        response = requests.get(url)
-        return response.json()
+    @property
+    def registration_url(self):
+        return self.url + "/auth/register"
+
+    @property
+    def login_url(self):
+        return self.url + "/auth/token"
+
+    def job_submission_url(self, backend):
+        assert backend in self.available_backends, "Unavailable backend"
+        return self.url + "/submit/{}".format(backend)
+
+    def job_retrieval_url(self, job_id):
+        return self.url + "/job/{}".format(job_id)

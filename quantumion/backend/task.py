@@ -82,3 +82,8 @@ class TaskResultAtomic(BaseModel):
 class Task(BaseModel):
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
+
+
+TaskResult = Union[TaskResultAnalog, TaskResultAnalog, TaskResultDigital]
+
+########################################################################################

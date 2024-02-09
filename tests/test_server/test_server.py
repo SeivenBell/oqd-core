@@ -1,13 +1,13 @@
-import numpy as np
-
 import argparse
 
-import requests
+import numpy as np
 
 ########################################################################################
 
-from quantumion.backend.task import Task, TaskArgsAnalog
+from quantumion.backend.client import Client
+from quantumion.backend.provider import Provider
 
+from quantumion.backend.task import Task, TaskArgsAnalog
 from quantumion.interface.analog import *
 
 ########################################################################################
@@ -24,21 +24,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    BASE_URL = args.url
+    url = args.url
 
     ########################################################################################
 
-    username = "test_user"
-    password = "test_password"
+    provider = Provider(url)
+    client = Client()
 
-    login = dict(username=username, password=password)
-
-    login_url = BASE_URL + "/auth/token/"
-    token = requests.post(
-        login_url,
-        data=login,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    ).json()
+    client.connect(provider)
 
     ########################################################################################
 
@@ -47,39 +40,20 @@ if __name__ == "__main__":
     ex = AnalogCircuit()
     ex.evolve(gate=gate)
 
-    analog_args = TaskArgsAnalog(n_shots=100)
+    analog_args = TaskArgsAnalog(n_shots=10)
     analog_task = Task(program=ex, args=analog_args)
 
     ########################################################################################
 
-    submission_url = BASE_URL + "/submit/{}".format("qutip")
-    job = requests.post(
-        submission_url,
-        json=analog_task.model_dump(),
-        headers={
-            "Authorization": "{} {}".format(token["token_type"], token["access_token"]),
-        },
-    ).json()
+    for i in range(10):
+        client.submit_job(analog_task, backend="qutip")
 
     ########################################################################################
 
-    retrieval_url = BASE_URL + "/job/{}".format(job["id"])
+    while client.pending:
+        print("\rJobs Pending ...", end="")
+        client.status_update()
 
-    status = job["status"]
-    while status not in ["finished", "failed"]:
-        job = requests.get(
-            retrieval_url,
-            headers={
-                "Authorization": "{} {}".format(
-                    token["token_type"], token["access_token"]
-                ),
-            },
-        ).json()
-        status = job["status"]
+    print(client.jobs)
 
-        if status == "finished":
-            print("\r{:<40} {:<12} {}".format(job["id"], status, job["result"]))
-        elif status == "failed":
-            print("\r{:<40} {:<12} {}".format(job["id"], status, ""))
-        else:
-            print("\r{:<40} {:<12} {}".format(job["id"], status, ""), end="")
+    ########################################################################################
