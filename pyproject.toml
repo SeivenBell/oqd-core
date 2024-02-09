@@ -23,6 +23,8 @@ dependencies = [
 [project.optional-dependencies]
 qutip = ["qutip"]
 tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
+docs = ["pymdown-extensions", "mkdocstrings", "mkdocs-material", "mkdocstrings-python"]
+
 all = ["qutip", "tensorcircuit", "matplotlib", "qiskit"]
 
 
