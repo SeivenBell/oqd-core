@@ -15,8 +15,8 @@ gantt
 
     section Testbench
     Spec. Sinara                        :spec, 2024-02-01, 2w
-    Lead time                           :leadtime, after spec, 6w
-    Installation                        :install, after leadtime, 4w
+    Lead time                           :leadtime, after spec, 12w
+    Installation                        :install, after leadtime, 3w
     Testing and development             :after install, 32w
     
     section Cloud provider
