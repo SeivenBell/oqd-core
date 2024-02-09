@@ -13,7 +13,7 @@ gantt
     title       Open Quantum Design: Technical roadmap, top stack layers
     %% (`excludes` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)
 
-    section Testbench installation
+    section Testbench
     Spec. Sinara                        :spec, 2024-02-01, 2w
     Lead time                           :leadtime, after spec, 6w
     Installation                        :install, after leadtime, 4w
@@ -22,9 +22,9 @@ gantt
     section Cloud provider
     User authorization, tokens                              :auth, 2024-03-01, 4w
     Install in Perimeter Institute                          :installcloud, after auth, 8w
-    Beta-testing of install cloud infrastructure            :testcloud, after installcloud, 12w
+    Beta-testing of cloud infrastructure                    :testcloud, after installcloud, 12w
     
-    section Intermediate representations
+    section IRs
     Time-dependence                                         :timedep, 2024-02-01, 3w
     Analog layer, dissipation rep.                          :diss, after timedep, 8w
     Analog layer, register addressing functionality         :addr, after timedep, 12w
@@ -34,13 +34,13 @@ gantt
     Canonical, verify, and transform visitors for analog -> atomic lowering (version 0.0.1)      :canon, after visitor, 12w
     Use visitors in backend classical analog emulators             :em_visit, after canon, 12w 
     
-    section Use-case development
+    section Use-cases
     Bang-bang protocols    :qaoa, 2024-02-01, 8w
     Annealing experiments  :anneal, after qaoa, 8w
     AMO and MB problems    :amomb, after anneal, 16w
     Mid-circuit measurements   :mcm, after amomb, 24w
     
-    section Documentation
+    section Docs & tests
     Maintain, add docstrings                       :2024-02-01, 52w
     Develop tutorials and examples                 :2024-06-01, 8w
     Unit tests                                     :2024-02-01, 52w
