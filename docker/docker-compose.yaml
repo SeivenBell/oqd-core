@@ -15,6 +15,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "_docker_healthcheck"]
+      start_period: 10s
       interval: 5s
       timeout: 25s
       retries: 5
@@ -31,15 +32,15 @@ services:
     container_name: postgresql
     restart: always
     environment:
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: password # Replace
       POSTGRES_USER: postgresql_admin
       POSTGRES_DB: db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d db -U postgresql_admin"]
       start_period: 10s
       interval: 5s
-      retries: 5
       timeout: 25s
+      retries: 5
     expose:
       - "5432"
     networks:
@@ -59,8 +60,8 @@ services:
       POSTGRES_HOST: postgresql
       POSTGRES_USER: postgresql_admin
       POSTGRES_DB: db
-      POSTGRES_PASSWORD: password
-      JWT_SECRET_KEY: secret
+      POSTGRES_PASSWORD: password # Replace
+      JWT_SECRET_KEY: secret # Replace
       JWT_ALGORITHM: HS256
       JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 30
     ports:
