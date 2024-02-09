@@ -31,7 +31,7 @@ services:
     container_name: postgresql
     restart: always
     environment:
-      POSTGRES_PASSWORD: QC4xn6MU9^69xzm!cYNT
+      POSTGRES_PASSWORD: password
       POSTGRES_USER: postgresql_admin
       POSTGRES_DB: db
     healthcheck:
@@ -59,8 +59,8 @@ services:
       POSTGRES_HOST: postgresql
       POSTGRES_USER: postgresql_admin
       POSTGRES_DB: db
-      POSTGRES_PASSWORD: QC4xn6MU9^69xzm!cYNT
-      JWT_SECRET_KEY: 8&S!FB8&%m*VZmYp3NvG
+      POSTGRES_PASSWORD: password
+      JWT_SECRET_KEY: secret
       JWT_ALGORITHM: HS256
       JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 30
     ports:

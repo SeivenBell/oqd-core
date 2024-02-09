@@ -37,6 +37,7 @@ all = [
     "fastapi>=0.104.0",
     "sqlalchemy",
     "psycopg2-binary",
+    "python-multipart",
 ]
 
 
