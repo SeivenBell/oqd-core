@@ -11,9 +11,12 @@ FROM python:3.10.13-slim-bookworm
 # RUN julia -e 'using Pkg; Pkg.add(["QuantumOptics", "Configurations", "StatsBase", "DataStructures", "JSON3", "IonSim"])'
 
 WORKDIR /app
-ADD . /app
 ENV PYTHONPATH /app
 
-RUN pip install .[all]
+ADD requirements.txt /app
+RUN pip install --no-cache-dir -r requirements.txt
+
+ADD . /app
+RUN pip install --no-cache-dir .[all]
 
 CMD rq worker --with-scheduler & python ./quantumion/server/main.py
