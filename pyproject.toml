@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 name = "quantumion"
 version = "0.0.0"
 requires-python = ">=3.10"
-dependencies = ["pydantic>=2.4", "pydantic-numpy", "h5py", "requests", "rich"]
+dependencies = ["pydantic>=2.4", "h5py", "requests", "rich"]
 
 [project.optional-dependencies]
 qutip = ["qutip"]

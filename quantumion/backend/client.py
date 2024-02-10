@@ -4,10 +4,12 @@ import requests
 
 import numpy as np
 
+from pydantic import TypeAdapter
+
 ########################################################################################
 
 from quantumion.backend.provider import Provider
-from quantumion.backend.task import Task
+from quantumion.backend.task import Task, TaskResult
 from quantumion.backend.job import Job
 
 ########################################################################################
@@ -100,7 +102,11 @@ class Client:
         if response.status_code == 200:
             self._jobs[job_id].status = response_data["status"]
             if self.jobs[job_id].status == "finished":
-                self._jobs[job_id].result = response_data["result"]
+                for i, j in response_data["result"].items():
+                    print(f"{i} {j}")
+                self._jobs[job_id].result = TypeAdapter(TaskResult).validate_python(
+                    response_data["result"]
+                )
 
             return self.jobs[job_id]
 

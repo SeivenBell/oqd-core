@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 import numpy as np
 from typing import Union, List, Dict, Literal
-from pydantic_numpy import typing as pnd
 from pydantic import BaseModel
 
 ########################################################################################
@@ -55,7 +54,7 @@ class TaskArgsDigital(BaseModel):
 class TaskResultDigital(BaseModel):
     layer: Literal["digital"] = "digital"
     counts: dict[str, int] = {}
-    state: pnd.Np1DArray
+    state: List[ComplexFloat] = []
 
 
 ########################################################################################
@@ -73,7 +72,6 @@ class TaskResultAtomic(BaseModel):
     # Hardware results
     collated_state_readout: dict[int, int] = {}
     state_readout: dict[int, int] = {}
-    detector_counts: dict[int, pnd.NpNDArrayInt32] = {}
 
 
 ########################################################################################

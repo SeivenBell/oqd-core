@@ -8,9 +8,13 @@ from quantumion.backend.task import Task, TaskResult
 
 ########################################################################################
 
+
 class Job(BaseModel):
     job_id: str
     task: Task
     backend: str
     status: str
     result: Optional[TaskResult] = None
+
+    class Config:
+        validate_assignment = True

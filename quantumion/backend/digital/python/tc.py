@@ -5,6 +5,7 @@ import tensorcircuit as tc
 from quantumion.backend.base import BackendBase
 from quantumion.backend.task import Task, TaskResultDigital
 
+from quantumion.interface.math import ComplexFloat
 from quantumion.interface.digital.circuit import DigitalCircuit
 
 ########################################################################################
@@ -27,6 +28,6 @@ class TensorCircuitBackend(BackendBase):
             counts=circ.sample(
                 batch=task.args.repetitions, allow_state=True, format="count_dict_bin"
             ),
-            state=circ.state(),
+            state=list(map(ComplexFloat.from_np_complex128, circ.state())),
         )
         return result
