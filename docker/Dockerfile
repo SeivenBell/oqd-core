@@ -9,7 +9,7 @@ WORKDIR /python
 
 RUN python -m venv /python/venv
 
-ENV PATH="$PATH:/python/venv/bin"
+ENV PATH="/python/venv/bin:$PATH"
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
@@ -23,7 +23,7 @@ ARG PIP_NO_CACHE_DIR=1
 
 COPY --from=build /python/venv /python/venv
 
-ENV PATH="$PATH:/python/venv/bin"
+ENV PATH="/python/venv/bin:$PATH"
 ENV PYTHONPATH="/app"
 
 WORKDIR $PYTHONPATH
