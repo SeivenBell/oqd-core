@@ -49,7 +49,7 @@ async def submit_job(
     return {"id": job.id, "status": job.get_status()}
 
 
-@app.get("/job/{job_id}", tags=["job"])
+@app.get("/retrieve/{job_id}", tags=["job"])
 async def retrieve_job(job_id: str, user: user_dependency, db: db_dependency):
     job_in_db = (
         db.query(JobInDB)
@@ -63,9 +63,27 @@ async def retrieve_job(job_id: str, user: user_dependency, db: db_dependency):
     if job_in_db:
         job = Job.fetch(id=job_id, connection=redis_client)
         status = job.get_status()
-        if status != "finished":
-            return {"id": job_id, "status": status}
+        result = job.return_value()
+        return {"id": job_id, "status": status, "result": result}
 
+    raise HTTPException(status_code=http_status.HTTP_401_UNAUTHORIZED)
+
+
+@app.delete("/cancel/{job_id}", tags=["job"])
+async def cancel_job(job_id: str, user: user_dependency, db: db_dependency):
+    job_in_db = (
+        db.query(JobInDB)
+        .filter(
+            JobInDB.jobid == job_id,
+            JobInDB.userid == user.userid,
+            JobInDB.username == user.username,
+        )
+        .first()
+    )
+    if job_in_db:
+        job = Job.fetch(id=job_id, connection=redis_client)
+        job.cancel()
+        status = job.get_status()
         result = job.return_value()
         return {"id": job_id, "status": status, "result": result}
 

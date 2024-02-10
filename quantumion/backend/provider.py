@@ -27,4 +27,7 @@ class Provider:
         return self.url + "/submit/{}".format(backend)
 
     def job_retrieval_url(self, job_id):
-        return self.url + "/job/{}".format(job_id)
+        return self.url + "/retrieve/{}".format(job_id)
+
+    def job_cancellation_url(self, job_id):
+        return self.url + "/cancel/{}".format(job_id)

@@ -26,7 +26,10 @@ class Client:
     @property
     def pending(self):
         return not np.array(
-            [(job.status in ["failed", "finished"]) for job in self.jobs.values()]
+            [
+                (job.status in ["failed", "finished", "canceled"])
+                for job in self.jobs.values()
+            ]
         ).all()
 
     @property
@@ -101,10 +104,11 @@ class Client:
 
         if response.status_code == 200:
             self._jobs[job_id].status = response_data["status"]
-            if self.jobs[job_id].status == "finished":
-                self._jobs[job_id].result = TypeAdapter(TaskResult).validate_python(
-                    response_data["result"]
-                )
+            self._jobs[job_id].result = (
+                TypeAdapter(TaskResult).validate_python(response_data["result"])
+                if response_data["result"]
+                else response_data["result"]
+            )
 
             return self.jobs[job_id]
 
@@ -121,3 +125,21 @@ class Client:
             task=self.jobs[job_id]["task"],
             backend=self.jobs[job_id]["backend"],
         )
+
+    def cancel_job(self, job_id):
+        response = requests.delete(
+            self.provider.job_cancellation_url(job_id=job_id),
+            headers=self.authorization_header,
+        )
+        response_data = response.json()
+
+        if response.status_code == 200:
+            self._jobs[job_id].status = response_data["status"]
+            self._jobs[job_id].result = (
+                TypeAdapter(TaskResult).validate_python(response_data["result"])
+                if response_data["result"]
+                else response_data["result"]
+            )
+            return self.jobs[job_id]
+
+        raise response.raise_for_status()
