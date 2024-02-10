@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from typing import Annotated
 
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from jose import JWTError, jwt
@@ -15,11 +15,9 @@ from sqlalchemy.orm import Session
 
 ########################################################################################
 
-from quantumion.server.database import SessionLocal
+from quantumion.server.model import Token, User
 
-from quantumion.server.model import UserRegistrationForm, Token, User
-
-from quantumion.server.database import UserInDB
+from quantumion.server.database import UserInDB, SessionLocal
 
 ########################################################################################
 
@@ -46,14 +44,6 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 ########################################################################################
-
-
-def available_user(user, db):
-    user_in_db = db.query(UserInDB).filter(UserInDB.username == user.username).first()
-    if not user_in_db:
-        return user
-
-    raise HTTPException(status_code=status.HTTP_409_CONFLICT)
 
 
 def authenticate_user(user, db):
@@ -88,23 +78,6 @@ async def current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 user_dependency = Annotated[User, Depends(current_user)]
 
 # ########################################################################################
-
-
-@router.post(
-    "/register",
-    status_code=status.HTTP_201_CREATED,
-)
-async def register_user(create_user_form: UserRegistrationForm, db: db_dependency):
-    user = available_user(create_user_form, db)
-    if user:
-        user_in_db = UserInDB(
-            username=user.username,
-            hashed_password=pwd_context.hash(user.password),
-        )
-
-        db.add(user_in_db)
-        db.commit()
-    pass
 
 
 @router.post("/token")

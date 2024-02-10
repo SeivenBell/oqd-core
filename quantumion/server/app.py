@@ -1,12 +1,8 @@
-import os
-
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi import status as http_status
 
-from redis import Redis
-from rq import Queue
 from rq.job import Job
 
 ########################################################################################
@@ -15,19 +11,17 @@ from quantumion.backend.analog.python.qutip import QutipBackend
 from quantumion.backend.digital.python.tc import TensorCircuitBackend
 from quantumion.backend.task import Task
 
-from quantumion.server import auth
 from quantumion.server.auth import user_dependency, db_dependency
-from quantumion.server.database import JobInDB
+from quantumion.server.database import redis_client, queue, JobInDB
 
-########################################################################################
-
-redis_client = Redis(host=os.environ["REDIS_HOST"], port=6379, decode_responses=False)
-queue = Queue(connection=redis_client)
+from quantumion.server.auth import router as auth_router
+from quantumion.server.user import router as user_router
 
 ########################################################################################
 
 app = FastAPI()
-app.include_router(auth.router)
+app.include_router(auth_router)
+app.include_router(user_router)
 
 
 @app.post("/submit/{backend}", tags=["job"])

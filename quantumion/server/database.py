@@ -1,10 +1,20 @@
 import os
 
+from redis import Redis
+from rq import Queue
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import Column, Integer, String
+
+########################################################################################
+
+REDIS_HOST = os.environ["REDIS_HOST"]
+
+redis_client = Redis(host=REDIS_HOST, port=6379, decode_responses=False)
+queue = Queue(connection=redis_client)
 
 ########################################################################################
 
@@ -19,6 +29,8 @@ POSTGRES_URL = (
 engine = create_engine(POSTGRES_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+########################################################################################
 
 
 class UserInDB(Base):
