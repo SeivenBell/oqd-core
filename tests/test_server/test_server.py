@@ -65,7 +65,18 @@ if __name__ == "__main__":
     ########################################################################################
 
     while client.pending:
-        print("\rJobs Pending ...", end="")
+        print(
+            "\r{} Jobs Pending ...".format(
+                len(
+                    [
+                        job
+                        for job in client.jobs.values()
+                        if job.status not in ["failed", "finished"]
+                    ]
+                )
+            ),
+            end="",
+        )
         client.status_update()
 
     print("\n{:<48} {:<16} {}".format("Job ID", "Status", "Results"))
