@@ -11,17 +11,15 @@ from jose import JWTError, jwt
 
 from passlib.context import CryptContext
 
-from sqlalchemy.orm import Session
-
 ########################################################################################
 
 from quantumion.server.model import Token, User
 
-from quantumion.server.database import UserInDB, SessionLocal
+from quantumion.server.database import UserInDB, db_dependency
 
 ########################################################################################
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -29,19 +27,6 @@ JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
 JWT_ALGORITHM = os.environ["JWT_ALGORITHM"]
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = os.environ["JWT_ACCESS_TOKEN_EXPIRE_MINUTES"]
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
-
-########################################################################################
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-db_dependency = Annotated[Session, Depends(get_db)]
 
 ########################################################################################
 

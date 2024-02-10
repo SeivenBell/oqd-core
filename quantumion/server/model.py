@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
 
 ########################################################################################
 
@@ -14,5 +16,17 @@ class Token(BaseModel):
 
 
 class User(BaseModel):
+    userid: int
+    username: str
+
+
+class Job(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    job_id: str
+    task: str
+    backend: str
+    status: str
+    result: Optional[str] = None
     userid: int
     username: str

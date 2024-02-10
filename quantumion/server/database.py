@@ -1,13 +1,18 @@
 import os
 
+from typing import Annotated
+
 from redis import Redis
 from rq import Queue
 
+from fastapi import Depends
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+
 
 ########################################################################################
 
@@ -33,6 +38,19 @@ Base = declarative_base()
 ########################################################################################
 
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+db_dependency = Annotated[Session, Depends(get_db)]
+
+########################################################################################
+
+
 class UserInDB(Base):
     __tablename__ = "users"
 
@@ -44,9 +62,36 @@ class UserInDB(Base):
 class JobInDB(Base):
     __tablename__ = "jobs"
 
-    jobid = Column(String, primary_key=True, index=True)
-    userid = Column(Integer, nullable=False)
-    username = Column(String, nullable=False)
+    job_id = Column(String, primary_key=True, index=True)
+    task = Column(String, nullable=False)
+    backend = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    result = Column(String, nullable=True)
+    userid = Column(Integer, ForeignKey("users.userid"), nullable=False)
+    username = Column(String, ForeignKey("users.username"), nullable=False)
 
 
 Base.metadata.create_all(engine)
+
+########################################################################################
+
+
+def report_success(job, connection, result, *args, **kwargs):
+    db = next(get_db())
+    status_update = dict(status="finished", result=result.model_dump_json())
+    db.query(JobInDB).filter(JobInDB.job_id == job.id).update(status_update)
+    db.commit()
+
+
+def report_failure(job, connection, result, *args, **kwargs):
+    db = next(get_db())
+    status_update = dict(status="failed")
+    db.query(JobInDB).filter(JobInDB.job_id == job.id).update(status_update)
+    db.commit()
+
+
+def report_stopped(job, connection, result, *args, **kwargs):
+    db = next(get_db())
+    status_update = dict(status="stopped")
+    db.query(JobInDB).filter(JobInDB.job_id == job.id).update(status_update)
+    db.commit()

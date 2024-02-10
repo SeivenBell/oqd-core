@@ -4,13 +4,11 @@ import requests
 
 import numpy as np
 
-from pydantic import TypeAdapter
-
 ########################################################################################
 
 from quantumion.backend.provider import Provider
-from quantumion.backend.task import Task, TaskResult
-from quantumion.backend.job import Job
+from quantumion.backend.task import Task
+from quantumion.server.model import Job
 
 ########################################################################################
 
@@ -82,16 +80,11 @@ class Client:
             json=task.model_dump(),
             headers=self.authorization_header,
         )
-        response_data = response.json()
+        job = Job.model_validate(response.json())
 
         if response.status_code == 200:
-            self._jobs[response_data["id"]] = Job(
-                job_id=response_data["id"],
-                task=task,
-                status=response_data["status"],
-                backend=backend,
-            )
-            return response_data["id"]
+            self._jobs[job.job_id] = job
+            return self.jobs[job.job_id]
 
         raise response.raise_for_status()
 
@@ -100,16 +93,10 @@ class Client:
             self.provider.job_retrieval_url(job_id=job_id),
             headers=self.authorization_header,
         )
-        response_data = response.json()
+        job = Job.model_validate(response.json())
 
         if response.status_code == 200:
-            self._jobs[job_id].status = response_data["status"]
-            self._jobs[job_id].result = (
-                TypeAdapter(TaskResult).validate_python(response_data["result"])
-                if response_data["result"]
-                else response_data["result"]
-            )
-
+            self._jobs[job_id] = job
             return self.jobs[job_id]
 
         raise response.raise_for_status()
@@ -121,9 +108,8 @@ class Client:
 
     def resubmit_job(self, job_id):
         return self.submit_job(
-            self,
-            task=self.jobs[job_id]["task"],
-            backend=self.jobs[job_id]["backend"],
+            task=Task.model_validate_json(self.jobs[job_id].task),
+            backend=self.jobs[job_id].backend,
         )
 
     def cancel_job(self, job_id):
@@ -131,15 +117,11 @@ class Client:
             self.provider.job_cancellation_url(job_id=job_id),
             headers=self.authorization_header,
         )
-        response_data = response.json()
+        job = Job.model_validate(response.json())
+        print(job.status)
 
         if response.status_code == 200:
-            self._jobs[job_id].status = response_data["status"]
-            self._jobs[job_id].result = (
-                TypeAdapter(TaskResult).validate_python(response_data["result"])
-                if response_data["result"]
-                else response_data["result"]
-            )
+            self._jobs[job_id] = job
             return self.jobs[job_id]
 
         raise response.raise_for_status()

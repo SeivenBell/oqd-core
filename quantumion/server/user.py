@@ -7,13 +7,13 @@ from rq.job import Job
 
 from quantumion.server.auth import user_dependency, db_dependency, pwd_context
 
-from quantumion.server.model import UserRegistrationForm
+from quantumion.server.model import UserRegistrationForm, Job
 
-from quantumion.server.database import redis_client, UserInDB, JobInDB
+from quantumion.server.database import UserInDB, JobInDB
 
 ########################################################################################
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="/user", tags=["User"])
 
 ########################################################################################
 
@@ -46,7 +46,7 @@ async def register_user(create_user_form: UserRegistrationForm, db: db_dependenc
     pass
 
 
-@router.get("/jobs", tags=["user", "job"])
+@router.get("/jobs", tags=["Job"])
 async def user_jobs(user: user_dependency, db: db_dependency):
     jobs_in_db = (
         db.query(JobInDB)
@@ -57,14 +57,6 @@ async def user_jobs(user: user_dependency, db: db_dependency):
         .all()
     )
     if jobs_in_db:
-        job_ids = {job_in_db.jobid for job_in_db in jobs_in_db}
-
-        jobs = []
-        for job_id in job_ids.copy():
-            try:
-                jobs.append(Job.fetch(id=job_id, connection=redis_client).get_status())
-            except:
-                job_ids.remove(job_id)
-        return job_ids
+        return [Job.model_validate(job) for job in jobs_in_db]
 
     raise HTTPException(status_code=http_status.HTTP_401_UNAUTHORIZED)
