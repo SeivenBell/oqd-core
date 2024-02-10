@@ -22,10 +22,10 @@ if __name__ == "__main__":
 
     BASE_URL = args.url
 
-    username = "test_user"
-    password = "test_password"
+    username = "string"
+    password = "string"
 
     registration = UserRegistrationForm(username=username, password=password)
 
-    registration_url = BASE_URL + "/auth/register"
+    registration_url = BASE_URL + "/user/register"
     response = requests.post(registration_url, json=registration.model_dump())
