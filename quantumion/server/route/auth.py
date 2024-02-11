@@ -21,7 +21,7 @@ from quantumion.server.database import UserInDB, db_dependency
 
 ########################################################################################
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -67,7 +67,7 @@ user_dependency = Annotated[User, Depends(current_user)]
 # ########################################################################################
 
 
-@router.post("/token")
+@auth_router.post("/token")
 async def request_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
 ):

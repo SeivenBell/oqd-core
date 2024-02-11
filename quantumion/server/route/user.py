@@ -7,15 +7,15 @@ from sqlalchemy import select
 
 ########################################################################################
 
-from quantumion.server.auth import user_dependency, db_dependency, pwd_context
+from quantumion.server.route.auth import user_dependency, pwd_context
 
 from quantumion.server.model import UserRegistrationForm, Job
 
-from quantumion.server.database import UserInDB, JobInDB
+from quantumion.server.database import UserInDB, JobInDB, db_dependency
 
 ########################################################################################
 
-router = APIRouter(prefix="/user", tags=["User"])
+user_router = APIRouter(prefix="/user", tags=["User"])
 
 ########################################################################################
 
@@ -34,7 +34,7 @@ async def available_user(user, db):
 ########################################################################################
 
 
-@router.post(
+@user_router.post(
     "/register",
     status_code=http_status.HTTP_201_CREATED,
 )
@@ -53,7 +53,7 @@ async def register_user(create_user_form: UserRegistrationForm, db: db_dependenc
     raise HTTPException(status_code=http_status.HTTP_401_UNAUTHORIZED)
 
 
-@router.get("/jobs", tags=["Job"])
+@user_router.get("/jobs", tags=["Job"])
 async def user_jobs(user: user_dependency, db: db_dependency):
     query = await db.execute(
         select(JobInDB).filter(
