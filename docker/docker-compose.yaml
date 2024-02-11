@@ -64,6 +64,7 @@ services:
       JWT_SECRET_KEY: secret # Replace
       JWT_ALGORITHM: HS256
       JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      RQ_WORKERS: 4
     ports:
       - "8000:8000"
     networks:

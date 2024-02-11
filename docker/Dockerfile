@@ -18,6 +18,8 @@ RUN pip install -r requirements.txt
 
 FROM python:3.10.13-slim-bookworm as app
 
+RUN apt update && apt install -y --no-install-recommends supervisor
+
 ARG PIP_DISABLE_PIP_VERSION_CHECK=1
 ARG PIP_NO_CACHE_DIR=1
 
@@ -31,7 +33,8 @@ WORKDIR $PYTHONPATH
 COPY . .
 RUN pip install .[all]
 
-CMD rq worker --with-scheduler & python ./quantumion/server/main.py
+COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["/usr/bin/supervisord"]
 
 ########################################################################################
 
