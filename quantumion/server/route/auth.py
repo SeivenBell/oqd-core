@@ -33,14 +33,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 ########################################################################################
 
 
-def authenticate_user(user, db):
-    user_in_db = db.query(UserInDB).filter(UserInDB.username == user.username).first()
-    if user_in_db and pwd_context.verify(user.password, user_in_db.hashed_password):
-        return user_in_db
-
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-
 def generate_token(username, userid):
     expires = datetime.utcnow() + timedelta(
         minutes=int(JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
