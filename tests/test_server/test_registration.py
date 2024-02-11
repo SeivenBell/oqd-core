@@ -29,5 +29,6 @@ if __name__ == "__main__":
 
     registration_url = BASE_URL + "/user/register"
     response = requests.post(registration_url, json=registration.model_dump())
+    print(response.json())
 
     response.raise_for_status()

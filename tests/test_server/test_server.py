@@ -70,19 +70,14 @@ if __name__ == "__main__":
 
     while client.pending:
         client.status_update()
+
+        queued = client.status_report["queued"]["count"]
         print(
-            "\r{} Jobs Pending ...".format(
-                len(
-                    [
-                        job
-                        for job in client.jobs.values()
-                        if job.status not in ["failed", "finished", "canceled"]
-                    ]
-                )
-            ),
+            "\r{} Jobs Pending ...".format(queued),
             end="",
         )
-        time.sleep(1)
+
+        time.sleep(queued / 4)
 
     print("\n{:<48} {:<16} {}".format("Job ID", "Status", "Results"))
     for job in client.jobs.values():

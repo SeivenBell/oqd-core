@@ -2,8 +2,6 @@ from typing import Literal
 
 import requests
 
-import numpy as np
-
 ########################################################################################
 
 from quantumion.backend.provider import Provider
@@ -21,14 +19,26 @@ class Client:
     def jobs(self):
         return self._jobs
 
+    def __len__(self):
+        return len(self.jobs)
+
     @property
     def pending(self):
-        return not np.array(
-            [
-                (job.status in ["failed", "finished", "canceled"])
-                for job in self.jobs.values()
-            ]
-        ).all()
+        return self.status_report["queued"]["count"] > 0
+
+    @property
+    def status_report(self):
+        _status_report = dict(
+            queued=dict(count=0, jobs=[]),
+            finished=dict(count=0, jobs=[]),
+            failed=dict(count=0, jobs=[]),
+            stopped=dict(count=0, jobs=[]),
+            canceled=dict(count=0, jobs=[]),
+        )
+        for job in self.jobs.values():
+            _status_report[job.status]["count"] += 1
+            _status_report[job.status]["jobs"].append(job)
+        return _status_report
 
     @property
     def provider(self):
