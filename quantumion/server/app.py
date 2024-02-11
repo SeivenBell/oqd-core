@@ -6,6 +6,8 @@ from fastapi import status as http_status
 from rq.job import Callback
 from rq.job import Job as RQJob
 
+from sqlalchemy import select
+
 ########################################################################################
 
 from quantumion.backend.analog.python.qutip import QutipBackend
@@ -62,22 +64,22 @@ async def submit_job(
         result=None,
     )
     db.add(job_in_db)
-    db.commit()
+    await db.commit()
+    await db.refresh(job_in_db)
 
     return Job.model_validate(job_in_db)
 
 
 @app.get("/retrieve/{job_id}", tags=["Job"])
 async def retrieve_job(job_id: str, user: user_dependency, db: db_dependency):
-    job_in_db = (
-        db.query(JobInDB)
-        .filter(
+    query = await db.execute(
+        select(JobInDB).filter(
             JobInDB.job_id == job_id,
             JobInDB.userid == user.userid,
             JobInDB.username == user.username,
         )
-        .first()
     )
+    job_in_db = query.scalars().first()
     if job_in_db:
         return Job.model_validate(job_in_db)
 
@@ -86,20 +88,20 @@ async def retrieve_job(job_id: str, user: user_dependency, db: db_dependency):
 
 @app.delete("/cancel/{job_id}", tags=["Job"])
 async def cancel_job(job_id: str, user: user_dependency, db: db_dependency):
-    job_in_db = (
-        db.query(JobInDB)
-        .filter(
+    query = await db.execute(
+        select(JobInDB).filter(
             JobInDB.job_id == job_id,
             JobInDB.userid == user.userid,
             JobInDB.username == user.username,
         )
-        .first()
     )
+    job_in_db = query.scalars().first()
     if job_in_db:
         job = RQJob.fetch(id=job_id, connection=redis_client)
         job.cancel()
         setattr(job_in_db, "status", "canceled")
-        db.commit()
+        await db.commit()
+        await db.refresh(job_in_db)
         return Job.model_validate(job_in_db)
 
     raise HTTPException(status_code=http_status.HTTP_401_UNAUTHORIZED)

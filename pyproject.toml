@@ -21,7 +21,7 @@ server = [
     "rq",
     "fastapi>=0.104.0",
     "sqlalchemy",
-    "psycopg2-binary",
+    "asyncpg",
     "python-multipart",
 ]
 all = [
@@ -37,7 +37,7 @@ all = [
     "rq",
     "fastapi>=0.104.0",
     "sqlalchemy",
-    "psycopg2-binary",
+    "asyncpg",
     "python-multipart",
 ]
 

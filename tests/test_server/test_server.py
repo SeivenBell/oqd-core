@@ -2,6 +2,9 @@ import argparse
 
 import numpy as np
 
+import time
+from timeit import default_timer
+
 ########################################################################################
 
 from quantumion.backend.client import Client
@@ -58,7 +61,8 @@ if __name__ == "__main__":
 
     ########################################################################################
 
-    for i in range(3):
+    t0 = default_timer()
+    for i in range(10):
         client.submit_job(analog_task, backend="qutip")
         client.submit_job(digital_task, backend="tensorcircuit")
 
@@ -78,9 +82,13 @@ if __name__ == "__main__":
             ),
             end="",
         )
+        time.sleep(1)
 
     print("\n{:<48} {:<16} {}".format("Job ID", "Status", "Results"))
     for job in client.jobs.values():
         print("{:<48} {:<16} {}".format(job.job_id, job.status, job.result))
 
     ########################################################################################
+
+    t = default_timer() - t0
+    print(f"Totat time taken (s): {t}s")

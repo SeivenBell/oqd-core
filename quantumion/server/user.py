@@ -3,6 +3,8 @@ from fastapi import status as http_status
 
 from rq.job import Job
 
+from sqlalchemy import select
+
 ########################################################################################
 
 from quantumion.server.auth import user_dependency, db_dependency, pwd_context
@@ -18,8 +20,11 @@ router = APIRouter(prefix="/user", tags=["User"])
 ########################################################################################
 
 
-def available_user(user, db):
-    user_in_db = db.query(UserInDB).filter(UserInDB.username == user.username).first()
+async def available_user(user, db):
+    query = await db.execute(
+        select(UserInDB).filter(UserInDB.username == user.username)
+    )
+    user_in_db = query.scalars().first()
     if not user_in_db:
         return user
 
@@ -34,7 +39,7 @@ def available_user(user, db):
     status_code=http_status.HTTP_201_CREATED,
 )
 async def register_user(create_user_form: UserRegistrationForm, db: db_dependency):
-    user = available_user(create_user_form, db)
+    user = await available_user(create_user_form, db)
     if user:
         user_in_db = UserInDB(
             username=user.username,
@@ -42,20 +47,21 @@ async def register_user(create_user_form: UserRegistrationForm, db: db_dependenc
         )
 
         db.add(user_in_db)
-        db.commit()
-    pass
+        await db.commit()
+        return {"status": "success"}
+
+    raise HTTPException(status_code=http_status.HTTP_401_UNAUTHORIZED)
 
 
 @router.get("/jobs", tags=["Job"])
 async def user_jobs(user: user_dependency, db: db_dependency):
-    jobs_in_db = (
-        db.query(JobInDB)
-        .filter(
+    query = await db.execute(
+        select(JobInDB).filter(
             JobInDB.userid == user.userid,
             JobInDB.username == user.username,
         )
-        .all()
     )
+    jobs_in_db = query.scalars().all()
     if jobs_in_db:
         return [Job.model_validate(job) for job in jobs_in_db]
 

@@ -11,6 +11,8 @@ from jose import JWTError, jwt
 
 from passlib.context import CryptContext
 
+from sqlalchemy import select
+
 ########################################################################################
 
 from quantumion.server.model import Token, User
@@ -69,9 +71,10 @@ user_dependency = Annotated[User, Depends(current_user)]
 async def request_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
 ):
-    user_in_db = (
-        db.query(UserInDB).filter(UserInDB.username == form_data.username).first()
+    query = await db.execute(
+        select(UserInDB).filter(UserInDB.username == form_data.username)
     )
+    user_in_db = query.scalars().first()
     if user_in_db and pwd_context.verify(
         form_data.password, user_in_db.hashed_password
     ):

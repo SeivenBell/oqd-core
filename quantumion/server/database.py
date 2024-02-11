@@ -7,12 +7,13 @@ from rq import Queue
 
 from fastapi import Depends
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import select
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+import asyncio
 
+from contextlib import asynccontextmanager
 
 ########################################################################################
 
@@ -27,71 +28,100 @@ POSTGRES_HOST = os.environ["POSTGRES_HOST"]
 POSTGRES_DB = os.environ["POSTGRES_DB"]
 POSTGRES_USER = os.environ["POSTGRES_USER"]
 POSTGRES_PASSWORD = os.environ["POSTGRES_PASSWORD"]
-POSTGRES_URL = (
-    f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{POSTGRES_DB}"
-)
+POSTGRES_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{POSTGRES_DB}"
 
-engine = create_engine(POSTGRES_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+engine = create_async_engine(POSTGRES_URL)
+SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 ########################################################################################
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-db_dependency = Annotated[Session, Depends(get_db)]
-
-########################################################################################
+class Base(DeclarativeBase):
+    pass
 
 
 class UserInDB(Base):
     __tablename__ = "users"
 
-    userid = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    userid: Mapped[int] = mapped_column(primary_key=True, index=True)
+    username: Mapped[str] = mapped_column(unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
 
 
 class JobInDB(Base):
     __tablename__ = "jobs"
 
-    job_id = Column(String, primary_key=True, index=True)
-    task = Column(String, nullable=False)
-    backend = Column(String, nullable=False)
-    status = Column(String, nullable=False)
-    result = Column(String, nullable=True)
-    userid = Column(Integer, ForeignKey("users.userid"), nullable=False)
-    username = Column(String, ForeignKey("users.username"), nullable=False)
+    job_id: Mapped[str] = mapped_column(primary_key=True, index=True)
+    task: Mapped[str] = mapped_column(nullable=False)
+    backend: Mapped[str] = mapped_column(nullable=False)
+    status: Mapped[str] = mapped_column(nullable=False)
+    result: Mapped[str] = mapped_column(nullable=True)
+    userid: Mapped[int] = mapped_column(nullable=False)
+    username: Mapped[str] = mapped_column(nullable=False)
 
-
-Base.metadata.create_all(engine)
 
 ########################################################################################
 
 
+async def get_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        await db.close()
+
+
+db_dependency = Annotated[AsyncSession, Depends(get_db)]
+
+########################################################################################
+
+
+async def _report_success(job, connection, result, *args, **kwargs):
+    async with asynccontextmanager(get_db)() as db:
+        status_update = dict(status="finished", result=result.model_dump_json())
+        query = await db.execute(select(JobInDB).filter(JobInDB.job_id == job.id))
+        job_in_db = query.scalars().first()
+        for k, v in status_update.items():
+            setattr(job_in_db, k, v)
+        await db.commit()
+
+
 def report_success(job, connection, result, *args, **kwargs):
-    db = next(get_db())
-    status_update = dict(status="finished", result=result.model_dump_json())
-    db.query(JobInDB).filter(JobInDB.job_id == job.id).update(status_update)
-    db.commit()
+    return asyncio.get_event_loop().run_until_complete(
+        _report_success(job, connection, result, *args, **kwargs)
+    )
+
+
+async def _report_failure(job, connection, result, *args, **kwargs):
+    async with asynccontextmanager(get_db)() as db:
+        status_update = dict(status="failed")
+        query = await db.execute(select(JobInDB).filter(JobInDB.job_id == job.id))
+        job_in_db = query.scalars().first()
+        for k, v in status_update.items():
+            setattr(job_in_db, k, v)
+        await db.commit()
 
 
 def report_failure(job, connection, result, *args, **kwargs):
-    db = next(get_db())
-    status_update = dict(status="failed")
-    db.query(JobInDB).filter(JobInDB.job_id == job.id).update(status_update)
-    db.commit()
+    return asyncio.get_event_loop().run_until_complete(
+        _report_failure(job, connection, result, *args, **kwargs)
+    )
+
+
+async def _report_stopped(job, connection, result, *args, **kwargs):
+    async with asynccontextmanager(get_db)() as db:
+        status_update = dict(status="stopped")
+        query = await db.execute(select(JobInDB).filter(JobInDB.job_id == job.id))
+        job_in_db = query.scalars().first()
+        for k, v in status_update.items():
+            setattr(job_in_db, k, v)
+        await db.commit()
 
 
 def report_stopped(job, connection, result, *args, **kwargs):
-    db = next(get_db())
-    status_update = dict(status="stopped")
-    db.query(JobInDB).filter(JobInDB.job_id == job.id).update(status_update)
-    db.commit()
+    return asyncio.get_event_loop().run_until_complete(
+        _report_stopped(job, connection, result, *args, **kwargs)
+    )
