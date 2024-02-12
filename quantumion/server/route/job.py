@@ -15,11 +15,10 @@ from quantumion.backend.digital.python.tc import TensorCircuitBackend
 from quantumion.backend.task import Task
 
 from quantumion.server.route.auth import user_dependency
-from quantumion.server.database import (
+from quantumion.server.database import db_dependency, JobInDB
+from quantumion.server.jobqueue import (
     redis_client,
     queue,
-    db_dependency,
-    JobInDB,
     report_success,
     report_failure,
     report_stopped,
