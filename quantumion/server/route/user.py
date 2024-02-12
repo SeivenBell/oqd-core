@@ -43,6 +43,7 @@ async def register_user(create_user_form: UserRegistrationForm, db: db_dependenc
     if user:
         user_in_db = UserInDB(
             username=user.username,
+            email=user.email,
             hashed_password=pwd_context.hash(user.password),
         )
 
@@ -57,7 +58,7 @@ async def register_user(create_user_form: UserRegistrationForm, db: db_dependenc
 async def user_jobs(user: user_dependency, db: db_dependency):
     query = await db.execute(
         select(JobInDB).filter(
-            JobInDB.userid == user.userid,
+            JobInDB.user_id == user.user_id,
             JobInDB.username == user.username,
         )
     )

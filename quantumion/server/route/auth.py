@@ -33,11 +33,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 ########################################################################################
 
 
-def generate_token(username, userid):
+def generate_token(username, user_id):
     expires = datetime.utcnow() + timedelta(
         minutes=int(JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    encode = {"id": userid, "sub": username, "exp": expires}
+    encode = {"id": user_id, "sub": username, "exp": expires}
     return jwt.encode(encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
@@ -45,9 +45,9 @@ async def current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         username = payload.get("sub")
-        userid = payload.get("id")
-        if not username is None and not userid is None:
-            return User(username=username, userid=userid)
+        user_id = payload.get("id")
+        if not username is None and not user_id is None:
+            return User(username=username, user_id=user_id)
         raise JWTError
 
     except JWTError:
@@ -67,10 +67,12 @@ async def request_token(
         select(UserInDB).filter(UserInDB.username == form_data.username)
     )
     user_in_db = query.scalars().first()
-    if user_in_db and pwd_context.verify(
-        form_data.password, user_in_db.hashed_password
+    if (
+        user_in_db
+        and pwd_context.verify(form_data.password, user_in_db.hashed_password)
+        and not user_in_db.disabled
     ):
-        token = generate_token(user_in_db.username, user_in_db.userid)
+        token = generate_token(user_in_db.username, user_in_db.user_id)
         return Token(access_token=token, token_type="bearer")
 
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

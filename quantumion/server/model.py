@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 class UserRegistrationForm(BaseModel):
     username: str
+    email: str
     password: str
 
 
@@ -16,7 +17,7 @@ class Token(BaseModel):
 
 
 class User(BaseModel):
-    userid: int
+    user_id: str
     username: str
 
 
@@ -28,5 +29,5 @@ class Job(BaseModel):
     backend: str
     status: str
     result: Optional[str] = None
-    userid: int
+    user_id: str
     username: str

@@ -1,6 +1,10 @@
 import os
 
-from typing import Annotated
+from typing import Annotated, Optional
+
+from datetime import datetime
+
+from uuid import uuid4
 
 from redis import Redis
 from rq import Queue
@@ -43,21 +47,26 @@ class Base(DeclarativeBase):
 class UserInDB(Base):
     __tablename__ = "users"
 
-    userid: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[str] = mapped_column(
+        primary_key=True, index=True, default=lambda: str(uuid4())
+    )
     username: Mapped[str] = mapped_column(unique=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str]
+    hashed_password: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    disabled: Mapped[bool] = mapped_column(default=False)
 
 
 class JobInDB(Base):
     __tablename__ = "jobs"
 
     job_id: Mapped[str] = mapped_column(primary_key=True, index=True)
-    task: Mapped[str] = mapped_column(nullable=False)
-    backend: Mapped[str] = mapped_column(nullable=False)
-    status: Mapped[str] = mapped_column(nullable=False)
-    result: Mapped[str] = mapped_column(nullable=True)
-    userid: Mapped[int] = mapped_column(nullable=False)
-    username: Mapped[str] = mapped_column(nullable=False)
+    task: Mapped[str]
+    backend: Mapped[str]
+    status: Mapped[str]
+    result: Mapped[Optional[str]]
+    user_id: Mapped[str]
+    username: Mapped[str]
 
 
 ########################################################################################
