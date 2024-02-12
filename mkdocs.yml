@@ -3,6 +3,14 @@ site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
 #site_url: http://0.0.0.0:8000
 
+nav:
+  - Introduction: index.md
+  - Tutorials: tutorials.md
+  - How to guides: how-to-guides.md
+  - Reference: reference.md
+  - Explanation: explanation.md
+
+
 use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
 
 theme:
@@ -40,14 +48,6 @@ theme:
 
 plugins:
   - mkdocstrings
-
-
-nav:
-  - Introduction: index.md
-  - Tutorials: tutorials.md
-  - How to guides: how-to-guides.md
-  - Reference: reference.md
-  - Explanation: explanation.md
 
 
 markdown_extensions:
