@@ -88,7 +88,3 @@ if __name__ == "__main__":
 
     t = default_timer() - t0
     print(f"Totat time taken (s): {t}s")
-
-    from rich import print
-
-    print(client.jobs)
