@@ -49,17 +49,17 @@ classDiagram
   }
 ```
 
-::: quantumion.analog.circuit.AnalogCircuit
+::: quantumion.interface.analog.circuit.AnalogCircuit
 
-::: quantumion.analog.gate.AnalogGate
+::: quantumion.interface.analog.gate.AnalogGate
 
-::: quantumion.analog.operator.Operator
+::: quantumion.interface.analog.operator.Operator
 
 
 # Digital mode
-::: quantumion.digital.circuit.DigitalCircuit
+::: quantumion.interface.digital.circuit.DigitalCircuit
 
-::: quantumion.digital.gate.Gate
+::: quantumion.interface.digital.gate.Gate
 
 
 # Atomic mode

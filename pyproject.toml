@@ -10,6 +10,12 @@ requires-python = ">=3.10"
 dependencies = ["pydantic>=2.4", "h5py", "requests", "rich"]
 
 [project.optional-dependencies]
+docs = [
+    "pymdown-extensions",
+    "mkdocstrings",
+    "mkdocs-material",
+    "mkdocstrings-python",
+]
 qutip = ["qutip"]
 tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
 server = [
@@ -40,7 +46,6 @@ all = [
     "asyncpg",
     "python-multipart",
 ]
-
 
 [tool.setuptools]
 packages = ["quantumion"]
