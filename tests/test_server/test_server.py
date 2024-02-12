@@ -62,7 +62,7 @@ if __name__ == "__main__":
     ########################################################################################
 
     t0 = default_timer()
-    for i in range(10):
+    for i in range(1):
         client.submit_job(analog_task, backend="qutip")
         client.submit_job(digital_task, backend="tensorcircuit")
 
@@ -80,6 +80,7 @@ if __name__ == "__main__":
         time.sleep(queued / 4)
 
     print("\n{:<48} {:<16} {}".format("Job ID", "Status", "Results"))
+
     for job in client.jobs.values():
         print("{:<48} {:<16} {}".format(job.job_id, job.status, job.result))
 
@@ -87,3 +88,7 @@ if __name__ == "__main__":
 
     t = default_timer() - t0
     print(f"Totat time taken (s): {t}s")
+
+    from rich import print
+
+    print(client.jobs)

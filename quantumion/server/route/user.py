@@ -59,7 +59,6 @@ async def user_jobs(user: user_dependency, db: db_dependency):
     query = await db.execute(
         select(JobInDB).filter(
             JobInDB.user_id == user.user_id,
-            JobInDB.username == user.username,
         )
     )
     jobs_in_db = query.scalars().all()

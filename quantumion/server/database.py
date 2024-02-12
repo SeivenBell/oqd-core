@@ -11,8 +11,12 @@ from rq import Queue
 
 from fastapi import Depends
 
-from sqlalchemy import select
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import select, ForeignKey
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+)
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 import asyncio
@@ -65,17 +69,13 @@ class JobInDB(Base):
     backend: Mapped[str]
     status: Mapped[str]
     result: Mapped[Optional[str]]
-    user_id: Mapped[str]
-    username: Mapped[str]
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
 
 
 ########################################################################################
 
 
 async def get_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
     db = SessionLocal()
     try:
         yield db

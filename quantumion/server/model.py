@@ -30,4 +30,3 @@ class Job(BaseModel):
     status: str
     result: Optional[str] = None
     user_id: str
-    username: str

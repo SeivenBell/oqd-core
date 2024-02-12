@@ -54,9 +54,8 @@ async def submit_job(
         task=task.model_dump_json(),
         backend=backend,
         status=job.get_status(),
-        user_id=user.user_id,
-        username=user.username,
         result=None,
+        user_id=user.user_id,
     )
     db.add(job_in_db)
     await db.commit()
@@ -71,7 +70,6 @@ async def retrieve_job(job_id: str, user: user_dependency, db: db_dependency):
         select(JobInDB).filter(
             JobInDB.job_id == job_id,
             JobInDB.user_id == user.user_id,
-            JobInDB.username == user.username,
         )
     )
     job_in_db = query.scalars().first()
@@ -87,7 +85,6 @@ async def cancel_job(job_id: str, user: user_dependency, db: db_dependency):
         select(JobInDB).filter(
             JobInDB.job_id == job_id,
             JobInDB.user_id == user.user_id,
-            JobInDB.username == user.username,
         )
     )
     job_in_db = query.scalars().first()
