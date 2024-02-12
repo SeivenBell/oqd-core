@@ -22,8 +22,11 @@ from contextlib import asynccontextmanager
 ########################################################################################
 
 REDIS_HOST = os.environ["REDIS_HOST"]
+REDIS_PASSWORD = os.environ["REDIS_PASSWORD"]
 
-redis_client = Redis(host=REDIS_HOST, port=6379, decode_responses=False)
+redis_client = Redis(
+    host=REDIS_HOST, password=REDIS_PASSWORD, port=6379, decode_responses=False
+)
 queue = Queue(connection=redis_client)
 
 ########################################################################################

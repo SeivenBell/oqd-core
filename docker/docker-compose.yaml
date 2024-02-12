@@ -11,15 +11,17 @@ networks:
 services:
   redis:
     image: redis
-    container_name: redis
+    container_name: quantumion_redis
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "_docker_healthcheck"]
+      test: ["CMD-SHELL", "redis-cli -a $${REDIS_PASSWORD} --raw incr _docker_healthcheck"]
       start_period: 10s
       interval: 5s
       timeout: 25s
       retries: 5
-    command: redis-server --save 20 1 --loglevel notice --appendonly yes --appendfsync everysec
+    environment:
+      REDIS_PASSWORD: password # Replace
+    command: ["sh", "-c", "redis-server --requirepass $${REDIS_PASSWORD} --save 20 1 --loglevel notice --appendonly yes --appendfsync everysec"]
     expose:
       - "6379"
     networks:
@@ -27,16 +29,16 @@ services:
     volumes:
       - redis_volume:/data
 
-  postgresql:
+  postgres:
     image: postgres
-    container_name: postgresql
+    container_name: quantumion_postgres
     restart: always
     environment:
       POSTGRES_PASSWORD: password # Replace
-      POSTGRES_USER: postgresql_admin
+      POSTGRES_USER: postgres_admin
       POSTGRES_DB: db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d db -U postgresql_admin"]
+      test: ["CMD-SHELL", "pg_isready -d db -U postgres_admin"]
       start_period: 10s
       interval: 5s
       timeout: 25s
@@ -46,7 +48,7 @@ services:
     networks:
       internal:
     volumes:
-      - postgresql_volume:/var/lib/postgresql/data 
+      - postgres_volume:/var/lib/postgres/data 
 
   app:
     build:
@@ -57,8 +59,9 @@ services:
     restart: always
     environment:
       REDIS_HOST: redis
-      POSTGRES_HOST: postgresql
-      POSTGRES_USER: postgresql_admin
+      REDIS_PASSWORD: password # Replace
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres_admin
       POSTGRES_DB: db
       POSTGRES_PASSWORD: password # Replace
       JWT_SECRET_KEY: secret # Replace
@@ -72,11 +75,11 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-      postgresql:
+      postgres:
         condition: service_healthy
 
 volumes:
   redis_volume:
     driver: local
-  postgresql_volume:
+  postgres_volume:
     driver: local
