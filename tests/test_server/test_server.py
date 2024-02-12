@@ -62,7 +62,7 @@ if __name__ == "__main__":
     ########################################################################################
 
     t0 = default_timer()
-    for i in range(1):
+    for i in range(3):
         client.submit_job(analog_task, backend="qutip")
         client.submit_job(digital_task, backend="tensorcircuit")
 
