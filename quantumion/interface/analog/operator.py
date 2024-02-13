@@ -1,12 +1,5 @@
-from operator import mul
-from functools import reduce
-from typing import List, Literal, Union
-
-########################################################################################
-
-from quantumion.interface.base import VisitableBaseModel
-from quantumion.interface.math import ComplexFloat
-from quantumion.utils.math import levi_civita
+from quantumion.interface.base import TypeReflectBaseModel
+from quantumion.interface.math import CastMathExpr, MathExpr
 
 ########################################################################################
 
@@ -21,98 +14,183 @@ __all__ = [
     "Identity",
 ]
 
+
 ########################################################################################
 
 
-class Operator(VisitableBaseModel):
-    """
-    Examples:
-        >>> PauliX = Operator(coefficient=1.0, pauli=["x"])
-        >>> Destroy = Operator(coefficient=1.0, ladder=[[-1]])
-        >>> Create = Operator(coefficient=1.0, ladder=[[1]])
+class Operator(TypeReflectBaseModel):
+    def __neg__(self):
+        return OpNeg(op=self)
 
-    Args:
-        coefficient (int, float, ComplexFloat): time-independent coefficient of the operator
-        pauli (list["x", "y", "z", "i"]): Pauli operator on qubit index
-        ladder (list[list[-1, 0, +1]]): Ladder operator(s) on mode index
-    """
+    def __add__(self, other):
+        return OpAdd(op1=self, op2=other)
 
-    coefficient: Union[int, float, ComplexFloat] = 1.0
-    pauli: List[Literal["x", "y", "z", "i"]] = []
-    ladder: List[List[Literal[-1, 0, 1]]] = []
-
-    @property
-    def n_qreg(self):
-        return len(self.pauli)
-
-    @property
-    def n_qmode(self):
-        return len(self.ladder)
-
-    def __eq__(self, other):
-        if not isinstance(other, Operator):
-            raise TypeError
-
-        eq = (self.pauli == other.pauli) and (self.ladder == other.ladder)
-        return eq
-
-    # def __add__(self, other):
-    #     if not isinstance(other, Operator):
-    #         raise TypeError(f"unsupported operand types for '{type(self)}' and '{type(other)}'")
-    #
-    #     assert (self.n_qreg == other.n_qreg) and (self.n_qmode == self.n_qmode)
-    #
-    #     if (self.qreg == other.qreg) and (self.qmode == other.qmode):
-    #         coefficient = self.coefficient + other.coefficient
-    #         return Operator(coefficient=coefficient, qreg=self.qreg, qmode=self.qmode)
-
-    def __mul__(self, other):
-        if isinstance(other, (int, float)):
-            return Operator(
-                coefficient=self.coefficient * other,
-                pauli=self.pauli,
-                ladder=self.ladder,
-            )
-
-        elif isinstance(other, Operator):
-            qreg, phases = list(zip(*list(map(levi_civita, self.pauli, other.pauli))))
-            phase = reduce(mul, phases, 1)
-            coefficient = phase * self.coefficient * other.coefficient
-            qmode = [a + b for a, b in zip(self.ladder, other.ladder)]
-            return Operator(coefficient=coefficient, pauli=qreg, ladder=qmode)
-
-        else:
-            return TypeError
-
-    def __rmul__(self, other):
-        return self * other
+    def __sub__(self, other):
+        return OpSub(op1=self, op2=other)
 
     def __matmul__(self, other):
-        if not isinstance(other, Operator):
-            raise TypeError
+        return OpKron(op1=self, op2=other)
 
-        qreg = self.pauli + other.pauli
-        qmode = self.ladder + other.ladder
-        coefficient = self.coefficient * other.coefficient
+    def __mul__(self, other):
+        if isinstance(other, Operator):
+            return OpMul(op1=self, op2=other)
+        else:
+            return OpScalarMul(op=self, expr=other)
 
-        return Operator(coefficient=coefficient, pauli=qreg, ladder=qmode)
+    def __rmul__(self, other):
+        return other * self
 
-    def __rmatmul__(self, other):
-        return other @ self
+    pass
 
 
-PauliX = Operator(pauli=["x"])
-PauliY = Operator(pauli=["y"])
-PauliZ = Operator(pauli=["z"])
-PauliI = Operator(pauli=["i"])
+########################################################################################
 
-Creation = Operator(ladder=[[-1]])
-Annihilation = Operator(ladder=[[1]])
-Identity = Operator(ladder=[[0]])
 
+class Pauli(Operator):
+    pass
+
+
+class PauliI(Pauli):
+    pass
+
+
+class PauliX(Pauli):
+    pass
+
+
+class PauliY(Pauli):
+    pass
+
+
+class PauliZ(Pauli):
+    pass
+
+
+########################################################################################
+
+
+class Ladder(Operator):
+    pass
+
+
+class Creation(Ladder):
+    pass
+
+
+class Annihilation(Ladder):
+    pass
+
+
+class Identity(Ladder):
+    pass
+
+
+########################################################################################
+
+
+class OpNeg(Operator):
+    op: Operator
+
+
+class OpScalarMul(Operator):
+    op: Operator
+    expr: CastMathExpr
+
+
+class OpAdd(Operator):
+    op1: Operator
+    op2: Operator
+
+
+class OpSub(Operator):
+    op1: Operator
+    op2: Operator
+
+
+class OpMul(Operator):
+    op1: Operator
+    op2: Operator
+
+
+class OpKron(Operator):
+    op1: Operator
+    op2: Operator
+
+
+########################################################################################
+
+from typing import Any
+
+from quantumion.compiler.visitor import Transform
+from quantumion.compiler.math import PrintMathExpr
+
+
+class PrintOperator(Transform):
+    def _visit(self, model: Any):
+        if isinstance(model, (Pauli, Ladder)):
+            return model.class_ + "()"
+        if isinstance(model, MathExpr):
+            return model.accept(PrintMathExpr())
+        raise TypeError("Incompatible type for input model")
+
+    def visit_OpNeg(self, model: OpNeg):
+        if not isinstance(model.op, (OpAdd, OpSub, OpMul)):
+            string = "-{}".format(self.visit(model.op))
+        else:
+            string = "-({})".format(self.visit(model.op))
+        return string
+
+    def visit_OpAdd(self, model: OpAdd):
+        string = "{} + {}".format(self.visit(model.op1), self.visit(model.op2))
+        return string
+
+    def visit_OpSub(self, model: OpSub):
+        string = "{} - {}".format(self.visit(model.op1), self.visit(model.op2))
+        return string
+
+    def visit_OpMul(self, model: OpMul):
+        s1 = (
+            f"({self.visit(model.op1)})"
+            if isinstance(model.op1, (OpAdd, OpSub, OpKron))
+            else self.visit(model.op1)
+        )
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if isinstance(model.op2, (OpAdd, OpSub, OpKron))
+            else self.visit(model.op2)
+        )
+
+        string = "{} * {}".format(s1, s2)
+        return string
+
+    def visit_OpKron(self, model: OpKron):
+        s1 = (
+            f"({self.visit(model.op1)})"
+            if isinstance(model.op1, (OpAdd, OpSub))
+            else self.visit(model.op1)
+        )
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if isinstance(model.op2, (OpAdd, OpSub))
+            else self.visit(model.op2)
+        )
+
+        string = "{} @ {}".format(s1, s2)
+        return string
+
+    def visit_OpScalarMul(self, model: OpScalarMul):
+        s1 = (
+            f"({self.visit(model.op)})"
+            if isinstance(model.op, (OpAdd, OpSub))
+            else self.visit(model.op)
+        )
+        s2 = self.visit(model.expr)
+
+        string = "{} * {}".format(s1, s2)
+        return string
+
+
+########################################################################################
 
 if __name__ == "__main__":
-    op = Operator(pauli=["x"], ladder=[[-1, 1]])
-    print(op)
-
-    print((PauliI * PauliX) @ (Creation * Annihilation))
+    pass
