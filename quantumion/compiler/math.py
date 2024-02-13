@@ -37,7 +37,7 @@ class PrintMathExpr(Transform):
         return string
 
     def visit_MathImag(self, model: MathImag):
-        string = "{}".format(model.name)
+        string = "1j"
         return string
 
     def visit_MathNeg(self, model: MathNeg):
@@ -50,7 +50,7 @@ class PrintMathExpr(Transform):
         return string
 
     def visit_MathUnary(self, model: MathUnary):
-        string = "{}({})".format(model.func, self.visit(model.arg))
+        string = "{}({})".format(model.func, self.visit(model.expr))
         return string
 
     def visit_MathAdd(self, model: MathAdd):
@@ -105,3 +105,6 @@ class PrintMathExpr(Transform):
 
         string = "{}**{}".format(s1, s2)
         return string
+
+
+########################################################################################

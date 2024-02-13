@@ -99,7 +99,7 @@ class MathNum(MathExpr):
 
 
 class MathImag(MathExpr):
-    name: Literal["1j"] = "1j"
+    pass
 
 
 class MathNeg(MathExpr):
