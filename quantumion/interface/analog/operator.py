@@ -189,14 +189,3 @@ class PrintOperator(Transform):
 
         string = "{} * {}".format(s2, s1)
         return string
-
-
-########################################################################################
-
-if __name__ == "__main__":
-    from quantumion.interface.math import MathUnary, MathAdd, MathMul, MathNum
-
-    op = PauliY() * (1 + 2j)
-
-    print(op)
-    print(op.accept(PrintOperator()))
