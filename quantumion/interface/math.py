@@ -20,7 +20,9 @@ class ASTVisitor(Transform):
         raise TypeError
 
     def visit_Module(self, model: ast.Module):
-        return self.visit(model.body[0])
+        if len(model.body) == 1:
+            return self.visit(model.body[0])
+        raise TypeError
 
     def visit_Expr(self, model: ast.Expr):
         return self.visit(model.value)
@@ -52,8 +54,9 @@ class ASTVisitor(Transform):
         raise TypeError
 
     def visit_Call(self, model: ast.Call):
-        print(model.func.id, model.args[0])
-        return MathUnary(func=model.func.id, expr=self.visit(model.args[0]))
+        if len(model.args) == 1:
+            return MathUnary(func=model.func.id, expr=self.visit(model.args[0]))
+        raise TypeError
 
 
 ########################################################################################
