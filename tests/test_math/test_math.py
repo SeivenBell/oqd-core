@@ -7,5 +7,9 @@ if __name__ == "__main__":
 
     expr = -MathNum(value=1) + 1
     expr = 2**-expr
-    expr = 2 + -expr + 1 + -MathUnary(func="sin", arg=MathNum(value=1) + 3232) ** 2
+    expr = 2 + -expr + 1 + -MathUnary(func="sin", expr=MathNum(value=1) + 3232) ** 2
+    expr += "1+ 4"
+
+    print(expr)
+
     print(expr.accept(PrintMathExpr()))
