@@ -38,7 +38,8 @@ class Operator(TypeReflectBaseModel):
             return OpScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
-        return other * self
+        other = MathExpr.cast(other)
+        return self * other
 
     pass
 
@@ -151,12 +152,12 @@ class PrintOperator(Transform):
     def visit_OpMul(self, model: OpMul):
         s1 = (
             f"({self.visit(model.op1)})"
-            if isinstance(model.op1, (OpAdd, OpSub, OpKron))
+            if isinstance(model.op1, (OpAdd, OpSub))
             else self.visit(model.op1)
         )
         s2 = (
             f"({self.visit(model.op2)})"
-            if isinstance(model.op2, (OpAdd, OpSub, OpKron))
+            if isinstance(model.op2, (OpAdd, OpSub))
             else self.visit(model.op2)
         )
 
@@ -186,11 +187,16 @@ class PrintOperator(Transform):
         )
         s2 = self.visit(model.expr)
 
-        string = "{} * {}".format(s1, s2)
+        string = "{} * {}".format(s2, s1)
         return string
 
 
 ########################################################################################
 
 if __name__ == "__main__":
-    pass
+    from quantumion.interface.math import MathUnary, MathAdd, MathMul
+
+    op = PauliY() * 2
+
+    print(op)
+    print(op.accept(PrintOperator()))

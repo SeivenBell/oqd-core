@@ -38,10 +38,7 @@ class MathExpr(TypeReflectBaseModel):
         return MathSub(expr1=self, expr2=other)
 
     def __mul__(self, other):
-        try:
-            return MathMul(expr1=self, expr2=other)
-        except:
-            return other * self
+        return MathMul(expr1=self, expr2=other)
 
     def __truediv__(self, other):
         return MathDiv(expr1=self, expr2=other)
