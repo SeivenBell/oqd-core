@@ -108,7 +108,7 @@ class MathNeg(MathExpr):
 
 class MathUnary(MathExpr):
     func: Unaries
-    arg: CastMathExpr
+    expr: CastMathExpr
 
 
 class MathAdd(MathExpr):
