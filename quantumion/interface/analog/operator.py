@@ -185,7 +185,7 @@ class PrintOperator(Transform):
             if isinstance(model.op, (OpAdd, OpSub))
             else self.visit(model.op)
         )
-        s2 = self.visit(model.expr)
+        s2 = f"({self.visit(model.expr)})"
 
         string = "{} * {}".format(s2, s1)
         return string
@@ -194,9 +194,9 @@ class PrintOperator(Transform):
 ########################################################################################
 
 if __name__ == "__main__":
-    from quantumion.interface.math import MathUnary, MathAdd, MathMul
+    from quantumion.interface.math import MathUnary, MathAdd, MathMul, MathNum
 
-    op = PauliY() * 2
+    op = PauliY() * (1 + 2j)
 
     print(op)
     print(op.accept(PrintOperator()))

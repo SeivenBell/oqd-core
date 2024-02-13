@@ -20,7 +20,7 @@ class MathExpr(TypeReflectBaseModel):
         if isinstance(value, (int, float)):
             value = MathNum(value=value)
             return value
-        if isinstance(value, np.complex128):
+        if isinstance(value, (complex, np.complex128)):
             value = MathNum(value=value.real) + MathImag() * value.imag
             return value
         if isinstance(value, str):
