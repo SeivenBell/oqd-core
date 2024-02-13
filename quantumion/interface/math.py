@@ -1,50 +1,13 @@
-from typing import Union, Literal, Annotated
+from typing import Union, Literal, Annotated, Any
 
 from pydantic import AfterValidator
+
+import numpy as np
 
 ########################################################################################
 
 from quantumion.interface.base import VisitableBaseModel, TypeReflectBaseModel
-
-########################################################################################
-
-
-class ComplexFloat(VisitableBaseModel):
-    real: float
-    imag: float
-
-    @classmethod
-    def from_np_complex128(cls, np_complex128):
-        """Converts a numpy complex128 datatype to custom ComplexFloat"""
-        return cls(real=np_complex128.real, imag=np_complex128.imag)
-
-    def __add__(self, other):
-        if isinstance(other, ComplexFloat):
-            self.real += other.real
-            self.imag += other.imag
-            return self
-
-        elif isinstance(other, (float, int)):
-            self.real += other
-            return self
-
-    def __mul__(self, other):
-        if isinstance(other, (float, int)):
-            self.real *= other
-            self.imag *= other
-            return self
-        elif isinstance(other, ComplexFloat):
-            real = self.real * other.real - self.imag * self.imag
-            imag = self.real * other.imag + self.imag * self.real
-            return ComplexFloat(real=real, imag=imag)
-        else:
-            raise TypeError
-
-    def __radd__(self, other):
-        return self + other
-
-    def __rmul__(self, other):
-        return self * other
+from quantumion.compiler.visitor import Transform
 
 
 ########################################################################################
@@ -56,21 +19,88 @@ def is_varname(v: str) -> str:
     return v
 
 
-def is_protectedvarname(v: str) -> str:
-    if v[0] != "%" or not v[1:].isidentifier():
-        raise ValueError
-    return v
-
-
 VarName = Annotated[str, AfterValidator(is_varname)]
-ProtectedVarName = Annotated[str, AfterValidator(is_protectedvarname)]
-Unaries = Literal["-", "sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
+Unaries = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
 
 ########################################################################################
 
 
 class MathExpr(TypeReflectBaseModel):
+
+    def __neg__(self):
+        return MathNeg(expr=self)
+
+    def __add__(self, other):
+        other = MathExpr.convert(other)
+
+        return MathAdd(expr1=self, expr2=other)
+
+    def __sub__(self, other):
+        other = MathExpr.convert(other)
+
+        return MathSub(expr1=self, expr2=other)
+
+    def __mul__(self, other):
+        try:
+            other = MathExpr.convert(other)
+            return MathMul(expr1=self, expr2=other)
+        except:
+            return other * self
+
+    def __truediv__(self, other):
+        other = MathExpr.convert(other)
+        return MathDiv(expr1=self, expr2=other)
+
+    def __pow__(self, other):
+        other = MathExpr.convert(other)
+
+        return MathPow(expr1=self, expr2=other)
+
+    def __radd__(self, other):
+        other = MathExpr.convert(other)
+        return other + self
+
+    def __rsub__(self, other):
+        other = MathExpr.convert(other)
+        return other - self
+
+    def __rmul__(self, other):
+        other = MathExpr.convert(other)
+        return other * self
+
+    def __rpow__(self, other):
+        other = MathExpr.convert(other)
+        return other**self
+
+    def __rtruediv__(self, other):
+        other = MathExpr.convert(other)
+        return other / self
+
+    @classmethod
+    def convert(cls, value):
+        if isinstance(value, MathExpr):
+            return value
+        if isinstance(value, (int, float)):
+            value = MathNum(value=value)
+            return value
+        if isinstance(value, np.complex128):
+            value = MathExpr._convert_complex128(value)
+            return value
+        if isinstance(value, str):
+            value = MathStr(string=value)
+            return value
+        raise TypeError
+
+    @classmethod
+    def _convert_complex128(cls, value):
+        """Converts a numpy complex128 datatype to custom ComplexFloat"""
+        assert isinstance(value, np.complex128)
+        return MathNum(value=value.real) + MathImag() * value.imag
+
     pass
+
+
+########################################################################################
 
 
 class MathStr(MathExpr):
@@ -81,16 +111,16 @@ class MathVar(MathExpr):
     name: VarName
 
 
-class MathProtectedVar(MathExpr):
-    name: ProtectedVarName
-
-
 class MathNum(MathExpr):
     value: Union[int, float]
 
 
 class MathImag(MathExpr):
     name: Literal["1j"] = "1j"
+
+
+class MathNeg(MathExpr):
+    expr: MathExpr
 
 
 class MathUnary(MathExpr):
