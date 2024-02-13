@@ -37,7 +37,9 @@ class PrintMathExpr(Transform):
         return string
 
     def visit_MathNeg(self, model: MathNeg):
-        if not isinstance(model.expr, (MathAdd, MathDiv, MathMul, MathDiv, MathPow)):
+        if not isinstance(
+            model.expr, (MathAdd, MathSub, MathDiv, MathMul, MathDiv, MathPow)
+        ):
             string = "-{}".format(self.visit(model.expr))
         else:
             string = "-({})".format(self.visit(model.expr))
