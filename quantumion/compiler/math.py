@@ -5,6 +5,7 @@ from typing import Any
 from quantumion.compiler.visitor import Transform
 
 from quantumion.interface.math import (
+    MathStr,
     MathVar,
     MathNeg,
     MathNum,
@@ -23,6 +24,9 @@ from quantumion.interface.math import (
 class PrintMathExpr(Transform):
     def _visit(self, model: Any):
         raise TypeError("Incompatible type for input model")
+
+    def visit_MathStr(self, model: MathStr):
+        return f"({model.string})"
 
     def visit_MathVar(self, model: MathVar):
         string = "{}".format(model.name)
