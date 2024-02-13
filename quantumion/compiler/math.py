@@ -7,6 +7,7 @@ from quantumion.compiler.visitor import Transform
 from quantumion.interface.math import (
     MathVar,
     MathNeg,
+    MathPos,
     MathNum,
     MathImag,
     MathAdd,
@@ -43,6 +44,15 @@ class PrintMathExpr(Transform):
             string = "-{}".format(self.visit(model.expr))
         else:
             string = "-({})".format(self.visit(model.expr))
+        return string
+
+    def visit_MathPos(self, model: MathPos):
+        if not isinstance(
+            model.expr, (MathAdd, MathSub, MathDiv, MathMul, MathDiv, MathPow)
+        ):
+            string = "+{}".format(self.visit(model.expr))
+        else:
+            string = "+({})".format(self.visit(model.expr))
         return string
 
     def visit_MathUnary(self, model: MathUnary):

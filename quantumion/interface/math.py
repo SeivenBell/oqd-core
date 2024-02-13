@@ -42,9 +42,14 @@ class ASTVisitor(Transform):
             return MathDiv(expr1=self.visit(model.left), expr2=self.visit(model.right))
         if isinstance(model.op, ast.Pow):
             return MathPow(expr1=self.visit(model.left), expr2=self.visit(model.right))
+        raise TypeError
 
     def visit_UnaryOp(self, model: ast.UnaryOp):
-        return MathNeg(expr=self.visit(model.operand))
+        if isinstance(model.op, ast.USub):
+            return MathNeg(expr=self.visit(model.operand))
+        if isinstance(model.op, ast.UAdd):
+            return MathPos(expr=self.visit(model.operand))
+        raise TypeError
 
     def visit_Call(self, model: ast.Call):
         print(model.func.id, model.args[0])
@@ -73,6 +78,9 @@ class MathExpr(TypeReflectBaseModel):
 
     def __neg__(self):
         return MathNeg(expr=self)
+
+    def __pos__(self):
+        return MathPos(expr=self)
 
     def __add__(self, other):
         return MathAdd(expr1=self, expr2=other)
@@ -142,6 +150,10 @@ class MathImag(MathExpr):
 
 
 class MathNeg(MathExpr):
+    expr: CastMathExpr
+
+
+class MathPos(MathExpr):
     expr: CastMathExpr
 
 
