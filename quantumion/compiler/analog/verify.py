@@ -4,12 +4,12 @@ from typing import Union, Any
 
 from quantumion.interface.analog import *
 
-from quantumion.compiler.analog.base import AnalogCircuitTransform, PrintOperator
+from quantumion.compiler.analog.base import AnalogCircuitTransformer, PrintOperator
 
 ########################################################################################
 
 
-class VerifyHilbertSpace(AnalogCircuitTransform):
+class VerifyHilbertSpace(AnalogCircuitTransformer):
     def _visit(self, model):
         if isinstance(model, Pauli):
             return (1, 0)

@@ -5,7 +5,7 @@ from typing import Any
 from quantumion.interface.analog import *
 from quantumion.interface.math import MathExpr
 
-from quantumion.compiler.visitor import Visitor, Transform
+from quantumion.compiler.visitor import Visitor, Transformer
 from quantumion.compiler.math import PrintMathExpr
 
 ########################################################################################
@@ -15,7 +15,7 @@ class AnalogCircuitVisitor(Visitor):
     pass
 
 
-class AnalogCircuitTransform(Transform):
+class AnalogCircuitTransformer(Transformer):
     pass
 
 
@@ -31,7 +31,7 @@ class AnalogCircuitIonsAnalysis(AnalogCircuitVisitor):
 ########################################################################################
 
 
-class PrintOperator(AnalogCircuitTransform):
+class PrintOperator(AnalogCircuitTransformer):
     def _visit(self, model: Any):
         if isinstance(model, (Pauli, Ladder)):
             return model.class_ + "()"

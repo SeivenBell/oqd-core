@@ -2,14 +2,14 @@ from typing import Any
 
 ########################################################################################
 
-from quantumion.compiler.visitor import Transform
+from quantumion.compiler.visitor import Transformer
 
 from quantumion.interface.math import *
 
 ########################################################################################
 
 
-class PrintMathExpr(Transform):
+class PrintMathExpr(Transformer):
     def _visit(self, model: Any):
         raise TypeError("Incompatible type for input model")
 
@@ -86,7 +86,7 @@ class PrintMathExpr(Transform):
 ########################################################################################
 
 
-class ReorderMathExpr(Transform):
+class ReorderMathExpr(Transformer):
 
     def visit_MathMul(self, model: MathMul):
         if isinstance(model.expr2, MathNum):

@@ -9,7 +9,7 @@ import ast
 ########################################################################################
 
 from quantumion.interface.base import TypeReflectBaseModel
-from quantumion.compiler.visitor import Transform
+from quantumion.compiler.visitor import Transformer
 
 ########################################################################################
 
@@ -112,7 +112,7 @@ Unaries = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
 ########################################################################################
 
 
-class AST_to_MathExpr(Transform):
+class AST_to_MathExpr(Transformer):
     def _visit(self, model: Any):
         raise TypeError
 

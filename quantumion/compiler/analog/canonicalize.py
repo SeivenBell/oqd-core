@@ -4,12 +4,12 @@ from typing import Any, Union
 
 from quantumion.interface.analog import *
 
-from quantumion.compiler.analog.base import AnalogCircuitTransform
+from quantumion.compiler.analog.base import AnalogCircuitTransformer
 
 ########################################################################################
 
 
-class GatherMathExpr(AnalogCircuitTransform):
+class GatherMathExpr(AnalogCircuitTransformer):
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OpMul, OpKron)):
             return self._visit_OpMulKron(model)

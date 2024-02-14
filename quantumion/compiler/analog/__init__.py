@@ -1,5 +1,5 @@
 from .base import (
     AnalogCircuitVisitor,
-    AnalogCircuitTransform,
+    AnalogCircuitTransformer,
     AnalogCircuitIonsAnalysis,
 )

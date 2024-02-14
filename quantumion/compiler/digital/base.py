@@ -1,4 +1,4 @@
-from quantumion.compiler.visitor import Visitor, Transform
+from quantumion.compiler.visitor import Visitor, Transformer
 
 ########################################################################################
 
@@ -7,7 +7,7 @@ class DigitalCircuitVisitor(Visitor):
     pass
 
 
-class DigitalCircuitTransform(Transform):
+class DigitalCircuitTransformer(Transformer):
     pass
 
 
