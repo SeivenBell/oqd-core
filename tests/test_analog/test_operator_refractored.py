@@ -127,6 +127,21 @@ class Test(unittest.TestCase):
         actual = "(0.0 + 1j * 2.0) * PauliX() * (PauliI() + (0.0 + 1j * 8.0) * PauliY())"
         self.assertEqual(test_function(inp), actual)
 
+    def test_pauli_minus_string(self):
+        """Pauli scalar multiplication with string and with negative sign"""
+        inp = 2 * MathExpr.cast('4*t') * -PauliX()
+        actual = "(2 * 4 * t) * -PauliX()"
+        self.assertEqual(test_function(inp), actual)
+
+    def test_pauli_multiple_minus(self):
+        """Pauli scalar multiplication with string and with double negative"""
+        inp = 2 * -(-PauliX())
+        actual = "(2) * --PauliX()"
+        self.assertEqual(test_function(inp), actual)
+
+    @unittest.skip("Not Implemented")
+    def test_pauli_multiple_minus_nested(self):
+        raise NotImplementedError
 
 
 
