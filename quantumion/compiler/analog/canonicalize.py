@@ -2,6 +2,7 @@ from typing import Any, Union
 
 ########################################################################################
 
+from quantumion.interface.math import MathNum
 from quantumion.interface.analog import *
 
 from quantumion.compiler.analog.base import AnalogCircuitTransformer
@@ -73,7 +74,7 @@ class SeparatePauliLadder(AnalogCircuitTransformer):
         return OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
-class DeNestOpMulKron(AnalogCircuitTransformer):
+class DistributeOp(AnalogCircuitTransformer):
     def visit_OpMul(self, model: OpMul):
         if isinstance(model.op1, (OpAdd, OpSub)):
             return model.op1.__class__(
@@ -107,3 +108,8 @@ class DeNestOpMulKron(AnalogCircuitTransformer):
                 op2=OpScalarMul(op=self.visit(model.op.op2), expr=model.expr),
             )
         return OpScalarMul(op=self.visit(model.op), expr=model.expr)
+
+    def visit_OpSub(self, model: OpSub):
+        return OpAdd(
+            op1=model.op1, op2=OpScalarMul(op=model.op2, expr=MathNum(value=-1))
+        )
