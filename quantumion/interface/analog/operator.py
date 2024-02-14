@@ -5,13 +5,22 @@ from quantumion.interface.math import CastMathExpr, MathExpr
 
 __all__ = [
     "Operator",
+    "Pauli",
     "PauliI",
     "PauliX",
     "PauliY",
     "PauliZ",
+    "Ladder",
     "Creation",
     "Annihilation",
     "Identity",
+    "OpNeg",
+    "OpPos",
+    "OpAdd",
+    "OpSub",
+    "OpMul",
+    "OpScalarMul",
+    "OpKron",
 ]
 
 
@@ -22,6 +31,9 @@ class Operator(TypeReflectBaseModel):
     def __neg__(self):
         return OpNeg(op=self)
 
+    def __pos__(self):
+        return OpPos(op=self)
+
     def __add__(self, other):
         return OpAdd(op1=self, op2=other)
 
@@ -29,7 +41,10 @@ class Operator(TypeReflectBaseModel):
         return OpSub(op1=self, op2=other)
 
     def __matmul__(self, other):
-        return OpKron(op1=self, op2=other)
+        if isinstance(other, Operator):
+            return OpKron(op1=self, op2=other)
+        else:
+            return OpScalarMul(op=self, expr=other)
 
     def __mul__(self, other):
         if isinstance(other, Operator):
@@ -93,6 +108,10 @@ class OpNeg(Operator):
     op: Operator
 
 
+class OpPos(Operator):
+    op: Operator
+
+
 class OpScalarMul(Operator):
     op: Operator
     expr: CastMathExpr
@@ -116,76 +135,3 @@ class OpMul(Operator):
 class OpKron(Operator):
     op1: Operator
     op2: Operator
-
-
-########################################################################################
-
-from typing import Any
-
-from quantumion.compiler.visitor import Transform
-from quantumion.compiler.math import PrintMathExpr
-
-
-class PrintOperator(Transform):
-    def _visit(self, model: Any):
-        if isinstance(model, (Pauli, Ladder)):
-            return model.class_ + "()"
-        if isinstance(model, MathExpr):
-            return model.accept(PrintMathExpr())
-        raise TypeError("Incompatible type for input model")
-
-    def visit_OpNeg(self, model: OpNeg):
-        if not isinstance(model.op, (OpAdd, OpSub, OpMul)):
-            string = "-{}".format(self.visit(model.op))
-        else:
-            string = "-({})".format(self.visit(model.op))
-        return string
-
-    def visit_OpAdd(self, model: OpAdd):
-        string = "{} + {}".format(self.visit(model.op1), self.visit(model.op2))
-        return string
-
-    def visit_OpSub(self, model: OpSub):
-        string = "{} - {}".format(self.visit(model.op1), self.visit(model.op2))
-        return string
-
-    def visit_OpMul(self, model: OpMul):
-        s1 = (
-            f"({self.visit(model.op1)})"
-            if isinstance(model.op1, (OpAdd, OpSub))
-            else self.visit(model.op1)
-        )
-        s2 = (
-            f"({self.visit(model.op2)})"
-            if isinstance(model.op2, (OpAdd, OpSub))
-            else self.visit(model.op2)
-        )
-
-        string = "{} * {}".format(s1, s2)
-        return string
-
-    def visit_OpKron(self, model: OpKron):
-        s1 = (
-            f"({self.visit(model.op1)})"
-            if isinstance(model.op1, (OpAdd, OpSub))
-            else self.visit(model.op1)
-        )
-        s2 = (
-            f"({self.visit(model.op2)})"
-            if isinstance(model.op2, (OpAdd, OpSub))
-            else self.visit(model.op2)
-        )
-
-        string = "{} @ {}".format(s1, s2)
-        return string
-
-    def visit_OpScalarMul(self, model: OpScalarMul):
-        s1 = (
-            f"({self.visit(model.op)})"
-            if isinstance(model.op, (OpAdd, OpSub))
-            else self.visit(model.op)
-        )
-        s2 = f"({self.visit(model.expr)})"
-
-        string = "{} * {}".format(s2, s1)
-        return string
