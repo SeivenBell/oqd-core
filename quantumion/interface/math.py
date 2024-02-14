@@ -75,8 +75,9 @@ class MathExpr(TypeReflectBaseModel):
             value = MathNum(value=value.real) + MathImag() * value.imag
             return value
         if isinstance(value, str):
-            value = ASTVisitor().visit(ast.parse(value))
-            return value
+            raise TypeError(
+                "Did you forget to wrap your string with MathStr(string=string)"
+            )
         raise TypeError
 
     def __neg__(self):
@@ -141,6 +142,10 @@ Unaries = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
 
 
 ########################################################################################
+
+
+def MathStr(*, string):
+    return ASTVisitor().visit(ast.parse(string))
 
 
 class MathVar(MathExpr):
