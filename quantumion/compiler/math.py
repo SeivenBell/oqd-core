@@ -34,7 +34,12 @@ class PrintMathExpr(Transformer):
         return string
 
     def visit_MathSub(self, model: MathSub):
-        string = "{} - {}".format(self.visit(model.expr1), self.visit(model.expr2))
+        s2 = (
+            f"({self.visit(model.expr2)})"
+            if isinstance(model.expr2, (MathAdd, MathSub))
+            else self.visit(model.expr2)
+        )
+        string = "{} - {}".format(self.visit(model.expr1), s2)
         return string
 
     def visit_MathMul(self, model: MathMul):
@@ -100,21 +105,14 @@ class ReorderMathExpr(Transformer):
 
 class DeNestMathMul(Transformer):
     def visit_MathMul(self, model: MathMul):
-        if isinstance(model.expr1, (MathAdd, MathSub)) and isinstance(
-            model.expr2, (MathAdd, MathSub)
-        ):
-            return (
-                self.visit(model.expr1.expr1 * model.expr2.expr1)
-                + self.visit(model.expr1.expr1 * model.expr2.expr2)
-                + self.visit(model.expr1.expr2 * model.expr2.expr1)
-                + self.visit(model.expr1.expr2 * model.expr2.expr2)
-            )
         if isinstance(model.expr1, (MathAdd, MathSub)):
-            return self.visit(model.expr2) * self.visit(model.expr1.expr1) + self.visit(
-                model.expr2
-            ) * self.visit(model.expr1.expr2)
+            return model.expr1.__class__(
+                expr1=MathMul(expr1=model.expr1.expr1, expr2=model.expr2),
+                expr2=MathMul(expr1=model.expr1.expr2, expr2=model.expr2),
+            )
         if isinstance(model.expr2, (MathAdd, MathSub)):
-            return self.visit(model.expr1) * self.visit(model.expr2.expr1) + self.visit(
-                model.expr1
-            ) * self.visit(model.expr2.expr2)
-        return MathMul(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
+            return model.expr2.__class__(
+                expr1=MathMul(expr1=model.expr1, expr2=model.expr2.expr1),
+                expr2=MathMul(expr1=model.expr1, expr2=model.expr2.expr2),
+            )
+        return MathMul(expr1=model.expr1, expr2=model.expr2)
