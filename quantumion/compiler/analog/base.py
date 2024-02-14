@@ -92,3 +92,80 @@ class PrintOperator(AnalogCircuitTransformer):
 
         string = "{} * {}".format(s2, s1)
         return string
+
+
+########################################################################################
+
+
+class VerbosePrintOperator(AnalogCircuitTransformer):
+    def _visit(self, model: Any):
+        if isinstance(model, (Pauli, Ladder)):
+            return model.class_ + "()"
+        if isinstance(model, MathExpr):
+            return model.accept(PrintMathExpr())
+        raise TypeError("Incompatible type for input model")
+
+    def visit_OpAdd(self, model: OpAdd):
+        s1 = (
+            f"({self.visit(model.op1)})"
+            if not isinstance(model.op1, (Pauli, Ladder))
+            else self.visit(model.op1)
+        )
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if not isinstance(model.op2, (Pauli, Ladder))
+            else self.visit(model.op2)
+        )
+        string = "{} + {}".format(s1, s2)
+        return string
+
+    def visit_OpSub(self, model: OpSub):
+        s1 = (
+            f"({self.visit(model.op1)})"
+            if not isinstance(model.op1, (Pauli, Ladder))
+            else self.visit(model.op1)
+        )
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if not isinstance(model.op2, (Pauli, Ladder))
+            else self.visit(model.op2)
+        )
+        string = "{} - {}".format(s1, s2)
+        return string
+
+    def visit_OpMul(self, model: OpMul):
+        s1 = (
+            f"({self.visit(model.op1)})"
+            if not isinstance(model.op1, (Pauli, Ladder))
+            else self.visit(model.op1)
+        )
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if not isinstance(model.op2, (Pauli, Ladder))
+            else self.visit(model.op2)
+        )
+        string = "{} * {}".format(s1, s2)
+        return string
+
+    def visit_OpKron(self, model: OpKron):
+        s1 = (
+            f"({self.visit(model.op1)})"
+            if not isinstance(model.op1, (Pauli, Ladder))
+            else self.visit(model.op1)
+        )
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if not isinstance(model.op2, (Pauli, Ladder))
+            else self.visit(model.op2)
+        )
+        string = "{} @ {}".format(s1, s2)
+        return string
+
+    def visit_OpScalarMul(self, model: OpScalarMul):
+        s = (
+            f"({self.visit(model.op)})"
+            if not isinstance(model.op, (Pauli, Ladder))
+            else self.visit(model.op)
+        )
+        string = "{} * {}".format(self.visit(model.expr), s)
+        return string
