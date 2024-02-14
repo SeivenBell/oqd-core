@@ -100,18 +100,20 @@ class ReorderMathExpr(Transformer):
 
 class DeNestMathMul(Transformer):
     def visit_MathMul(self, model: MathMul):
-        if isinstance(model.expr1, MathAdd) and isinstance(model.expr2, MathAdd):
+        if isinstance(model.expr1, (MathAdd, MathSub)) and isinstance(
+            model.expr2, (MathAdd, MathSub)
+        ):
             return (
                 self.visit(model.expr1.expr1 * model.expr2.expr1)
                 + self.visit(model.expr1.expr1 * model.expr2.expr2)
                 + self.visit(model.expr1.expr2 * model.expr2.expr1)
                 + self.visit(model.expr1.expr2 * model.expr2.expr2)
             )
-        if isinstance(model.expr1, MathAdd):
+        if isinstance(model.expr1, (MathAdd, MathSub)):
             return self.visit(model.expr2) * self.visit(model.expr1.expr1) + self.visit(
                 model.expr2
             ) * self.visit(model.expr1.expr2)
-        if isinstance(model.expr2, MathAdd):
+        if isinstance(model.expr2, (MathAdd, MathSub)):
             return self.visit(model.expr1) * self.visit(model.expr2.expr1) + self.visit(
                 model.expr1
             ) * self.visit(model.expr2.expr2)

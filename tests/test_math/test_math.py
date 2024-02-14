@@ -14,7 +14,7 @@ from quantumion.compiler.analog.verify import VerifyHilbertSpace
 
 if __name__ == "__main__":
 
-    expr = MathStr(string="(1+2)*(2+1*(3+4*(3+5)*sin((a+2)*(6+d)**2)))")
+    expr = MathStr(string="(1+2+4-5)*(2+1*(3+4*(3+5)*sin((a+2)*(6+d)**2)))")
     pprint("{:^5}:".format(0), expr.accept(PrintMathExpr()))
     for i in range(10):
         expr = expr.accept(DeNestMathMul())
