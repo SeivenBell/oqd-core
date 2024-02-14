@@ -1,15 +1,34 @@
-from quantumion.interface.math import MathNum, MathUnary
+from rich import print as pprint
+
+########################################################################################
+
+from quantumion.interface.math import *
+from quantumion.interface.analog.operator import *
+
 from quantumion.compiler.math import PrintMathExpr
+from quantumion.compiler.analog.base import PrintOperator
+from quantumion.compiler.analog.canonicalize import GatherMathExpr
+from quantumion.compiler.analog.verify import VerifyHilbertSpace
 
 ########################################################################################
 
 if __name__ == "__main__":
 
-    expr = -MathNum(value=1) + 1
-    expr = 2**-expr
-    expr = 2 + -expr + 1 + -MathUnary(func="sin", expr=MathNum(value=1) + 3232) ** 2
-    expr += "1+ 4"
+    expr = (
+        1
+        * PauliX()
+        @ PauliY()
+        * MathStr(string="2")
+        * MathStr(string="sin(w*t)")
+        @ Annihilation()
+        * (PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="A"))
+    )
 
-    print(expr)
+    for i in range(10):
+        expr = expr.accept(GatherMathExpr())
 
-    print(expr.accept(PrintMathExpr()))
+    pprint(expr)
+
+    pprint(expr.accept(PrintOperator()))
+
+    pprint(expr.accept(VerifyHilbertSpace()))

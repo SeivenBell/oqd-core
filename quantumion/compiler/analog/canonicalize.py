@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Union
 
 ########################################################################################
 
@@ -10,6 +10,13 @@ from quantumion.compiler.analog.base import AnalogCircuitTransform
 
 
 class GatherMathExpr(AnalogCircuitTransform):
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (OpMul, OpKron)):
+            return self._visit_OpMulKron(model)
+        if isinstance(model, Operator):
+            return model
+        raise TypeError
+
     def visit_OpScalarMul(self, model: OpScalarMul):
         if isinstance(model.op, OpScalarMul):
             return model.expr * model.op.expr * self.visit(model.op.op)
@@ -31,9 +38,3 @@ class GatherMathExpr(AnalogCircuitTransform):
                 model.__class__(op1=model.op1, op2=model.op2.op)
             )
         return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
-
-    def visit_OpMul(self, model: OpMul):
-        return self._visit_OpMulKron(model)
-
-    def visit_OpKron(self, model: OpKron):
-        return self._visit_OpMulKron(model)

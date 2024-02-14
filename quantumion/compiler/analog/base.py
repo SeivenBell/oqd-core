@@ -94,7 +94,7 @@ class PrintOperator(AnalogCircuitTransform):
     def visit_OpScalarMul(self, model: OpScalarMul):
         s1 = (
             f"({self.visit(model.op)})"
-            if isinstance(model.op, (OpAdd, OpSub))
+            if isinstance(model.op, (OpAdd, OpSub, OpKron))
             else self.visit(model.op)
         )
         s2 = f"({self.visit(model.expr)})"
