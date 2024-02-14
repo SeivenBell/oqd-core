@@ -44,7 +44,12 @@ class PrintOperator(AnalogCircuitTransformer):
         return string
 
     def visit_OpSub(self, model: OpSub):
-        string = "{} - {}".format(self.visit(model.op1), self.visit(model.op2))
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if isinstance(model.op2, (OpAdd, OpSub))
+            else self.visit(model.op2)
+        )
+        string = "{} - {}".format(self.visit(model.op1), s2)
         return string
 
     def visit_OpMul(self, model: OpMul):
