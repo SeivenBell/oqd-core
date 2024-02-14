@@ -50,26 +50,25 @@ class GatherMathExpr(AnalogCircuitTransformer):
 
 class ProperKronOrder(AnalogCircuitTransformer):
     def visit_OpKron(self, model: OpKron):
-        if isinstance(model.op1, OpKron):
+        if isinstance(model.op2, OpKron):
             return OpKron(
-                op1=self.visit(model.op1.op1),
-                op2=OpKron(op1=self.visit(model.op1.op2), op2=self.visit(model.op2)),
+                op1=OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2.op1)),
+                op2=self.visit(model.op2.op2),
             )
         return OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 class SeparatePauliLadder(AnalogCircuitTransformer):
     def visit_OpKron(self, model: OpKron):
-        print(model.op1)
-        if isinstance(model.op1, Ladder):
-            if isinstance(model.op2, Pauli):
+        if isinstance(model.op2, Pauli):
+            if isinstance(model.op1, Ladder):
                 return OpKron(
                     op1=model.op2,
                     op2=model.op1,
                 )
-            if isinstance(model.op2, OpKron):
+            if isinstance(model.op1, OpKron) and isinstance(model.op1.op2, Ladder):
                 return OpKron(
-                    op1=model.op2.op1, op2=OpKron(op1=model.op1, op2=model.op2.op2)
+                    op1=OpKron(op1=model.op1.op1, op2=model.op2), op2=model.op1.op2
                 )
         return OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
