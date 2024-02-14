@@ -16,7 +16,7 @@ def test_function(operator: Operator, visitor = PrintOperator()) -> Operator:
     return operator.accept(visitor=visitor)
 
 @colorize(color=BLUE)
-class Test(unittest.TestCase):
+class TestReal(unittest.TestCase):
     maxDiff = None
 
     def test_pauli_add(self):
@@ -109,6 +109,24 @@ class Test(unittest.TestCase):
         actual = "(cos(t)) * (sin(t) + 3 * tan(t)) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
+    def test_pauli_minus_string(self):
+        """Pauli scalar multiplication with string and with negative sign"""
+        inp = 2 * MathStr(string='4*t') * -PauliX()
+        actual = "(2 * 4 * t) * (-1) * PauliX()"
+        self.assertEqual(test_function(inp), actual)
+
+    def test_pauli_multiple_minus(self):
+        """Pauli scalar multiplication with string and with double negative"""
+        inp = 2 * -(-PauliX())
+        actual = "(2) * (-1) * (-1) * PauliX()"
+        self.assertEqual(test_function(inp), actual)
+
+    @unittest.skip("Not Implemented")
+    def test_pauli_multiple_minus_nested(self):
+        raise NotImplementedError
+
+@colorize(color=MAGENTA)
+class TestComplex(unittest.TestCase):
     def test_pauli_left_img(self):
         """Testing Pauli with left img"""
         inp = 2j*PauliX()
@@ -126,22 +144,6 @@ class Test(unittest.TestCase):
         inp = PauliX() * 2j * (PauliI() + 8j * PauliY())
         actual = "(0.0 + 1j * 2.0) * PauliX() * (PauliI() + (0.0 + 1j * 8.0) * PauliY())"
         self.assertEqual(test_function(inp), actual)
-
-    def test_pauli_minus_string(self):
-        """Pauli scalar multiplication with string and with negative sign"""
-        inp = 2 * MathStr(string='4*t') * -PauliX()
-        actual = "(2 * 4 * t) * (-1) * PauliX()"
-        self.assertEqual(test_function(inp), actual)
-
-    def test_pauli_multiple_minus(self):
-        """Pauli scalar multiplication with string and with double negative"""
-        inp = 2 * -(-PauliX())
-        actual = "(2) * (-1) * (-1) * PauliX()"
-        self.assertEqual(test_function(inp), actual)
-
-    @unittest.skip("Not Implemented")
-    def test_pauli_multiple_minus_nested(self):
-        raise NotImplementedError
 
 
 
