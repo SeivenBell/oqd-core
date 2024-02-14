@@ -70,12 +70,12 @@ class PrintOperator(AnalogCircuitTransformer):
     def visit_OpKron(self, model: OpKron):
         s1 = (
             f"({self.visit(model.op1)})"
-            if isinstance(model.op1, (OpAdd, OpSub))
+            if isinstance(model.op1, (OpAdd, OpSub, OpMul))
             else self.visit(model.op1)
         )
         s2 = (
             f"({self.visit(model.op2)})"
-            if isinstance(model.op2, (OpAdd, OpSub))
+            if isinstance(model.op2, (OpAdd, OpSub, OpMul))
             else self.visit(model.op2)
         )
 
