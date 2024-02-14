@@ -87,13 +87,32 @@ class PrintMathExpr(Transformer):
 
 
 class ReorderMathExpr(Transformer):
-
     def visit_MathMul(self, model: MathMul):
-        if isinstance(model.expr2, MathNum):
+        if isinstance(model.expr2, MathNum) and not isinstance(model.expr1, MathNum):
             return MathMul(expr1=self.visit(model.expr2), expr2=self.visit(model.expr1))
         return MathMul(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
 
     def visit_MathAdd(self, model: MathAdd):
-        if isinstance(model.expr2, MathNum):
+        if isinstance(model.expr2, MathNum) and not isinstance(model.expr1, MathNum):
             return MathAdd(expr1=self.visit(model.expr2), expr2=self.visit(model.expr1))
         return MathAdd(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
+
+
+class DeNestMathMul(Transformer):
+    def visit_MathMul(self, model: MathMul):
+        if isinstance(model.expr1, MathAdd) and isinstance(model.expr2, MathAdd):
+            return (
+                self.visit(model.expr1.expr1 * model.expr2.expr1)
+                + self.visit(model.expr1.expr1 * model.expr2.expr2)
+                + self.visit(model.expr1.expr2 * model.expr2.expr1)
+                + self.visit(model.expr1.expr2 * model.expr2.expr2)
+            )
+        if isinstance(model.expr1, MathAdd):
+            return self.visit(model.expr2) * self.visit(model.expr1.expr1) + self.visit(
+                model.expr2
+            ) * self.visit(model.expr1.expr2)
+        if isinstance(model.expr2, MathAdd):
+            return self.visit(model.expr1) * self.visit(model.expr2.expr1) + self.visit(
+                model.expr1
+            ) * self.visit(model.expr2.expr2)
+        return MathMul(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
