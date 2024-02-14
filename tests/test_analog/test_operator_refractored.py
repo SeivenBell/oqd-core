@@ -1,5 +1,5 @@
 from quantumion.interface.analog import *
-from quantumion.interface.analog.operator import PrintOperator
+from quantumion.compiler.analog.base import PrintOperator
 from rich import print as pprint
 import unittest
 from quantumion.interface.math import *
@@ -75,7 +75,7 @@ class Test(unittest.TestCase):
 
     def test_pauli_scalar_string_nested(self):
         """Testing scalar Pauli multiplication with combination of string and (int, float)"""
-        inp = 3 * MathExpr.cast('4*t') * PauliX()
+        inp = 3 * MathStr(string='4*t') * PauliX()
         actual = "(3 * 4 * t) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
@@ -87,25 +87,25 @@ class Test(unittest.TestCase):
 
     def test_pauli_string_left_multiplication(self):
         """Testing string Pauli left Multiplication"""
-        inp = 'sin(t)'*PauliX()
+        inp = MathStr(string='sin(t)')*PauliX()
         actual = "(sin(t)) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
     def test_pauli_string_right_multiplication(self):
         """Testing string Pauli right Multiplication"""
-        inp = PauliX() * 'cos(t)'
+        inp = PauliX() * MathStr(string='cos(t)')
         actual = "(cos(t)) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
     def test_pauli_string_left_right_multiplication(self):
         """Testing string Pauli left and right Multiplication"""
-        inp = 'sin(t)' * PauliX() * 'cos(t)'
+        inp = MathStr(string='sin(t)') * PauliX() * MathStr(string='cos(t)')
         actual = "(cos(t)) * (sin(t)) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
     def test_pauli_string_left_right_multiplication_nested(self):
         """Testing string Pauli left and right nested Multiplication"""
-        inp = 'sin(t)+3*tan(t)' * PauliX() * 'cos(t)'
+        inp = MathStr(string='sin(t)+3*tan(t)') * PauliX() * MathStr(string='cos(t)')
         actual = "(cos(t)) * (sin(t) + 3 * tan(t)) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
@@ -129,14 +129,14 @@ class Test(unittest.TestCase):
 
     def test_pauli_minus_string(self):
         """Pauli scalar multiplication with string and with negative sign"""
-        inp = 2 * MathExpr.cast('4*t') * -PauliX()
-        actual = "(2 * 4 * t) * -PauliX()"
+        inp = 2 * MathStr(string='4*t') * -PauliX()
+        actual = "(2 * 4 * t) * (-1) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
     def test_pauli_multiple_minus(self):
         """Pauli scalar multiplication with string and with double negative"""
         inp = 2 * -(-PauliX())
-        actual = "(2) * --PauliX()"
+        actual = "(2) * (-1) * (-1) * PauliX()"
         self.assertEqual(test_function(inp), actual)
 
     @unittest.skip("Not Implemented")
