@@ -39,13 +39,13 @@ class Operator(TypeReflectBaseModel):
         return OpSub(op1=self, op2=other)
 
     def __matmul__(self, other):
-        if isinstance(other, Operator):
-            return OpKron(op1=self, op2=other)
-        else:
-            return OpScalarMul(op=self, expr=other)
+        return OpKron(op1=self, op2=other)
 
     def __mul__(self, other):
-        return OpMul(op1=self, op2=other)
+        if isinstance(other, Operator):
+            return OpMul(op1=self, op2=other)
+        else:
+            return OpScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
         other = MathExpr.cast(other)
