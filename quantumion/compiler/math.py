@@ -2,26 +2,14 @@ from typing import Any
 
 ########################################################################################
 
-from quantumion.compiler.visitor import Transform
+from quantumion.compiler.visitor import Transformer
 
-from quantumion.interface.math import (
-    MathVar,
-    MathNeg,
-    MathPos,
-    MathNum,
-    MathImag,
-    MathAdd,
-    MathSub,
-    MathMul,
-    MathDiv,
-    MathPow,
-    MathUnary,
-)
+from quantumion.interface.math import *
 
 ########################################################################################
 
 
-class PrintMathExpr(Transform):
+class PrintMathExpr(Transformer):
     def _visit(self, model: Any):
         raise TypeError("Incompatible type for input model")
 
@@ -37,24 +25,6 @@ class PrintMathExpr(Transform):
         string = "1j"
         return string
 
-    def visit_MathNeg(self, model: MathNeg):
-        if not isinstance(
-            model.expr, (MathAdd, MathSub, MathDiv, MathMul, MathDiv, MathPow)
-        ):
-            string = "-{}".format(self.visit(model.expr))
-        else:
-            string = "-({})".format(self.visit(model.expr))
-        return string
-
-    def visit_MathPos(self, model: MathPos):
-        if not isinstance(
-            model.expr, (MathAdd, MathSub, MathDiv, MathMul, MathDiv, MathPow)
-        ):
-            string = "+{}".format(self.visit(model.expr))
-        else:
-            string = "+({})".format(self.visit(model.expr))
-        return string
-
     def visit_MathUnary(self, model: MathUnary):
         string = "{}({})".format(model.func, self.visit(model.expr))
         return string
@@ -64,7 +34,12 @@ class PrintMathExpr(Transform):
         return string
 
     def visit_MathSub(self, model: MathSub):
-        string = "{} - {}".format(self.visit(model.expr1), self.visit(model.expr2))
+        s2 = (
+            f"({self.visit(model.expr2)})"
+            if isinstance(model.expr2, (MathAdd, MathSub))
+            else self.visit(model.expr2)
+        )
+        string = "{} - {}".format(self.visit(model.expr1), s2)
         return string
 
     def visit_MathMul(self, model: MathMul):
@@ -111,3 +86,33 @@ class PrintMathExpr(Transform):
 
         string = "{}**{}".format(s1, s2)
         return string
+
+
+########################################################################################
+
+
+class ReorderMathExpr(Transformer):
+    def visit_MathMul(self, model: MathMul):
+        if isinstance(model.expr2, MathNum) and not isinstance(model.expr1, MathNum):
+            return MathMul(expr1=self.visit(model.expr2), expr2=self.visit(model.expr1))
+        return MathMul(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
+
+    def visit_MathAdd(self, model: MathAdd):
+        if isinstance(model.expr2, MathNum) and not isinstance(model.expr1, MathNum):
+            return MathAdd(expr1=self.visit(model.expr2), expr2=self.visit(model.expr1))
+        return MathAdd(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
+
+
+class DeNestMathMul(Transformer):
+    def visit_MathMul(self, model: MathMul):
+        if isinstance(model.expr1, (MathAdd, MathSub)):
+            return model.expr1.__class__(
+                expr1=self.visit(MathMul(expr1=model.expr1.expr1, expr2=model.expr2)),
+                expr2=self.visit(MathMul(expr1=model.expr1.expr2, expr2=model.expr2)),
+            )
+        if isinstance(model.expr2, (MathAdd, MathSub)):
+            return model.expr2.__class__(
+                expr1=self.visit(MathMul(expr1=model.expr1, expr2=model.expr2.expr1)),
+                expr2=self.visit(MathMul(expr1=model.expr1, expr2=model.expr2.expr2)),
+            )
+        return MathMul(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))

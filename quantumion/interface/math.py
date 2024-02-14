@@ -9,55 +9,23 @@ import ast
 ########################################################################################
 
 from quantumion.interface.base import TypeReflectBaseModel
-from quantumion.compiler.visitor import Transform
-
+from quantumion.compiler.visitor import Transformer
 
 ########################################################################################
 
-
-class ASTVisitor(Transform):
-    def _visit(self, model: Any):
-        raise TypeError
-
-    def visit_Module(self, model: ast.Module):
-        if len(model.body) == 1:
-            return self.visit(model.body[0])
-        raise TypeError
-
-    def visit_Expr(self, model: ast.Expr):
-        return self.visit(model.value)
-
-    def visit_Constant(self, model: ast.Constant):
-        return MathNum(value=model.value)
-
-    def visit_Name(self, model: ast.Name):
-        return MathVar(name=model.id)
-
-    def visit_BinOp(self, model: ast.BinOp):
-        if isinstance(model.op, ast.Add):
-            return MathAdd(expr1=self.visit(model.left), expr2=self.visit(model.right))
-        if isinstance(model.op, ast.Sub):
-            return MathSub(expr1=self.visit(model.left), expr2=self.visit(model.right))
-        if isinstance(model.op, ast.Mult):
-            return MathMul(expr1=self.visit(model.left), expr2=self.visit(model.right))
-        if isinstance(model.op, ast.Div):
-            return MathDiv(expr1=self.visit(model.left), expr2=self.visit(model.right))
-        if isinstance(model.op, ast.Pow):
-            return MathPow(expr1=self.visit(model.left), expr2=self.visit(model.right))
-        raise TypeError
-
-    def visit_UnaryOp(self, model: ast.UnaryOp):
-        if isinstance(model.op, ast.USub):
-            return MathNeg(expr=self.visit(model.operand))
-        if isinstance(model.op, ast.UAdd):
-            return MathPos(expr=self.visit(model.operand))
-        raise TypeError
-
-    def visit_Call(self, model: ast.Call):
-        if len(model.args) == 1:
-            return MathUnary(func=model.func.id, expr=self.visit(model.args[0]))
-        raise TypeError
-
+__all__ = [
+    "MathExpr",
+    "MathStr",
+    "MathNum",
+    "MathVar",
+    "MathImag",
+    "MathUnary",
+    "MathAdd",
+    "MathSub",
+    "MathMul",
+    "MathDiv",
+    "MathPow",
+]
 
 ########################################################################################
 
@@ -75,15 +43,16 @@ class MathExpr(TypeReflectBaseModel):
             value = MathNum(value=value.real) + MathImag() * value.imag
             return value
         if isinstance(value, str):
-            value = ASTVisitor().visit(ast.parse(value))
-            return value
+            raise TypeError(
+                f'Did you forget to wrap your string ("{value}") with MathStr(string="{value}")'
+            )
         raise TypeError
 
     def __neg__(self):
-        return MathNeg(expr=self)
+        return MathMul(expr1=MathNum(value=-1), expr2=self)
 
     def __pos__(self):
-        return MathPos(expr=self)
+        return self
 
     def __add__(self, other):
         return MathAdd(expr1=self, expr2=other)
@@ -143,6 +112,57 @@ Unaries = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
 ########################################################################################
 
 
+class AST_to_MathExpr(Transformer):
+    def _visit(self, model: Any):
+        raise TypeError
+
+    def visit_Module(self, model: ast.Module):
+        if len(model.body) == 1:
+            return self.visit(model.body[0])
+        raise TypeError
+
+    def visit_Expr(self, model: ast.Expr):
+        return self.visit(model.value)
+
+    def visit_Constant(self, model: ast.Constant):
+        return MathNum(value=model.value)
+
+    def visit_Name(self, model: ast.Name):
+        return MathVar(name=model.id)
+
+    def visit_BinOp(self, model: ast.BinOp):
+        if isinstance(model.op, ast.Add):
+            return MathAdd(expr1=self.visit(model.left), expr2=self.visit(model.right))
+        if isinstance(model.op, ast.Sub):
+            return MathSub(expr1=self.visit(model.left), expr2=self.visit(model.right))
+        if isinstance(model.op, ast.Mult):
+            return MathMul(expr1=self.visit(model.left), expr2=self.visit(model.right))
+        if isinstance(model.op, ast.Div):
+            return MathDiv(expr1=self.visit(model.left), expr2=self.visit(model.right))
+        if isinstance(model.op, ast.Pow):
+            return MathPow(expr1=self.visit(model.left), expr2=self.visit(model.right))
+        raise TypeError
+
+    def visit_UnaryOp(self, model: ast.UnaryOp):
+        if isinstance(model.op, ast.USub):
+            return -self.visit(model.operand)
+        if isinstance(model.op, ast.UAdd):
+            return self.visit(model.operand)
+        raise TypeError
+
+    def visit_Call(self, model: ast.Call):
+        if len(model.args) == 1:
+            return MathUnary(func=model.func.id, expr=self.visit(model.args[0]))
+        raise TypeError
+
+
+def MathStr(*, string):
+    return AST_to_MathExpr().visit(ast.parse(string))
+
+
+########################################################################################
+
+
 class MathVar(MathExpr):
     name: VarName
 
@@ -153,14 +173,6 @@ class MathNum(MathExpr):
 
 class MathImag(MathExpr):
     pass
-
-
-class MathNeg(MathExpr):
-    expr: CastMathExpr
-
-
-class MathPos(MathExpr):
-    expr: CastMathExpr
 
 
 class MathUnary(MathExpr):

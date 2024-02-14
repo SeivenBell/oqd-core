@@ -30,7 +30,7 @@ class Visitor:
         pass
 
 
-class Transform(Visitor):
+class Transformer(Visitor):
     def _visit(self, model: Any) -> Any:
         new_model = model
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         a: A
         b: B
 
-    class CTransform(Transform):
+    class CTransformer(Transformer):
         def visit_A(self, model: A) -> A:
             assert isinstance(model, A)
             new_value = model.value + 1
@@ -77,11 +77,11 @@ if __name__ == "__main__":
 
     model = C(a=A(value=1), b=B(value=2))
 
-    Transform = Transform()
-    ctransform = CTransform()
+    Transformer = Transformer()
+    ctransformer = CTransformer()
 
-    new_model = model.accept(Transform)
-    new_model2 = model.accept(ctransform)
+    new_model = model.accept(Transformer)
+    new_model2 = model.accept(ctransformer)
 
     print(new_model)
     print(new_model2)
