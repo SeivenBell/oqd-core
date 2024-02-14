@@ -4,17 +4,7 @@ from typing import Any
 
 from quantumion.compiler.visitor import Transform
 
-from quantumion.interface.math import (
-    MathVar,
-    MathNum,
-    MathImag,
-    MathAdd,
-    MathSub,
-    MathMul,
-    MathDiv,
-    MathPow,
-    MathUnary,
-)
+from quantumion.interface.math import *
 
 ########################################################################################
 
@@ -91,3 +81,19 @@ class PrintMathExpr(Transform):
 
         string = "{}**{}".format(s1, s2)
         return string
+
+
+########################################################################################
+
+
+class ReorderMathExpr(Transform):
+
+    def visit_MathMul(self, model: MathMul):
+        if isinstance(model.expr2, MathNum):
+            return MathMul(expr1=self.visit(model.expr2), expr2=self.visit(model.expr1))
+        return MathMul(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
+
+    def visit_MathAdd(self, model: MathAdd):
+        if isinstance(model.expr2, MathNum):
+            return MathAdd(expr1=self.visit(model.expr2), expr2=self.visit(model.expr1))
+        return MathAdd(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
