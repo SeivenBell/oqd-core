@@ -13,6 +13,8 @@ class GatherMathExpr(AnalogCircuitTransform):
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OpMul, OpKron)):
             return self._visit_OpMulKron(model)
+        if isinstance(model, (OpAdd, OpSub)):
+            return self._visit_OpAddSub(model)
         if isinstance(model, Operator):
             return model
         raise TypeError
@@ -37,4 +39,7 @@ class GatherMathExpr(AnalogCircuitTransform):
             return model.op2.expr * self.visit(
                 model.__class__(op1=model.op1, op2=model.op2.op)
             )
+        return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
+
+    def _visit_OpAddSub(self, model: Union[OpAdd, OpSub]):
         return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
