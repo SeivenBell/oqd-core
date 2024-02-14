@@ -107,12 +107,12 @@ class DeNestMathMul(Transformer):
     def visit_MathMul(self, model: MathMul):
         if isinstance(model.expr1, (MathAdd, MathSub)):
             return model.expr1.__class__(
-                expr1=MathMul(expr1=model.expr1.expr1, expr2=model.expr2),
-                expr2=MathMul(expr1=model.expr1.expr2, expr2=model.expr2),
+                expr1=self.visit(MathMul(expr1=model.expr1.expr1, expr2=model.expr2)),
+                expr2=self.visit(MathMul(expr1=model.expr1.expr2, expr2=model.expr2)),
             )
         if isinstance(model.expr2, (MathAdd, MathSub)):
             return model.expr2.__class__(
-                expr1=MathMul(expr1=model.expr1, expr2=model.expr2.expr1),
-                expr2=MathMul(expr1=model.expr1, expr2=model.expr2.expr2),
+                expr1=self.visit(MathMul(expr1=model.expr1, expr2=model.expr2.expr1)),
+                expr2=self.visit(MathMul(expr1=model.expr1, expr2=model.expr2.expr2)),
             )
-        return MathMul(expr1=model.expr1, expr2=model.expr2)
+        return MathMul(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
