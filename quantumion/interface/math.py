@@ -19,8 +19,6 @@ __all__ = [
     "MathNum",
     "MathVar",
     "MathImag",
-    "MathNeg",
-    "MathPos",
     "MathUnary",
     "MathAdd",
     "MathSub",
@@ -51,10 +49,10 @@ class MathExpr(TypeReflectBaseModel):
         raise TypeError
 
     def __neg__(self):
-        return MathNeg(expr=self)
+        return MathMul(expr1=MathNum(value=-1), expr2=self)
 
     def __pos__(self):
-        return MathPos(expr=self)
+        return self
 
     def __add__(self, other):
         return MathAdd(expr1=self, expr2=other)
@@ -147,9 +145,9 @@ class AST_to_MathExpr(Transform):
 
     def visit_UnaryOp(self, model: ast.UnaryOp):
         if isinstance(model.op, ast.USub):
-            return MathNeg(expr=self.visit(model.operand))
+            return -self.visit(model.operand)
         if isinstance(model.op, ast.UAdd):
-            return MathPos(expr=self.visit(model.operand))
+            return self.visit(model.operand)
         raise TypeError
 
     def visit_Call(self, model: ast.Call):
@@ -175,14 +173,6 @@ class MathNum(MathExpr):
 
 class MathImag(MathExpr):
     pass
-
-
-class MathNeg(MathExpr):
-    expr: CastMathExpr
-
-
-class MathPos(MathExpr):
-    expr: CastMathExpr
 
 
 class MathUnary(MathExpr):

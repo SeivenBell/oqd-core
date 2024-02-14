@@ -39,20 +39,6 @@ class PrintOperator(AnalogCircuitTransform):
             return model.accept(PrintMathExpr())
         raise TypeError("Incompatible type for input model")
 
-    def visit_OpNeg(self, model: OpNeg):
-        if not isinstance(model.op, (OpAdd, OpSub, OpMul)):
-            string = "-{}".format(self.visit(model.op))
-        else:
-            string = "-({})".format(self.visit(model.op))
-        return string
-
-    def visit_OpPos(self, model: OpPos):
-        if not isinstance(model.op, (OpAdd, OpSub, OpMul)):
-            string = "+{}".format(self.visit(model.op))
-        else:
-            string = "+({})".format(self.visit(model.op))
-        return string
-
     def visit_OpAdd(self, model: OpAdd):
         string = "{} + {}".format(self.visit(model.op1), self.visit(model.op2))
         return string

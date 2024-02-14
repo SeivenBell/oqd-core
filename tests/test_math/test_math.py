@@ -14,21 +14,23 @@ from quantumion.compiler.analog.verify import VerifyHilbertSpace
 
 if __name__ == "__main__":
 
-    expr = (
-        1
-        * PauliX()
-        @ PauliY()
-        * MathStr(string="2")
-        * MathStr(string="sin(w*t)")
-        @ Annihilation()
-        * (PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="A"))
+    expr = 1 * PauliX() @ PauliY() * MathStr(string="2") * MathStr(
+        string="sin(w*t)"
+    ) @ Annihilation() * (
+        PauliI() @ (PauliZ() * 1) @ Creation() * -MathStr(string="A")
+    ) @ (
+        PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="A")
+    ) + (
+        PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="-A")
+    ) @ (
+        PauliI() @ (PauliZ() * 1) @ -Creation() * MathStr(string="+A")
     )
 
-    for i in range(10):
+    for i in range(100):
         expr = expr.accept(GatherMathExpr())
 
     pprint(expr)
 
-    pprint(expr.accept(PrintOperator()))
+    pprint("\n +".join(expr.accept(PrintOperator()).split("+")))
 
     pprint(expr.accept(VerifyHilbertSpace()))

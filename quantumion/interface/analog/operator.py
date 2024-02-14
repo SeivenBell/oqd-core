@@ -14,8 +14,6 @@ __all__ = [
     "Creation",
     "Annihilation",
     "Identity",
-    "OpNeg",
-    "OpPos",
     "OpAdd",
     "OpSub",
     "OpMul",
@@ -29,10 +27,10 @@ __all__ = [
 
 class Operator(TypeReflectBaseModel):
     def __neg__(self):
-        return OpNeg(op=self)
+        return OpScalarMul(op=self, expr=MathExpr.cast(-1))
 
     def __pos__(self):
-        return OpPos(op=self)
+        return self
 
     def __add__(self, other):
         return OpAdd(op1=self, op2=other)
@@ -102,14 +100,6 @@ class Identity(Ladder):
 
 
 ########################################################################################
-
-
-class OpNeg(Operator):
-    op: Operator
-
-
-class OpPos(Operator):
-    op: Operator
 
 
 class OpScalarMul(Operator):
