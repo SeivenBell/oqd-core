@@ -4,7 +4,7 @@ from typing import Union, Any
 
 from quantumion.interface.analog import *
 
-from quantumion.compiler.analog.base import AnalogCircuitTransform
+from quantumion.compiler.analog.base import AnalogCircuitTransform, PrintOperator
 
 ########################################################################################
 
@@ -23,15 +23,19 @@ class VerifyHilbertSpace(AnalogCircuitTransform):
         return self.visit(model.op)
 
     def _visit_OpAddSubMul(self, model: Union[OpAdd, OpSub, OpMul]):
-        dim1 = self.visit(model.op1)
-        dim2 = self.visit(model.op2)
+        space1 = self.visit(model.op1)
+        space2 = self.visit(model.op2)
 
-        assert dim1 == dim2
-        return dim1
+        assert space1 == space2, (
+            "\nInconsistent Hilbert space between:"
+            + f"\n\t{model.op1.accept(PrintOperator())}"
+            + f"\n\t{model.op2.accept(PrintOperator())}"
+        )
+        return space1
 
     def visit_OpKron(self, model: OpKron):
-        dim1 = self.visit(model.op1)
-        dim2 = self.visit(model.op2)
+        space1 = self.visit(model.op1)
+        space2 = self.visit(model.op2)
 
-        dim = (dim1[0] + dim2[0], dim1[1] + dim2[1])
-        return dim
+        space = (space1[0] + space2[0], space1[1] + space2[1])
+        return space
