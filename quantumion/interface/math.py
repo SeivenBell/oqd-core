@@ -44,7 +44,8 @@ class MathExpr(TypeReflectBaseModel):
             return value
         if isinstance(value, str):
             raise TypeError(
-                f'Did you forget to wrap your string ("{value}") with MathStr(string="{value}")'
+                "Tried to cast a string to MathExpr. "
+                + f'Wrap your string ("{value}") with MathStr(string="{value}").'
             )
         raise TypeError
 
