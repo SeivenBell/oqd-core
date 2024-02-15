@@ -23,56 +23,88 @@ if __name__ == "__main__":
 
     ########################################################################################
 
-    expr = 1 * PauliX() @ PauliY() * MathStr(string="2") * MathStr(
-        string="sin(w*t + -k*x)"
-    ) @ Annihilation() * (
-        PauliI() @ (PauliZ() * 1) @ Creation() * -MathStr(string="A")
-    ) @ (
-        PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="A")
-    ) - (
-        PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="-A")
-    ) @ (
-        PauliI() @ (PauliZ() * 1) @ -Creation() * MathStr(string="+A")
-    )
+    # expr = 1 * PauliX() @ PauliY() * MathStr(string="2") * MathStr(
+    #     string="sin(w*t + -k*x)"
+    # ) @ Annihilation() * (
+    #     PauliI() @ (PauliZ() * 1) @ Creation() * -MathStr(string="A")
+    # ) @ (
+    #     PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="A")
+    # ) - (
+    #     PauliI() @ (PauliZ() * 1) @ Creation() * MathStr(string="-A")
+    # ) @ (
+    #     PauliI() @ (PauliZ() * 1) @ -Creation() * MathStr(string="+A")
+    # )
 
-    pprint(
-        "\nHilbert Space  :\n\tPauli  : {}\n\tLadder : {}".format(
-            *expr.accept(VerifyHilbertSpace())
+    # pprint(
+    #     "\nHilbert Space  :\n\tPauli  : {}\n\tLadder : {}".format(
+    #         *expr.accept(VerifyHilbertSpace())
+    #     )
+    # )
+
+    # i = 0
+    # while True:
+    #     _expr = expr.accept(DistributeOp())
+    #     if _expr == expr:
+    #         break
+    #     i += 1
+    #     expr = _expr
+    #     pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
+
+    # i = 0
+    # while True:
+    #     _expr = expr.accept(GatherMathExpr())
+    #     if _expr == expr:
+    #         break
+    #     i += 1
+    #     expr = _expr
+    #     pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
+
+    # i = 0
+    # while True:
+    #     _expr = expr.accept(ProperKronOrder())
+    #     if _expr == expr:
+    #         break
+    #     i += 1
+    #     expr = _expr
+    #     pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
+
+    # i = 0
+    # while True:
+    #     _expr = expr.accept(SeparatePauliLadder())
+    #     if _expr == expr:
+    #         break
+    #     i += 1
+    #     expr = _expr
+    #     pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
+
+    ########################################################################################
+
+    I, X, Y, Z = PauliI(), PauliX(), PauliY(), PauliZ()
+    A, C, J = Annihilation(), Creation(), Identity()
+
+    expr = A * C * C * A * C * A * C
+
+    import re
+
+    i = 0
+    pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
+    while True:
+        _expr = expr.accept(NormalOrder())
+        _expr = _expr.accept(DistributeOp())
+        _expr = _expr.accept(DistributeOp())
+        _expr = _expr.accept(DistributeOp())
+        _expr = _expr.accept(ProperMulOrder())
+
+        if _expr == expr:
+            break
+        i += 1
+        expr = _expr
+        pprint(
+            "\n{:^5}:".format(i),
+            # "\n"
+            # + re.sub(
+            #     "\* Identity\(\)",
+            #     "",
+            "\n".join(expr.accept(PrintOperator()).split("+")),
+            # ),
         )
-    )
-
-    i = 0
-    while True:
-        _expr = expr.accept(DistributeOp())
-        if _expr == expr:
-            break
-        i += 1
-        expr = _expr
-        pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
-
-    i = 0
-    while True:
-        _expr = expr.accept(GatherMathExpr())
-        if _expr == expr:
-            break
-        i += 1
-        expr = _expr
-        pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
-
-    i = 0
-    while True:
-        _expr = expr.accept(ProperKronOrder())
-        if _expr == expr:
-            break
-        i += 1
-        expr = _expr
-        pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))
-
-    i = 0
-    while True:
-        _expr = expr.accept(SeparatePauliLadder())
-        if _expr == expr:
-            break
-        i += 1
-        expr = _expr
-        pprint("\n{:^5}:".format(i), "\n" + expr.accept(VerbosePrintOperator()))

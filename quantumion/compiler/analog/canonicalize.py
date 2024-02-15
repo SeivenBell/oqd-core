@@ -113,3 +113,34 @@ class DistributeOp(AnalogCircuitTransformer):
         return OpAdd(
             op1=model.op1, op2=OpScalarMul(op=model.op2, expr=MathNum(value=-1))
         )
+
+
+class ProperMulOrder(AnalogCircuitTransformer):
+    def visit_OpMul(self, model: OpMul):
+        if isinstance(model.op2, OpMul):
+            return OpMul(
+                op1=OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2.op1)),
+                op2=self.visit(model.op2.op2),
+            )
+        return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
+
+
+class NormalOrder(AnalogCircuitTransformer):
+    def visit_OpMul(self, model: OpMul):
+        if isinstance(model.op2, Creation):
+            if isinstance(model.op1, Annihilation):
+                return OpSub(op1=OpMul(op1=model.op2, op2=model.op1), op2=Identity())
+            if isinstance(model.op1, OpMul) and isinstance(model.op1.op2, Annihilation):
+                return OpMul(
+                    op1=model.op1.op1,
+                    op2=OpSub(
+                        op1=OpMul(op1=model.op2, op2=model.op1.op2), op2=Identity()
+                    ),
+                )
+            if isinstance(model.op1, Identity):
+                return OpMul(op1=model.op2, op2=model.op1)
+            if isinstance(model.op1, OpMul) and isinstance(model.op1.op2, Identity):
+                return OpMul(
+                    op1=model.op1.op1, op2=OpMul(op1=model.op2, op2=model.op1.op2)
+                )
+        return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
