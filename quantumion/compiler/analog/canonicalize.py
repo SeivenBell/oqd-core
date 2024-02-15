@@ -2,7 +2,7 @@ from typing import Any, Union
 
 ########################################################################################
 
-from quantumion.interface.math import MathNum, MathImag, MathMul
+from quantumion.interface.math import MathNum, MathImag, MathAdd
 from quantumion.interface.analog import *
 
 from quantumion.compiler.analog.base import AnalogCircuitTransformer
@@ -205,64 +205,115 @@ class NormalOrder(AnalogCircuitTransformer):
 ########################################################################################
 
 
-# class SortedOrder(AnalogCircuitTransformer):
-#     def _visit(self, model: Any):
-#         if isinstance(model, (Pauli, Ladder)):
-#             return model.class_ + "()"
-#         if isinstance(model, MathExpr):
-#             return model.accept(PrintMathExpr())
-#         raise TypeError("Incompatible type for input model")
+class TermIndex(AnalogCircuitTransformer):
+    def _visit(self, model):
+        if isinstance(model, Ladder):
+            return (0, 1)
 
-#     def visit_OpAdd(self, model: OpAdd):
-#         string = "{} + {}".format(self.visit(model.op1), self.visit(model.op2))
-#         return string
+    def visit_PauliI(self, model: PauliI):
+        return [0]
 
-#     def visit_OpSub(self, model: OpSub):
-#         s2 = (
-#             f"({self.visit(model.op2)})"
-#             if isinstance(model.op2, (OpAdd, OpSub))
-#             else self.visit(model.op2)
-#         )
-#         string = "{} - {}".format(self.visit(model.op1), s2)
-#         return string
+    def visit_PauliX(self, model: PauliX):
+        return [1]
 
-#     def visit_OpMul(self, model: OpMul):
-#         s1 = (
-#             f"({self.visit(model.op1)})"
-#             if isinstance(model.op1, (OpAdd, OpSub, OpKron))
-#             else self.visit(model.op1)
-#         )
-#         s2 = (
-#             f"({self.visit(model.op2)})"
-#             if isinstance(model.op2, (OpAdd, OpSub, OpKron))
-#             else self.visit(model.op2)
-#         )
+    def visit_PauliY(self, model: PauliY):
+        return [2]
 
-#         string = "{} * {}".format(s1, s2)
-#         return string
+    def visit_PauliZ(self, model: PauliZ):
+        return [3]
 
-#     def visit_OpKron(self, model: OpKron):
-#         s1 = (
-#             f"({self.visit(model.op1)})"
-#             if isinstance(model.op1, (OpAdd, OpSub, OpMul))
-#             else self.visit(model.op1)
-#         )
-#         s2 = (
-#             f"({self.visit(model.op2)})"
-#             if isinstance(model.op2, (OpAdd, OpSub, OpMul))
-#             else self.visit(model.op2)
-#         )
+    def visit_Identity(self, model: Identity):
+        return [0, 0]
 
-#         string = "{} @ {}".format(s1, s2)
-#         return string
+    def visit_Annihilation(self, model: Annihilation):
+        return [1, 0]
 
-#     def visit_OpScalarMul(self, model: OpScalarMul):
-#         s1 = (
-#             f"({self.visit(model.op)})"
-#             if isinstance(model.op, (OpAdd, OpSub, OpKron))
-#             else self.visit(model.op)
-#         )
-#         s2 = f"({self.visit(model.expr)})"
+    def visit_Creation(self, model: Annihilation):
+        return [1, 1]
 
-#         string = "{} * {}".format(s2, s1)
-#         return string
+    def visit_OpAdd(self, model: OpAdd):
+        term1 = (
+            self.visit(model.op1)
+            if isinstance(model.op1, OpAdd)
+            else [self.visit(model.op1)]
+        )
+        term2 = self.visit(model.op2)
+        return term1 + [term2]
+
+    def visit_OpScalarMul(self, model: OpScalarMul):
+        term = self.visit(model.op)
+        return term
+
+    def visit_OpMul(self, model: OpMul):
+        term1 = self.visit(model.op1)
+        term2 = self.visit(model.op2)
+        return [term1[0] + term2[0], term1[1] + term2[1]]
+
+    def visit_OpKron(self, model: OpKron):
+        term1 = self.visit(model.op1)
+        term2 = self.visit(model.op2)
+        return term1 + term2
+
+
+class SortedOrder(AnalogCircuitTransformer):
+    def visit_OpAdd(self, model: OpAdd):
+        if isinstance(model.op1, OpAdd):
+            term1 = TermIndex().visit(model.op1.op2)
+            term2 = TermIndex().visit(model.op2)
+
+            if term1 == term2:
+                expr1 = (
+                    model.op1.op2.expr
+                    if isinstance(model.op1.op2, OpScalarMul)
+                    else MathNum(value=1)
+                )
+                expr2 = (
+                    model.op2.expr
+                    if isinstance(model.op2, OpScalarMul)
+                    else MathNum(value=1)
+                )
+                op = model.op2.op if isinstance(model.op2, OpScalarMul) else model.op2
+                return OpScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+
+            i = 0
+            while True:
+                if term1[i] > term2[i]:
+                    return OpAdd(
+                        op1=self.visit(OpAdd(op1=model.op1.op1, op2=model.op2)),
+                        op2=model.op1.op2,
+                    )
+                if term1[i] < term2[i]:
+                    return OpAdd(op1=self.visit(model.op1), op2=model.op2)
+                if term1[i] == term2[i]:
+                    i += 1
+                    continue
+
+        term1 = TermIndex().visit(model.op1)
+        term2 = TermIndex().visit(model.op2)
+
+        if term1 == term2:
+            expr1 = (
+                model.op1.expr
+                if isinstance(model.op1, OpScalarMul)
+                else MathNum(value=1)
+            )
+            expr2 = (
+                model.op2.expr
+                if isinstance(model.op2, OpScalarMul)
+                else MathNum(value=1)
+            )
+            op = model.op2.op if isinstance(model.op2, OpScalarMul) else model.op2
+            return OpScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+
+        i = 0
+        while True:
+            if term1[i] > term2[i]:
+                return OpAdd(
+                    op1=model.op2,
+                    op2=model.op1,
+                )
+            if term1[i] < term2[i]:
+                return OpAdd(op1=model.op1, op2=model.op2)
+            if term1[i] == term2[i]:
+                i += 1
+                continue
