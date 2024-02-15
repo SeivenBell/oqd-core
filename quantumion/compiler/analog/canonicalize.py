@@ -273,7 +273,10 @@ class SortedOrder(AnalogCircuitTransformer):
                     else MathNum(value=1)
                 )
                 op = model.op2.op if isinstance(model.op2, OpScalarMul) else model.op2
-                return OpScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+                return OpAdd(
+                    op1=self.visit(model.op1.op1),
+                    op2=OpScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2)),
+                )
 
             i = 0
             while True:
