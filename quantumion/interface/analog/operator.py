@@ -1,5 +1,5 @@
 from quantumion.interface.base import TypeReflectBaseModel
-from quantumion.interface.math import CastMathExpr, MathExpr
+from quantumion.interface.math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
 
 ########################################################################################
 
@@ -10,6 +10,8 @@ __all__ = [
     "PauliX",
     "PauliY",
     "PauliZ",
+    "PauliPlus",
+    "PauliMinus",
     "Ladder",
     "Creation",
     "Annihilation",
@@ -80,6 +82,24 @@ class PauliY(Pauli):
 
 class PauliZ(Pauli):
     pass
+
+
+def PauliPlus():
+    return OpAdd(
+        op1=PauliX(),
+        op2=OpScalarMul(
+            op=PauliY(), expr=MathMul(expr1=MathImag(), expr2=MathNum(value=1))
+        ),
+    )
+
+
+def PauliMinus():
+    return OpAdd(
+        op1=PauliX(),
+        op2=OpScalarMul(
+            op=PauliY(), expr=MathMul(expr1=MathImag(), expr2=MathNum(value=-1))
+        ),
+    )
 
 
 ########################################################################################
