@@ -3,6 +3,7 @@ from typing import Union, List
 import re
 
 from rich import print as pprint
+from rich.console import Console
 
 ########################################################################################
 
@@ -26,6 +27,10 @@ def repeat(model: Union[MathExpr, Operator], visitor: List[Visitor], verbose=Tru
     i = 0
     while True:
         _model = model.accept(visitor())
+        try:
+            model.accept(VerifyHilbertSpace())
+        except:
+            raise Exception("{}".format(visitor.__name__))
         if _model == model:
             break
         i += 1
@@ -52,14 +57,7 @@ def multivisitor(
 ########################################################################################
 
 if __name__ == "__main__":
-    op = (
-        (
-            X @ C @ X @ (A * C * C * A) @ X @ X
-            - ((Y @ A @ Y @ A @ X @ X) * (Z @ C @ Z @ A @ X @ X))
-        )
-        @ A
-        @ C
-    )
+    op = (X @ C @ X @ (A * C * C * A * C * C) @ X @ X) @ A @ C
 
     pprint(
         "\nHilbert Space  :\n\tPauli  : {}\n\tLadder : {}\n".format(
@@ -69,24 +67,40 @@ if __name__ == "__main__":
 
     pprint(op.accept(PrintOperator()))
 
-    op = multivisitor(
-        op, [Distribute, GatherMathExpr, ProperOrder, GatherPauli], verbose=False
-    )
-    pprint(op.accept(VerbosePrintOperator()))
-
-    for i in range(10):
-        op = multivisitor(
+    print("=" * 40)
+    while True:
+        _op = multivisitor(
             op,
             [
-                NormalOrder,
-                PauliAlgebra,
-                CleanIdentity,
                 Distribute,
                 GatherMathExpr,
                 ProperOrder,
+                GatherPauli,
+                NormalOrder,
+                Distribute,
+                GatherMathExpr,
+                ProperOrder,
+                PruneIdentity,
             ],
             verbose=False,
         )
-        pprint(op.accept(PrintOperator()))
+        print("=" * 40)
+        if op == _op:
+            break
+        op = _op
 
-    pprint(op.accept(PauliAlgebra()).accept(PrintOperator()))
+    pprint(op.accept(PrintOperator()))
+
+    pprint(
+        "\nHilbert Space  :\n\tPauli  : {}\n\tLadder : {}\n".format(
+            *op.accept(VerifyHilbertSpace())
+        )
+    )
+
+    console = Console(record=True)
+    with console.capture() as capture:
+        console.print(op)
+    op_str = console.export_text()
+
+    with open("_op.py", mode="w", encoding="utf8") as f:
+        f.write(op_str)
