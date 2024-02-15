@@ -132,7 +132,7 @@ class NormalOrder(AnalogCircuitTransformer):
                 return OpSub(op1=OpMul(op1=model.op2, op2=model.op1), op2=Identity())
             if isinstance(model.op1, OpMul) and isinstance(model.op1.op2, Annihilation):
                 return OpMul(
-                    op1=model.op1.op1,
+                    op1=self.visit(model.op1.op1),
                     op2=OpSub(
                         op1=OpMul(op1=model.op2, op2=model.op1.op2), op2=Identity()
                     ),
@@ -141,6 +141,7 @@ class NormalOrder(AnalogCircuitTransformer):
                 return OpMul(op1=model.op2, op2=model.op1)
             if isinstance(model.op1, OpMul) and isinstance(model.op1.op2, Identity):
                 return OpMul(
-                    op1=model.op1.op1, op2=OpMul(op1=model.op2, op2=model.op1.op2)
+                    op1=self.visit(model.op1.op1),
+                    op2=OpMul(op1=model.op2, op2=model.op1.op2),
                 )
         return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
