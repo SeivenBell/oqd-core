@@ -162,10 +162,11 @@ class VerbosePrintOperator(AnalogCircuitTransformer):
         return string
 
     def visit_OpScalarMul(self, model: OpScalarMul):
-        s = (
+        s1 = (
             f"({self.visit(model.op)})"
             if not isinstance(model.op, (Pauli, Ladder))
             else self.visit(model.op)
         )
-        string = "{} * {}".format(self.visit(model.expr), s)
+        s2 = f"({self.visit(model.expr)})"
+        string = "{} * {}".format(s2, s1)
         return string
