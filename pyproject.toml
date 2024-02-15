@@ -16,6 +16,7 @@ docs = [
     "mkdocs-material",
     "mkdocstrings-python",
 ]
+test = ["unittest", "unittest_prettify"]
 qutip = ["qutip"]
 tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
 server = [
