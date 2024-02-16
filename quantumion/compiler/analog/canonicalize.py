@@ -157,35 +157,22 @@ class OperatorDistribute(AnalogCircuitTransformer):
 
 
 class ProperOrder(AnalogCircuitTransformer):
-    def visit_OperatorKron(self, model: OperatorKron):
-        if isinstance(model.op2, OperatorKron):
-            return OperatorKron(
-                op1=OperatorKron(
-                    op1=self.visit(model.op1), op2=self.visit(model.op2.op1)
-                ),
-                op2=self.visit(model.op2.op2),
-            )
-        return OperatorKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
+    def _visit(self, model: Any):
+        if isinstance(model, (OperatorAdd, OperatorMul, OperatorKron)):
+            return self.visit_OperatorAddMulKron(model)
+        return super(self.__class__, self)._visit(model)
 
-    def visit_OperatorMul(self, model: OperatorMul):
-        if isinstance(model.op2, OperatorMul):
-            return OperatorMul(
-                op1=OperatorMul(
+    def visit_OperatorAddMulKron(
+        self, model: Union[OperatorAdd, OperatorMul, OperatorKron]
+    ):
+        if isinstance(model.op2, model.__class__):
+            return model.__class__(
+                op1=model.__class__(
                     op1=self.visit(model.op1), op2=self.visit(model.op2.op1)
                 ),
                 op2=self.visit(model.op2.op2),
             )
-        return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
-
-    def visit_OperatorAdd(self, model: OperatorAdd):
-        if isinstance(model.op2, OperatorAdd):
-            return OperatorAdd(
-                op1=OperatorAdd(
-                    op1=self.visit(model.op1), op2=self.visit(model.op2.op1)
-                ),
-                op2=self.visit(model.op2.op2),
-            )
-        return OperatorAdd(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 ########################################################################################
