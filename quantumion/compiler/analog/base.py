@@ -101,71 +101,38 @@ class PrintOperator(AnalogCircuitTransformer):
 ########################################################################################
 
 
-class VerbosePrintOperator(AnalogCircuitTransformer):
-    def _visit(self, model: Any):
-        raise TypeError("Incompatible type for input model")
-
-    def visit_OperatorTerminal(self, model: OperatorTerminal):
-        return model.class_ + "()"
-
-    def visit_MathExpr(self, model: MathExpr):
-        return model.accept(PrintMathExpr())
+class VerbosePrintOperator(PrintOperator):
+    def visit_OperatorBinaryOp(self, model: OperatorBinaryOp):
+        s1 = (
+            f"({self.visit(model.op1)})"
+            if not isinstance(model.op1, OperatorTerminal)
+            else self.visit(model.op1)
+        )
+        s2 = (
+            f"({self.visit(model.op2)})"
+            if not isinstance(model.op2, OperatorTerminal)
+            else self.visit(model.op2)
+        )
+        string = "{} {} {}".format(
+            s1,
+            dict(OperatorAdd="+", OperatorSub="-", OperatorMul="*", OperatorKron="@")[
+                model.__class__.__name__
+            ],
+            s2,
+        )
+        return string
 
     def visit_OperatorAdd(self, model: OperatorAdd):
-        s1 = (
-            f"({self.visit(model.op1)})"
-            if not isinstance(model.op1, OperatorTerminal)
-            else self.visit(model.op1)
-        )
-        s2 = (
-            f"({self.visit(model.op2)})"
-            if not isinstance(model.op2, OperatorTerminal)
-            else self.visit(model.op2)
-        )
-        string = "{} + {}".format(s1, s2)
-        return string
+        return self.visit_OperatorBinaryOp(model)
 
     def visit_OperatorSub(self, model: OperatorSub):
-        s1 = (
-            f"({self.visit(model.op1)})"
-            if not isinstance(model.op1, OperatorTerminal)
-            else self.visit(model.op1)
-        )
-        s2 = (
-            f"({self.visit(model.op2)})"
-            if not isinstance(model.op2, OperatorTerminal)
-            else self.visit(model.op2)
-        )
-        string = "{} - {}".format(s1, s2)
-        return string
+        return self.visit_OperatorBinaryOp(model)
 
     def visit_OperatorMul(self, model: OperatorMul):
-        s1 = (
-            f"({self.visit(model.op1)})"
-            if not isinstance(model.op1, OperatorTerminal)
-            else self.visit(model.op1)
-        )
-        s2 = (
-            f"({self.visit(model.op2)})"
-            if not isinstance(model.op2, OperatorTerminal)
-            else self.visit(model.op2)
-        )
-        string = "{} * {}".format(s1, s2)
-        return string
+        return self.visit_OperatorBinaryOp(model)
 
     def visit_OperatorKron(self, model: OperatorKron):
-        s1 = (
-            f"({self.visit(model.op1)})"
-            if not isinstance(model.op1, OperatorTerminal)
-            else self.visit(model.op1)
-        )
-        s2 = (
-            f"({self.visit(model.op2)})"
-            if not isinstance(model.op2, OperatorTerminal)
-            else self.visit(model.op2)
-        )
-        string = "{} @ {}".format(s1, s2)
-        return string
+        return self.visit_OperatorBinaryOp(model)
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         s1 = (
@@ -174,5 +141,6 @@ class VerbosePrintOperator(AnalogCircuitTransformer):
             else self.visit(model.op)
         )
         s2 = f"({self.visit(model.expr)})"
+
         string = "{} * {}".format(s2, s1)
         return string
