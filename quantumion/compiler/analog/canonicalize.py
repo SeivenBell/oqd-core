@@ -104,7 +104,7 @@ class GatherPauli(AnalogCircuitTransformer):
 ########################################################################################
 
 
-class Distribute(AnalogCircuitTransformer):
+class OperatorDistribute(AnalogCircuitTransformer):
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (OperatorAdd, OperatorSub)):
             return model.op1.__class__(

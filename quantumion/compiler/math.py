@@ -103,7 +103,7 @@ class GatherNum(Transformer):
         return MathAdd(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
 
 
-class DistributeMath(Transformer):
+class MathExprDistribute(Transformer):
     def visit_MathMul(self, model: MathMul):
         if isinstance(model.expr1, (MathAdd, MathSub)):
             return model.expr1.__class__(
