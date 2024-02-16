@@ -9,9 +9,15 @@ from quantumion.interface.base import VisitableBaseModel
 
 class Visitor:
     def visit(self, model: Any) -> Any:
-        new_model = getattr(
-            self, "visit_{}".format(model.__class__.__name__), self._visit
-        )(model)
+        for cls in model.__class__.__mro__:
+            visit_func = getattr(self, "visit_{}".format(cls.__name__), None)
+            if visit_func:
+                break
+
+        if not visit_func:
+            visit_func = self._visit
+
+        new_model = visit_func(model)
         return new_model
 
     def _visit(self, model: Any) -> Any:

@@ -12,16 +12,16 @@ from quantumion.compiler.analog.base import AnalogCircuitTransformer
 
 
 class PruneIdentity(AnalogCircuitTransformer):
-    def visit_OpMul(self, model: OpMul):
+    def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (Identity, PauliI)):
             return self.visit(model.op2)
         if isinstance(model.op2, (Identity, PauliI)):
             return self.visit(model.op1)
-        return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 class PauliAlgebra(AnalogCircuitTransformer):
-    def visit_OpMul(self, model: OpMul):
+    def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, Pauli) and isinstance(model.op2, Pauli):
             if isinstance(model.op1, PauliI):
                 return self.visit(model.op2)
@@ -30,16 +30,16 @@ class PauliAlgebra(AnalogCircuitTransformer):
             if model.op1 == model.op2:
                 return PauliI()
             if isinstance(model.op1, PauliX) and isinstance(model.op2, PauliY):
-                return OpScalarMul(op=PauliZ(), expr=MathImag())
+                return OperatorScalarMul(op=PauliZ(), expr=MathImag())
             if isinstance(model.op1, PauliY) and isinstance(model.op2, PauliZ):
-                return OpScalarMul(op=PauliX(), expr=MathImag())
+                return OperatorScalarMul(op=PauliX(), expr=MathImag())
             if isinstance(model.op1, PauliZ) and isinstance(model.op2, PauliX):
-                return OpScalarMul(op=PauliY(), expr=MathImag())
-            return OpScalarMul(
-                op=self.visit(OpMul(op1=model.op2, op2=model.op1)),
+                return OperatorScalarMul(op=PauliY(), expr=MathImag())
+            return OperatorScalarMul(
+                op=self.visit(OperatorMul(op1=model.op2, op2=model.op1)),
                 expr=MathNum(value=-1),
             )
-        return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 ########################################################################################
@@ -47,104 +47,109 @@ class PauliAlgebra(AnalogCircuitTransformer):
 
 class GatherMathExpr(AnalogCircuitTransformer):
     def _visit(self, model: Any) -> Any:
-        if isinstance(model, (OpMul, OpKron)):
-            return self._visit_OpMulKron(model)
-        if isinstance(model, (OpAdd, OpSub)):
-            return self._visit_OpAddSub(model)
+        if isinstance(model, (OperatorMul, OperatorKron)):
+            return self.visit_OperatorMulKron(model)
+        if isinstance(model, (OperatorAdd, OperatorSub)):
+            return self.visit_OperatorAddSub(model)
         if isinstance(model, Operator):
             return model
         raise TypeError
 
-    def visit_OpScalarMul(self, model: OpScalarMul):
-        if isinstance(model.op, OpScalarMul):
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+        if isinstance(model.op, OperatorScalarMul):
             return model.expr * model.op.expr * self.visit(model.op.op)
         return model.expr * self.visit(model.op)
 
-    def _visit_OpMulKron(self, model: Union[OpMul, OpKron]):
-        if isinstance(model.op1, OpScalarMul) and isinstance(model.op2, OpScalarMul):
+    def visit_OperatorMulKron(self, model: Union[OperatorMul, OperatorKron]):
+        if isinstance(model.op1, OperatorScalarMul) and isinstance(
+            model.op2, OperatorScalarMul
+        ):
             return (
                 model.op1.expr
                 * model.op2.expr
                 * self.visit(model.__class__(op1=model.op1.op, op2=model.op2.op))
             )
-        if isinstance(model.op1, OpScalarMul):
+        if isinstance(model.op1, OperatorScalarMul):
             return model.op1.expr * self.visit(
                 model.__class__(op1=model.op1.op, op2=model.op2)
             )
-        if isinstance(model.op2, OpScalarMul):
+        if isinstance(model.op2, OperatorScalarMul):
             return model.op2.expr * self.visit(
                 model.__class__(op1=model.op1, op2=model.op2.op)
             )
         return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
-    def _visit_OpAddSub(self, model: Union[OpAdd, OpSub]):
+    def visit_OperatorAddSub(self, model: Union[OperatorAdd, OperatorSub]):
         return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 class GatherPauli(AnalogCircuitTransformer):
-    def visit_OpKron(self, model: OpKron):
+    def visit_OperatorKron(self, model: OperatorKron):
         if isinstance(model.op2, Pauli):
             if isinstance(model.op1, Ladder):
-                return OpKron(
+                return OperatorKron(
                     op1=model.op2,
                     op2=model.op1,
                 )
-            if isinstance(model.op1, OpKron) and isinstance(
-                model.op1.op2, Union[Ladder, OpMul]
+            if isinstance(model.op1, OperatorKron) and isinstance(
+                model.op1.op2, Union[Ladder, OperatorMul]
             ):
-                return OpKron(
-                    op1=OpKron(op1=model.op1.op1, op2=model.op2), op2=model.op1.op2
+                return OperatorKron(
+                    op1=OperatorKron(op1=model.op1.op1, op2=model.op2),
+                    op2=model.op1.op2,
                 )
-        return OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 ########################################################################################
 
 
 class Distribute(AnalogCircuitTransformer):
-    def visit_OpMul(self, model: OpMul):
-        if isinstance(model.op1, (OpAdd, OpSub)):
+    def visit_OperatorMul(self, model: OperatorMul):
+        if isinstance(model.op1, (OperatorAdd, OperatorSub)):
             return model.op1.__class__(
-                op1=self.visit(OpMul(op1=model.op1.op1, op2=model.op2)),
-                op2=self.visit(OpMul(op1=model.op1.op2, op2=model.op2)),
+                op1=self.visit(OperatorMul(op1=model.op1.op1, op2=model.op2)),
+                op2=self.visit(OperatorMul(op1=model.op1.op2, op2=model.op2)),
             )
-        if isinstance(model.op2, (OpAdd, OpSub)):
+        if isinstance(model.op2, (OperatorAdd, OperatorSub)):
             return model.op2.__class__(
-                op1=self.visit(OpMul(op1=model.op1, op2=model.op2.op1)),
-                op2=self.visit(OpMul(op1=model.op1, op2=model.op2.op2)),
+                op1=self.visit(OperatorMul(op1=model.op1, op2=model.op2.op1)),
+                op2=self.visit(OperatorMul(op1=model.op1, op2=model.op2.op2)),
             )
-        if isinstance(model.op1, (OpKron)) and isinstance(model.op2, (OpKron)):
-            return OpKron(
-                op1=OpMul(op1=model.op1.op1, op2=model.op2.op1),
-                op2=OpMul(op1=model.op1.op2, op2=model.op2.op2),
+        if isinstance(model.op1, (OperatorKron)) and isinstance(
+            model.op2, (OperatorKron)
+        ):
+            return OperatorKron(
+                op1=OperatorMul(op1=model.op1.op1, op2=model.op2.op1),
+                op2=OperatorMul(op1=model.op1.op2, op2=model.op2.op2),
             )
-        return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
-    def visit_OpKron(self, model: OpKron):
-        if isinstance(model.op1, (OpAdd, OpSub)):
+    def visit_OperatorKron(self, model: OperatorKron):
+        if isinstance(model.op1, (OperatorAdd, OperatorSub)):
             return model.op1.__class__(
-                op1=self.visit(OpKron(op1=model.op1.op1, op2=model.op2)),
-                op2=self.visit(OpKron(op1=model.op1.op2, op2=model.op2)),
+                op1=self.visit(OperatorKron(op1=model.op1.op1, op2=model.op2)),
+                op2=self.visit(OperatorKron(op1=model.op1.op2, op2=model.op2)),
             )
-        if isinstance(model.op2, (OpAdd, OpSub)):
+        if isinstance(model.op2, (OperatorAdd, OperatorSub)):
             return model.op2.__class__(
-                op1=self.visit(OpKron(op1=model.op1, op2=model.op2.op1)),
-                op2=self.visit(OpKron(op1=model.op1, op2=model.op2.op2)),
+                op1=self.visit(OperatorKron(op1=model.op1, op2=model.op2.op1)),
+                op2=self.visit(OperatorKron(op1=model.op1, op2=model.op2.op2)),
             )
-        return OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
-    def visit_OpScalarMul(self, model: OpScalarMul):
-        if isinstance(model.op, (OpAdd, OpSub)):
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+        if isinstance(model.op, (OperatorAdd, OperatorSub)):
             return model.op.__class__(
-                op1=OpScalarMul(op=self.visit(model.op.op1), expr=model.expr),
-                op2=OpScalarMul(op=self.visit(model.op.op2), expr=model.expr),
+                op1=OperatorScalarMul(op=self.visit(model.op.op1), expr=model.expr),
+                op2=OperatorScalarMul(op=self.visit(model.op.op2), expr=model.expr),
             )
-        return OpScalarMul(op=self.visit(model.op), expr=model.expr)
+        return OperatorScalarMul(op=self.visit(model.op), expr=model.expr)
 
-    def visit_OpSub(self, model: OpSub):
-        return OpAdd(
+    def visit_OperatorSub(self, model: OperatorSub):
+        return OperatorAdd(
             op1=self.visit(model.op1),
-            op2=OpScalarMul(op=self.visit(model.op2), expr=MathNum(value=-1)),
+            op2=OperatorScalarMul(op=self.visit(model.op2), expr=MathNum(value=-1)),
         )
 
 
@@ -152,64 +157,73 @@ class Distribute(AnalogCircuitTransformer):
 
 
 class ProperOrder(AnalogCircuitTransformer):
-    def visit_OpKron(self, model: OpKron):
-        if isinstance(model.op2, OpKron):
-            return OpKron(
-                op1=OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2.op1)),
+    def visit_OperatorKron(self, model: OperatorKron):
+        if isinstance(model.op2, OperatorKron):
+            return OperatorKron(
+                op1=OperatorKron(
+                    op1=self.visit(model.op1), op2=self.visit(model.op2.op1)
+                ),
                 op2=self.visit(model.op2.op2),
             )
-        return OpKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorKron(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
-    def visit_OpMul(self, model: OpMul):
-        if isinstance(model.op2, OpMul):
-            return OpMul(
-                op1=OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2.op1)),
+    def visit_OperatorMul(self, model: OperatorMul):
+        if isinstance(model.op2, OperatorMul):
+            return OperatorMul(
+                op1=OperatorMul(
+                    op1=self.visit(model.op1), op2=self.visit(model.op2.op1)
+                ),
                 op2=self.visit(model.op2.op2),
             )
-        return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
-    def visit_OpAdd(self, model: OpAdd):
-        if isinstance(model.op2, OpAdd):
-            return OpAdd(
-                op1=OpAdd(op1=self.visit(model.op1), op2=self.visit(model.op2.op1)),
+    def visit_OperatorAdd(self, model: OperatorAdd):
+        if isinstance(model.op2, OperatorAdd):
+            return OperatorAdd(
+                op1=OperatorAdd(
+                    op1=self.visit(model.op1), op2=self.visit(model.op2.op1)
+                ),
                 op2=self.visit(model.op2.op2),
             )
-        return OpAdd(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorAdd(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 ########################################################################################
 
 
 class NormalOrder(AnalogCircuitTransformer):
-    def visit_OpMul(self, model: OpMul):
+    def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op2, Creation):
             if isinstance(model.op1, Annihilation):
-                return OpSub(op1=OpMul(op1=model.op2, op2=model.op1), op2=Identity())
-            if isinstance(model.op1, OpMul) and isinstance(model.op1.op2, Annihilation):
-                return OpMul(
+                return OperatorSub(
+                    op1=OperatorMul(op1=model.op2, op2=model.op1), op2=Identity()
+                )
+            if isinstance(model.op1, OperatorMul) and isinstance(
+                model.op1.op2, Annihilation
+            ):
+                return OperatorMul(
                     op1=self.visit(model.op1.op1),
-                    op2=OpSub(
-                        op1=OpMul(op1=model.op2, op2=model.op1.op2), op2=Identity()
+                    op2=OperatorSub(
+                        op1=OperatorMul(op1=model.op2, op2=model.op1.op2),
+                        op2=Identity(),
                     ),
                 )
             if isinstance(model.op1, Identity):
-                return OpMul(op1=model.op2, op2=model.op1)
-            if isinstance(model.op1, OpMul) and isinstance(model.op1.op2, Identity):
-                return OpMul(
+                return OperatorMul(op1=model.op2, op2=model.op1)
+            if isinstance(model.op1, OperatorMul) and isinstance(
+                model.op1.op2, Identity
+            ):
+                return OperatorMul(
                     op1=self.visit(model.op1.op1),
-                    op2=OpMul(op1=model.op2, op2=model.op1.op2),
+                    op2=OperatorMul(op1=model.op2, op2=model.op1.op2),
                 )
-        return OpMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
+        return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 ########################################################################################
 
 
 class TermIndex(AnalogCircuitTransformer):
-    def _visit(self, model):
-        if isinstance(model, Ladder):
-            return (0, 1)
-
     def visit_PauliI(self, model: PauliI):
         return [0]
 
@@ -231,62 +245,68 @@ class TermIndex(AnalogCircuitTransformer):
     def visit_Creation(self, model: Annihilation):
         return [1, 1]
 
-    def visit_OpAdd(self, model: OpAdd):
+    def visit_OperatorAdd(self, model: OperatorAdd):
         term1 = (
             self.visit(model.op1)
-            if isinstance(model.op1, OpAdd)
+            if isinstance(model.op1, OperatorAdd)
             else [self.visit(model.op1)]
         )
         term2 = self.visit(model.op2)
         return term1 + [term2]
 
-    def visit_OpScalarMul(self, model: OpScalarMul):
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         term = self.visit(model.op)
         return term
 
-    def visit_OpMul(self, model: OpMul):
+    def visit_OperatorMul(self, model: OperatorMul):
         term1 = self.visit(model.op1)
         term2 = self.visit(model.op2)
         return [term1[0] + term2[0], term1[1] + term2[1]]
 
-    def visit_OpKron(self, model: OpKron):
+    def visit_OperatorKron(self, model: OperatorKron):
         term1 = self.visit(model.op1)
         term2 = self.visit(model.op2)
         return term1 + term2
 
 
 class SortedOrder(AnalogCircuitTransformer):
-    def visit_OpAdd(self, model: OpAdd):
-        if isinstance(model.op1, OpAdd):
+    def visit_OperatorAdd(self, model: OperatorAdd):
+        if isinstance(model.op1, OperatorAdd):
             term1 = TermIndex().visit(model.op1.op2)
             term2 = TermIndex().visit(model.op2)
 
             if term1 == term2:
                 expr1 = (
                     model.op1.op2.expr
-                    if isinstance(model.op1.op2, OpScalarMul)
+                    if isinstance(model.op1.op2, OperatorScalarMul)
                     else MathNum(value=1)
                 )
                 expr2 = (
                     model.op2.expr
-                    if isinstance(model.op2, OpScalarMul)
+                    if isinstance(model.op2, OperatorScalarMul)
                     else MathNum(value=1)
                 )
-                op = model.op2.op if isinstance(model.op2, OpScalarMul) else model.op2
-                return OpAdd(
+                op = (
+                    model.op2.op
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else model.op2
+                )
+                return OperatorAdd(
                     op1=self.visit(model.op1.op1),
-                    op2=OpScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2)),
+                    op2=OperatorScalarMul(
+                        op=op, expr=MathAdd(expr1=expr1, expr2=expr2)
+                    ),
                 )
 
             i = 0
             while True:
                 if term1[i] > term2[i]:
-                    return OpAdd(
-                        op1=self.visit(OpAdd(op1=model.op1.op1, op2=model.op2)),
+                    return OperatorAdd(
+                        op1=self.visit(OperatorAdd(op1=model.op1.op1, op2=model.op2)),
                         op2=model.op1.op2,
                     )
                 if term1[i] < term2[i]:
-                    return OpAdd(op1=self.visit(model.op1), op2=model.op2)
+                    return OperatorAdd(op1=self.visit(model.op1), op2=model.op2)
                 if term1[i] == term2[i]:
                     i += 1
                     continue
@@ -297,26 +317,26 @@ class SortedOrder(AnalogCircuitTransformer):
         if term1 == term2:
             expr1 = (
                 model.op1.expr
-                if isinstance(model.op1, OpScalarMul)
+                if isinstance(model.op1, OperatorScalarMul)
                 else MathNum(value=1)
             )
             expr2 = (
                 model.op2.expr
-                if isinstance(model.op2, OpScalarMul)
+                if isinstance(model.op2, OperatorScalarMul)
                 else MathNum(value=1)
             )
-            op = model.op2.op if isinstance(model.op2, OpScalarMul) else model.op2
-            return OpScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+            op = model.op2.op if isinstance(model.op2, OperatorScalarMul) else model.op2
+            return OperatorScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
 
         i = 0
         while True:
             if term1[i] > term2[i]:
-                return OpAdd(
+                return OperatorAdd(
                     op1=model.op2,
                     op2=model.op1,
                 )
             if term1[i] < term2[i]:
-                return OpAdd(op1=model.op1, op2=model.op2)
+                return OperatorAdd(op1=model.op1, op2=model.op2)
             if term1[i] == term2[i]:
                 i += 1
                 continue

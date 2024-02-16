@@ -5,6 +5,7 @@ from quantumion.interface.math import CastMathExpr, MathExpr, MathImag, MathNum,
 
 __all__ = [
     "Operator",
+    "OperatorTerminal",
     "Pauli",
     "PauliI",
     "PauliX",
@@ -16,11 +17,12 @@ __all__ = [
     "Creation",
     "Annihilation",
     "Identity",
-    "OpAdd",
-    "OpSub",
-    "OpMul",
-    "OpScalarMul",
-    "OpKron",
+    "OperatorBinaryOp",
+    "OperatorAdd",
+    "OperatorSub",
+    "OperatorMul",
+    "OperatorScalarMul",
+    "OperatorKron",
 ]
 
 
@@ -29,16 +31,16 @@ __all__ = [
 
 class Operator(TypeReflectBaseModel):
     def __neg__(self):
-        return OpScalarMul(op=self, expr=MathExpr.cast(-1))
+        return OperatorScalarMul(op=self, expr=MathNum(value=-1))
 
     def __pos__(self):
         return self
 
     def __add__(self, other):
-        return OpAdd(op1=self, op2=other)
+        return OperatorAdd(op1=self, op2=other)
 
     def __sub__(self, other):
-        return OpSub(op1=self, op2=other)
+        return OperatorSub(op1=self, op2=other)
 
     def __matmul__(self, other):
         if isinstance(other, MathExpr):
@@ -46,13 +48,13 @@ class Operator(TypeReflectBaseModel):
                 "Tried Kron product between Operator and MathExpr. "
                 + "Scalar multiplication of MathExpr and Operator should be bracketed when perfoming Kron product."
             )
-        return OpKron(op1=self, op2=other)
+        return OperatorKron(op1=self, op2=other)
 
     def __mul__(self, other):
         if isinstance(other, Operator):
-            return OpMul(op1=self, op2=other)
+            return OperatorMul(op1=self, op2=other)
         else:
-            return OpScalarMul(op=self, expr=other)
+            return OperatorScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
         other = MathExpr.cast(other)
@@ -64,7 +66,14 @@ class Operator(TypeReflectBaseModel):
 ########################################################################################
 
 
-class Pauli(Operator):
+class OperatorTerminal(Operator):
+    pass
+
+
+########################################################################################
+
+
+class Pauli(OperatorTerminal):
     pass
 
 
@@ -85,18 +94,18 @@ class PauliZ(Pauli):
 
 
 def PauliPlus():
-    return OpAdd(
+    return OperatorAdd(
         op1=PauliX(),
-        op2=OpScalarMul(
+        op2=OperatorScalarMul(
             op=PauliY(), expr=MathMul(expr1=MathImag(), expr2=MathNum(value=1))
         ),
     )
 
 
 def PauliMinus():
-    return OpAdd(
+    return OperatorAdd(
         op1=PauliX(),
-        op2=OpScalarMul(
+        op2=OperatorScalarMul(
             op=PauliY(), expr=MathMul(expr1=MathImag(), expr2=MathNum(value=-1))
         ),
     )
@@ -105,7 +114,7 @@ def PauliMinus():
 ########################################################################################
 
 
-class Ladder(Operator):
+class Ladder(OperatorTerminal):
     pass
 
 
@@ -124,26 +133,30 @@ class Identity(Ladder):
 ########################################################################################
 
 
-class OpScalarMul(Operator):
+class OperatorScalarMul(Operator):
     op: Operator
     expr: CastMathExpr
 
 
-class OpAdd(Operator):
+class OperatorBinaryOp(Operator):
+    pass
+
+
+class OperatorAdd(OperatorBinaryOp):
     op1: Operator
     op2: Operator
 
 
-class OpSub(Operator):
+class OperatorSub(OperatorBinaryOp):
     op1: Operator
     op2: Operator
 
 
-class OpMul(Operator):
+class OperatorMul(OperatorBinaryOp):
     op1: Operator
     op2: Operator
 
 
-class OpKron(Operator):
+class OperatorKron(OperatorBinaryOp):
     op1: Operator
     op2: Operator

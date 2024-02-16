@@ -11,18 +11,22 @@ from quantumion.compiler.analog.base import AnalogCircuitTransformer, PrintOpera
 
 class VerifyHilbertSpace(AnalogCircuitTransformer):
     def _visit(self, model):
-        if isinstance(model, Pauli):
-            return (1, 0)
-        if isinstance(model, Ladder):
-            return (0, 1)
-        if isinstance(model, (OpAdd, OpSub, OpMul)):
-            return self._visit_OpAddSubMul(model)
+        if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul)):
+            return self.visit_OperatorAddSubMul(model)
         raise TypeError
 
-    def visit_OpScalarMul(self, model: OpScalarMul):
+    def visit_Pauli(self, model):
+        return (1, 0)
+
+    def visit_Ladder(self, model):
+        return (0, 1)
+
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         return self.visit(model.op)
 
-    def _visit_OpAddSubMul(self, model: Union[OpAdd, OpSub, OpMul]):
+    def visit_OperatorAddSubMul(
+        self, model: Union[OperatorAdd, OperatorSub, OperatorMul]
+    ):
         space1 = self.visit(model.op1)
         space2 = self.visit(model.op2)
 
@@ -33,7 +37,7 @@ class VerifyHilbertSpace(AnalogCircuitTransformer):
         )
         return space1
 
-    def visit_OpKron(self, model: OpKron):
+    def visit_OperatorKron(self, model: OperatorKron):
         space1 = self.visit(model.op1)
         space2 = self.visit(model.op2)
 

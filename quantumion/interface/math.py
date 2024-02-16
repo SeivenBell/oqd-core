@@ -15,11 +15,14 @@ from quantumion.compiler.visitor import Transformer
 
 __all__ = [
     "MathExpr",
+    "MathTerminal",
     "MathStr",
     "MathNum",
     "MathVar",
     "MathImag",
-    "MathUnary",
+    "MathUnaryOp",
+    "MathFunc",
+    "MathBinaryOp",
     "MathAdd",
     "MathSub",
     "MathMul",
@@ -107,7 +110,7 @@ def is_varname(value: str) -> str:
 
 VarName = Annotated[str, AfterValidator(is_varname)]
 CastMathExpr = Annotated[MathExpr, BeforeValidator(MathExpr.cast)]
-Unaries = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
+Functions = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
 
 
 ########################################################################################
@@ -153,7 +156,7 @@ class AST_to_MathExpr(Transformer):
 
     def visit_Call(self, model: ast.Call):
         if len(model.args) == 1:
-            return MathUnary(func=model.func.id, expr=self.visit(model.args[0]))
+            return MathFunc(func=model.func.id, expr=self.visit(model.args[0]))
         raise TypeError
 
 
@@ -164,43 +167,55 @@ def MathStr(*, string):
 ########################################################################################
 
 
-class MathVar(MathExpr):
-    name: VarName
-
-
-class MathNum(MathExpr):
-    value: Union[int, float]
-
-
-class MathImag(MathExpr):
+class MathTerminal(MathExpr):
     pass
 
 
-class MathUnary(MathExpr):
-    func: Unaries
+class MathVar(MathTerminal):
+    name: VarName
+
+
+class MathNum(MathTerminal):
+    value: Union[int, float]
+
+
+class MathImag(MathTerminal):
+    pass
+
+
+class MathUnaryOp(MathExpr):
+    pass
+
+
+class MathFunc(MathUnaryOp):
+    func: Functions
     expr: CastMathExpr
 
 
-class MathAdd(MathExpr):
+class MathBinaryOp(MathExpr):
+    pass
+
+
+class MathAdd(MathBinaryOp):
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
-class MathSub(MathExpr):
+class MathSub(MathBinaryOp):
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
-class MathMul(MathExpr):
+class MathMul(MathBinaryOp):
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
-class MathDiv(MathExpr):
+class MathDiv(MathBinaryOp):
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
-class MathPow(MathExpr):
+class MathPow(MathBinaryOp):
     expr1: CastMathExpr
     expr2: CastMathExpr

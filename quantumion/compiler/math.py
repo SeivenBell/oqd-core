@@ -25,7 +25,7 @@ class PrintMathExpr(Transformer):
         string = "1j"
         return string
 
-    def visit_MathUnary(self, model: MathUnary):
+    def visit_MathFunc(self, model: MathFunc):
         string = "{}({})".format(model.func, self.visit(model.expr))
         return string
 
@@ -91,7 +91,7 @@ class PrintMathExpr(Transformer):
 ########################################################################################
 
 
-class ReorderMathExpr(Transformer):
+class GatherNum(Transformer):
     def visit_MathMul(self, model: MathMul):
         if isinstance(model.expr2, MathNum) and not isinstance(model.expr1, MathNum):
             return MathMul(expr1=self.visit(model.expr2), expr2=self.visit(model.expr1))
@@ -103,7 +103,7 @@ class ReorderMathExpr(Transformer):
         return MathAdd(expr1=self.visit(model.expr1), expr2=self.visit(model.expr2))
 
 
-class DeNestMathMul(Transformer):
+class DistributeMath(Transformer):
     def visit_MathMul(self, model: MathMul):
         if isinstance(model.expr1, (MathAdd, MathSub)):
             return model.expr1.__class__(
