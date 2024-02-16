@@ -129,7 +129,7 @@ class AST_to_MathExpr(Transformer):
         return self.visit(model.value)
 
     def visit_Constant(self, model: ast.Constant):
-        return MathNum(value=model.value)
+        return MathExpr.cast(model.value)
 
     def visit_Name(self, model: ast.Name):
         return MathVar(name=model.id)
