@@ -22,13 +22,13 @@ class PruneIdentity(AnalogCircuitTransformer):
 
 class PauliAlgebra(AnalogCircuitTransformer):
     def visit_OpMul(self, model: OpMul):
-        if isinstance(model.op1, PauliI):
-            return self.visit(model.op2)
-        if isinstance(model.op2, PauliI):
-            return self.visit(model.op1)
-        if model.op1 == model.op2:
-            return PauliI()
         if isinstance(model.op1, Pauli) and isinstance(model.op2, Pauli):
+            if isinstance(model.op1, PauliI):
+                return self.visit(model.op2)
+            if isinstance(model.op2, PauliI):
+                return self.visit(model.op1)
+            if model.op1 == model.op2:
+                return PauliI()
             if isinstance(model.op1, PauliX) and isinstance(model.op2, PauliY):
                 return OpScalarMul(op=PauliZ(), expr=MathImag())
             if isinstance(model.op1, PauliY) and isinstance(model.op2, PauliZ):
