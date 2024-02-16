@@ -6,7 +6,7 @@ from quantumion.interface.analog import *
 from quantumion.interface.math import MathExpr
 
 from quantumion.compiler.visitor import Visitor, Transformer
-from quantumion.compiler.math import PrintMathExpr
+from quantumion.compiler.math import PrintMathExpr, VerbosePrintMathExpr
 
 ########################################################################################
 
@@ -102,6 +102,10 @@ class PrintOperator(AnalogCircuitTransformer):
 
 
 class VerbosePrintOperator(PrintOperator):
+
+    def visit_MathExpr(self, model: MathExpr):
+        return model.accept(VerbosePrintMathExpr())
+
     def visit_OperatorBinaryOp(self, model: OperatorBinaryOp):
         s1 = (
             f"({self.visit(model.op1)})"
