@@ -68,12 +68,16 @@ class PrintOperator(AnalogCircuitTransformer):
     def visit_OperatorMul(self, model: OperatorMul):
         s1 = (
             f"({self.visit(model.op1)})"
-            if isinstance(model.op1, (OperatorAdd, OperatorSub, OperatorKron))
+            if isinstance(
+                model.op1, (OperatorAdd, OperatorSub, OperatorKron, OperatorScalarMul)
+            )
             else self.visit(model.op1)
         )
         s2 = (
             f"({self.visit(model.op2)})"
-            if isinstance(model.op2, (OperatorAdd, OperatorSub, OperatorKron))
+            if isinstance(
+                model.op2, (OperatorAdd, OperatorSub, OperatorKron, OperatorScalarMul)
+            )
             else self.visit(model.op2)
         )
 
@@ -83,12 +87,16 @@ class PrintOperator(AnalogCircuitTransformer):
     def visit_OperatorKron(self, model: OperatorKron):
         s1 = (
             f"({self.visit(model.op1)})"
-            if isinstance(model.op1, (OperatorAdd, OperatorSub, OperatorMul))
+            if isinstance(
+                model.op1, (OperatorAdd, OperatorSub, OperatorMul, OperatorScalarMul)
+            )
             else self.visit(model.op1)
         )
         s2 = (
             f"({self.visit(model.op2)})"
-            if isinstance(model.op2, (OperatorAdd, OperatorSub, OperatorMul))
+            if isinstance(
+                model.op2, (OperatorAdd, OperatorSub, OperatorMul, OperatorScalarMul)
+            )
             else self.visit(model.op2)
         )
 
