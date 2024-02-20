@@ -65,13 +65,14 @@ class TestRealFinalString(unittest.TestCase):
     def test_pauli_scalar_multiplication_nested_l1(self):
         """Testing scalar Pauli Multiplication with nested operations"""
         inp = (PauliX() * 3) @ PauliY() + (5 * PauliZ()) @ (2 * PauliI())
-        actual = "(3) * PauliX() @ PauliY() + (5) * PauliZ() @ (2) * PauliI()"
+        actual = "((3) * PauliX()) @ PauliY() + ((5) * PauliZ()) @ ((2) * PauliI())"
         self.assertEqual(test_function(inp), actual)
 
     def test_pauli_scalar_multiplication_nested_l2(self):
         """Testing scalar Pauli Multiplication with more nested operations"""
         inp = (PauliX() * 3) @ ((3*PauliY()+7*PauliY()) - (3 * PauliZ())) + (5*5 * PauliZ()) @ (2 * PauliI())
-        actual = "(3) * PauliX() @ ((3) * PauliY() + (7) * PauliY() - (3) * PauliZ()) + (25) * PauliZ() @ (2) * PauliI()"
+        pprint(inp)
+        actual = "((3) * PauliX()) @ ((3) * PauliY() + (7) * PauliY() - (3) * PauliZ()) + ((25) * PauliZ()) @ ((2) * PauliI())"
         self.assertEqual(test_function(inp), actual)
 
     def test_pauli_scalar_string_nested(self):
@@ -144,7 +145,7 @@ class TestComplexFinalString(unittest.TestCase):
     def test_pauli_nested_img(self):
         """Testing Pauli with nested img"""
         inp = PauliX() * 2j * (PauliI() + 8j * PauliY())
-        actual = "(0.0 + 1j * 2.0) * PauliX() * (PauliI() + (0.0 + 1j * 8.0) * PauliY())"
+        actual = "((0.0 + 1j * 2.0) * PauliX()) * (PauliI() + (0.0 + 1j * 8.0) * PauliY())"
         self.assertEqual(test_function(inp), actual)
 
 
