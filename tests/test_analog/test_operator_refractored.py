@@ -16,7 +16,8 @@ def test_function(operator: Operator, visitor = PrintOperator()) -> Operator:
     return operator.accept(visitor=visitor)
 
 @colorize(color=BLUE)
-class TestReal(unittest.TestCase):
+class TestRealFinalString(unittest.TestCase):
+    """Testing the final string produced with the actual for real number expressions"""
     maxDiff = None
 
     def test_pauli_add(self):
@@ -126,7 +127,8 @@ class TestReal(unittest.TestCase):
         raise NotImplementedError
 
 @colorize(color=MAGENTA)
-class TestComplex(unittest.TestCase):
+class TestComplexFinalString(unittest.TestCase):
+    """Testing the final string produced with the actual for complex number expressions"""
     def test_pauli_left_img(self):
         """Testing Pauli with left img"""
         inp = 2j*PauliX()
