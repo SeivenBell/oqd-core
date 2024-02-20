@@ -8,6 +8,12 @@ from quantumion.compiler.analog.base import AnalogCircuitTransformer, PrintOpera
 
 ########################################################################################
 
+__all__ = [
+    "VerifyHilbertSpace",
+]
+
+########################################################################################
+
 
 class VerifyHilbertSpace(AnalogCircuitTransformer):
     def _visit(self, model):

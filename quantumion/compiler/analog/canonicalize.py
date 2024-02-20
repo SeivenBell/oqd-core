@@ -7,6 +7,19 @@ from quantumion.interface.analog import *
 
 from quantumion.compiler.analog.base import AnalogCircuitTransformer
 
+########################################################################################
+
+__all__ = [
+    "PruneIdentity",
+    "PauliAlgebra",
+    "GatherMathExpr",
+    "GatherPauli",
+    "OperatorDistribute",
+    "ProperOrder",
+    "NormalOrder",
+    "TermIndex",
+    "SortedOrder",
+]
 
 ########################################################################################
 
