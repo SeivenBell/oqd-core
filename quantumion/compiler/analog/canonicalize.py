@@ -2,10 +2,10 @@ from typing import Any, Union
 
 ########################################################################################
 
-from quantumion.interface.math import MathNum, MathImag, MathAdd
+from quantumion.interface.math import MathNum, MathImag, MathAdd, MathExpr
 from quantumion.interface.analog import *
 
-from quantumion.compiler.analog.base import AnalogCircuitTransformer
+from quantumion.compiler.analog.base import AnalogCircuitTransformer, AnalogCircuitVisitor
 
 ########################################################################################
 
@@ -19,6 +19,8 @@ __all__ = [
     "NormalOrder",
     "TermIndex",
     "SortedOrder",
+    "CanonicalizationVerificationOperator",
+    "CanonicalFormError"
 ]
 
 ########################################################################################
@@ -340,3 +342,80 @@ class SortedOrder(AnalogCircuitTransformer):
             if term1[i] == term2[i]:
                 i += 1
                 continue
+
+class CanonicalFormError(Exception):
+    """
+    Error class for canonical form (maybe we need it to put it elsewhere)
+    """
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
+
+class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
+    def visit_OperatorAdd(self, model: OperatorAdd):
+        if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, OperatorScalarMul):
+            self.visit(model.op1)
+        elif isinstance(model.op1, OperatorScalarMul) and isinstance(model.op2, OperatorScalarMul):
+            self.visit(model.op2)
+        else:
+            raise CanonicalFormError("Incorrect canonical addition")
+        
+    def visit_OperatorMul(self, model: OperatorMul):
+        _allowed_prod_ops = Union[Annihilation, 
+                                  Creation, 
+                                  Identity,
+                                  OperatorMul,
+                                  ]
+        """
+        OpMul should not have OpKron and Anhilitation or something else. It should not have opkron at all
+        """
+        if isinstance(model.op1, OperatorMul):
+            self.visit(model=model.op1)
+
+        if isinstance(model.op2, OperatorMul):
+            self.visit(model = model.op2)
+
+        if not (isinstance(model.op1, _allowed_prod_ops) and isinstance(model.op2, _allowed_prod_ops)):
+            raise CanonicalFormError("Incorrect canonical Operator multiplication")
+
+        
+    def visit_OperatorKron(self, model: OperatorKron):
+        _allowed_ops = Union[PauliX, 
+                             PauliY, 
+                             PauliZ, 
+                             PauliI, 
+                             Annihilation, 
+                             Creation, 
+                             Identity,
+                             OperatorMul,
+                             OperatorKron,
+                             ]
+        if isinstance(model.op1, (OperatorMul, OperatorKron)):
+            self.visit(model=model.op1)
+        
+        if isinstance(model.op2, (OperatorMul, OperatorKron)):
+            self.visit(model=model.op2)
+        
+        if not(isinstance(model.op1, _allowed_ops) and isinstance(model.op2, _allowed_ops)): # terminal
+            raise CanonicalFormError("Incorrect canonical kron")
+        
+
+# class CanonicalizationVerificationScalarMul(AnalogCircuitVisitor):
+#     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+#         if not (isinstance(model.expr, MathExpr) and isinstance(model.op, Operator)):
+#             raise NotCanonicalFormError("Incorrect canonical addition")
+
+if __name__ == '__main__':
+    from rich import print as pprint
+    X, Y, Z, I = PauliX(), PauliY(), PauliZ(), PauliI()
+    A, C, LI =  Annihilation(), Creation(), Identity()
+
+    test_op = X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))
+    test_op = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A) + 7 * (Z @ A*C)
+    test_op = 1*(I @ (A*A)) + 3*(X @ (A*A))# + 7*(X @ A*A) + 6* (Z @ (A*A)) + 7 * (Z @ (A*C))
+    ### test with nested addition and it seems to work
+    test_op = 2*(I @ (A*C) @ X @ (C*A*A*A*C*LI*A) @ (X * Y)) 
+    #test_op = X @ (Y @ (Y @ (X * Y)))
+    #test_op = 3*X + (X@X) + 2*(X)
+    pprint(test_op)
+    pprint(test_op.accept(CanonicalizationVerificationOperator()))
