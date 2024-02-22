@@ -352,11 +352,25 @@ class CanonicalFormError(Exception):
         super().__init__(message)
 
 class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
+    def __init__(self):
+        self.allowed_ops = Union[
+            PauliX, 
+            PauliY, 
+            PauliZ, 
+            PauliI, 
+            Annihilation, 
+            Creation, 
+            Identity,
+            OperatorMul,
+            OperatorKron,
+        ]
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, OperatorScalarMul):
             self.visit(model.op1)
-        elif isinstance(model.op1, OperatorScalarMul) and isinstance(model.op2, OperatorScalarMul):
             self.visit(model.op2)
+        elif isinstance(model.op1, OperatorScalarMul) and isinstance(model.op2, OperatorScalarMul):
+            self.visit(model.op1)
+            self.visit(model.op2)        
         else:
             raise CanonicalFormError("Incorrect canonical addition")
         
@@ -380,30 +394,25 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
 
         
     def visit_OperatorKron(self, model: OperatorKron):
-        _allowed_ops = Union[PauliX, 
-                             PauliY, 
-                             PauliZ, 
-                             PauliI, 
-                             Annihilation, 
-                             Creation, 
-                             Identity,
-                             OperatorMul,
-                             OperatorKron,
-                             ]
         if isinstance(model.op1, (OperatorMul, OperatorKron)):
             self.visit(model=model.op1)
         
         if isinstance(model.op2, (OperatorMul, OperatorKron)):
             self.visit(model=model.op2)
         
-        if not(isinstance(model.op1, _allowed_ops) and isinstance(model.op2, _allowed_ops)): # terminal
+        if not(isinstance(model.op1, self.allowed_ops) and isinstance(model.op2, self.allowed_ops)): # terminal
             raise CanonicalFormError("Incorrect canonical kron")
         
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+        if isinstance(model.op, self.allowed_ops): # paulis and ladders are needed for edge cases (i.e. for single register systems)
+            self.visit(model = model.op)
+        else:
+            raise CanonicalFormError("Incorrect canonical scalar operator multiplication")
+        
+    def visit_OperatorSub(self, model: OperatorSub):
+        if isinstance(model, OperatorSub):
+            raise CanonicalFormError("Subtraction of terms present")
 
-# class CanonicalizationVerificationScalarMul(AnalogCircuitVisitor):
-#     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
-#         if not (isinstance(model.expr, MathExpr) and isinstance(model.op, Operator)):
-#             raise NotCanonicalFormError("Incorrect canonical addition")
 
 if __name__ == '__main__':
     from rich import print as pprint
@@ -414,7 +423,10 @@ if __name__ == '__main__':
     test_op = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A) + 7 * (Z @ A*C)
     test_op = 1*(I @ (A*A)) + 3*(X @ (A*A))# + 7*(X @ A*A) + 6* (Z @ (A*A)) + 7 * (Z @ (A*C))
     ### test with nested addition and it seems to work
-    test_op = 2*(I @ (A*C) @ X @ (C*A*A*A*C*LI*A) @ (X * Y)) 
+    #@test_op = 2*(I @ (A*C) @ X @ (C*A*A*A*C*LI*A) @ (X * Y)) 
+    test_op = (3*(I*I)) + (2*(X*X))
+    test_op = (3*(3*(3*(A*A)))) + (2*(C*C))
+    test_op = 1*I + 2*X
     #test_op = X @ (Y @ (Y @ (X * Y)))
     #test_op = 3*X + (X@X) + 2*(X)
     pprint(test_op)

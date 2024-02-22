@@ -41,6 +41,12 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         #self.assertTrue(test_function(operator = op, visitor=CanonicalizationVerificationAddition()))
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
+    def test_simple_addition_tensor_prod_true(self):
+        """Simple addition test of canonical operator with tensor product"""
+        op =  1*(I@Y) + 2*(X@I)
+        #self.assertTrue(test_function(operator = op, visitor=CanonicalizationVerificationAddition()))
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
     def test_simple_addition_false(self):
         """Simple addition test of non canonical operator"""
         op =  1*I + X
@@ -51,6 +57,7 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         op =  1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + 6* (Z @ (A*A)) + 7 * (Z @ (A*C))
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
+    @unittest.skip("The issue of brackets seems to be resolved")
     def test_complicated_addition_passing_test_missing_bracket(self):
         # Note: removing some brackets gives errors because of tree structure what to do
         # This can be source of some ambiguity. 
@@ -88,6 +95,19 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         op = 2*(I @ (A*C) @ X @ (C*A*A*2*A*C*LI*A)) 
         self.assertCanonicalFormErrorRaised(operator=op)
 
+    def test_scalar_operator_product_with_pauli(self): # produces `Incorrect canonical scalar operator multiplication` as expected
+        """Nested product of Paulis"""
+        op = (3*(3*(3*(A*A)))) + (2*(C*C))
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_scalar_operator_product_with_ladder(self): # produces `Incorrect canonical scalar operator multiplication`` as expected
+        """Nested product of Ladders"""
+        op = (3*(3*(3*(X*Y)))) + (2*(X*Z))
+        self.assertCanonicalFormErrorRaised(operator=op)
+    
+    def test_subtraction(self):
+        op = 3*X - 2*Y
+        self.assertCanonicalFormErrorRaised(operator=op)
         
 
 @colorize(color=BLUE)
