@@ -101,11 +101,18 @@ class UnitBase(TypeReflectBaseModel):
             scale=self.scale * other.scale, dimension=self.dimension * other.dimension
         )
 
+    def __rmul__(self, other):
+        return self * other
+
     def __truediv__(self, other):
         other = UnitBase.cast(other)
         return UnitBase(
             scale=self.scale / other.scale, dimension=self.dimension / other.dimension
         )
+
+    def __rtruediv__(self, other):
+        other = UnitBase.cast(other)
+        return other / self
 
     def __pow__(self, other):
         assert isinstance(other, (int, float))
@@ -114,7 +121,7 @@ class UnitBase(TypeReflectBaseModel):
 
 ########################################################################################
 
-unitless = UnitBase(scale=1, dimension=Dimensionless)
+unitless = UnitBase(scale=1.0, dimension=Dimensionless)
 
 deci = UnitBase(scale=1e-1, dimension=Dimensionless)
 centi = UnitBase(scale=1e-2, dimension=Dimensionless)
@@ -146,10 +153,10 @@ pi = UnitBase(scale=np.pi, dimension=Dimensionless)
 
 ########################################################################################s
 
-metre = UnitBase(scale=1, dimension=LengthDimension)
+metre = UnitBase(scale=1.0, dimension=LengthDimension)
 astronomicalunit = UnitBase(scale=1.495978707e11, dimension=LengthDimension)
 
-second = UnitBase(scale=1, dimension=TimeDimension)
+second = UnitBase(scale=1.0, dimension=TimeDimension)
 minute = UnitBase(scale=60, dimension=TimeDimension)
 hour = UnitBase(scale=3600, dimension=TimeDimension)
 day = UnitBase(scale=86400, dimension=TimeDimension)
@@ -161,23 +168,23 @@ lightyear = speedoflight * year
 
 ########################################################################################
 
-volt = UnitBase(scale=1, dimension=VoltageDimension)
+volt = UnitBase(scale=1.0, dimension=VoltageDimension)
 
 gram = UnitBase(scale=1e-3, dimension=MassDimension)
 atomicmassunit = UnitBase(scale=1.66053906660e-27, dimension=MassDimension)
 
-joule = UnitBase(scale=1, dimension=EnergyDimension)
+joule = UnitBase(scale=1.0, dimension=EnergyDimension)
 electronvolt = UnitBase(scale=1.602176634e-19, dimension=EnergyDimension)
 
-watt = UnitBase(scale=1, dimension=PowerDimension)
+watt = UnitBase(scale=1.0, dimension=PowerDimension)
 
-newton = UnitBase(scale=1, dimension=ForceDimension)
+newton = UnitBase(scale=1.0, dimension=ForceDimension)
 
 ########################################################################################
 
-ampere = UnitBase(scale=1, dimension=CurrentDimension)
+ampere = UnitBase(scale=1.0, dimension=CurrentDimension)
 
-coulomb = UnitBase(scale=1, dimension=ChargeDimension)
+coulomb = UnitBase(scale=1.0, dimension=ChargeDimension)
 elementarycharge = UnitBase(scale=1.602176634e-19, dimension=ChargeDimension)
 
 
@@ -232,4 +239,5 @@ class UnitfulMathExpr(TypeReflectBaseModel):
 ########################################################################################
 
 if __name__ == "__main__":
+    print(1 / second)
     pass
