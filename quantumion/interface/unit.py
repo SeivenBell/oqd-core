@@ -1,5 +1,7 @@
 from typing import Union
 
+import numpy as np
+
 ########################################################################################
 
 from quantumion.interface.base import TypeReflectBaseModel
@@ -73,6 +75,9 @@ AccelerationDimension = LengthDimension / TimeDimension**2
 ChargeDimension = CurrentDimension * TimeDimension
 EnergyDimension = MassDimension * LengthDimension**2 / TimeDimension**2
 FrequencyDimension = TimeDimension ** (-1)
+VoltageDimension = EnergyDimension / ChargeDimension
+PowerDimension = EnergyDimension / TimeDimension
+ForceDimension = MassDimension * LengthDimension / TimeDimension**2
 
 ########################################################################################
 
@@ -107,52 +112,98 @@ class UnitBase(TypeReflectBaseModel):
         return UnitBase(scale=self.scale**other, dimension=self.dimension**other)
 
 
+########################################################################################
+
 unitless = UnitBase(scale=1, dimension=Dimensionless)
 
-metre = UnitBase(scale=1, dimension=LengthDimension)
-decimetre = UnitBase(scale=1e-1, dimension=LengthDimension)
-centimetre = UnitBase(scale=1e-2, dimension=LengthDimension)
-millimetre = UnitBase(scale=1e-3, dimension=LengthDimension)
-micrometre = UnitBase(scale=1e-6, dimension=LengthDimension)
-nanometre = UnitBase(scale=1e-9, dimension=LengthDimension)
-picometre = UnitBase(scale=1e-12, dimension=LengthDimension)
-femtometre = UnitBase(scale=1e-15, dimension=LengthDimension)
-attometre = UnitBase(scale=1e-18, dimension=LengthDimension)
-zeptometre = UnitBase(scale=1e-21, dimension=LengthDimension)
-yactometre = UnitBase(scale=1e-24, dimension=LengthDimension)
-kilometre = UnitBase(scale=1e3, dimension=LengthDimension)
-megametre = UnitBase(scale=1e6, dimension=LengthDimension)
-gigametre = UnitBase(scale=1e9, dimension=LengthDimension)
-terametre = UnitBase(scale=1e12, dimension=LengthDimension)
-petametre = UnitBase(scale=1e15, dimension=LengthDimension)
-exametre = UnitBase(scale=1e18, dimension=LengthDimension)
-zettametre = UnitBase(scale=1e21, dimension=LengthDimension)
-yottametre = UnitBase(scale=1e24, dimension=LengthDimension)
-ronnametre = UnitBase(scale=1e27, dimension=LengthDimension)
+deci = UnitBase(scale=1e-1, dimension=Dimensionless)
+centi = UnitBase(scale=1e-2, dimension=Dimensionless)
+milli = UnitBase(scale=1e-3, dimension=Dimensionless)
+micro = UnitBase(scale=1e-6, dimension=Dimensionless)
+nano = UnitBase(scale=1e-9, dimension=Dimensionless)
+pico = UnitBase(scale=1e-12, dimension=Dimensionless)
+femto = UnitBase(scale=1e-15, dimension=Dimensionless)
+atto = UnitBase(scale=1e-18, dimension=Dimensionless)
+zepto = UnitBase(scale=1e-21, dimension=Dimensionless)
+yocto = UnitBase(scale=1e-24, dimension=Dimensionless)
+ronto = UnitBase(scale=1e-27, dimension=Dimensionless)
+quecto = UnitBase(scale=1e-30, dimension=Dimensionless)
 
+
+deca = UnitBase(scale=1e1, dimension=Dimensionless)
+hecto = UnitBase(scale=1e2, dimension=Dimensionless)
+kilo = UnitBase(scale=1e3, dimension=Dimensionless)
+mega = UnitBase(scale=1e6, dimension=Dimensionless)
+giga = UnitBase(scale=1e9, dimension=Dimensionless)
+tera = UnitBase(scale=1e12, dimension=Dimensionless)
+peta = UnitBase(scale=1e15, dimension=Dimensionless)
+exa = UnitBase(scale=1e18, dimension=Dimensionless)
+zetta = UnitBase(scale=1e21, dimension=Dimensionless)
+yotta = UnitBase(scale=1e24, dimension=Dimensionless)
+ronna = UnitBase(scale=1e27, dimension=Dimensionless)
+quetta = UnitBase(scale=1e30, dimension=Dimensionless)
+
+pi = UnitBase(scale=np.pi, dimension=Dimensionless)
+
+########################################################################################s
+
+metre = UnitBase(scale=1, dimension=LengthDimension)
+astronomicalunit = UnitBase(scale=1.495978707e11, dimension=LengthDimension)
 
 second = UnitBase(scale=1, dimension=TimeDimension)
-decisecond = UnitBase(scale=1e-1, dimension=TimeDimension)
-centisecond = UnitBase(scale=1e-2, dimension=TimeDimension)
-millisecond = UnitBase(scale=1e-3, dimension=TimeDimension)
-microsecond = UnitBase(scale=1e-6, dimension=TimeDimension)
-nanosecond = UnitBase(scale=1e-9, dimension=TimeDimension)
-picosecond = UnitBase(scale=1e-12, dimension=TimeDimension)
-femtosecond = UnitBase(scale=1e-15, dimension=TimeDimension)
-attosecond = UnitBase(scale=1e-18, dimension=TimeDimension)
-zeptosecond = UnitBase(scale=1e-21, dimension=TimeDimension)
-yactosecond = UnitBase(scale=1e-24, dimension=TimeDimension)
-kilosecond = UnitBase(scale=1e3, dimension=TimeDimension)
-megasecond = UnitBase(scale=1e6, dimension=TimeDimension)
-gigasecond = UnitBase(scale=1e9, dimension=TimeDimension)
-terasecond = UnitBase(scale=1e12, dimension=TimeDimension)
-petasecond = UnitBase(scale=1e15, dimension=TimeDimension)
-exasecond = UnitBase(scale=1e18, dimension=TimeDimension)
-zettasecond = UnitBase(scale=1e21, dimension=TimeDimension)
-yottasecond = UnitBase(scale=1e24, dimension=TimeDimension)
-ronnasecond = UnitBase(scale=1e27, dimension=TimeDimension)
-minute = UnitBase(scale=6e2, dimension=TimeDimension)
-hour = UnitBase(scale=3.6e3, dimension=TimeDimension)
+minute = UnitBase(scale=60, dimension=TimeDimension)
+hour = UnitBase(scale=3600, dimension=TimeDimension)
+day = UnitBase(scale=86400, dimension=TimeDimension)
+year = UnitBase(scale=31557600, dimension=TimeDimension)
+
+coulomb = UnitBase(scale=1, dimension=ChargeDimension)
+elementarycharge = UnitBase(scale=1.602176634e-19, dimension=ChargeDimension)
+
+ampere = UnitBase(scale=1, dimension=CurrentDimension)
+
+volt = UnitBase(scale=1, dimension=VoltageDimension)
+
+watt = UnitBase(scale=1, dimension=PowerDimension)
+
+joule = UnitBase(scale=1, dimension=EnergyDimension)
+electronvolt = UnitBase(scale=1.602176634e-19, dimension=EnergyDimension)
+
+speedoflight = UnitBase(scale=299792458, dimension=VelocityDimension)
+
+lightyear = speedoflight * year
+
+gram = UnitBase(scale=1e-3, dimension=MassDimension)
+atomicmassunit = UnitBase(scale=1.66053906660e-27, dimension=MassDimension)
+
+newton = UnitBase(scale=1, dimension=ForceDimension)
+
+########################################################################################
+
+planckconstant = UnitBase(
+    scale=6.62607015e-34, dimension=EnergyDimension * TimeDimension
+)
+reducedplanckconstant = planckconstant / (pi * 2)
+
+boltzmannconstant = UnitBase(
+    scale=1.380649e-23, dimension=EnergyDimension / TemperatureDimension
+)
+
+avogadroconstant = UnitBase(scale=6.02214076e23, dimension=SubstanceDimension ** (-1))
+
+gravitationalconstant = UnitBase(
+    scale=6.67430e-11, dimension=ForceDimension * LengthDimension**2 / MassDimension**2
+)
+
+
+plancklength = (reducedplanckconstant * gravitationalconstant / speedoflight**3) ** 0.5
+plancktime = (reducedplanckconstant * gravitationalconstant / speedoflight**5) ** 0.5
+planckmass = (reducedplanckconstant * speedoflight / gravitationalconstant) ** 0.5
+plancktemperature = (
+    reducedplanckconstant
+    * speedoflight**5
+    / (gravitationalconstant * boltzmannconstant**2)
+) ** 0.5
+
 
 ########################################################################################
 
@@ -177,4 +228,4 @@ class UnitfulMathExpr(TypeReflectBaseModel):
 ########################################################################################
 
 if __name__ == "__main__":
-    print(kilometre / hour)
+    pass
