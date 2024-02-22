@@ -1,4 +1,6 @@
-from typing import Union
+from typing import Union, Annotated
+
+from pydantic import BeforeValidator
 
 import numpy as np
 
@@ -97,8 +99,11 @@ class UnitBase(TypeReflectBaseModel):
 
     def __mul__(self, other):
         other = UnitBase.cast(other)
-        return UnitBase(
-            scale=self.scale * other.scale, dimension=self.dimension * other.dimension
+        return UnitMul(
+            scale=self.scale * other.scale,
+            dimension=self.dimension * other.dimension,
+            unit1=self,
+            unit2=other,
         )
 
     def __rmul__(self, other):
@@ -106,8 +111,11 @@ class UnitBase(TypeReflectBaseModel):
 
     def __truediv__(self, other):
         other = UnitBase.cast(other)
-        return UnitBase(
-            scale=self.scale / other.scale, dimension=self.dimension / other.dimension
+        return UnitDiv(
+            scale=self.scale / other.scale,
+            dimension=self.dimension / other.dimension,
+            unit1=self,
+            unit2=other,
         )
 
     def __rtruediv__(self, other):
@@ -116,7 +124,34 @@ class UnitBase(TypeReflectBaseModel):
 
     def __pow__(self, other):
         assert isinstance(other, (int, float))
-        return UnitBase(scale=self.scale**other, dimension=self.dimension**other)
+        return UnitPow(
+            scale=self.scale**other,
+            dimension=self.dimension**other,
+            unit=self,
+            exponent=other,
+        )
+
+
+########################################################################################
+
+CastUnitBase = Annotated[UnitBase, BeforeValidator(UnitBase.cast)]
+
+########################################################################################
+
+
+class UnitMul(UnitBase):
+    unit1: UnitBase
+    unit2: UnitBase
+
+
+class UnitDiv(UnitBase):
+    unit1: UnitBase
+    unit2: UnitBase
+
+
+class UnitPow(UnitBase):
+    unit: UnitBase
+    exponent: Union[int, float]
 
 
 ########################################################################################
@@ -248,6 +283,7 @@ class UnitfulMathExpr(TypeReflectBaseModel):
 ########################################################################################
 
 if __name__ == "__main__":
-    print(1 / (nano * second))
-    print(giga * hertz)
+    from rich import print as pprint
+
+    pprint((giga * hertz) ** 2)
     pass
