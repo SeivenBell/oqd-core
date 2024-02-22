@@ -232,7 +232,7 @@ class UnitfulMathExpr(TypeReflectBaseModel):
     def __mul__(self, other):
         return UnitfulMathExpr(self.expr * other.expr, self.unit * other.unit)
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         return UnitfulMathExpr(self.expr / other.expr, self.unit / other.unit)
 
 
