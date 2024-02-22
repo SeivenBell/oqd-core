@@ -217,6 +217,13 @@ plancktemperature = (
     / (gravitationalconstant * boltzmannconstant**2)
 ) ** 0.5
 
+########################################################################################
+
+kelvin = UnitBase(scale=1.0, dimension=TemperatureDimension)
+
+mole = UnitBase(scale=1.0, dimension=SubstanceDimension)
+
+candela = UnitBase(scale=1.0, dimension=LuminosityDimension)
 
 ########################################################################################
 
