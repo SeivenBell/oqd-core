@@ -377,13 +377,7 @@ class CanonicalizationVerificationOpSeq(AnalogCircuitVisitor):
 class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
     def __init__(self):
         self.allowed_ops = Union[
-            PauliX, 
-            PauliY, 
-            PauliZ, 
-            PauliI, 
-            Annihilation, 
-            Creation, 
-            Identity,
+            OperatorTerminal,
             OperatorMul,
             OperatorKron,
         ]
@@ -398,29 +392,27 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
             raise CanonicalFormError("Incorrect canonical addition")
         
     def visit_OperatorMul(self, model: OperatorMul):
-        _allowed_prod_ops = Union[Annihilation, 
-                                  Creation, 
-                                  Identity,
+        _allowed_prod_ops = Union[Ladder,
                                   OperatorMul,
                                   ]
         """
         OpMul should not have OpKron and Anhilitation or something else. It should not have opkron at all
         """
-        if isinstance(model.op1, OperatorMul):
+        if isinstance(model.op1, OperatorMul): # check op2 ladder
             self.visit(model=model.op1)
 
-        if isinstance(model.op2, OperatorMul):
+        if isinstance(model.op2, OperatorMul): # check op1 ladder
             self.visit(model = model.op2)
 
         if not (isinstance(model.op1, _allowed_prod_ops) and isinstance(model.op2, _allowed_prod_ops)):
-            raise CanonicalFormError("Incorrect canonical Operator multiplication")
+            raise CanonicalFormError("Incorrect canonical Operator multiplication") # pauli algebra not fully applied
 
         
     def visit_OperatorKron(self, model: OperatorKron):
         if isinstance(model.op1, (OperatorMul, OperatorKron)):
             self.visit(model=model.op1)
         
-        if isinstance(model.op2, (OperatorMul, OperatorKron)):
+        if isinstance(model.op2, (OperatorMul, OperatorKron)): # ProperOrder: no need and raise error for not proper order
             self.visit(model=model.op2)
         
         if not(isinstance(model.op1, self.allowed_ops) and isinstance(model.op2, self.allowed_ops)): # terminal
@@ -439,6 +431,7 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
 
 if __name__ == '__main__':
     from rich import print as pprint
+    from quantumion.compiler.analog import *
     X, Y, Z, I = PauliX(), PauliY(), PauliZ(), PauliI()
     A, C, LI =  Annihilation(), Creation(), Identity()
 
@@ -450,7 +443,15 @@ if __name__ == '__main__':
     test_op = (3*(I*I)) + (2*(X*X))
     test_op = (3*(3*(3*(A*A)))) + (2*(C*C))
     test_op = 1*X + 2*I
+    #test_op = 2*X*(A+Y) + 3*Y*Y
+    test_op = A * A * C
+    #test_op = X*(A+Y)
+    #test_op = 11*2*(2*(2*X*A))
+    #test_op = 2*X*(Z+Y) + 2 * Z + Z*(A*(A*(1*(6 * A*A))))
+    test_op = Z*A*(A*(1*(6 * A*A)))
+    test_op = 2*(I @ (Y*X) @ X @ (C*A*A*A*C*LI*A) @ (C*X)) 
+    #test_op = Z*A*A
     #test_op = X @ (Y @ (Y @ (X * Y)))
     #test_op = 3*X + (X@X) + 2*(X)
     pprint(test_op)
-    pprint(test_op.accept(CanonicalizationVerificationOpSeq()))
+    pprint(test_op.accept(VerifyHilbertSpace()))
