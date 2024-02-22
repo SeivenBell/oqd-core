@@ -129,7 +129,6 @@ yocto = UnitBase(scale=1e-24, dimension=Dimensionless)
 ronto = UnitBase(scale=1e-27, dimension=Dimensionless)
 quecto = UnitBase(scale=1e-30, dimension=Dimensionless)
 
-
 deca = UnitBase(scale=1e1, dimension=Dimensionless)
 hecto = UnitBase(scale=1e2, dimension=Dimensionless)
 kilo = UnitBase(scale=1e3, dimension=Dimensionless)
@@ -156,26 +155,31 @@ hour = UnitBase(scale=3600, dimension=TimeDimension)
 day = UnitBase(scale=86400, dimension=TimeDimension)
 year = UnitBase(scale=31557600, dimension=TimeDimension)
 
-coulomb = UnitBase(scale=1, dimension=ChargeDimension)
-elementarycharge = UnitBase(scale=1.602176634e-19, dimension=ChargeDimension)
-
-ampere = UnitBase(scale=1, dimension=CurrentDimension)
-
-volt = UnitBase(scale=1, dimension=VoltageDimension)
-
-watt = UnitBase(scale=1, dimension=PowerDimension)
-
-joule = UnitBase(scale=1, dimension=EnergyDimension)
-electronvolt = UnitBase(scale=1.602176634e-19, dimension=EnergyDimension)
-
 speedoflight = UnitBase(scale=299792458, dimension=VelocityDimension)
 
 lightyear = speedoflight * year
 
+########################################################################################
+
+volt = UnitBase(scale=1, dimension=VoltageDimension)
+
 gram = UnitBase(scale=1e-3, dimension=MassDimension)
 atomicmassunit = UnitBase(scale=1.66053906660e-27, dimension=MassDimension)
 
+joule = UnitBase(scale=1, dimension=EnergyDimension)
+electronvolt = UnitBase(scale=1.602176634e-19, dimension=EnergyDimension)
+
+watt = UnitBase(scale=1, dimension=PowerDimension)
+
 newton = UnitBase(scale=1, dimension=ForceDimension)
+
+########################################################################################
+
+ampere = UnitBase(scale=1, dimension=CurrentDimension)
+
+coulomb = UnitBase(scale=1, dimension=ChargeDimension)
+elementarycharge = UnitBase(scale=1.602176634e-19, dimension=ChargeDimension)
+
 
 ########################################################################################
 
