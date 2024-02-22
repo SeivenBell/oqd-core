@@ -140,17 +140,17 @@ CastUnitBase = Annotated[UnitBase, BeforeValidator(UnitBase.cast)]
 
 
 class UnitMul(UnitBase):
-    unit1: UnitBase
-    unit2: UnitBase
+    unit1: CastUnitBase
+    unit2: CastUnitBase
 
 
 class UnitDiv(UnitBase):
-    unit1: UnitBase
-    unit2: UnitBase
+    unit1: CastUnitBase
+    unit2: CastUnitBase
 
 
 class UnitPow(UnitBase):
-    unit: UnitBase
+    unit: CastUnitBase
     exponent: Union[int, float]
 
 
@@ -285,5 +285,4 @@ class UnitfulMathExpr(TypeReflectBaseModel):
 if __name__ == "__main__":
     from rich import print as pprint
 
-    pprint((giga * hertz) ** 2)
     pass
