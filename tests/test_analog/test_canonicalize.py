@@ -108,7 +108,11 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
     def test_subtraction(self):
         op = 3*X - 2*Y
         self.assertCanonicalFormErrorRaised(operator=op)
-        
+
+    @unittest.skip("Not implemenyed yet")
+    def test_proper(self):
+        op = X @ (Y @ Z)
+        self.assertCanonicalFormErrorRaised(operator=op)
 
 @colorize(color=BLUE)
 class TestGatherMathExpr(unittest.TestCase):

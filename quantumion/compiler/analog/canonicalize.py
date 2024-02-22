@@ -347,9 +347,10 @@ class CanonicalFormError(Exception):
     """
     Error class for canonical form (maybe we need it to put it elsewhere)
     """
-    def __init__(self, message):
-        self.message = message
-        super().__init__(message)
+    pass
+    # def __init__(self, message):
+    #     self.message = message
+    #     pass#super().__init__(message)
 
 class CanonicalizationVerificationOpSeq(AnalogCircuitVisitor):
     def __init__(self):
