@@ -166,6 +166,8 @@ speedoflight = UnitBase(scale=299792458, dimension=VelocityDimension)
 
 lightyear = speedoflight * year
 
+hertz = UnitBase(scale=1.0, dimension=FrequencyDimension)
+
 ########################################################################################
 
 volt = UnitBase(scale=1.0, dimension=VoltageDimension)
@@ -239,5 +241,6 @@ class UnitfulMathExpr(TypeReflectBaseModel):
 ########################################################################################
 
 if __name__ == "__main__":
-    print(1 / second)
+    print(1 / (nano * second))
+    print(giga * hertz)
     pass
