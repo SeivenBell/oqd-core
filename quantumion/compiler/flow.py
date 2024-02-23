@@ -1,10 +1,11 @@
-from typing import Any
+from typing import Any, List
 
 from abc import ABC, abstractmethod, abstractproperty
 
 ########################################################################################
 
 from quantumion.compiler.visitor import Visitor
+from quantumion.compiler.analog import *
 
 ########################################################################################
 
@@ -21,16 +22,15 @@ class FlowBase(ABC):
     pass
 
 
+########################################################################################
+
+
 class FlowNode(FlowBase):
 
     @property
     def namespace(self):
         _namespace = {self.name: self}
         return _namespace
-
-    @abstractmethod
-    def __call__(self, model: Any):
-        pass
 
 
 class VisitorFlowNode(FlowNode):
@@ -41,7 +41,7 @@ class VisitorFlowNode(FlowNode):
 
     def __call__(self, model: Any):
         model.accept(self.visitor)
-        return model
+        pass
 
     pass
 
@@ -51,110 +51,122 @@ class TransformFlowNode(VisitorFlowNode):
         return model.accept(self.visitor)
 
 
+class FlowTerminal(FlowNode):
+    pass
+
+
 class FlowGraph(FlowBase):
-    def __init__(self, nodes, rootnode=None, max_iter=10, **kwargs):
-        self.nodes = nodes
-        self.max_iter = max_iter
-        self._current_iter = 0
-
-        if rootnode:
-            if rootnode in self.namespace.keys():
-                self.rootnode = rootnode
-            raise NameError
-        else:
-            self.rootnode = self.nodes[0].name
-
-        super().__init__(**kwargs)
-        pass
+    nodes: List[FlowBase] = [FlowTerminal(name="terminal")]
+    rootnode: str = ""
 
     @property
     def namespace(self):
         _namespace = {self.name: self}
         for node in self.nodes:
-            overlap = set(node.namespace.keys()) & set(_namespace.keys())
-            if overlap:
-                raise NameError("Overlapping Namespace: {}".format(",".join(overlap)))
             _namespace.update(node.namespace)
         return _namespace
 
-    def __call__(self, model: Any):
-        for node in self:
-            model = node(model)
-        return model
+    def __init__(self, max_iter=10, verbose=False, **kwargs):
+        self._current_node = self.rootnode
+        self._current_iter = 0
+        self.max_iter = max_iter
+        self.verbose = verbose
+        super().__init__(**kwargs)
+
+    @property
+    def exceeded_max_iter(self):
+        if self.current_iter >= self.max_iter:
+            raise StopIteration
+        pass
+
+    @property
+    def current_node(self):
+        return self._current_node
+
+    @property
+    def current_iter(self):
+        return self._current_iter
 
     def __iter__(self):
-        self._current_iter = 0
         self._current_node = self.rootnode
+        self._current_iter = 0
         return self
 
     def __next__(self):
         self.exceeded_max_iter
-        self._current_iter += 1
-        return self.next()
-
-    def next(self):
-        print(self._current_node, end="->")
-        return getattr(self, "next_{}".format(self._current_node))()
-
-    @property
-    def exceeded_max_iter(self):
-        if self._current_iter >= self.max_iter:
+        if isinstance(self.namespace[self.current_node], FlowTerminal):
+            if self.verbose:
+                print(self.current_node)
             raise StopIteration
-        pass
 
-    pass
+        if self.verbose:
+            print(self.current_node, end=" --> ")
+
+        self._current_iter += 1
+
+        return getattr(self, "next_{}".format(self.current_node))
+
+    def __call__(self, model):
+        for node in self:
+            model = node(model)
+        return model
 
 
 class CanonicalizationFlow(FlowGraph):
-    def next_n1(self):
-        def step(model: Any):
-            model = self.namespace["n1"](model)
+    nodes = [
+        VisitorFlowNode(visitor=VerifyHilbertSpace(), name="n0"),
+        TransformFlowNode(visitor=OperatorDistribute(), name="n1"),
+        TransformFlowNode(visitor=ProperOrder(), name="n2"),
+        FlowTerminal(name="terminal"),
+    ]
+    rootnode = "n0"
+
+    def next_n0(self, model):
+        self.namespace[self.current_node](model)
+        self._current_node = "n1"
+        return model
+
+    def next_n1(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
             self._current_node = "n2"
-            return model
+        model = _model
+        return model
 
-        return step
+    def next_n2(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "terminal"
+        model = _model
+        return model
 
-    def next_n2(self):
-        def step(model: Any):
-            model = self.namespace["n2"](model)
-            self._current_node = "n1"
-            return model
 
-        return step
+class TestFlow(CanonicalizationFlow):
+    nodes = [
+        CanonicalizationFlow(name="g1", verbose=True),
+    ]
+    rootnode = "g1"
 
-    def next_g1(self):
-        def step(model: Any):
-            model = self.namespace["g1"](model)
-            self._current_node = "n3"
-            return model
-
-        return step
-
-    def next_n3(self):
-        def step(model: Any):
-            model = self.namespace["n3"](model)
-            self._current_node = "g1"
-            return model
-
-        return step
+    def next_g1(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "terminal"
+        model = _model
+        return model
 
 
 # ########################################################################################
 
 if __name__ == "__main__":
-    from quantumion.compiler.analog import *
+    from rich import print as pprint
     from quantumion.interface.analog import *
 
     I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
     A, C, J = Annihilation(), Creation(), Identity()
 
-    vfn = TransformFlowNode(visitor=OperatorDistribute(), name="n1")
-    vfn2 = TransformFlowNode(visitor=ProperOrder(), name="n2")
-    vfn3 = TransformFlowNode(visitor=ProperOrder(), name="n3")
+    op = I @ (X * (X + Y))
+    fg = CanonicalizationFlow(name="g1", verbose=False)
+    fg = TestFlow(name="g2", verbose=True)
 
-    fg = CanonicalizationFlow(nodes=(vfn, vfn2), name="g1")
-    fg2 = CanonicalizationFlow(nodes=(fg, vfn3), name="g2")
-
-    model = I * (X + X)
-    model = fg2(model)
-    print(model.accept(PrintOperator()))
+    op = fg(op)
+    pprint(op.accept(PrintOperator()))
