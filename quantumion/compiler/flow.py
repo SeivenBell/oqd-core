@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod, abstractproperty
 
 from quantumion.compiler.visitor import Visitor
 from quantumion.compiler.analog import *
+from quantumion.compiler.math import *
 
 ########################################################################################
 
@@ -72,7 +73,7 @@ class FlowGraph(FlowBase):
             _namespace.update(node.namespace)
         return _namespace
 
-    def __init__(self, max_iter=10, verbose=False, **kwargs):
+    def __init__(self, max_iter=1000, verbose=False, **kwargs):
         self._current_node = self.rootnode
         self._current_iter = 0
         self.max_iter = max_iter
@@ -82,7 +83,7 @@ class FlowGraph(FlowBase):
     @property
     def exceeded_max_iter(self):
         if self.current_iter >= self.max_iter:
-            raise StopIteration
+            raise RecursionError
         pass
 
     @property
@@ -102,11 +103,11 @@ class FlowGraph(FlowBase):
         self.exceeded_max_iter
         if isinstance(self.namespace[self.current_node], FlowTerminal):
             if self.verbose:
-                print(self.current_node)
+                print("({}: {})".format(self.current_iter, self.current_node))
             raise StopIteration
 
         if self.verbose:
-            print(self.current_node, end=" --> ")
+            print("({}: {})".format(self.current_iter, self.current_node), end=" --> ")
 
         self._current_iter += 1
 
@@ -120,40 +121,117 @@ class FlowGraph(FlowBase):
 
 class CanonicalizationFlow(FlowGraph):
     nodes = [
-        VisitorFlowNode(visitor=VerifyHilbertSpace(), name="n0"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="n1"),
-        TransformFlowNode(visitor=ProperOrder(), name="n2"),
+        VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
+        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
+        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
+        TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
+        TransformFlowNode(visitor=NormalOrder(), name="normal"),
+        TransformFlowNode(visitor=OperatorDistribute(), name="distribute2"),
+        TransformFlowNode(visitor=ProperOrder(), name="proper2"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformFlowNode(visitor=SortedOrder(), name="sorted"),
+        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
+        TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
+        TransformFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
         FlowTerminal(name="terminal"),
     ]
-    rootnode = "n0"
+    rootnode = "hspace"
 
-    def next_n0(self, model):
+    def next_hspace(self, model):
         self.namespace[self.current_node](model)
-        self._current_node = "n1"
+        self._current_node = "distribute"
         return model
 
-    def next_n1(self, model):
+    def next_distribute(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
-            self._current_node = "n2"
+            self._current_node = "proper"
         model = _model
         return model
 
-    def next_n2(self, model):
+    def next_proper(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
-            self._current_node = "terminal"
+            self._current_node = "gathermath"
         model = _model
         return model
 
+    def next_gathermath(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "gatherpauli"
+        model = _model
+        return model
 
-class TestFlow(CanonicalizationFlow):
-    nodes = [
-        CanonicalizationFlow(name="g1", verbose=True),
-    ]
-    rootnode = "g1"
+    def next_gatherpauli(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "paulialgebra"
+        model = _model
+        return model
 
-    def next_g1(self, model):
+    def next_paulialgebra(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "normal"
+        model = _model
+        return model
+
+    def next_normal(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "sorted"
+        else:
+            self._current_node = "distribute2"
+        model = _model
+        return model
+
+    def next_distribute2(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "proper2"
+        model = _model
+        return model
+
+    def next_proper2(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "gathermath2"
+        model = _model
+        return model
+
+    def next_gathermath2(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "normal"
+        model = _model
+        return model
+
+    def next_sorted(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "distmath"
+        model = _model
+        return model
+
+    def next_distmath(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "propermath"
+        model = _model
+        return model
+
+    def next_propermath(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "partmath"
+        model = _model
+        return model
+
+    def next_partmath(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
             self._current_node = "terminal"
@@ -166,13 +244,14 @@ class TestFlow(CanonicalizationFlow):
 if __name__ == "__main__":
     from rich import print as pprint
     from quantumion.interface.analog import *
+    from quantumion.interface.math import *
 
     I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
     A, C, J = Annihilation(), Creation(), Identity()
 
-    op = I @ (X * (X + Y))
-    # fg = CanonicalizationFlow(name="g1", verbose=False)
-    fg = TestFlow(name="g2", verbose=True)
+    # op = I @ (MathStr(string="1*(a+b)") * (X * (X + Y))) @ (A * A * C)
+    op = X @ (A * C) @ Y
+    fg = CanonicalizationFlow(name="g1", verbose=True)
 
     op = fg(op)
     pprint(op.accept(PrintOperator()))
