@@ -26,11 +26,14 @@ class FlowBase(ABC):
 
 
 class FlowNode(FlowBase):
-
     @property
     def namespace(self):
         _namespace = {self.name: self}
         return _namespace
+
+    @abstractmethod
+    def __call__(self, model: Any):
+        pass
 
 
 class VisitorFlowNode(FlowNode):
@@ -52,6 +55,9 @@ class TransformFlowNode(VisitorFlowNode):
 
 
 class FlowTerminal(FlowNode):
+    def __call__(self, model: Any):
+        raise NotImplementedError
+
     pass
 
 
@@ -165,7 +171,7 @@ if __name__ == "__main__":
     A, C, J = Annihilation(), Creation(), Identity()
 
     op = I @ (X * (X + Y))
-    fg = CanonicalizationFlow(name="g1", verbose=False)
+    # fg = CanonicalizationFlow(name="g1", verbose=False)
     fg = TestFlow(name="g2", verbose=True)
 
     op = fg(op)
