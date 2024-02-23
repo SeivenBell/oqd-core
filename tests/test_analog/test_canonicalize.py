@@ -18,20 +18,17 @@ def test_function(operator: Operator, visitor = PrintOperator()):
 
 class CanonicalFormErrors(unittest.TestCase):
 
-    def assertCanonicalFormErrorRaised(self, operator):
+    def assertCanonicalFormErrorRaised(self, operator, visitor = CanonicalizationVerificationOperator()):
         with self.assertRaises(CanonicalFormError) as context:
-            test_function(operator = operator, visitor=CanonicalizationVerificationOperator())
+            test_function(operator = operator, visitor=visitor)
         print(context.exception)
     
-    def assertCanonicalFormErrorNotRaised(self, operator):
+    def assertCanonicalFormErrorNotRaised(self, operator, visitor = CanonicalizationVerificationOperator()):
         with self.assertRaises(AssertionError) as context:
-            self.assertCanonicalFormErrorRaised(operator=operator)
+            self.assertCanonicalFormErrorRaised(operator=operator, visitor=visitor)
         print(context.exception)
 
-
-
-
-@colorize(color=BLUE)
+@colorize(color=MAGENTA)
 class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
 
@@ -121,6 +118,53 @@ class TestGatherMathExpr(unittest.TestCase):
     @unittest.skip("Not Implemented")
     def test_basic(self):
         raise NotImplementedError
+
+
+@colorize(color=BLUE)
+class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+    op = ((2*X) + Y) @ Z
+
+    def test_pauli_simple_fail(self):
+        """Simple failure with pauli"""
+        op = ((2*X) + Y) @ Z
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
+    def test_pauli_ladder_simple_fail(self):
+        """Simple failure with pauli and ladder"""
+        op = ((2*X) + A) @ Z
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
+    def test_pauli_simple_pass(self):
+        """Simple pass with pauli"""
+        op = (2*X)@Z + Y@Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
+    def test_pauli_ladder_simple_pass(self):
+        """Simple pass with pauli"""
+        op = (2*X)@Z + Y@Z + 2*(A*A*A*C)*(C*A*A)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
+    def test_pauli_nested_fail(self):
+        """Simple failure with nested pauli"""
+        op = Y*(X@(X@X*(X+X)))
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
+    def test_pauli_nested_pass(self):
+        """Simple pass with nested pauli"""
+        op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A) + 7 * (Z @ A*C)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
+    def test_complex_nested_pass(self):
+        """Complicated pass with nested pauli and ladder"""
+        op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A*A*A*A*A*C+A*C*C*C) + 7 * (Z @ A*C)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
+    def test_complex_nested_fail(self):
+        """Complicated fail with nested pauli and ladder"""
+        op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ (A*A*A*A*A*A*C+A*C*C*C)) + 7 * (Z @ A*C)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+
 
 if __name__ == '__main__':
     unittest.main()

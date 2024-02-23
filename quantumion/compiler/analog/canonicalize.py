@@ -20,7 +20,8 @@ __all__ = [
     "TermIndex",
     "SortedOrder",
     "CanonicalizationVerificationOperator",
-    "CanonicalFormError"
+    "CanonicalFormError",
+    "CanonicalizationVerificationOperatorDistribute",
 ]
 
 ########################################################################################
@@ -349,7 +350,7 @@ class CanonicalFormError(Exception):
     """
     pass
 
-class CanonicalizationVerificationOpSeq(AnalogCircuitVisitor):
+class CanonicalizationVerificationOpSeq(AnalogCircuitVisitor): # check using SortedOrder
     def __init__(self):
         self._current_pauli = None
         self._map_pauli_top_idx = {
@@ -429,6 +430,47 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
             raise CanonicalFormError("Subtraction of terms present")
 
 
+class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (OperatorMul, OperatorKron)):
+            self.visit_OperatorMulKron(model)
+        else:
+            return super(self.__class__, self)._visit(model)
+    
+    def visit_OperatorMulKron(self, model: (OperatorMul, OperatorKron)):
+        allowed_ops = Union[
+                    OperatorTerminal,
+                    Ladder,
+                    OperatorMul,
+                    OperatorScalarMul,
+                    OperatorKron,
+                ]
+        if not(isinstance(model.op1, allowed_ops) and isinstance(model.op2, allowed_ops)):
+            raise CanonicalFormError("Incomplete Operator Distribution")
+        else:
+            self.visit(model.op1)
+            self.visit(model.op2)
+
+class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
+    pass
+
+class CanonicalizationVerificationPauliAlgebra(AnalogCircuitVisitor):
+    pass
+
+class CanonicalizationVerificationGatherMathExpr(AnalogCircuitVisitor):
+    pass
+
+class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
+    pass
+
+class CanonicalizationVerificationProperOrder(AnalogCircuitVisitor):
+    pass
+
+class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
+    pass
+
+class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
+    pass
 if __name__ == '__main__':
     from rich import print as pprint
     from quantumion.compiler.analog import *
@@ -449,9 +491,21 @@ if __name__ == '__main__':
     #test_op = 11*2*(2*(2*X*A))
     #test_op = 2*X*(Z+Y) + 2 * Z + Z*(A*(A*(1*(6 * A*A))))
     test_op = Z*A*(A*(1*(6 * A*A)))
-    test_op = 2*(I @ (Y*X) @ X @ (C*A*A*A*C*LI*A) @ (C*X)) 
+    #test_op = 2*(I @ (Y*X) @ X @ (C*A*A*A*C*LI*A) @ (C*X)) 
     #test_op = Z*A*A
     #test_op = X @ (Y @ (Y @ (X * Y)))
     #test_op = 3*X + (X@X) + 2*(X)
+    ########################################################################
+    # distribute
+    test_op = X+Y*((2*X)+Y)*Z
+    test_op = Y*(X@(X@X*(X+X)))
+    test_op = X @ (Y+Z)
+    test_op = X @ Y + X @ (Z*Z)
+
     pprint(test_op)
-    pprint(test_op.accept(VerifyHilbertSpace()))
+    pprint(test_op.accept(OperatorDistribute()))
+    pprint(test_op.accept(CanonicalizationVerificationOperatorDistribute()))
+    ########################################################################
+    ### assumptions are needed -> without some assumptions of tree structure this is impossible.
+
+    # PauliAlgebra 
