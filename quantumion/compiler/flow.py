@@ -141,7 +141,7 @@ class FlowGraph(FlowBase):
     @property
     def exceeded_max_iter(self):
         if self.current_iter >= self.max_iter:
-            raise RecursionError
+            raise RecursionError(f"Exceeded number of iterations allowed for {self}")
         pass
 
     @property
@@ -153,9 +153,7 @@ class FlowGraph(FlowBase):
         if value in self.namespace.keys():
             self._current_node = value
             return
-        raise NameError(
-            f'No node named "{value}" in namespace of {self.__class__.__name__}'
-        )
+        raise NameError(f'No node named "{value}" in namespace of {self}')
 
     @property
     def next_node(self):
@@ -166,9 +164,7 @@ class FlowGraph(FlowBase):
         if value in self.namespace.keys():
             self._next_node = value
             return
-        raise NameError(
-            f'No node named "{value}" in namespace of {self.__class__.__name__}'
-        )
+        raise NameError(f'No node named "{value}" in namespace of {self}')
 
     @property
     def current_iter(self):
@@ -338,5 +334,3 @@ if __name__ == "__main__":
 
     op = fg(op)
     pprint(op.accept(PrintOperator()))
-
-    pprint(fg.traversal)
