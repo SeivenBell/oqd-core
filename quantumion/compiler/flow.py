@@ -20,6 +20,10 @@ class FlowBase(ABC):
     def __call__(self, model: Any):
         pass
 
+    @abstractproperty
+    def traversal(self):
+        pass
+
     pass
 
 
@@ -27,8 +31,15 @@ class FlowBase(ABC):
 
 
 class FlowNode(FlowBase):
+    def __init__(self, name, **kwargs):
+        super().__init__(name=name, **kwargs)
+
     def __call__(self, model: Any):
         raise NotImplementedError
+
+    @property
+    def traversal(self):
+        return None
 
     pass
 
@@ -177,32 +188,32 @@ class FlowGraph(FlowBase):
     def __iter__(self):
         self.current_node = self.rootnode
         self._current_iter = 0
-        self._traversal = {}
+        self._traversal = []
         return self
 
     def __next__(self):
         self.exceeded_max_iter
 
         if isinstance(self.namespace[self.current_node], FlowTerminal):
-            raise StopIteration
-
-        return self.forward
-
-    @property
-    def forward(self):
-        def _forward(model: Any):
-            model = getattr(self, "forward_{}".format(self.current_node))(model)
-
-            if isinstance(self.namespace[self.current_node], FlowNode):
-                self._traversal[self.current_iter] = self.namespace[
-                    self.current_node
-                ].name
-
-            if isinstance(self.namespace[self.current_node], FlowGraph):
-                self._traversal[self.current_iter] = (
+            self._traversal.append(
+                (
+                    self.current_iter,
                     self.namespace[self.current_node].name,
                     self.namespace[self.current_node].traversal,
                 )
+            )
+            raise StopIteration
+
+        def _forward(model: Any):
+            model = getattr(self, "forward_{}".format(self.current_node))(model)
+
+            self._traversal.append(
+                (
+                    self.current_iter,
+                    self.namespace[self.current_node].name,
+                    self.namespace[self.current_node].traversal,
+                )
+            )
 
             self.current_node = self.next_node
 
@@ -263,9 +274,9 @@ class CanonicalizationFlow(FlowGraph):
         TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
         NormalOrderFlow(name="normalflow"),
         TransformFlowNode(visitor=SortedOrder(), name="sorted"),
-        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
         TransformFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
+        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
@@ -329,8 +340,10 @@ if __name__ == "__main__":
     I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
     A, C, J = Annihilation(), Creation(), Identity()
 
-    op = X @ C @ (X * Y) @ (A * C * C * A * C * C) @ (X @ X @ A @ C)
+    op = X @ (A * A * C)
     fg = CanonicalizationFlow(name="g1")
 
     op = fg(op)
     pprint(op.accept(PrintOperator()))
+
+    pprint(fg.traversal)
