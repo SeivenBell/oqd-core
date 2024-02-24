@@ -111,12 +111,28 @@ class FlowGraph(FlowBase):
 
         self._current_iter += 1
 
-        return getattr(self, "next_{}".format(self.current_node))
+        return getattr(self, "forward_{}".format(self.current_node))
 
     def __call__(self, model):
         for node in self:
             model = node(model)
         return model
+
+    def forward_factory(method):
+        def _method(self, model: Any):
+            _model = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+
+            if model == _model:
+                self._current_node = instructions["done"]
+            elif "repeat" in instructions.keys():
+                self._current_node = instructions["repeat"]
+
+            model = _model
+            return model
+
+        return _method
 
 
 class CanonicalizationFlow(FlowGraph):
@@ -141,110 +157,66 @@ class CanonicalizationFlow(FlowGraph):
     ]
     rootnode = "hspace"
 
-    def next_hspace(self, model):
+    def forward_hspace(self, model):
         self.namespace[self.current_node](model)
         self._current_node = "distribute"
         return model
 
-    def next_distribute(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "gathermath"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_distribute(self, model):
+        return dict(done="gathermath")
 
-    def next_gathermath(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "proper"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_gathermath(self, model):
+        return dict(done="proper")
 
-    def next_proper(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "paulialgebra"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_proper(self, model):
+        return dict(done="paulialgebra")
 
-    def next_paulialgebra(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "gathermath2"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_paulialgebra(self, model):
+        return dict(done="gathermath2")
 
-    def next_gathermath2(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "gatherpauli"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_gathermath2(self, model):
+        return dict(done="gatherpauli")
 
-    def next_gatherpauli(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "normal"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_gatherpauli(self, model):
+        return dict(done="normal")
 
-    def next_normal(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "sorted"
-        else:
-            self._current_node = "distribute2"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_normal(self, model):
+        return dict(done="sorted", repeat="distribute2")
 
-    def next_distribute2(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "gathermath3"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_distribute2(self, model):
+        return dict(done="gathermath3")
 
-    def next_gathermath3(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "proper2"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_gathermath3(self, model):
+        return dict(done="proper2")
 
-    def next_proper2(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "normal"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_proper2(self, model):
+        return dict(done="normal")
 
-    def next_sorted(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "distmath"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_sorted(self, model):
+        return dict(done="distmath")
 
-    def next_distmath(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "propermath"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_distmath(self, model):
+        return dict(done="propermath")
 
-    def next_propermath(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "partmath"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_propermath(self, model):
+        return dict(done="partmath")
 
-    def next_partmath(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "terminal"
-        model = _model
-        return model
+    @FlowGraph.forward_factory
+    def forward_partmath(self, model):
+        return dict(done="terminal")
 
 
 # ########################################################################################
