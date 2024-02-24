@@ -90,7 +90,7 @@ class ForwardDecorators:
         return _method
 
     @staticmethod
-    def forward_branch(method):
+    def forward_return(method):
         def _method(self, model: Any):
             _model = self.namespace[self.current_node](model)
 
@@ -98,8 +98,8 @@ class ForwardDecorators:
 
             if model == _model:
                 self.next_node = instructions["done"]
-            elif "branch" in instructions.keys():
-                self.next_node = instructions["branch"]
+            elif "return" in instructions.keys():
+                self.next_node = instructions["return"]
 
             model = _model
             return model
