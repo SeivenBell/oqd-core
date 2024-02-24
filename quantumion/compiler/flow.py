@@ -16,8 +16,8 @@ class FlowBase(ABC):
         self.name = name
         pass
 
-    @abstractproperty
-    def namespace(self):
+    @abstractmethod
+    def __call__(self, model: Any):
         pass
 
     pass
@@ -27,14 +27,17 @@ class FlowBase(ABC):
 
 
 class FlowNode(FlowBase):
-    @property
-    def namespace(self):
-        _namespace = {self.name: self}
-        return _namespace
-
-    @abstractmethod
     def __call__(self, model: Any):
-        pass
+        raise NotImplementedError
+
+    pass
+
+
+class FlowTerminal(FlowNode):
+    def __call__(self, model: Any):
+        raise NotImplementedError
+
+    pass
 
 
 class VisitorFlowNode(FlowNode):
@@ -55,11 +58,56 @@ class TransformFlowNode(VisitorFlowNode):
         return model.accept(self.visitor)
 
 
-class FlowTerminal(FlowNode):
-    def __call__(self, model: Any):
-        raise NotImplementedError
+########################################################################################
 
-    pass
+
+class ForwardDecorators:
+    @staticmethod
+    def forward_once(method):
+        def _method(self, model: Any):
+            model = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+            self.next_node = instructions["done"]
+
+            return model
+
+        return _method
+
+    @staticmethod
+    def forward_fixed_point(method):
+        def _method(self, model: Any):
+            _model = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+
+            if model == _model:
+                self.next_node = instructions["done"]
+
+            model = _model
+            return model
+
+        return _method
+
+    @staticmethod
+    def forward_branch(method):
+        def _method(self, model: Any):
+            _model = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+
+            if model == _model:
+                self.next_node = instructions["done"]
+            elif "branch" in instructions.keys():
+                self.next_node = instructions["branch"]
+
+            model = _model
+            return model
+
+        return _method
+
+
+########################################################################################
 
 
 class FlowGraph(FlowBase):
@@ -68,19 +116,26 @@ class FlowGraph(FlowBase):
 
     @property
     def namespace(self):
-        _namespace = {self.name: self}
+        _namespace = {}
+        overlap = set()
         for node in self.nodes:
-            _namespace.update(node.namespace)
+            if node.name in _namespace.keys():
+                overlap.add(node.name)
+            _namespace[node.name] = node
+
+        if overlap:
+            raise NameError(
+                "Multiple nodes with names: {}".format(
+                    ", ".join({f'"{name}"' for name in overlap})
+                )
+            )
+
         return _namespace
 
-    def __init__(self, max_iter=1000, verbose=False, **kwargs):
+    def __init__(self, max_iter=1000, **kwargs):
         self.max_iter = max_iter
-        self.verbose = verbose
 
         super().__init__(**kwargs)
-
-        self._current_iter = 0
-        self.current_node = self.rootnode
         pass
 
     @property
@@ -103,59 +158,102 @@ class FlowGraph(FlowBase):
         )
 
     @property
+    def next_node(self):
+        return self._next_node
+
+    @next_node.setter
+    def next_node(self, value):
+        if value in self.namespace.keys():
+            self._next_node = value
+            return
+        raise NameError(
+            f'No node named "{value}" in namespace of {self.__class__.__name__}'
+        )
+
+    @property
     def current_iter(self):
         return self._current_iter
 
+    @property
+    def traversal(self):
+        return self._traversal
+
     def __iter__(self):
-        self._current_node = self.rootnode
+        self.current_node = self.rootnode
         self._current_iter = 0
+        self._traversal = {}
         return self
 
     def __next__(self):
         self.exceeded_max_iter
+
         if isinstance(self.namespace[self.current_node], FlowTerminal):
-            if self.verbose:
-                print("({}: {})".format(self.current_iter, self.current_node))
             raise StopIteration
 
-        if self.verbose:
-            print("({}: {})".format(self.current_iter, self.current_node), end=" --> ")
+        return self.forward
 
-        self._current_iter += 1
+    @property
+    def forward(self):
+        def _forward(model: Any):
+            model = getattr(self, "forward_{}".format(self.current_node))(model)
 
-        return getattr(self, "forward_{}".format(self.current_node))
+            if isinstance(self.namespace[self.current_node], FlowNode):
+                self._traversal[self.current_iter] = self.namespace[
+                    self.current_node
+                ].name
+
+            if isinstance(self.namespace[self.current_node], FlowGraph):
+                self._traversal[self.current_iter] = (
+                    self.namespace[self.current_node].name,
+                    self.namespace[self.current_node].traversal,
+                )
+
+            self.current_node = self.next_node
+
+            self._current_iter += 1
+            return model
+
+        return _forward
 
     def __call__(self, model):
         for node in self:
             model = node(model)
         return model
 
-    def forward_once(method):
-        def _method(self, model: Any):
-            model = self.namespace[self.current_node](model)
 
-            instructions = method(self, model)
-            self.current_node = instructions["done"]
+########################################################################################
 
-            return model
 
-        return _method
+class NormalOrderFlow(FlowGraph):
+    nodes = [
+        TransformFlowNode(visitor=NormalOrder(), name="normal"),
+        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
+        FlowTerminal(name="terminal"),
+    ]
+    rootnode = "normal"
 
-    def forward_fixed_point(method):
-        def _method(self, model: Any):
-            _model = self.namespace[self.current_node](model)
+    @ForwardDecorators.forward_once
+    def forward_normal(self, model):
+        return dict(done="distribute")
 
-            instructions = method(self, model)
+    @ForwardDecorators.forward_fixed_point
+    def forward_distribute(self, model):
+        return dict(done="gathermath")
 
-            if model == _model:
-                self.current_node = instructions["done"]
-            elif "repeat" in instructions.keys():
-                self.current_node = instructions["repeat"]
+    @ForwardDecorators.forward_fixed_point
+    def forward_gathermath(self, model):
+        return dict(done="proper")
 
-            model = _model
-            return model
+    @ForwardDecorators.forward_fixed_point
+    def forward_proper(self, model):
+        return dict(done="prune")
 
-        return _method
+    @ForwardDecorators.forward_fixed_point
+    def forward_prune(self, model):
+        return dict(done="terminal")
 
 
 class CanonicalizationFlow(FlowGraph):
@@ -167,11 +265,7 @@ class CanonicalizationFlow(FlowGraph):
         TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
         TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
         TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
-        TransformFlowNode(visitor=NormalOrder(), name="normal"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute2"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath3"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper2"),
-        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
+        NormalOrderFlow(name="normalflow"),
         TransformFlowNode(visitor=SortedOrder(), name="sorted"),
         TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
@@ -180,63 +274,51 @@ class CanonicalizationFlow(FlowGraph):
     ]
     rootnode = "hspace"
 
-    @FlowGraph.forward_once
+    @ForwardDecorators.forward_once
     def forward_hspace(self, model):
         return dict(done="distribute")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_distribute(self, model):
         return dict(done="gathermath")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_gathermath(self, model):
         return dict(done="proper")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_proper(self, model):
         return dict(done="paulialgebra")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_paulialgebra(self, model):
         return dict(done="gathermath2")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_gathermath2(self, model):
         return dict(done="gatherpauli")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_gatherpauli(self, model):
-        return dict(done="normal")
+        return dict(done="normalflow")
 
-    @FlowGraph.forward_fixed_point
-    def forward_normal(self, model):
-        return dict(done="sorted", repeat="distribute2")
+    @ForwardDecorators.forward_fixed_point
+    def forward_normalflow(self, model):
+        return dict(done="sorted")
 
-    @FlowGraph.forward_fixed_point
-    def forward_distribute2(self, model):
-        return dict(done="gathermath3")
-
-    @FlowGraph.forward_fixed_point
-    def forward_gathermath3(self, model):
-        return dict(done="proper2")
-
-    @FlowGraph.forward_fixed_point
-    def forward_proper2(self, model):
-        return dict(done="normal")
-
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_sorted(self, model):
         return dict(done="distmath")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_distmath(self, model):
         return dict(done="propermath")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_propermath(self, model):
         return dict(done="partmath")
 
-    @FlowGraph.forward_fixed_point
+    @ForwardDecorators.forward_fixed_point
     def forward_partmath(self, model):
         return dict(done="terminal")
 
@@ -252,7 +334,9 @@ if __name__ == "__main__":
     A, C, J = Annihilation(), Creation(), Identity()
 
     op = X @ C @ (X * Y) @ (A * C * C * A * C * C) @ (X @ X @ A @ C)
-    fg = CanonicalizationFlow(name="g1", verbose=True)
+    fg = CanonicalizationFlow(name="g1")
 
     op = fg(op)
     pprint(op.accept(PrintOperator()))
+
+    pprint(fg.traversal)
