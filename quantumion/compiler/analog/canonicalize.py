@@ -22,6 +22,7 @@ __all__ = [
     "CanonicalizationVerificationOperator",
     "CanonicalFormError",
     "CanonicalizationVerificationOperatorDistribute",
+    "CanonicalizationVerificationGatherMathExpr",
 ]
 
 ########################################################################################
@@ -435,7 +436,7 @@ class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
         if isinstance(model, (OperatorMul, OperatorKron)):
             self.visit_OperatorMulKron(model)
         else:
-            return super(self.__class__, self)._visit(model)
+            super(self.__class__, self)._visit(model)
     
     def visit_OperatorMulKron(self, model: (OperatorMul, OperatorKron)):
         allowed_ops = Union[
@@ -451,13 +452,25 @@ class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
             self.visit(model.op1)
             self.visit(model.op2)
 
+class CanonicalizationVerificationGatherMathExpr(AnalogCircuitVisitor):
+    """Assuming that OperatorDistribute has already been fully ran"""
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (OperatorMul, OperatorKron)):
+            self.visit_OperatorMulKron(model)
+        else:
+            super(self.__class__, self)._visit(model)
+    
+    def visit_OperatorMulKron(self, model: (OperatorMul, OperatorKron)):
+        if isinstance(model.op1, OperatorScalarMul) or isinstance(model.op2, OperatorScalarMul):
+            raise CanonicalFormError("Incomplete Gather Math Expression")
+        else:
+            self.visit(model.op1)
+            self.visit(model.op2)
+
 class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
     pass
 
 class CanonicalizationVerificationPauliAlgebra(AnalogCircuitVisitor):
-    pass
-
-class CanonicalizationVerificationGatherMathExpr(AnalogCircuitVisitor):
     pass
 
 class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
@@ -496,15 +509,14 @@ if __name__ == '__main__':
     #test_op = X @ (Y @ (Y @ (X * Y)))
     #test_op = 3*X + (X@X) + 2*(X)
     ########################################################################
-    # distribute
-    test_op = X+Y*((2*X)+Y)*Z
-    test_op = Y*(X@(X@X*(X+X)))
-    test_op = X @ (Y+Z)
-    test_op = X @ Y + X @ (Z*Z)
+    # math expre
+    # test_op = 2*(X@(7*Y*(1j+2)*Y)) + 6*(Z@(-3j*Y)) 
+    # test_op = X * ((2+3)*X)
+    test_op = 5*(X*X)
 
     pprint(test_op)
-    pprint(test_op.accept(OperatorDistribute()))
-    pprint(test_op.accept(CanonicalizationVerificationOperatorDistribute()))
+    #pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()))#.accept(PrintOperator()))
+    pprint(test_op.accept(CanonicalizationVerificationGatherMathExpr()))
     ########################################################################
     ### assumptions are needed -> without some assumptions of tree structure this is impossible.
 

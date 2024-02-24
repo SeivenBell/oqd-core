@@ -111,14 +111,6 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         op = X @ (Y @ Z)
         self.assertCanonicalFormErrorRaised(operator=op)
 
-@colorize(color=BLUE)
-class TestGatherMathExpr(unittest.TestCase):
-    maxDiff = None
-
-    @unittest.skip("Not Implemented")
-    def test_basic(self):
-        raise NotImplementedError
-
 
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, unittest.TestCase):
@@ -164,7 +156,39 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, un
         op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ (A*A*A*A*A*A*C+A*C*C*C)) + 7 * (Z @ A*C)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
 
+    def test_complex_pauli_pass(self):
+        """Complicated test with complex numers"""
+        op = 2*(X@(7*Y*(1j+2)*Y)) + 6*(Z@(-3j*Y)) 
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
 
+@colorize(color=BLUE)
+class TestCanonicalizationVerificationGatherMathExpr(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def test_pauli_simple_pass(self):
+        """Simple Pauli passing"""
+        op = 2*(X@Z) + Y@Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+
+    def test_pauli_simple_fail(self):
+        """Simple Pauli passing"""
+        op = (2*X)@Z + Y@Z
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+
+    def test_pauli_simple_fail_one_term(self):
+        """Simple Pauli failing with 1 term"""
+        op = X * ((2+3)*X)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+
+    def test_pauli_complicated_pass(self):
+        """Complicated test passing with pauli and ladders"""
+        op = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*A*C*LI)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+
+    def test_pauli_complicated_fail(self):
+        """Complicated test failing with pauli and ladders"""
+        op = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*(1*A)*C*LI)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())
