@@ -45,7 +45,7 @@ class VisitorFlowNode(FlowNode):
 
     def __call__(self, model: Any):
         model.accept(self.visitor)
-        pass
+        return model
 
     pass
 
@@ -74,11 +74,14 @@ class FlowGraph(FlowBase):
         return _namespace
 
     def __init__(self, max_iter=1000, verbose=False, **kwargs):
-        self._current_node = self.rootnode
-        self._current_iter = 0
         self.max_iter = max_iter
         self.verbose = verbose
+
         super().__init__(**kwargs)
+
+        self._current_iter = 0
+        self.current_node = self.rootnode
+        pass
 
     @property
     def exceeded_max_iter(self):
@@ -89,6 +92,15 @@ class FlowGraph(FlowBase):
     @property
     def current_node(self):
         return self._current_node
+
+    @current_node.setter
+    def current_node(self, value):
+        if value in self.namespace.keys():
+            self._current_node = value
+            return
+        raise NameError(
+            f'No node named "{value}" in namespace of {self.__class__.__name__}'
+        )
 
     @property
     def current_iter(self):
@@ -118,16 +130,27 @@ class FlowGraph(FlowBase):
             model = node(model)
         return model
 
-    def forward_factory(method):
+    def forward_once(method):
+        def _method(self, model: Any):
+            model = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+            self.current_node = instructions["done"]
+
+            return model
+
+        return _method
+
+    def forward_fixed_point(method):
         def _method(self, model: Any):
             _model = self.namespace[self.current_node](model)
 
             instructions = method(self, model)
 
             if model == _model:
-                self._current_node = instructions["done"]
+                self.current_node = instructions["done"]
             elif "repeat" in instructions.keys():
-                self._current_node = instructions["repeat"]
+                self.current_node = instructions["repeat"]
 
             model = _model
             return model
@@ -157,64 +180,63 @@ class CanonicalizationFlow(FlowGraph):
     ]
     rootnode = "hspace"
 
+    @FlowGraph.forward_once
     def forward_hspace(self, model):
-        self.namespace[self.current_node](model)
-        self._current_node = "distribute"
-        return model
+        return dict(done="distribute")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_distribute(self, model):
         return dict(done="gathermath")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_gathermath(self, model):
         return dict(done="proper")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_proper(self, model):
         return dict(done="paulialgebra")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_paulialgebra(self, model):
         return dict(done="gathermath2")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_gathermath2(self, model):
         return dict(done="gatherpauli")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_gatherpauli(self, model):
         return dict(done="normal")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_normal(self, model):
         return dict(done="sorted", repeat="distribute2")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_distribute2(self, model):
         return dict(done="gathermath3")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_gathermath3(self, model):
         return dict(done="proper2")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_proper2(self, model):
         return dict(done="normal")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_sorted(self, model):
         return dict(done="distmath")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_distmath(self, model):
         return dict(done="propermath")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_propermath(self, model):
         return dict(done="partmath")
 
-    @FlowGraph.forward_factory
+    @FlowGraph.forward_fixed_point
     def forward_partmath(self, model):
         return dict(done="terminal")
 
