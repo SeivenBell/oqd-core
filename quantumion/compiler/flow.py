@@ -123,15 +123,16 @@ class CanonicalizationFlow(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
         TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper"),
         TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
-        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
+        TransformFlowNode(visitor=ProperOrder(), name="proper"),
         TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
         TransformFlowNode(visitor=NormalOrder(), name="normal"),
         TransformFlowNode(visitor=OperatorDistribute(), name="distribute2"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath3"),
         TransformFlowNode(visitor=ProperOrder(), name="proper2"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
         TransformFlowNode(visitor=SortedOrder(), name="sorted"),
         TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
@@ -148,13 +149,6 @@ class CanonicalizationFlow(FlowGraph):
     def next_distribute(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
-            self._current_node = "proper"
-        model = _model
-        return model
-
-    def next_proper(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
             self._current_node = "gathermath"
         model = _model
         return model
@@ -162,11 +156,11 @@ class CanonicalizationFlow(FlowGraph):
     def next_gathermath(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
-            self._current_node = "gatherpauli"
+            self._current_node = "proper"
         model = _model
         return model
 
-    def next_gatherpauli(self, model):
+    def next_proper(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
             self._current_node = "paulialgebra"
@@ -174,6 +168,20 @@ class CanonicalizationFlow(FlowGraph):
         return model
 
     def next_paulialgebra(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "gathermath2"
+        model = _model
+        return model
+
+    def next_gathermath2(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
+            self._current_node = "gatherpauli"
+        model = _model
+        return model
+
+    def next_gatherpauli(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
             self._current_node = "normal"
@@ -192,18 +200,18 @@ class CanonicalizationFlow(FlowGraph):
     def next_distribute2(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
+            self._current_node = "gathermath3"
+        model = _model
+        return model
+
+    def next_gathermath3(self, model):
+        _model = self.namespace[self.current_node](model)
+        if model == _model:
             self._current_node = "proper2"
         model = _model
         return model
 
     def next_proper2(self, model):
-        _model = self.namespace[self.current_node](model)
-        if model == _model:
-            self._current_node = "gathermath2"
-        model = _model
-        return model
-
-    def next_gathermath2(self, model):
         _model = self.namespace[self.current_node](model)
         if model == _model:
             self._current_node = "normal"
@@ -249,8 +257,7 @@ if __name__ == "__main__":
     I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
     A, C, J = Annihilation(), Creation(), Identity()
 
-    # op = I @ (MathStr(string="1*(a+b)") * (X * (X + Y))) @ (A * A * C)
-    op = X @ (A * C) @ Y
+    op = X @ C @ (X * Y) @ (A * C * C * A * C * C) @ (X @ X @ A @ C)
     fg = CanonicalizationFlow(name="g1", verbose=True)
 
     op = fg(op)
