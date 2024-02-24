@@ -432,25 +432,32 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
 
 
 class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
+    def __init__(self):
+        self.allowed_ops = Union[
+                OperatorTerminal,
+                Ladder,
+                OperatorMul,
+                OperatorScalarMul,
+                OperatorKron,
+            ]
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorMul, OperatorKron)):
-            self.visit_OperatorMulKron(model)
+            self.visit_OperatorMulKronScalMul(model)
         else:
             super(self.__class__, self)._visit(model)
     
-    def visit_OperatorMulKron(self, model: (OperatorMul, OperatorKron)):
-        allowed_ops = Union[
-                    OperatorTerminal,
-                    Ladder,
-                    OperatorMul,
-                    OperatorScalarMul,
-                    OperatorKron,
-                ]
-        if not(isinstance(model.op1, allowed_ops) and isinstance(model.op2, allowed_ops)):
+    def visit_OperatorMulKronScalMul(self, model: (OperatorMul, OperatorKron)):
+        if not(isinstance(model.op1, self.allowed_ops) and isinstance(model.op2, self.allowed_ops)):
             raise CanonicalFormError("Incomplete Operator Distribution")
         else:
             self.visit(model.op1)
             self.visit(model.op2)
+
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+        if not(isinstance(model.op, self.allowed_ops)):
+            raise CanonicalFormError("Scalar multiplication of operators not simplified fully")
+        else:
+            self.visit(model = model.op)
 
 class CanonicalizationVerificationGatherMathExpr(AnalogCircuitVisitor):
     """Assuming that OperatorDistribute has already been fully ran"""
@@ -512,11 +519,14 @@ if __name__ == '__main__':
     # math expre
     # test_op = 2*(X@(7*Y*(1j+2)*Y)) + 6*(Z@(-3j*Y)) 
     # test_op = X * ((2+3)*X)
-    test_op = 5*(X*X)
+    test_op = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A))
+    test_op = 3* (X + Y)
+    test_op =  2*(X@(7*Y*(1j+2)*Y)) + 6*(Z@(-3j*Y))
 
-    pprint(test_op)
+    pprint(test_op.accept(PrintOperator()))
+    #pprint(test_op)
     #pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()))#.accept(PrintOperator()))
-    pprint(test_op.accept(CanonicalizationVerificationGatherMathExpr()))
+    pprint(test_op.accept(OperatorDistribute()).accept(PrintOperator()))
     ########################################################################
     ### assumptions are needed -> without some assumptions of tree structure this is impossible.
 
