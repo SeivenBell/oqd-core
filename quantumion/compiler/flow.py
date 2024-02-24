@@ -1,6 +1,8 @@
-from typing import Any, List
+from typing import Any, List, Optional, Union
 
 from abc import ABC, abstractmethod, abstractproperty
+
+from quantumion.interface.base import TypeReflectBaseModel
 
 ########################################################################################
 
@@ -11,20 +13,89 @@ from quantumion.compiler.math import *
 ########################################################################################
 
 
+class TraversalSite(TypeReflectBaseModel):
+    iteration: str
+    node: str
+    subtraversal: Optional["Traversal"] = None
+    emission: Any = None
+
+
+class Traversal(TypeReflectBaseModel):
+    sites: List[TraversalSite] = []
+
+    class Config:
+        validate_assignment = True
+
+
+########################################################################################
+
+
+class ForwardDecorators:
+    @staticmethod
+    def forward_once(method):
+        def _method(self, model: Any) -> FlowOut:
+            flowout = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+            self.next_node = instructions["done"]
+
+            return flowout
+
+        return _method
+
+    @staticmethod
+    def forward_fixed_point(method):
+        def _method(self, model: Any) -> FlowOut:
+            flowout = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+
+            if model == flowout.model:
+                self.next_node = instructions["done"]
+
+            return flowout
+
+        return _method
+
+    @staticmethod
+    def forward_return(method):
+        def _method(self, model: Any) -> FlowOut:
+            flowout = self.namespace[self.current_node](model)
+
+            instructions = method(self, model)
+
+            if model == flowout.model:
+                self.next_node = instructions["done"]
+            elif "return" in instructions.keys():
+                self.next_node = instructions["return"]
+
+            return flowout
+
+        return _method
+
+
+########################################################################################
+
+
 class FlowBase(ABC):
     def __init__(self, name, **kwargs):
         self.name = name
         pass
 
     @abstractmethod
-    def __call__(self, model: Any):
+    def __call__(self, model: Any) -> "FlowOut":
         pass
 
     @abstractproperty
-    def traversal(self):
+    def traversal(self) -> Union[Traversal, None]:
         pass
 
     pass
+
+
+class FlowOut(TypeReflectBaseModel):
+    model: Any
+    emission: Any = None
 
 
 ########################################################################################
@@ -34,11 +105,11 @@ class FlowNode(FlowBase):
     def __init__(self, name, **kwargs):
         super().__init__(name=name, **kwargs)
 
-    def __call__(self, model: Any):
+    def __call__(self, model: Any) -> FlowOut:
         raise NotImplementedError
 
     @property
-    def traversal(self):
+    def traversal(self) -> None:
         return None
 
     pass
@@ -57,65 +128,16 @@ class VisitorFlowNode(FlowNode):
         super().__init__(**kwargs)
         pass
 
-    def __call__(self, model: Any):
+    def __call__(self, model: Any) -> FlowOut:
         model.accept(self.visitor)
-        return model
+        return FlowOut(model=model)
 
     pass
 
 
 class TransformFlowNode(VisitorFlowNode):
-    def __call__(self, model: Any):
-        return model.accept(self.visitor)
-
-
-########################################################################################
-
-
-class ForwardDecorators:
-    @staticmethod
-    def forward_once(method):
-        def _method(self, model: Any):
-            model = self.namespace[self.current_node](model)
-
-            instructions = method(self, model)
-            self.next_node = instructions["done"]
-
-            return model
-
-        return _method
-
-    @staticmethod
-    def forward_fixed_point(method):
-        def _method(self, model: Any):
-            _model = self.namespace[self.current_node](model)
-
-            instructions = method(self, model)
-
-            if model == _model:
-                self.next_node = instructions["done"]
-
-            model = _model
-            return model
-
-        return _method
-
-    @staticmethod
-    def forward_return(method):
-        def _method(self, model: Any):
-            _model = self.namespace[self.current_node](model)
-
-            instructions = method(self, model)
-
-            if model == _model:
-                self.next_node = instructions["done"]
-            elif "return" in instructions.keys():
-                self.next_node = instructions["return"]
-
-            model = _model
-            return model
-
-        return _method
+    def __call__(self, model: Any) -> FlowOut:
+        return FlowOut(model=model.accept(self.visitor))
 
 
 ########################################################################################
@@ -182,50 +204,50 @@ class FlowGraph(FlowBase):
         return self._current_iter
 
     @property
-    def traversal(self):
+    def traversal(self) -> Traversal:
         return self._traversal
 
     def __iter__(self):
         self.current_node = self.rootnode
         self._current_iter = 0
-        self._traversal = []
+        self._traversal = Traversal()
         return self
 
     def __next__(self):
         self.exceeded_max_iter
 
         if isinstance(self.namespace[self.current_node], FlowTerminal):
-            self._traversal.append(
-                (
-                    self.current_iter,
-                    self.namespace[self.current_node].name,
-                    self.namespace[self.current_node].traversal,
-                )
-            )
+            self._traversal.sites += [
+                TraversalSite(
+                    iteration=str(self.current_iter),
+                    node=self.current_node,
+                ),
+            ]
             raise StopIteration
 
         def _forward(model: Any):
-            model = getattr(self, "forward_{}".format(self.current_node))(model)
+            flowout = getattr(self, "forward_{}".format(self.current_node))(model)
 
-            self._traversal.append(
-                (
-                    self.current_iter,
-                    self.namespace[self.current_node].name,
-                    self.namespace[self.current_node].traversal,
-                )
-            )
+            self._traversal.sites += [
+                TraversalSite(
+                    iteration=str(self.current_iter),
+                    node=self.current_node,
+                    subtraversal=self.namespace[self.current_node].traversal,
+                    emission=flowout.emission,
+                ),
+            ]
 
             self.current_node = self.next_node
 
             self._current_iter += 1
-            return model
+            return flowout.model
 
         return _forward
 
-    def __call__(self, model):
+    def __call__(self, model) -> FlowOut:
         for node in self:
             model = node(model)
-        return model
+        return FlowOut(model=model)
 
 
 ########################################################################################
@@ -340,10 +362,10 @@ if __name__ == "__main__":
     I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
     A, C, J = Annihilation(), Creation(), Identity()
 
-    op = X @ (A * A * C)
+    op = X @ (A * C)
     fg = CanonicalizationFlow(name="g1")
 
-    op = fg(op)
+    op = fg(op).model
     pprint(op.accept(PrintOperator()))
 
     pprint(fg.traversal)
