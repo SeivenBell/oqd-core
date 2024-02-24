@@ -123,7 +123,6 @@ class TestGatherMathExpr(unittest.TestCase):
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
-    op = ((2*X) + Y) @ Z
 
     def test_pauli_simple_fail(self):
         """Simple failure with pauli"""
