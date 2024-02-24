@@ -474,6 +474,12 @@ class CanonicalizationVerificationGatherMathExpr(AnalogCircuitVisitor):
             self.visit(model.op1)
             self.visit(model.op2)
 
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+        if isinstance(model.op, OperatorScalarMul):
+            raise CanonicalFormError("Incomplete scalar multiplications after GatherMathExpression")
+        else:
+            self.visit(model = model.op)
+
 class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
     pass
 
@@ -521,12 +527,13 @@ if __name__ == '__main__':
     # test_op = X * ((2+3)*X)
     test_op = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A))
     test_op = 3* (X + Y)
-    test_op =  2*(X@(7*Y*(1j+2)*Y)) + 6*(Z@(-3j*Y))
+    test_op = (3 * 3 * 3) * ((X * Y) @ (A*C))#(3*(3*(X*Y)))
 
     pprint(test_op.accept(PrintOperator()))
     #pprint(test_op)
+    #pprint(test_op.accept(GatherMathExpr()))
     #pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()))#.accept(PrintOperator()))
-    pprint(test_op.accept(OperatorDistribute()).accept(PrintOperator()))
+    pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(PrintOperator()))
     ########################################################################
     ### assumptions are needed -> without some assumptions of tree structure this is impossible.
 

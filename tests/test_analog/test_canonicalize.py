@@ -191,7 +191,7 @@ class TestCanonicalizationVerificationGatherMathExpr(CanonicalFormErrors, unitte
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
 
     def test_pauli_simple_fail(self):
-        """Simple Pauli passing"""
+        """Simple Pauli failing"""
         op = (2*X)@Z + Y@Z
         self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
 
@@ -210,11 +210,21 @@ class TestCanonicalizationVerificationGatherMathExpr(CanonicalFormErrors, unitte
         op = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*(1*A)*C*LI)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
 
-
     def test_addition_pauli_scalar_multiple_nested_fail(self):
         """Pauli addition fail with scalar multiple passes with nested operations"""
         op = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A))
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+
+    def test_pauli_nested_ops_fail(self):
+        """Nested scalar multiplications of Paulis fail"""
+        op = (3*(3*(3*(X*Y))))
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+
+    def test_pauli_ladder_nested_ops_pass(self):
+        """Nested scalar multiplications pass"""
+        op = (3 * 3 * 3) * ((X * Y) @ (A*C))
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())
