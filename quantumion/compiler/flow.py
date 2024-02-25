@@ -129,8 +129,8 @@ class VisitorFlowNode(FlowNode):
         pass
 
     def __call__(self, model: Any) -> FlowOut:
-        model.accept(self.visitor)
-        return FlowOut(model=model)
+        emission = self.visitor.emit(model)
+        return FlowOut(model=model, emission=emission)
 
     pass
 
@@ -362,10 +362,10 @@ if __name__ == "__main__":
     I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
     A, C, J = Annihilation(), Creation(), Identity()
 
-    op = X @ (A * C)
+    op = X * (X + Y) @ (A * C)
     fg = CanonicalizationFlow(name="g1")
 
     op = fg(op).model
-    pprint(op.accept(PrintOperator()))
 
     pprint(fg.traversal)
+    pprint(op.accept(PrintOperator()))
