@@ -504,10 +504,19 @@ class CanonicalizationVerificationProperOrder(AnalogCircuitVisitor):
         else:
             self.visit(model.op)
 
-class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
-    pass
-
 class CanonicalizationVerificationPauliAlgebra(AnalogCircuitVisitor):
+    """
+    Assumptions:
+    Distributed, Gathered and then proper ordered. Then MatMul is done on the set of operators.
+    """
+    def visit_OperatorMul(self, model: OperatorMul):
+        if isinstance(model.op1, Pauli) and isinstance(model.op2, Pauli):
+            raise CanonicalFormError("Incomplete Pauli Algebra")
+        else:
+            self.visit(model.op1)
+            self.visit(model.op2)
+
+class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
     pass
 
 class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
@@ -554,11 +563,11 @@ if __name__ == '__main__':
     test_op = Z+(2*(X@(2*I)+Y))
     test_op = Z*(2*I)+ ((5*Y) + 8*Z) ### showing gathermathexpr not req
     test_op = 2*(Z+I) + 3*((A+Y) + Z) ### showing distribute is req
-    test_op = (A @ C) @ (2* (X + (2*Y)+Z))
+    test_op = Z+(Y*(Y*Y))
     pprint(test_op.accept(VerbosePrintOperator()))
     pprint(test_op)
     #pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()))#.accept(PrintOperator()))
-    pprint(test_op.accept(CanonicalizationVerificationProperOrder()))
+    pprint(test_op.accept(CanonicalizationVerificationPauliAlgebra()))
     ########################################################################
     ### assumptions are needed -> without some assumptions of tree structure this is impossible.
 
