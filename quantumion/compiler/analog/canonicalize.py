@@ -23,6 +23,7 @@ __all__ = [
     "CanonicalFormError",
     "CanonicalizationVerificationOperatorDistribute",
     "CanonicalizationVerificationGatherMathExpr",
+    "CanonicalizationVerificationProperOrder",
 ]
 
 ########################################################################################
@@ -480,6 +481,29 @@ class CanonicalizationVerificationGatherMathExpr(AnalogCircuitVisitor):
         else:
             self.visit(model = model.op)
 
+class CanonicalizationVerificationProperOrder(AnalogCircuitVisitor):
+    """Assumptions:
+        None
+    """
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (OperatorAdd, OperatorMul, OperatorKron)):
+            self.visit_OperatorAddMulKron(model)
+        else:
+            super(self.__class__, self)._visit(model)
+
+    def visit_OperatorAddMulKron(self, model: (OperatorAdd, OperatorMul, OperatorKron)):
+        if isinstance(model.op2, model.__class__):
+            raise CanonicalFormError("Incorrect Proper Ordering")
+        else:
+            self.visit(model.op1)
+            self.visit(model.op2)
+
+    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+        if isinstance(model.op, model.__class__):
+            raise CanonicalFormError("Incorrect Proper Ordering (for scalar multiplication)")
+        else:
+            self.visit(model.op)
+
 class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
     pass
 
@@ -487,9 +511,6 @@ class CanonicalizationVerificationPauliAlgebra(AnalogCircuitVisitor):
     pass
 
 class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
-    pass
-
-class CanonicalizationVerificationProperOrder(AnalogCircuitVisitor):
     pass
 
 class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
@@ -528,12 +549,16 @@ if __name__ == '__main__':
     test_op = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A))
     test_op = 3* (X + Y)
     test_op = (3 * 3 * 3) * ((X * Y) @ (A*C))#(3*(3*(X*Y)))
-
-    pprint(test_op.accept(PrintOperator()))
-    #pprint(test_op)
-    #pprint(test_op.accept(GatherMathExpr()))
+    test_op = I+(2*(X+Y))
+    test_op = Z+(X+(2*Y))
+    test_op = Z+(2*(X@(2*I)+Y))
+    test_op = Z*(2*I)+ ((5*Y) + 8*Z) ### showing gathermathexpr not req
+    test_op = 2*(Z+I) + 3*((A+Y) + Z) ### showing distribute is req
+    test_op = (A @ C) @ (2* (X + (2*Y)+Z))
+    pprint(test_op.accept(VerbosePrintOperator()))
+    pprint(test_op)
     #pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()))#.accept(PrintOperator()))
-    pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(PrintOperator()))
+    pprint(test_op.accept(CanonicalizationVerificationProperOrder()))
     ########################################################################
     ### assumptions are needed -> without some assumptions of tree structure this is impossible.
 

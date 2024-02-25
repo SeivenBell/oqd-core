@@ -225,6 +225,60 @@ class TestCanonicalizationVerificationGatherMathExpr(CanonicalFormErrors, unitte
         op = (3 * 3 * 3) * ((X * Y) @ (A*C))
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
 
+@colorize(color=BLUE)
+class TestCanonicalizationVerificationProperOrder(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def test_simple_pauli_pass(self):
+        """Simple tensor product in proper order"""
+        op = (X @ Y) @ Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_simple_pauli_pass(self):
+        """Simple tensor product not in proper order"""
+        op = X @ (Y @ Z)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_simple_pauli_with_other_ops_pass(self):
+        """Simple tensor product with other operations in proper order"""
+        op = (X @ (2*Y + Z@(A*C*A))) @ Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_simple_pauli_with_other_ops_pass(self):
+        """Simple tensor product with other operations not in proper order"""
+        op = X @ ((2*Y + Z@(A*C*A)) @ Z)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_nested_paulis_v1(self):
+        """Nested structure with nested addition not in proper order"""
+        op = I + (X + (2*Y)+Z)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_nested_paulis_pass_v2(self):
+        """Nested structure with nested addition in proper order"""
+        op = (I + X) + ((2*Y) + Z)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_nested_paulis_pass_with_brackets(self):
+        """Nested structure with nested addition in proper order with brackets"""
+        op = ((I + X) + (2*Y))+Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        
+    def test_nested_paulis_pass_without_brackets(self):
+        """Nested structure with nested addition in proper order with brackets (i.e. using Python default)"""
+        op = I + X + (2*Y) + Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_nested_tensor_prod_paulis_multiplication_fail(self):
+        """Nested structure with nested multiplication (4j*(2...)) not in proper order"""
+        op = (A @ C) @ (4j*(2 * (X + (2*Y)+Z)))
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
+    def test_nested_tensor_prod_paulis_multiplication_pass(self):
+        """Nested structure with nested multiplication (4j*...) in proper order"""
+        op = (A @ C) @ ((4j* 2) * (X + (2*Y)+Z))
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())
