@@ -129,13 +129,16 @@ flowchart LR
 
 START:::hidden -- Input --> node1
 
-node1("FlowNode 1<br/>----------<br/>name: FN1<br/>site: 0,1 and 2")
-graph1("FlowGraph 1<br/>----------<br/>name: FG1<br/>site: 3 and 4")
-terminal("Terminal<br/>----------<br/>name: terminal<br/>site: 5")
+node1("FlowNode 1<br/>----------<br/>name: FN1<br/>site: 0, 1, 2, 4")
+node2("FlowNode 2<br/>----------<br/>name: FN2<br/>site: 3 and 5")
+graph1("FlowGraph 1<br/>----------<br/>name: FG1<br/>site: 6 and 7")
+terminal("Terminal<br/>----------<br/>name: terminal<br/>site: 8")
 
-node1 -- "(0,1)" --> node1 -- "(1,2)" --> node1 -- "(2,3)" --> graph1
+node1 -- "(0,1)" --> node1 -- "(1,2)" --> node1 -- "(2,3)" --> node2
 
-graph1 -- "(3,4)" --> graph1 --> terminal
+node2 -- "(3,4)" --> node1 -- "(4,5)" --> node2 -- "(5,6)" --> graph1
+
+graph1 -- "(6,7)" --> graph1 -- "(7,8)" --> terminal
 
 terminal -- Output --> END:::hidden
 
@@ -151,11 +154,11 @@ traversal.sites[1] = TraversalSite(
     iteration=1, node="FN1", subtraversal=None, emission=...
 )
 ...
-traversal.sites[3] = TraversalSite(
-    iteration=1, node="FG1", subtraversal=Traversal(...), emission=None
+traversal.sites[6] = TraversalSite(
+    iteration=6, node="FG1", subtraversal=Traversal(...), emission=None
 )
 ...
-travelsal.sites[5] = TraversalSite(
-    iteration=5, node="terminal", subtraversal=None, emission=None
+travelsal.sites[8] = TraversalSite(
+    iteration=8, node="terminal", subtraversal=None, emission=None
 )
 ```
