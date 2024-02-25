@@ -440,23 +440,3 @@ class CanonicalizationFlow2(FlowGraph):
     @ForwardDecorator.forward_fixed_point
     def forward_partmath(self, model):
         return dict(done="terminal")
-
-
-# ########################################################################################
-
-if __name__ == "__main__":
-    from rich import print as pprint
-    from quantumion.interface.analog import *
-    from quantumion.interface.math import *
-
-    I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
-    A, C, J = Annihilation(), Creation(), Identity()
-
-    op = X @ C @ (X * Y) @ (A * C * C * A * C * C) @ (X @ X @ A @ C)
-
-    fg = CanonicalizationFlow2(name="g1")
-
-    op = fg(op).model
-
-    pprint(fg.traversal)
-    pprint(op.accept(PrintOperator()))
