@@ -13,7 +13,6 @@ from quantumion.compiler.math import PrintMathExpr, VerbosePrintMathExpr
 __all__ = [
     "AnalogCircuitVisitor",
     "AnalogCircuitTransformer",
-    "AnalogCircuitIonsAnalysis",
     "PrintOperator",
     "VerbosePrintOperator",
 ]
@@ -28,15 +27,6 @@ class AnalogCircuitVisitor(Visitor):
 
 class AnalogCircuitTransformer(Transformer):
     pass
-
-
-class AnalogCircuitIonsAnalysis(AnalogCircuitVisitor):
-    def __init__(self):
-        self.ions = 0
-
-    def visit_AnalogCircuit(self, model: AnalogCircuit) -> None:
-        assert isinstance(model, AnalogCircuit)
-        self.ions = model.n_qreg
 
 
 ########################################################################################
