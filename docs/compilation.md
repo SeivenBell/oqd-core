@@ -123,7 +123,7 @@
     classDef hidden display: none;
     ```
 
-### Traversal
+## Traversal
 ```mermaid
 flowchart LR
 
