@@ -52,6 +52,8 @@ class ForwardDecorator:
 
             if model == flowout.model:
                 self.next_node = instructions["done"]
+            else:
+                self.next_node = self.current_node
 
             return flowout
 
@@ -68,6 +70,8 @@ class ForwardDecorator:
                 self.next_node = instructions["done"]
             elif "detour" in instructions.keys():
                 self.next_node = instructions["detour"]
+            else:
+                self.next_node = self.current_node
 
             return flowout
 
@@ -199,6 +203,11 @@ class FlowGraph(FlowBase):
             return
         raise NameError(f'No node named "{value}" in namespace of {self}')
 
+    @next_node.deleter
+    def next_node(self):
+        del self._next_node
+        pass
+
     @property
     def current_iter(self):
         return self._current_iter
@@ -238,8 +247,10 @@ class FlowGraph(FlowBase):
             ]
 
             self.current_node = self.next_node
-
             self._current_iter += 1
+
+            del self.next_node
+
             return flowout.model
 
         return _forward
