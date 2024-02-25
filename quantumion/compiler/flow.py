@@ -30,7 +30,7 @@ class Traversal(TypeReflectBaseModel):
 ########################################################################################
 
 
-class ForwardDecorators:
+class ForwardDecorator:
     @staticmethod
     def forward_once(method):
         def _method(self, model: Any) -> FlowOut:
@@ -58,7 +58,7 @@ class ForwardDecorators:
         return _method
 
     @staticmethod
-    def forward_return(method):
+    def forward_detour(method):
         def _method(self, model: Any) -> FlowOut:
             flowout = self.namespace[self.current_node](model)
 
@@ -66,8 +66,8 @@ class ForwardDecorators:
 
             if model == flowout.model:
                 self.next_node = instructions["done"]
-            elif "return" in instructions.keys():
-                self.next_node = instructions["return"]
+            elif "detour" in instructions.keys():
+                self.next_node = instructions["detour"]
 
             return flowout
 
@@ -264,23 +264,23 @@ class NormalOrderFlow(FlowGraph):
     ]
     rootnode = "normal"
 
-    @ForwardDecorators.forward_once
+    @ForwardDecorator.forward_once
     def forward_normal(self, model):
         return dict(done="distribute")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_distribute(self, model):
         return dict(done="gathermath")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_gathermath(self, model):
         return dict(done="proper")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_proper(self, model):
         return dict(done="prune")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_prune(self, model):
         return dict(done="terminal")
 
@@ -303,51 +303,141 @@ class CanonicalizationFlow(FlowGraph):
     ]
     rootnode = "hspace"
 
-    @ForwardDecorators.forward_once
+    @ForwardDecorator.forward_once
     def forward_hspace(self, model):
         return dict(done="distribute")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_distribute(self, model):
         return dict(done="gathermath")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_gathermath(self, model):
         return dict(done="proper")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_proper(self, model):
         return dict(done="paulialgebra")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_paulialgebra(self, model):
         return dict(done="gathermath2")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_gathermath2(self, model):
         return dict(done="gatherpauli")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_gatherpauli(self, model):
         return dict(done="normalflow")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_normalflow(self, model):
         return dict(done="sorted")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_sorted(self, model):
         return dict(done="distmath")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_distmath(self, model):
         return dict(done="propermath")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
     def forward_propermath(self, model):
         return dict(done="partmath")
 
-    @ForwardDecorators.forward_fixed_point
+    @ForwardDecorator.forward_fixed_point
+    def forward_partmath(self, model):
+        return dict(done="terminal")
+
+
+########################################################################################
+
+
+class CanonicalizationFlow2(FlowGraph):
+    nodes = [
+        VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
+        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
+        TransformFlowNode(visitor=NormalOrder(), name="normal"),
+        TransformFlowNode(visitor=OperatorDistribute(), name="distribute2"),
+        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath3"),
+        TransformFlowNode(visitor=ProperOrder(), name="proper2"),
+        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
+        TransformFlowNode(visitor=SortedOrder(), name="sorted"),
+        TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
+        TransformFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
+        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
+        FlowTerminal(name="terminal"),
+    ]
+    rootnode = "hspace"
+
+    @ForwardDecorator.forward_once
+    def forward_hspace(self, model):
+        return dict(done="distribute")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_distribute(self, model):
+        return dict(done="gathermath")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_gathermath(self, model):
+        return dict(done="proper")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_proper(self, model):
+        return dict(done="paulialgebra")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_paulialgebra(self, model):
+        return dict(done="gathermath2")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_gathermath2(self, model):
+        return dict(done="gatherpauli")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_gatherpauli(self, model):
+        return dict(done="normal")
+
+    @ForwardDecorator.forward_detour
+    def forward_normal(self, model):
+        return dict(done="sorted", detour="distribute2")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_distribute2(self, model):
+        return dict(done="gathermath3")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_gathermath3(self, model):
+        return dict(done="proper2")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_proper2(self, model):
+        return dict(done="prune")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_prune(self, model):
+        return dict(done="normal")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_sorted(self, model):
+        return dict(done="distmath")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_distmath(self, model):
+        return dict(done="propermath")
+
+    @ForwardDecorator.forward_fixed_point
+    def forward_propermath(self, model):
+        return dict(done="partmath")
+
+    @ForwardDecorator.forward_fixed_point
     def forward_partmath(self, model):
         return dict(done="terminal")
 
@@ -362,8 +452,9 @@ if __name__ == "__main__":
     I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
     A, C, J = Annihilation(), Creation(), Identity()
 
-    op = X * (X + Y) @ (A * C)
-    fg = CanonicalizationFlow(name="g1")
+    op = X @ C @ (X * Y) @ (A * C * C * A * C * C) @ (X @ X @ A @ C)
+
+    fg = CanonicalizationFlow2(name="g1")
 
     op = fg(op).model
 
