@@ -68,6 +68,8 @@ markdown_extensions:
   # for notes/admonitions
   - admonition
   - pymdownx.details
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
 
   # for flow diagrams
   - pymdownx.superfences:
