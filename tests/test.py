@@ -1,7 +1,3 @@
-from typing import Union, List
-
-import re
-
 from rich import print as pprint
 from rich.console import Console
 
