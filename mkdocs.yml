@@ -65,6 +65,8 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
 
   # for notes/admonitions
   - admonition
