@@ -4,6 +4,7 @@
 
 ## Flow
 
+### Examples
 === "FlowNode"
     ```mermaid
     flowchart LR
@@ -14,20 +15,50 @@
     ```
 
 === "FlowGraph"
-    ```mermaid
-    flowchart LR
+    === "Only FlowNodes"
+        ```mermaid
+        flowchart LR
+        
+        START:::hidden -- Input --> node1(FlowNode 1) --> change1{Change} -- no --> node2(FlowNode 2) --> terminal(Terminal) -- Output --> END:::hidden
 
+        change1 -- yes --> node1
+
+        node1 -. Emission .-> MID1:::hidden
+        node2 -. Emission .-> MID2:::hidden
     
-    START:::hidden -- Input --> node1(FlowNode 1) --> change1{Change} -- no --> node2(FlowNode 2) --> change2{Change} -- no --> terminal(Terminal) -- Output --> END:::hidden
+        classDef hidden display:none;
+        ```
+    === "In General"
+        ```mermaid
+        flowchart LR
 
-    change1 -- yes --> node1
-    node1 -. Emission .-> MID1:::hidden
+        START:::hidden -- Input --> node1(FlowNode 1) --> change1{Change} -- no --> graph1{{"FlowGraph1<br/>(See below)"}} --> change2{Change} -- no --> terminal2(Terminal) -- Output --> END:::hidden
 
-    change2 -- yes --> node2
-    node2 -. Emission .-> MID2:::hidden
+        change1 -- yes --> node1
+        change2 -- yes --> graph1
 
-    classDef hidden display: none;
-    ```
+        node1 -. Emission .-> MID1:::hidden
+
+        classDef hidden display: none;
+        ```
+
+        ```mermaid
+        flowchart LR
+
+        subgraph graph1 [FlowGraph1]
+        direction LR
+        START:::hidden -- Input --> node2(FlowNode 2) --> change2{Change} -- no --> node3(FlowNode 3) --> terminal(Terminal) -- Output --> END:::hidden
+
+        change2 -- yes --> node4(FlowNode 4) --> change4{Change} -- no --> node2
+        change4 -- yes --> node4
+
+        node2 -. Emission .-> MID2:::hidden
+        node3 -. Emission .-> MID3:::hidden
+        node4 -. Emission .-> MID4:::hidden
+        end
+
+        classDef hidden display: none;
+        ```
 
 ### Forward Decorators
 === "Forward Once"
@@ -59,6 +90,7 @@
     START:::hidden -- Input --> node1("FlowNode1<br/>(name: FN1)") --> change1{Change} -- no --> node2("FlowNode2<br/>(name: FN2)") -- continue --> END:::hidden
     
     change1 -- yes --> node1
+
     node1 -. Emission .-> MID1:::hidden
 
     classDef hidden display: none;
@@ -76,6 +108,7 @@
     START:::hidden -- Input --> node1("FlowNode1<br/>(name: FN1)") --> change1{Change} -- no --> node2("FlowNode2<br/>(name: FN2)") -- continue --> END:::hidden
     
     change1 -- yes --> node3("FlowNode3<br/>(name: FN3)") -- continue --> END2:::hidden
+
     node1 -. Emission .-> MID1:::hidden
 
     classDef hidden display: none;
