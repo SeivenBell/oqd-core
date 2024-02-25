@@ -42,11 +42,10 @@
         classDef hidden display: none;
         ```
 
+        /// details | FlowGraph1
         ```mermaid
         flowchart LR
 
-        subgraph graph1 [FlowGraph1]
-        direction LR
         START:::hidden -- Input --> node2(FlowNode 2) --> change2{Change} -- no --> node3(FlowNode 3) --> terminal(Terminal) -- Output --> END:::hidden
 
         change2 -- yes --> node4(FlowNode 4) --> change4{Change} -- no --> node2
@@ -55,10 +54,10 @@
         node2 -. Emission .-> MID2:::hidden
         node3 -. Emission .-> MID3:::hidden
         node4 -. Emission .-> MID4:::hidden
-        end
 
         classDef hidden display: none;
         ```
+        ///
 
 ### Forward Decorators
 === "Forward Once"
