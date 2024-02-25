@@ -1,4 +1,4 @@
-from typing import Union, Annotated
+from typing import Union, Annotated, Any
 
 from pydantic import BeforeValidator
 
@@ -7,7 +7,14 @@ import numpy as np
 ########################################################################################
 
 from quantumion.interface.base import TypeReflectBaseModel
-from quantumion.interface.math import CastMathExpr
+from quantumion.interface.math import CastMathExpr, MathExpr
+
+########################################################################################
+
+
+class UnitError(Exception):
+    pass
+
 
 ########################################################################################
 
@@ -98,25 +105,27 @@ class UnitBase(TypeReflectBaseModel):
         raise TypeError
 
     def __mul__(self, other):
-        other = UnitBase.cast(other)
-        return UnitMul(
-            scale=self.scale * other.scale,
-            dimension=self.dimension * other.dimension,
-            unit1=self,
-            unit2=other,
-        )
+        if isinstance(other, (UnitBase, int, float)):
+            other = UnitBase.cast(other)
+            return UnitBase(
+                scale=self.scale * other.scale,
+                dimension=self.dimension * other.dimension,
+            )
+        else:
+            return other.__rmul__(self)
+
+    def __truediv__(self, other):
+        if isinstance(other, (UnitBase, int, float)):
+            other = UnitBase.cast(other)
+            return UnitBase(
+                scale=self.scale / other.scale,
+                dimension=self.dimension / other.dimension,
+            )
+        else:
+            return other.__rtruediv__(self)
 
     def __rmul__(self, other):
         return self * other
-
-    def __truediv__(self, other):
-        other = UnitBase.cast(other)
-        return UnitDiv(
-            scale=self.scale / other.scale,
-            dimension=self.dimension / other.dimension,
-            unit1=self,
-            unit2=other,
-        )
 
     def __rtruediv__(self, other):
         other = UnitBase.cast(other)
@@ -124,35 +133,18 @@ class UnitBase(TypeReflectBaseModel):
 
     def __pow__(self, other):
         assert isinstance(other, (int, float))
-        return UnitPow(
+        return UnitBase(
             scale=self.scale**other,
             dimension=self.dimension**other,
-            unit=self,
-            exponent=other,
         )
+
+    def as_expr(self):
+        return UnitfulMathExpr.cast(self)
 
 
 ########################################################################################
 
 CastUnitBase = Annotated[UnitBase, BeforeValidator(UnitBase.cast)]
-
-########################################################################################
-
-
-class UnitMul(UnitBase):
-    unit1: CastUnitBase
-    unit2: CastUnitBase
-
-
-class UnitDiv(UnitBase):
-    unit1: CastUnitBase
-    unit2: CastUnitBase
-
-
-class UnitPow(UnitBase):
-    unit: CastUnitBase
-    exponent: Union[int, float]
-
 
 ########################################################################################
 
@@ -267,22 +259,104 @@ class UnitfulMathExpr(TypeReflectBaseModel):
     expr: CastMathExpr
     unit: UnitBase = unitless
 
+    @classmethod
+    def cast(cls, value: Any):
+        if isinstance(value, (UnitfulMathExpr)):
+            return value
+        if isinstance(value, (MathExpr, int, float, complex, np.complex128, str)):
+            expr = MathExpr.cast(value)
+            return UnitfulMathExpr(expr=expr)
+        if isinstance(value, (UnitBase)):
+            expr = MathExpr.cast(1)
+            return UnitfulMathExpr(expr=expr, unit=value)
+        raise TypeError
+
     def __add__(self, other):
-        return UnitfulMathExpr(self.expr + other.expr, self.unit)
+        other = UnitfulMathExpr.cast(other)
+        expr1 = self.expr
+        expr2 = other.expr
+        unit1 = self.unit
+        unit2 = other.unit
+
+        if self.unit.dimension == other.unit.dimension:
+            if unit1.scale >= unit2.scale:
+                unit = unit1
+                expr2 = expr2 * (unit2.scale / unit1.scale)
+            else:
+                unit = unit2
+                expr1 = expr1 * (unit1.scale / unit2.scale)
+
+            return UnitfulMathExpr(expr=expr1 + expr2, unit=unit)
+
+        raise UnitError(
+            "Incompatible units, expr1 has units of dimension ({}) and expr2 has units of dimension ({})".format(
+                unit1.dimension, unit2.dimension
+            )
+        )
 
     def __sub__(self, other):
-        return UnitfulMathExpr(self.expr - other.expr, self.unit)
+        other = UnitfulMathExpr.cast(other)
+        expr1 = self.expr
+        expr2 = other.expr
+        unit1 = self.unit
+        unit2 = other.unit
+
+        if self.unit.dimension == other.unit.dimension:
+            if unit1.scale >= unit2.scale:
+                unit = unit1
+                expr2 = expr2 * unit2.scale / unit1.scale
+            else:
+                unit = unit2
+                expr1 = expr1 * unit1.scale / unit2.scale
+
+            return UnitfulMathExpr(expr=expr1 - expr2, unit=unit)
+
+        raise UnitError(
+            "Incompatible units, expr1 has units of dimension ({}) and expr2 has units of dimension ({})".format(
+                unit1.dimension, unit2.dimension
+            )
+        )
 
     def __mul__(self, other):
-        return UnitfulMathExpr(self.expr * other.expr, self.unit * other.unit)
+        other = UnitfulMathExpr.cast(other)
+        return UnitfulMathExpr(expr=self.expr * other.expr, unit=self.unit * other.unit)
 
     def __truediv__(self, other):
-        return UnitfulMathExpr(self.expr / other.expr, self.unit / other.unit)
+        other = UnitfulMathExpr.cast(other)
+        return UnitfulMathExpr(expr=self.expr / other.expr, unit=self.unit / other.unit)
 
+    def __radd__(self, other):
+        return self + other
+
+    def __radd__(self, other):
+        other = UnitfulMathExpr.cast(other)
+        return other + self
+
+    def __rsub__(self, other):
+        other = UnitfulMathExpr.cast(other)
+        return other - self
+
+    def __rmul__(self, other):
+        other = UnitfulMathExpr.cast(other)
+        return other * self
+
+    def __rtruediv__(self, other):
+        other = UnitfulMathExpr.cast(other)
+        return other / self
+
+
+CastUnitfulMathExpr = Annotated[UnitfulMathExpr, BeforeValidator(UnitfulMathExpr.cast)]
 
 ########################################################################################
 
 if __name__ == "__main__":
     from rich import print as pprint
+
+    from quantumion.interface.math import *
+
+    t = UnitfulMathExpr(expr=MathVar(name="t"), unit=second)
+    w = UnitfulMathExpr(expr=MathVar(name="w"), unit=giga * hertz)
+
+    pprint(w * t)
 
     pass
