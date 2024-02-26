@@ -308,6 +308,11 @@ class TestCanonicalizationVerificationPauliAlgebra(CanonicalFormErrors, unittest
         op = X*(2*Y)
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
 
+    def test_assumption_pass_v2(self):
+        """Showing test passing due to assumption: GatherMathExpr needs to be done before further PauliAlgebra can be done"""
+        op = X*((1j)*Y)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())
