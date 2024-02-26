@@ -20,8 +20,24 @@ A, C, J = Annihilation(), Creation(), Identity()
 
 ########################################################################################
 
+
+class TestFlow(FlowGraph):
+    nodes = [
+        CanonicalizationFlow(name="g1"),
+        FlowTerminal(name="terminal1"),
+        FlowTerminal(name="terminal2"),
+    ]
+    rootnode = "g1"
+    forward_decorator = ForwardDecorator()
+
+    @forward_decorator.catch_error(redirect="terminal2")
+    @forward_decorator.forward_once(done="terminal1")
+    def forward_g1(self, model):
+        pass
+
+
 if __name__ == "__main__":
-    op = (X + A) @ (A * C)
+    op = (X + (X * Y + Z)) @ (A * C)
 
     fg = CanonicalizationFlow2(name="g1")
 
@@ -36,3 +52,5 @@ if __name__ == "__main__":
 
     with open("_console.py", mode="w", encoding="utf8") as f:
         f.write(string)
+
+    pprint(fg.forward_decorator.rules)

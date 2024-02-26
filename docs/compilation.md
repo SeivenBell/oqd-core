@@ -62,9 +62,11 @@
 ### Forward Decorators
 === "Forward Once"
     ```python linenums="1"
-    @ForwardDecorator.forward_once
+    forward_decorator = ForwardDecorator()
+
+    @forward_decorator.forward_once(done="FN2")
     def forward_FN1(self, model):
-        return dict(done="FN2")
+        pass
     ```
     ```mermaid
     flowchart LR
@@ -81,9 +83,11 @@
     ```
 === "Forward Fixed Point"
     ```python linenums="1"
-    @ForwardDecorator.forward_fixed_point
+    forward_decorator = ForwardDecorator()
+
+    @forward_decorator.forward_fixed_point(done="FN2")
     def forward_FN1(self, model):
-        return dict(done="FN2")
+        pass
     ```
     ```mermaid
     flowchart LR
@@ -102,9 +106,11 @@
     ```
 === "Forward Detour"
     ```python linenums="1"
-    @ForwardDecorator.forward_detour
+    forward_decorator = ForwardDecorator()
+
+    @forward_decorator.forward_detour(done="FN2", detour="FN3)
     def forward_FN1(self, model):
-        return dict(done="FN2", detour="FN3")
+        pass
     ```
     ```mermaid
     flowchart LR
@@ -124,10 +130,12 @@
     ```
 === "Catch Error"
     ```python linenums="1"
-    @ForwardDecorator.catch_error(redirect="FN3")
-    @ForwardDecorator.forward_once
+    forward_decorator = ForwardDecorator()
+
+    @forward_decorator.catch_error(redirect="FN3")
+    @forward_decorator.forward_once(done="FN2")
     def forward_FN1(self, model):
-        return dict(done="FN2")
+        pass
     ```
     ```mermaid
     flowchart LR
@@ -142,6 +150,45 @@
     status -. Emission .-> MID1:::hidden
 
     classDef hidden display: none;
+    ```
+
+#### Forward Rules
+A FlowGraph can instantiate a ForwardDecorator as a class attribute, when the ForwardDecorator is used, the logic is recorded to a ForwardRules object in a dictionary.
+=== "Forward Once"
+    ```python linenums="1"
+    ForwardRules(
+        class_='ForwardRules',
+        rules={
+            'forward_FN1': {'done': 'FN2'},
+        }
+    )
+    ```
+=== "Forward Fixed Point"
+    ```python linenums="1"
+    ForwardRules(
+        class_='ForwardRules',
+        rules={
+            'forward_FN1': {'done': 'FN2'},
+        }
+    )
+    ```
+=== "Forward Detour"
+    ```python linenums="1"
+    ForwardRules(
+        class_='ForwardRules',
+        rules={
+            'forward_FN1': {'done': 'FN2', 'detour': 'FN3'},
+        }
+    )
+    ```
+=== "Catch Error"
+    ```python linenums="1"
+    ForwardRules(
+        class_='ForwardRules',
+        rules={
+            'forward_FN1': {'done': 'FN2', 'redirect': 'FN3'},
+        }
+    )
     ```
 
 ## Traversal

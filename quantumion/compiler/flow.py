@@ -1,11 +1,12 @@
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Union, Dict
 
 from abc import ABC, abstractmethod, abstractproperty
 
-from quantumion.interface.base import TypeReflectBaseModel
+import functools
 
 ########################################################################################
 
+from quantumion.interface.base import TypeReflectBaseModel
 from quantumion.compiler.visitor import Visitor
 from quantumion.compiler.analog import *
 from quantumion.compiler.math import *
@@ -30,56 +31,91 @@ class Traversal(TypeReflectBaseModel):
 ########################################################################################
 
 
+class ForwardRules(TypeReflectBaseModel):
+    rules: Dict[str, Dict[str, str]] = {}
+
+    class Config:
+        validate_assignment = True
+
+
+########################################################################################
+
+
 class ForwardDecorator:
-    @staticmethod
-    def forward_once(method):
-        def _method(self, model: Any) -> FlowOut:
-            flowout = self.namespace[self.current_node](model)
+    def __init__(self):
+        self._rules = ForwardRules()
 
-            instructions = method(self, model)
-            self.next_node = instructions["done"]
+    @property
+    def rules(self):
+        return self._rules
 
-            return flowout
+    def update_rules(self, key, value):
+        rules = self._rules.rules
+        if key in rules.keys():
+            rules[key].update(value)
+        else:
+            rules[key] = value
+        self._rules.rules = rules
 
-        return _method
+    def forward_once(self, done):
+        def _forward_once(method):
+            self.update_rules(method.__name__, dict(done=done))
 
-    @staticmethod
-    def forward_fixed_point(method):
-        def _method(self, model: Any) -> FlowOut:
-            flowout = self.namespace[self.current_node](model)
+            @functools.wraps(method)
+            def _method(self, model: Any) -> FlowOut:
+                flowout = self.namespace[self.current_node](model)
 
-            instructions = method(self, model)
+                self.next_node = done
 
-            if model == flowout.model:
-                self.next_node = instructions["done"]
-            else:
-                self.next_node = self.current_node
+                return flowout
 
-            return flowout
+            return _method
 
-        return _method
+        return _forward_once
 
-    @staticmethod
-    def forward_detour(method):
-        def _method(self, model: Any) -> FlowOut:
-            flowout = self.namespace[self.current_node](model)
+    def forward_fixed_point(self, done):
+        def _forward_fixed_point(method):
+            self.update_rules(method.__name__, dict(done=done))
 
-            instructions = method(self, model)
+            @functools.wraps(method)
+            def _method(self, model: Any) -> FlowOut:
+                flowout = self.namespace[self.current_node](model)
 
-            if model == flowout.model:
-                self.next_node = instructions["done"]
-            elif "detour" in instructions.keys():
-                self.next_node = instructions["detour"]
-            else:
-                self.next_node = self.current_node
+                if model == flowout.model:
+                    self.next_node = done
+                else:
+                    self.next_node = self.current_node
 
-            return flowout
+                return flowout
 
-        return _method
+            return _method
 
-    @staticmethod
-    def catch_error(redirect):
+        return _forward_fixed_point
+
+    def forward_detour(self, done, detour):
+        def _forward_detour(method):
+            self.update_rules(method.__name__, dict(done=done, detour=detour))
+
+            @functools.wraps(method)
+            def _method(self, model: Any) -> FlowOut:
+                flowout = self.namespace[self.current_node](model)
+
+                if model == flowout.model:
+                    self.next_node = done
+                else:
+                    self.next_node = detour
+
+                return flowout
+
+            return _method
+
+        return _forward_detour
+
+    def catch_error(self, redirect):
         def _catch_error(method):
+            self.update_rules(method.__name__, dict(redirect=redirect))
+
+            @functools.wraps(method)
             def _method(self, model: Any) -> FlowOut:
                 try:
                     flowout = method(self, model)
@@ -91,6 +127,13 @@ class ForwardDecorator:
             return _method
 
         return _catch_error
+
+
+########################################################################################
+
+
+class FlowError(Exception):
+    pass
 
 
 ########################################################################################
@@ -186,6 +229,9 @@ class FlowGraph(FlowBase):
 
     def __init__(self, max_iter=1000, **kwargs):
         self.max_iter = max_iter
+
+        if FlowTerminal not in [node.__class__ for node in self.nodes]:
+            raise FlowError("FlowGraph does not contain a terminal node")
 
         super().__init__(**kwargs)
         pass
@@ -289,26 +335,27 @@ class NormalOrderFlow(FlowGraph):
         FlowTerminal(name="terminal"),
     ]
     rootnode = "normal"
+    forward_decorator = ForwardDecorator()
 
-    @ForwardDecorator.forward_once
+    @forward_decorator.forward_once(done="distribute")
     def forward_normal(self, model):
-        return dict(done="distribute")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gathermath")
     def forward_distribute(self, model):
-        return dict(done="gathermath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="proper")
     def forward_gathermath(self, model):
-        return dict(done="proper")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="prune")
     def forward_proper(self, model):
-        return dict(done="prune")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="terminal")
     def forward_prune(self, model):
-        return dict(done="terminal")
+        pass
 
 
 class CanonicalizationFlow(FlowGraph):
@@ -328,54 +375,55 @@ class CanonicalizationFlow(FlowGraph):
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
+    forward_decorator = ForwardDecorator()
 
-    @ForwardDecorator.forward_once
+    @forward_decorator.forward_once(done="distribute")
     def forward_hspace(self, model):
-        return dict(done="distribute")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gathermath")
     def forward_distribute(self, model):
-        return dict(done="gathermath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="proper")
     def forward_gathermath(self, model):
-        return dict(done="proper")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="paulialgebra")
     def forward_proper(self, model):
-        return dict(done="paulialgebra")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gathermath2")
     def forward_paulialgebra(self, model):
-        return dict(done="gathermath2")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gatherpauli")
     def forward_gathermath2(self, model):
-        return dict(done="gatherpauli")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="normalflow")
     def forward_gatherpauli(self, model):
-        return dict(done="normalflow")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="sorted")
     def forward_normalflow(self, model):
-        return dict(done="sorted")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="distmath")
     def forward_sorted(self, model):
-        return dict(done="distmath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="propermath")
     def forward_distmath(self, model):
-        return dict(done="propermath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="partmath")
     def forward_propermath(self, model):
-        return dict(done="partmath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="terminal")
     def forward_partmath(self, model):
-        return dict(done="terminal")
+        pass
 
 
 ########################################################################################
@@ -402,67 +450,68 @@ class CanonicalizationFlow2(FlowGraph):
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
+    forward_decorator = ForwardDecorator()
 
-    @ForwardDecorator.forward_once
+    @forward_decorator.forward_once(done="distribute")
     def forward_hspace(self, model):
-        return dict(done="distribute")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gathermath")
     def forward_distribute(self, model):
-        return dict(done="gathermath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="proper")
     def forward_gathermath(self, model):
-        return dict(done="proper")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="paulialgebra")
     def forward_proper(self, model):
-        return dict(done="paulialgebra")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gathermath2")
     def forward_paulialgebra(self, model):
-        return dict(done="gathermath2")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gatherpauli")
     def forward_gathermath2(self, model):
-        return dict(done="gatherpauli")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="normal")
     def forward_gatherpauli(self, model):
-        return dict(done="normal")
+        pass
 
-    @ForwardDecorator.forward_detour
+    @forward_decorator.forward_detour(done="sorted", detour="distribute2")
     def forward_normal(self, model):
-        return dict(done="sorted", detour="distribute2")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="gathermath3")
     def forward_distribute2(self, model):
-        return dict(done="gathermath3")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="proper2")
     def forward_gathermath3(self, model):
-        return dict(done="proper2")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="prune")
     def forward_proper2(self, model):
-        return dict(done="prune")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="normal")
     def forward_prune(self, model):
-        return dict(done="normal")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="distmath")
     def forward_sorted(self, model):
-        return dict(done="distmath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="propermath")
     def forward_distmath(self, model):
-        return dict(done="propermath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="partmath")
     def forward_propermath(self, model):
-        return dict(done="partmath")
+        pass
 
-    @ForwardDecorator.forward_fixed_point
+    @forward_decorator.forward_fixed_point(done="terminal")
     def forward_partmath(self, model):
-        return dict(done="terminal")
+        pass
