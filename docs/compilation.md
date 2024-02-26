@@ -122,9 +122,9 @@
 
     classDef hidden display: none;
     ```
-=== "Catch Errors"
+=== "Catch Error"
     ```python linenums="1"
-    @ForwardDecorator.catch_error(redirect="terminal")
+    @ForwardDecorator.catch_error(redirect="FN3")
     @ForwardDecorator.forward_once
     def forward_FN1(self, model):
         return dict(done="FN2")
@@ -134,11 +134,11 @@
     
     node1("FlowNode1<br/>----------<br/>name: FN1")
     node2("FlowNode2<br/>----------<br/>name: FN2")
-    terminal("Terminal<br/>----------<br/>name: terminal")
+    node3("FlowNode3<br/>----------<br/>name: FN3")
     
     START:::hidden -- Input --> node1 --> status{Status} -- success --> node2 -- continue --> END:::hidden
 
-    status -- error --> terminal -- out --> END2:::hidden
+    status -- error --> node3 -- continue --> END2:::hidden
     status -. Emission .-> MID1:::hidden
 
     classDef hidden display: none;
