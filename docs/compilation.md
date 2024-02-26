@@ -124,7 +124,7 @@
     ```
 === "Catch Errors"
     ```python linenums="1"
-    @ForwardDecorator.catch_errors(redirect="terminal")
+    @ForwardDecorator.catch_error(redirect="terminal")
     @ForwardDecorator.forward_once
     def forward_FN1(self, model):
         return dict(done="FN2")
