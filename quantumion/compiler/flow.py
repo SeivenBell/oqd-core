@@ -17,7 +17,7 @@ from quantumion.compiler.math import *
 
 
 class TraversalSite(TypeReflectBaseModel):
-    iteration: str
+    site: str
     node: str
     subtraversal: Optional["Traversal"] = None
     emission: Any = None
@@ -306,8 +306,8 @@ class FlowGraph(FlowBase):
 
         return _namespace
 
-    def __init__(self, max_iter=1000, **kwargs):
-        self.max_iter = max_iter
+    def __init__(self, max_steps=1000, **kwargs):
+        self.max_steps = max_steps
 
         if FlowTerminal not in [node.__class__ for node in self.nodes]:
             raise FlowError("FlowGraph does not contain a terminal node")
@@ -316,9 +316,9 @@ class FlowGraph(FlowBase):
         pass
 
     @property
-    def exceeded_max_iter(self):
-        if self.current_iter >= self.max_iter:
-            raise RecursionError(f"Exceeded number of iterations allowed for {self}")
+    def exceeded_max_steps(self):
+        if self.current_step >= self.max_steps:
+            raise RecursionError(f"Exceeded number of steps allowed for {self}")
         pass
 
     @property
@@ -349,8 +349,8 @@ class FlowGraph(FlowBase):
         pass
 
     @property
-    def current_iter(self):
-        return self._current_iter
+    def current_step(self):
+        return self._current_step
 
     @property
     def traversal(self) -> Traversal:
@@ -358,17 +358,17 @@ class FlowGraph(FlowBase):
 
     def __iter__(self):
         self.current_node = self.rootnode
-        self._current_iter = 0
+        self._current_step = 0
         self._traversal = Traversal()
         return self
 
     def __next__(self):
-        self.exceeded_max_iter
+        self.exceeded_max_steps
 
         if isinstance(self.namespace[self.current_node], FlowTerminal):
             self._traversal.sites += [
                 TraversalSite(
-                    iteration=str(self.current_iter),
+                    site=str(self.current_step),
                     node=self.current_node,
                 ),
             ]
@@ -379,7 +379,7 @@ class FlowGraph(FlowBase):
 
             self._traversal.sites += [
                 TraversalSite(
-                    iteration=str(self.current_iter),
+                    site=str(self.current_step),
                     node=self.current_node,
                     subtraversal=self.namespace[self.current_node].traversal,
                     emission=flowout.emission,
@@ -387,7 +387,7 @@ class FlowGraph(FlowBase):
             ]
 
             self.current_node = self.next_node
-            self._current_iter += 1
+            self._current_step += 1
 
             del self.next_node
 
