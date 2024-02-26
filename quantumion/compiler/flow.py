@@ -77,6 +77,21 @@ class ForwardDecorator:
 
         return _method
 
+    @staticmethod
+    def catch_error(redirect):
+        def _catch_error(method):
+            def _method(self, model: Any) -> FlowOut:
+                try:
+                    flowout = method(self, model)
+                    return flowout
+                except Exception as e:
+                    self.next_node = redirect
+                    return FlowOut(model=model, emission=e)
+
+            return _method
+
+        return _catch_error
+
 
 ########################################################################################
 

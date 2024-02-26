@@ -122,6 +122,27 @@
 
     classDef hidden display: none;
     ```
+=== "Catch Errors"
+    ```python linenums="1"
+    @ForwardDecorator.catch_errors(redirect="terminal")
+    @ForwardDecorator.forward_once
+    def forward_FN1(self, model):
+        return dict(done="FN2")
+    ```
+    ```mermaid
+    flowchart LR
+    
+    node1("FlowNode1<br/>----------<br/>name: FN1")
+    node2("FlowNode2<br/>----------<br/>name: FN2")
+    terminal("Terminal<br/>----------<br/>name: terminal")
+    
+    START:::hidden -- Input --> node1 --> status{Status} -- success --> node2 -- continue --> END:::hidden
+
+    status -- error --> terminal -- out --> END2:::hidden
+    status -. Emission .-> MID1:::hidden
+
+    classDef hidden display: none;
+    ```
 
 ## Traversal
 ```mermaid

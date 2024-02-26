@@ -21,7 +21,7 @@ A, C, J = Annihilation(), Creation(), Identity()
 ########################################################################################
 
 if __name__ == "__main__":
-    op = (X + X) @ (A * C)
+    op = (X + A) @ (A * C)
 
     fg = CanonicalizationFlow2(name="g1")
 
