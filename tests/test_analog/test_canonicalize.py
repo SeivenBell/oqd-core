@@ -279,6 +279,30 @@ class TestCanonicalizationVerificationProperOrder(CanonicalFormErrors, unittest.
         op = (A @ C) @ ((4j* 2) * (X + (2*Y)+Z))
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
 
+@colorize(color=BLUE)
+class TestCanonicalizationVerificationPauliAlgebra(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def test_simple_pass(self):
+        """Simple Pauli Pass"""
+        op = X@X + Z@X
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+
+    def test_simple_fail(self):
+        """Simple Pauli Fail"""
+        op = X@X + Z@(X*X)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+
+    def test_nested_pass(self):
+        """Simple nested Pauli test pass"""
+        op = I@I@X@(X-Z)@(A*A) + Z@(X@(X@(X+Z)))@(A*C*A*C*C)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+
+    def test_nested_pass(self):
+        """Simple nested Pauli test fail because of X * I"""
+        op = I@I@X@(X-Z)@(A*A) + Z@(X@(X@((X*I)+Z)))@(A*C*A*C*C)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())

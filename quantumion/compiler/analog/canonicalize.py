@@ -24,6 +24,7 @@ __all__ = [
     "CanonicalizationVerificationOperatorDistribute",
     "CanonicalizationVerificationGatherMathExpr",
     "CanonicalizationVerificationProperOrder",
+    "CanonicalizationVerificationPauliAlgebra",
 ]
 
 ########################################################################################
