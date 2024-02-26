@@ -62,9 +62,9 @@
 ### Forward Decorators
 === "Forward Once"
     ```python linenums="1"
-    forward_decorator = ForwardDecorator()
+    forward_decorators = ForwardDecorators()
 
-    @forward_decorator.forward_once(done="FN2")
+    @forward_decorators.forward_once(done="FN2")
     def forward_FN1(self, model):
         pass
     ```
@@ -83,9 +83,9 @@
     ```
 === "Forward Fixed Point"
     ```python linenums="1"
-    forward_decorator = ForwardDecorator()
+    forward_decorators = ForwardDecorators()
 
-    @forward_decorator.forward_fixed_point(done="FN2")
+    @forward_decorators.forward_fixed_point(done="FN2")
     def forward_FN1(self, model):
         pass
     ```
@@ -106,9 +106,9 @@
     ```
 === "Forward Detour"
     ```python linenums="1"
-    forward_decorator = ForwardDecorator()
+    forward_decorators = ForwardDecorators()
 
-    @forward_decorator.forward_detour(done="FN2", detour="FN3)
+    @forward_decorators.forward_detour(done="FN2", detour="FN3)
     def forward_FN1(self, model):
         pass
     ```
@@ -130,10 +130,10 @@
     ```
 === "Catch Error"
     ```python linenums="1"
-    forward_decorator = ForwardDecorator()
+    forward_decorators = ForwardDecorators()
 
-    @forward_decorator.catch_error(redirect="FN3")
-    @forward_decorator.forward_once(done="FN2")
+    @forward_decorators.catch_error(redirect="FN3")
+    @forward_decorators.forward_once(done="FN2")
     def forward_FN1(self, model):
         pass
     ```
@@ -153,41 +153,41 @@
     ```
 
 #### Forward Rules
-A FlowGraph can instantiate a ForwardDecorator as a class attribute, when the ForwardDecorator is used, the logic is recorded to a ForwardRules object in a dictionary.
+A FlowGraph can instantiate a ForwardDecorators object as a class attribute. When a method of ForwardDecorators are used, the logic is recorded to a ForwardRules object as a ForwardRule object.
 === "Forward Once"
     ```python linenums="1"
-    ForwardRules(
-        class_='ForwardRules',
-        rules={
-            'forward_FN1': {'done': 'FN2'},
-        }
+    ForwardRule(
+        class_="ForwardRule",
+        name="forward_FN1",
+        decorators=["forward_once"],
+        destinations={"done": "FN2"},
     )
     ```
 === "Forward Fixed Point"
     ```python linenums="1"
-    ForwardRules(
-        class_='ForwardRules',
-        rules={
-            'forward_FN1': {'done': 'FN2'},
-        }
+    ForwardRule(
+        class_="ForwardRule",
+        name="forward_FN1",
+        decorators=["forward_fixed_point"],
+        destinations={"done": "FN2"},
     )
     ```
 === "Forward Detour"
     ```python linenums="1"
-    ForwardRules(
-        class_='ForwardRules',
-        rules={
-            'forward_FN1': {'done': 'FN2', 'detour': 'FN3'},
-        }
+    ForwardRule(
+        class_="ForwardRule",
+        name="forward_FN1",
+        decorators=["forward_detour"],
+        destinations={"done": "FN2", "detour": "FN3"},
     )
     ```
 === "Catch Error"
     ```python linenums="1"
-    ForwardRules(
-        class_='ForwardRules',
-        rules={
-            'forward_FN1': {'done': 'FN2', 'redirect': 'FN3'},
-        }
+    ForwardRule(
+        class_="ForwardRule",
+        name="forward_FN1",
+        decorators=["forward_once", "catch_error"],
+        destinations={"done": "FN2", "redirect": "FN3"},
     )
     ```
 

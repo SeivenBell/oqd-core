@@ -28,10 +28,10 @@ class TestFlow(FlowGraph):
         FlowTerminal(name="terminal2"),
     ]
     rootnode = "g1"
-    forward_decorator = ForwardDecorator()
+    forward_decorators = ForwardDecorators()
 
-    @forward_decorator.catch_error(redirect="terminal2")
-    @forward_decorator.forward_once(done="terminal1")
+    @forward_decorators.catch_error(redirect="terminal2")
+    @forward_decorators.forward_once(done="terminal1")
     def forward_g1(self, model):
         pass
 
@@ -39,7 +39,7 @@ class TestFlow(FlowGraph):
 if __name__ == "__main__":
     op = (X + (X * Y + Z)) @ (A * C)
 
-    fg = CanonicalizationFlow2(name="g1")
+    fg = CanonicalizationFlow(name="g1")
 
     op = fg(op).model
 
@@ -53,4 +53,4 @@ if __name__ == "__main__":
     with open("_console.py", mode="w", encoding="utf8") as f:
         f.write(string)
 
-    pprint(fg.forward_decorator.rules)
+    pprint(fg.forward_decorators.rules)
