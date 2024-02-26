@@ -256,17 +256,17 @@ The Traversal records each site it passes through as a TraversalSite:
 
 ```python linenums="1" 
 traversal.sites[0] = TraversalSite(
-    iteration=0, node="FN1", subtraversal=None, emission=...
+    site=0, node="FN1", subtraversal=None, emission=...
 )
 traversal.sites[1] = TraversalSite(
-    iteration=1, node="FN1", subtraversal=None, emission=...
+    site=1, node="FN1", subtraversal=None, emission=...
 )
 ...
 traversal.sites[6] = TraversalSite(
-    iteration=6, node="FG1", subtraversal=Traversal(...), emission=None
+    site=6, node="FG1", subtraversal=Traversal(...), emission=None
 )
 ...
 travelsal.sites[8] = TraversalSite(
-    iteration=8, node="terminal", subtraversal=None, emission=None
+    site=8, node="terminal", subtraversal=None, emission=None
 )
 ```
