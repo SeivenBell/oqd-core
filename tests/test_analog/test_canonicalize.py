@@ -298,10 +298,15 @@ class TestCanonicalizationVerificationPauliAlgebra(CanonicalFormErrors, unittest
         op = I@I@X@(X-Z)@(A*A) + Z@(X@(X@(X+Z)))@(A*C*A*C*C)
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
 
-    def test_nested_pass(self):
+    def test_nested_fail(self):
         """Simple nested Pauli test fail because of X * I"""
         op = I@I@X@(X-Z)@(A*A) + Z@(X@(X@((X*I)+Z)))@(A*C*A*C*C)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+
+    def test_assumption_pass(self):
+        """Showing test passing due to assumption"""
+        op = X*(2*Y)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
 
 if __name__ == '__main__':
     unittest.main()
