@@ -35,6 +35,10 @@ class Visitor:
     def reset(self):
         pass
 
+    def emit(self, model: Any):
+        model.accept(self)
+        return
+
 
 class Transformer(Visitor):
     def _visit(self, model: Any) -> Any:
