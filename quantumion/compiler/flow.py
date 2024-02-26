@@ -182,6 +182,31 @@ class ForwardDecorators:
 
         return _catch_error
 
+    def catch_errors_and_branch(self, branch):
+        def _catch_errors_and_branch(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "catch_error_and_branch",
+                    ],
+                    destinations={f"{k.__name__}_branch": v for k, v in branch.items()},
+                )
+            )
+
+            @functools.wraps(method)
+            def _method(self, model: Any) -> FlowOut:
+                try:
+                    flowout = method(self, model)
+                    return flowout
+                except tuple(branch.keys()) as e:
+                    self.next_node = branch[e.__class__]
+                    return FlowOut(model=model, emission=e)
+
+            return _method
+
+        return _catch_errors_and_branch
+
 
 ########################################################################################
 
