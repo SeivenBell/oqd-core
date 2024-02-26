@@ -108,7 +108,7 @@
     ```python linenums="1"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.forward_detour(done="FN2", detour="FN3)
+    @forward_decorators.forward_detour(done="FN2", detour="FN3")
     def forward_FN1(self, model):
         pass
     ```
@@ -151,6 +151,33 @@
 
     classDef hidden display: none;
     ```
+=== "Catch Error and Branch"
+    ```python linenums="1"
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.catch_error(branch={TypeError:"FN3", ValueError:"FN4"}}
+    @forward_decorators.forward_once(done="FN2")
+    def forward_FN1(self, model):
+        pass
+    ```
+    ```mermaid
+    flowchart LR
+    
+    node1("FlowNode1<br/>----------<br/>name: FN1")
+    node2("FlowNode2<br/>----------<br/>name: FN2")
+    node3("FlowNode3<br/>----------<br/>name: FN3")
+    node4("FlowNode4<br/>----------<br/>name: FN4")
+    
+    START:::hidden -- Input --> node1 --> status{Status} -- success --> node2 -- continue --> END:::hidden
+
+    status -- error --> branch{Branch}
+    branch -- TypeError --> node3 -- continue --> END2:::hidden
+    branch -- ValueError --> node4 -- continue --> END3:::hidden
+    
+    status -. Emission .-> MID1:::hidden
+
+    classDef hidden display: none;
+    ```
 
 #### Forward Rules
 A FlowGraph can instantiate a ForwardDecorators object as a class attribute. When a method of ForwardDecorators are used, the logic is recorded to a ForwardRules object as a ForwardRule object.
@@ -188,6 +215,19 @@ A FlowGraph can instantiate a ForwardDecorators object as a class attribute. Whe
         name="forward_FN1",
         decorators=["forward_once", "catch_error"],
         destinations={"done": "FN2", "redirect": "FN3"},
+    )
+    ```
+=== "Catch Error and Branch"
+    ```python linenums="1"
+    ForwardRule(
+        class_="ForwardRule",
+        name="forward_FN1",
+        decorators=["forward_once", "catch_error_and_branch"],
+        destinations={
+            "done": "FN2",
+            "TypeError_branch": "FN3",
+            "ValueError_branch": "FN4",
+        },
     )
     ```
 
