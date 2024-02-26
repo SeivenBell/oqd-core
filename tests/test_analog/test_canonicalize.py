@@ -311,8 +311,125 @@ class TestCanonicalizationVerificationPauliAlgebra(CanonicalFormErrors, unittest
     def test_assumption_pass_v2(self):
         """Showing test passing due to assumption: GatherMathExpr needs to be done before further PauliAlgebra can be done"""
         op = X*((1j)*Y)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())        
 
+@colorize(color=GREEN)
+class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def test_simple_pass(self):
+        """Simple pass"""
+        op = X@X@Y@(A*C*LI)@A
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_simple_fail(self):
+        """Simple fail"""
+        op = X@X@Y@(A*C*LI)@A@I
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_complicated_addition_pass(self):
+        """Complicated Addition pass"""
+        op = X@X@Y@(A*C*LI)@A + I@I@I@I@C@C ##  X@(A*A)@A+I@C@C
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_simple_adddition_fail(self):
+        """Simple Addition fail"""
+        op = X@X@Y@(A*C*LI)@A@I + I@I@I@I@C@C
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        
+    def test_simple_addition_pass(self):
+        """Simple Addition pass"""
+        op = X@(A*A)@A+I@C@C
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_assumption_addition_pass(self):
+        """Assumption Single Nested Addition pass"""
+        op = (Y+I)@A@X
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_assumtion_nested_addition_pass(self):
+        """Assumption double Nested Addition pass"""
+        op = (Y+I)@A@(Z+I)# +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_assumption_simple_nested_addition_pass(self):
+        """Error not found when Ladder @ PauliAddition"""
+        op = A@(Z+I)# +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_assumption_simple_nested_subtraction_pass(self):
+        """Error not found when Ladder @ PauliSubtraction"""
+        op = A@(Z+I)# +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_assumption_simple_nested_product_fail(self):
+        """Error found when Ladder @ PauliMultiplication"""
+        op = A@(Z*I)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+@colorize(color=RED)
+class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def test_simple_pass(self):
+        """Simple pass"""
+        op = X@X@Y@(C*A)@A
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_fail(self):
+        """Simple fail"""
+        op = X@X@Y@(A*C)@A
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_pass_only_ladders(self):
+        """Simple pass with only ladders"""
+        op = (C*C*C*A)@C@LI
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_fail_only_ladders(self):
+        """Simple fail with only ladders"""
+        op = (C*C*C*A)@C@LI
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_addition_pass(self):
+        """Simple pass with addition"""
+        op = X@X@Y@(C*A)@A + I@I@I@C@C
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_addition_fail(self):
+        """Simple fail with addition"""
+        op = X@X@Y@(C*A*C)@A + I@I@I@C@C
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_starting_with_ladder_pass_v1(self):
+        """Starting with ladder pass  v1"""
+        op = (C*A)@(Z+I)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_starting_with_ladder_fail_v1(self):
+        """Starting with ladder fail  v1"""
+        op = (C*A*C)@(Z+I)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_starting_with_single_ladder_pass_v1(self):
+        """Starting with single ladder pass  v1"""
+        op = C@(Z+I)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_simple_starting_with_single_ladder_tensors(self):
+        """Starting with ladder pass  v1"""
+        op = C@A@C@LI@A@C@(Z+I)@X@Y
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_assumption_only_ladder_addition_without_distribution(self):
+        """Error not detected when we do only ladder operations without distribution of ladders"""
+        op = A*(A+C)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+
+    def test_assumption_only_ladder_addition_with_distribution(self):
+        """Error detected when we do only ladder operation with distribution of ladders"""
+        op = (A*A)+(A*C)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())    
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())

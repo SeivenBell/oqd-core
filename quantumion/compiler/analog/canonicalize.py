@@ -25,6 +25,8 @@ __all__ = [
     "CanonicalizationVerificationGatherMathExpr",
     "CanonicalizationVerificationProperOrder",
     "CanonicalizationVerificationPauliAlgebra",
+    "CanonicalizationVerificationGatherPauli",
+    "CanonicalizationVerificationNormalOrder",
 ]
 
 ########################################################################################
@@ -517,13 +519,73 @@ class CanonicalizationVerificationPauliAlgebra(AnalogCircuitVisitor):
             self.visit(model.op1)
             self.visit(model.op2)
 
-class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
-    pass
-
 class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
-    pass
+    """Assumptions:
+    >>> Distributed, Gathered and then proper ordered and PauliAlgebra
+    """
+    def __init__(self):
+        super().__init__()
+        self.pauli_tracker = False
 
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (OperatorAdd, OperatorSub)):
+            self.visit_OperatorAddSub(model)
+        else:
+            super(self.__class__, self)._visit(model)
+
+    def visit_OperatorKron(self, model: OperatorKron):
+        if isinstance(model.op2, Pauli):
+            self.pauli_tracker = True
+            self.visit(model.op1)
+        if (isinstance(model.op1, (Ladder, OperatorMul)) or isinstance(model.op2, (Ladder, OperatorMul))):
+            self.visit(model.op2) # left tree contains @ and right tree contains multiplications (right is more complicated than left). test both to see which cases fail
+            if self.pauli_tracker:
+                raise CanonicalFormError("Incorrect GatherPauli")
+            self.visit(model.op1)
+
+    def visit_OperatorMul(self, model: OperatorMul): # extra precaution to ensure pauli algebra is not present for GatherPauli
+        if isinstance(model.op1, Pauli) or isinstance(model.op2, Pauli):
+            raise CanonicalFormError("Pauli Algbebra incomplete or Pauli * Ladder present")
+        self.visit(model.op1)
+        self.visit(model.op2)
+
+    def visit_OperatorAddSub(self, model: Union[OperatorAdd, OperatorSub]):
+        self.pauli_tracker = False
+        self.visit(model.op1)
+        self.pauli_tracker = False
+        self.visit(model.op2)
+        
 class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
+    """Assumptions:
+    >>> Distributed, Gathered and then proper ordered, PauliAlgebra and GatherPauli
+    """
+    def __init__(self):
+        super().__init__()
+        self.creation_tracker = False
+
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul, OperatorKron)):
+            self.visit_OperatorAddSubMulKron(model)
+        else:
+            super(self.__class__, self)._visit(model)
+
+    def visit_OperatorMul(self, model: OperatorMul):
+        if isinstance(model.op2, Creation):
+            self.creation_tracker = True
+            self.visit(model.op1)
+        if isinstance(model.op1, Annihilation) or isinstance(model.op2, Annihilation):
+            if self.creation_tracker:
+                raise CanonicalFormError("Ladders are not in Normal order")
+            self.visit(model.op1)
+            self.visit(model.op2)
+
+    def visit_OperatorAddSubMulKron(self, model: Union[OperatorAdd, OperatorSub, OperatorMul, OperatorKron]):
+        self.creation_tracker = False
+        self.visit(model.op1)
+        self.creation_tracker = False
+        self.visit(model.op2)
+
+class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
     pass
 
 class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
