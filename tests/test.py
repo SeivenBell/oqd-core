@@ -75,6 +75,7 @@ class TestFlow(FlowGraph):
         FlowTerminal(name="terminal1"),
         FlowTerminal(name="terminal2"),
         FlowTerminal(name="terminal3"),
+        FlowTerminal(name="terminal4"),
     ]
     rootnode = "n1"
     forward_decorators = ForwardDecorators()
@@ -96,6 +97,7 @@ class TestFlow(FlowGraph):
     def forward_n3(self, model):
         pass
 
+    @forward_decorators.catch_error(redirect="terminal4")
     @forward_decorators.forward_return()
     def forward_n4(self, model):
         pass
@@ -129,7 +131,7 @@ class TestFlow(FlowGraph):
 
 ########################################################################################
 if __name__ == "__main__":
-    op = X * Y
+    op = X * Z
 
     fg = TestFlow(name="g1", max_steps=10)
 

@@ -34,6 +34,18 @@ __all__ = [
     "CanonicalizationFlow2",
 ]
 
+
+########################################################################################
+
+
+class FlowError(Exception):
+    pass
+
+
+class ForwardError(Exception):
+    pass
+
+
 ########################################################################################
 
 
@@ -192,8 +204,14 @@ class ForwardDecorators:
 
             @functools.wraps(method)
             def _method(self, model: Any):
+                try:
+                    self.next_node = self.traversal.sites[-1].node
+                except:
+                    raise ForwardError(
+                        "Previous site does not exist for forward_return."
+                    )
+
                 flowout = self.namespace[self.current_node](model)
-                self.next_node = self.traversal.sites[-1].node
 
                 return flowout
 
@@ -250,13 +268,6 @@ class ForwardDecorators:
             return _method
 
         return _catch_errors_and_branch
-
-
-########################################################################################
-
-
-class FlowError(Exception):
-    pass
 
 
 ########################################################################################
