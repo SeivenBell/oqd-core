@@ -157,6 +157,29 @@ class ForwardDecorators:
 
         return _forward_detour
 
+    def forward_return(self):
+        def _forward_return(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "forward_return",
+                    ],
+                    destinations={},
+                )
+            )
+
+            @functools.wraps(method)
+            def _method(self, model: Any):
+                flowout = method(self.model)
+                self.next_node = self.traversal[-2].node
+
+                return flowout
+
+            return _method
+
+        return _forward_return
+
     def catch_error(self, redirect):
         def _catch_error(method):
             self.update_rule(
