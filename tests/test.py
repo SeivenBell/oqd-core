@@ -29,11 +29,11 @@ def dummy_node(label):
     def call(self, model):
         if not hasattr(self, "used"):
             self.used = False
+        else:
+            self.used = True
 
-        if self.used:
+        if self.used and False:
             raise Exception("Node Used")
-
-        self.used = True
 
         return FlowOut(model=model, emission=dict(used=self.used))
 
@@ -92,8 +92,9 @@ class TestFlow(FlowGraph):
     def forward_n2(self, model):
         pass
 
-    @forward_decorators.catch_error(redirect="terminal3")
-    @forward_decorators.forward_once(done="n4")
+    @forward_decorators.forward_branch_from_emission(
+        key="used", branch={True: "terminal3", False: "n4"}
+    )
     def forward_n3(self, model):
         pass
 
@@ -147,4 +148,4 @@ if __name__ == "__main__":
         f.write(string)
 
     pprint(fg.traversal)
-    pprint(fg.forward_decorators.rules)
+    # pprint(fg.forward_decorators.rules)

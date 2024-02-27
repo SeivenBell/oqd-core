@@ -219,6 +219,37 @@ class ForwardDecorators:
 
         return _forward_return
 
+    def forward_branch_from_emission(self, key, branch):
+        def _forward_branch_from_emission(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "forward_branch_from_emission",
+                    ],
+                    destinations={
+                        f"emission.{key}=={k}_branch": v for k, v in branch.items()
+                    },
+                )
+            )
+
+            @functools.wraps(method)
+            def _method(self, model: Any):
+                flowout = self.namespace[self.current_node](model)
+
+                if isinstance(flowout.emission, dict):
+                    emission_dict = flowout.emission
+                else:
+                    emission_dict = vars(flowout.emission)
+
+                self.next_node = branch[emission_dict[key]]
+
+                return flowout
+
+            return _method
+
+        return _forward_branch_from_emission
+
     def catch_error(self, redirect):
         def _catch_error(method):
             self.update_rule(

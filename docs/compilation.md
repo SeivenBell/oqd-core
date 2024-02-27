@@ -155,6 +155,37 @@
 
     classDef hidden display: none;
     ```
+=== "Forward Branch from Emission"
+    ```python linenums="1"
+    forward_decorators = ForwardDecorators()
+    
+    @forward_decorators.forward_branch_from_emission(
+            key="dest", branch={fn2: "FN2", fn3: "FN3"}
+        )
+    def forward_FN1(self, model):
+        pass
+    ```
+    ```mermaid
+    flowchart LR
+    
+    node1("FlowNode1<br/>----------<br/>name: FN1")
+    node2("FlowNode2<br/>----------<br/>name: FN2")
+    node3("FlowNode3<br/>----------<br/>name: FN3")
+
+    
+    START1:::hidden -- from --> node1 --> branch{Branch}
+
+    node1 -. Emission .-> branch
+
+    branch -- "(emission.dest == fn2)" --> node2 -- continue --> END1:::hidden
+    branch -- "(emission.dest == fn3)" --> node3 -- continue --> END2:::hidden
+
+    node1 -. Emission .-> MID:::hidden
+
+    node1 
+
+    classDef hidden display: none;
+    ```
 === "Catch Error"
     ```python linenums="1"
     forward_decorators = ForwardDecorators()
@@ -244,6 +275,18 @@ A FlowGraph can instantiate a ForwardDecorators object as a class attribute. Whe
         name="forward_FN3",
         decorators=["forward_return"],
         destinations={},
+    )
+    ```
+=== "Forward Branch from Emission"
+    ```python linenums="1"
+    ForwardRule(
+        class_="ForwardRule",
+        name="forward_FN1",
+        decorators=["forward_branch_from_emission"],
+        destinations={
+            "emission.dest==fn2_branch": "FN2",
+            "emission.dest==fn3_branch": "FN3",
+        },
     )
     ```
 === "Catch Error"
