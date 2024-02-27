@@ -15,6 +15,27 @@ from quantumion.compiler.math import *
 
 ########################################################################################
 
+__all__ = [
+    "TraversalSite",
+    "Traversal",
+    "ForwardRule",
+    "ForwardRules",
+    "ForwardDecorators",
+    "FlowError",
+    "FlowBase",
+    "FlowOut",
+    "FlowNode",
+    "FlowTerminal",
+    "VisitorFlowNode",
+    "TransformerFlowNode",
+    "FlowGraph",
+    "NormalOrderFlow",
+    "CanonicalizationFlow",
+    "CanonicalizationFlow2",
+]
+
+########################################################################################
+
 
 class TraversalSite(TypeReflectBaseModel):
     site: str
@@ -171,8 +192,8 @@ class ForwardDecorators:
 
             @functools.wraps(method)
             def _method(self, model: Any):
-                flowout = method(self.model)
-                self.next_node = self.traversal[-2].node
+                flowout = self.namespace[self.current_node](model)
+                self.next_node = self.traversal.sites[-2].node
 
                 return flowout
 
@@ -299,7 +320,7 @@ class VisitorFlowNode(FlowNode):
     pass
 
 
-class TransformFlowNode(VisitorFlowNode):
+class TransformerFlowNode(VisitorFlowNode):
     def __call__(self, model: Any) -> FlowOut:
         return FlowOut(model=model.accept(self.visitor))
 
@@ -429,11 +450,11 @@ class FlowGraph(FlowBase):
 
 class NormalOrderFlow(FlowGraph):
     nodes = [
-        TransformFlowNode(visitor=NormalOrder(), name="normal"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper"),
-        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
+        TransformerFlowNode(visitor=NormalOrder(), name="normal"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformerFlowNode(visitor=PruneIdentity(), name="prune"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "normal"
@@ -463,17 +484,17 @@ class NormalOrderFlow(FlowGraph):
 class CanonicalizationFlow(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper"),
-        TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
-        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformerFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformerFlowNode(visitor=GatherPauli(), name="gatherpauli"),
         NormalOrderFlow(name="normalflow"),
-        TransformFlowNode(visitor=SortedOrder(), name="sorted"),
-        TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
-        TransformFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
-        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
+        TransformerFlowNode(visitor=SortedOrder(), name="sorted"),
+        TransformerFlowNode(visitor=DistributeMathExpr(), name="distmath"),
+        TransformerFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
+        TransformerFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
@@ -534,21 +555,21 @@ class CanonicalizationFlow(FlowGraph):
 class CanonicalizationFlow2(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper"),
-        TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
-        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
-        TransformFlowNode(visitor=NormalOrder(), name="normal"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute2"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath3"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper2"),
-        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
-        TransformFlowNode(visitor=SortedOrder(), name="sorted"),
-        TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
-        TransformFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
-        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformerFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformerFlowNode(visitor=GatherPauli(), name="gatherpauli"),
+        TransformerFlowNode(visitor=NormalOrder(), name="normal"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute2"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath3"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper2"),
+        TransformerFlowNode(visitor=PruneIdentity(), name="prune"),
+        TransformerFlowNode(visitor=SortedOrder(), name="sorted"),
+        TransformerFlowNode(visitor=DistributeMathExpr(), name="distmath"),
+        TransformerFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
+        TransformerFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"

@@ -5,9 +5,11 @@ import types
 
 ########################################################################################
 
+
 from quantumion.interface.math import *
 from quantumion.interface.analog.operator import *
 
+from quantumion.compiler.visitor import Visitor, Transformer
 from quantumion.compiler.math import *
 from quantumion.compiler.analog.base import *
 from quantumion.compiler.analog.canonicalize import *
@@ -23,8 +25,36 @@ A, C, J = Annihilation(), Creation(), Identity()
 ########################################################################################
 
 
+def dummy_node(label):
+    def call(self, model):
+        if not hasattr(self, "used"):
+            self.used = False
+
+        if self.used:
+            raise Exception("Node Used")
+
+        self.used = True
+
+        return FlowOut(model=model, emission=dict(used=self.used))
+
+    dummy_flow_node = type(
+        "DummyFlowNode{}".format(label),
+        (FlowNode,),
+        {
+            "__call__": call,
+        },
+    )
+
+    return dummy_flow_node
+
+
+DummyFlowNode = dummy_node(label=1)
+
+########################################################################################
+
+
 class TestVisitor(Visitor):
-    def visit_Operator(self, model):
+    def visit_OperatorMul(self, model):
         raise TypeError
         pass
 
@@ -39,6 +69,9 @@ class TestVisitor(Visitor):
 class TestFlow(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=TestVisitor(), name="n1"),
+        DummyFlowNode(name="n2"),
+        DummyFlowNode(name="n3"),
+        DummyFlowNode(name="n4"),
         FlowTerminal(name="terminal1"),
         FlowTerminal(name="terminal2"),
         FlowTerminal(name="terminal3"),
@@ -47,10 +80,24 @@ class TestFlow(FlowGraph):
     forward_decorators = ForwardDecorators()
 
     @forward_decorators.catch_errors_and_branch(
-        branch={AssertionError: "terminal2", TypeError: "terminal3"}
+        branch={AssertionError: "n2", TypeError: "n3"}
     )
     @forward_decorators.forward_once(done="terminal1")
     def forward_n1(self, model):
+        pass
+
+    @forward_decorators.catch_error(redirect="terminal2")
+    @forward_decorators.forward_once(done="n4")
+    def forward_n2(self, model):
+        pass
+
+    @forward_decorators.catch_error(redirect="terminal3")
+    @forward_decorators.forward_once(done="n4")
+    def forward_n3(self, model):
+        pass
+
+    @forward_decorators.forward_return()
+    def forward_n4(self, model):
         pass
 
 
@@ -82,12 +129,11 @@ class TestFlow(FlowGraph):
 
 ########################################################################################
 if __name__ == "__main__":
-    op = X + Y
+    op = X * Y
 
-    fg = TestFlow(name="g1")
+    fg = TestFlow(name="g1", max_steps=10)
 
     op = fg(op).model
-
     pprint(op.accept(PrintOperator()))
 
     console = Console(record=True)
