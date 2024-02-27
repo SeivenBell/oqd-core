@@ -193,7 +193,7 @@ class ForwardDecorators:
             @functools.wraps(method)
             def _method(self, model: Any):
                 flowout = self.namespace[self.current_node](model)
-                self.next_node = self.traversal.sites[-2].node
+                self.next_node = self.traversal.sites[-1].node
 
                 return flowout
 
