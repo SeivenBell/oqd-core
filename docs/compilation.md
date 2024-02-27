@@ -182,7 +182,9 @@
     ```python linenums="1"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.catch_error_and_branch(branch={TypeError:"FN3", ValueError:"FN4"}}
+    @forward_decorators.catch_error_and_branch(
+        branch={TypeError: "FN3", ValueError: "FN4"},
+    )
     @forward_decorators.forward_once(done="FN2")
     def forward_FN1(self, model):
         pass
