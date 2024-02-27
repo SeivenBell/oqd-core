@@ -15,9 +15,42 @@ from quantumion.compiler.math import *
 
 ########################################################################################
 
+__all__ = [
+    "TraversalSite",
+    "Traversal",
+    "ForwardRule",
+    "ForwardRules",
+    "ForwardDecorators",
+    "FlowError",
+    "FlowBase",
+    "FlowOut",
+    "FlowNode",
+    "FlowTerminal",
+    "VisitorFlowNode",
+    "TransformerFlowNode",
+    "FlowGraph",
+    "NormalOrderFlow",
+    "CanonicalizationFlow",
+    "CanonicalizationFlow2",
+]
+
+
+########################################################################################
+
+
+class FlowError(Exception):
+    pass
+
+
+class ForwardError(Exception):
+    pass
+
+
+########################################################################################
+
 
 class TraversalSite(TypeReflectBaseModel):
-    iteration: str
+    site: str
     node: str
     subtraversal: Optional["Traversal"] = None
     emission: Any = None
@@ -157,6 +190,66 @@ class ForwardDecorators:
 
         return _forward_detour
 
+    def forward_return(self):
+        def _forward_return(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "forward_return",
+                    ],
+                    destinations={},
+                )
+            )
+
+            @functools.wraps(method)
+            def _method(self, model: Any):
+                try:
+                    self.next_node = self.traversal.sites[-1].node
+                except:
+                    raise ForwardError(
+                        "Previous site does not exist for forward_return."
+                    )
+
+                flowout = self.namespace[self.current_node](model)
+
+                return flowout
+
+            return _method
+
+        return _forward_return
+
+    def forward_branch_from_emission(self, key, branch):
+        def _forward_branch_from_emission(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "forward_branch_from_emission",
+                    ],
+                    destinations={
+                        f"emission.{key}=={k}_branch": v for k, v in branch.items()
+                    },
+                )
+            )
+
+            @functools.wraps(method)
+            def _method(self, model: Any):
+                flowout = self.namespace[self.current_node](model)
+
+                if isinstance(flowout.emission, dict):
+                    emission_dict = flowout.emission
+                else:
+                    emission_dict = vars(flowout.emission)
+
+                self.next_node = branch[emission_dict[key]]
+
+                return flowout
+
+            return _method
+
+        return _forward_branch_from_emission
+
     def catch_error(self, redirect):
         def _catch_error(method):
             self.update_rule(
@@ -182,12 +275,30 @@ class ForwardDecorators:
 
         return _catch_error
 
+    def catch_errors_and_branch(self, branch):
+        def _catch_errors_and_branch(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "catch_error_and_branch",
+                    ],
+                    destinations={f"{k.__name__}_branch": v for k, v in branch.items()},
+                )
+            )
 
-########################################################################################
+            @functools.wraps(method)
+            def _method(self, model: Any) -> FlowOut:
+                try:
+                    flowout = method(self, model)
+                    return flowout
+                except tuple(branch.keys()) as e:
+                    self.next_node = branch[e.__class__]
+                    return FlowOut(model=model, emission=e)
 
+            return _method
 
-class FlowError(Exception):
-    pass
+        return _catch_errors_and_branch
 
 
 ########################################################################################
@@ -251,7 +362,7 @@ class VisitorFlowNode(FlowNode):
     pass
 
 
-class TransformFlowNode(VisitorFlowNode):
+class TransformerFlowNode(VisitorFlowNode):
     def __call__(self, model: Any) -> FlowOut:
         return FlowOut(model=model.accept(self.visitor))
 
@@ -281,8 +392,8 @@ class FlowGraph(FlowBase):
 
         return _namespace
 
-    def __init__(self, max_iter=1000, **kwargs):
-        self.max_iter = max_iter
+    def __init__(self, max_steps=1000, **kwargs):
+        self.max_steps = max_steps
 
         if FlowTerminal not in [node.__class__ for node in self.nodes]:
             raise FlowError("FlowGraph does not contain a terminal node")
@@ -291,9 +402,9 @@ class FlowGraph(FlowBase):
         pass
 
     @property
-    def exceeded_max_iter(self):
-        if self.current_iter >= self.max_iter:
-            raise RecursionError(f"Exceeded number of iterations allowed for {self}")
+    def exceeded_max_steps(self):
+        if self.current_step >= self.max_steps:
+            raise RecursionError(f"Exceeded number of steps allowed for {self}")
         pass
 
     @property
@@ -324,8 +435,8 @@ class FlowGraph(FlowBase):
         pass
 
     @property
-    def current_iter(self):
-        return self._current_iter
+    def current_step(self):
+        return self._current_step
 
     @property
     def traversal(self) -> Traversal:
@@ -333,17 +444,17 @@ class FlowGraph(FlowBase):
 
     def __iter__(self):
         self.current_node = self.rootnode
-        self._current_iter = 0
+        self._current_step = 0
         self._traversal = Traversal()
         return self
 
     def __next__(self):
-        self.exceeded_max_iter
+        self.exceeded_max_steps
 
         if isinstance(self.namespace[self.current_node], FlowTerminal):
             self._traversal.sites += [
                 TraversalSite(
-                    iteration=str(self.current_iter),
+                    site=str(self.current_step),
                     node=self.current_node,
                 ),
             ]
@@ -354,7 +465,7 @@ class FlowGraph(FlowBase):
 
             self._traversal.sites += [
                 TraversalSite(
-                    iteration=str(self.current_iter),
+                    site=str(self.current_step),
                     node=self.current_node,
                     subtraversal=self.namespace[self.current_node].traversal,
                     emission=flowout.emission,
@@ -362,7 +473,7 @@ class FlowGraph(FlowBase):
             ]
 
             self.current_node = self.next_node
-            self._current_iter += 1
+            self._current_step += 1
 
             del self.next_node
 
@@ -381,11 +492,11 @@ class FlowGraph(FlowBase):
 
 class NormalOrderFlow(FlowGraph):
     nodes = [
-        TransformFlowNode(visitor=NormalOrder(), name="normal"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper"),
-        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
+        TransformerFlowNode(visitor=NormalOrder(), name="normal"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformerFlowNode(visitor=PruneIdentity(), name="prune"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "normal"
@@ -415,17 +526,17 @@ class NormalOrderFlow(FlowGraph):
 class CanonicalizationFlow(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper"),
-        TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
-        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformerFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformerFlowNode(visitor=GatherPauli(), name="gatherpauli"),
         NormalOrderFlow(name="normalflow"),
-        TransformFlowNode(visitor=SortedOrder(), name="sorted"),
-        TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
-        TransformFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
-        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
+        TransformerFlowNode(visitor=SortedOrder(), name="sorted"),
+        TransformerFlowNode(visitor=DistributeMathExpr(), name="distmath"),
+        TransformerFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
+        TransformerFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
@@ -486,21 +597,21 @@ class CanonicalizationFlow(FlowGraph):
 class CanonicalizationFlow2(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper"),
-        TransformFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
-        TransformFlowNode(visitor=GatherPauli(), name="gatherpauli"),
-        TransformFlowNode(visitor=NormalOrder(), name="normal"),
-        TransformFlowNode(visitor=OperatorDistribute(), name="distribute2"),
-        TransformFlowNode(visitor=GatherMathExpr(), name="gathermath3"),
-        TransformFlowNode(visitor=ProperOrder(), name="proper2"),
-        TransformFlowNode(visitor=PruneIdentity(), name="prune"),
-        TransformFlowNode(visitor=SortedOrder(), name="sorted"),
-        TransformFlowNode(visitor=DistributeMathExpr(), name="distmath"),
-        TransformFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
-        TransformFlowNode(visitor=PartitionMathExpr(), name="partmath"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper"),
+        TransformerFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
+        TransformerFlowNode(visitor=GatherPauli(), name="gatherpauli"),
+        TransformerFlowNode(visitor=NormalOrder(), name="normal"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute2"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath3"),
+        TransformerFlowNode(visitor=ProperOrder(), name="proper2"),
+        TransformerFlowNode(visitor=PruneIdentity(), name="prune"),
+        TransformerFlowNode(visitor=SortedOrder(), name="sorted"),
+        TransformerFlowNode(visitor=DistributeMathExpr(), name="distmath"),
+        TransformerFlowNode(visitor=ProperOrderMathExpr(), name="propermath"),
+        TransformerFlowNode(visitor=PartitionMathExpr(), name="partmath"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
