@@ -9,6 +9,7 @@ nav:
   - How to guides: how-to-guides.md
   - Reference: reference.md
   - Explanation: explanation.md
+  - Units: units.md
 
 
 use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
@@ -70,6 +71,11 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.blocks.admonition
   - pymdownx.blocks.details
+
+  
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
 
   # for flow diagrams
   - pymdownx.superfences:
