@@ -37,7 +37,48 @@ In our case, this means we may want to compile out units in the intermediate rep
 
 ## Implementation
 
+### AST
 === "Global"
+    ```mermaid
+    flowchart TB
+
+    unitful[[Unitful]]
+
+    add["+ (Math)"]
+
+    num1(1)
+    var2(a)
+
+    unit(cm)
+
+    unitful --> add & unit
+    add --> num1 & var2
+    ```
+=== "Local"
+    ```mermaid
+    flowchart TB
+
+    add[["+ (Unitful)"]]
+
+    num1(1)
+    var2(a)
+
+    unitful1[[Unitful]]
+
+    unitful2[[Unitful]]
+
+    unit1(cm)
+    dimension2(length)
+
+    add --> unitful1 & unitful2
+
+    unitful1 --> num1 & unit1
+    unitful2 --> var2 & dimension2
+
+    ```
+
+### Key points
+===! "Global"
     Global implementation of units tags the abstract syntax tree (AST) of mathematical expressions with a unit.
 
     - [x] 1 (cm)
@@ -68,43 +109,3 @@ In our case, this means we may want to compile out units in the intermediate rep
         - consider $\sin(w*t)$ $\rightarrow$ $w \ [\mathrm{Time}^{-1}] * t \ [\mathrm{Time}]$ can be verified to be dimensionless
     - [x] Expressions must have the appropriate coefficients
         - e.g. $t^7$ (cm) $\rightarrow$ $1 \left( \mathrm{cm}/\mathrm{s}^7 \right) * t^7 \left[ \mathrm{Time}^7 \right]$
-
-### AST
-=== "Global"
-    ```mermaid
-    flowchart TB
-
-    unitful[[Unitful]]
-
-    add["+ (Math)"]
-
-    num1(1)
-    var2(a)
-
-    unit(cm)
-
-    unitful --> add & unit
-    add --> num1 & var2
-    ```
-=== "Local"
-    ```mermaid
-    flowchart TB
-
-    add["+ (Unitful)"]
-
-    num1(1)
-    var2(a)
-
-    unitful1[[Unitful]]
-
-    unitful2[[Unitful]]
-
-    unit1(cm)
-    dimension2(length)
-
-    add --> unitful1 & unitful2
-
-    unitful1 --> num1 & unit1
-    unitful2 --> var2 & dimension2
-
-    ```
