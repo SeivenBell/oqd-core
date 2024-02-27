@@ -160,7 +160,7 @@
     forward_decorators = ForwardDecorators()
     
     @forward_decorators.forward_branch_from_emission(
-            key="dest", branch={fn2: "FN2", fn3: "FN3"}
+            key="dest", branch={"fn2": "FN2", "fn3": "FN3"}
         )
     def forward_FN1(self, model):
         pass
