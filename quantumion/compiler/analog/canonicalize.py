@@ -27,6 +27,7 @@ __all__ = [
     "CanonicalizationVerificationPauliAlgebra",
     "CanonicalizationVerificationGatherPauli",
     "CanonicalizationVerificationNormalOrder",
+    "CanonicalizationVerificationPruneIdentity",
 ]
 
 ########################################################################################
@@ -586,7 +587,15 @@ class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
         self.visit(model.op2)
 
 class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
-    pass
+    """Assumptions:
+    >>> Distributed, Gathered
+    """
+    def visit_OperatorMul(self, model: OperatorMul):
+        print(model)
+        if isinstance(model.op1, Identity) or isinstance(model.op2, Identity):
+            raise CanonicalFormError("Prune Identity is not complete")
+        self.visit(model.op1)
+        self.visit(model.op2)
 
 class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
     pass

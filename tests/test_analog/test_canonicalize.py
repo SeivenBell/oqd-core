@@ -430,6 +430,30 @@ class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors, unittest.
         """Error detected when we do only ladder operation with distribution of ladders"""
         op = (A*A)+(A*C)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())    
+
+@colorize(color=RED)
+class TestCanonicalizationVerificationPruneIdentity(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def test_simple_pass(self):
+        """Simple pass"""
+        op = X@X@Y@(C*A)@A
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+
+    def test_simple_addition_pass(self):
+        """Simple pass"""
+        op = A@LI@LI + C@C@LI
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+
+    def test_simple_fail(self):
+        """Simple pass"""
+        op = X@X@Y@(C*A*LI)@A
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+
+    def test_show_proper_order_not_needed(self):
+        """Showing that expression does not need to be in proper order"""
+        op = A*(C*A*(A*C*A*(C*C)*LI))
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())
