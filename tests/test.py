@@ -3,6 +3,10 @@ from rich.console import Console
 
 import types
 
+import networkx as nx
+
+from matplotlib import pyplot as plt
+
 ########################################################################################
 
 
@@ -61,6 +65,7 @@ class TestFlow2(FlowGraph):
 
 
 ########################################################################################
+
 if __name__ == "__main__":
     op = X + Y
 
@@ -69,10 +74,25 @@ if __name__ == "__main__":
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
 
-    console = Console(record=True)
-    with console.capture() as capture:
-        console.print(fg.traversal)
-    string = console.export_text()
+    # console = Console(record=True)
+    # with console.capture() as capture:
+    #     console.print(fg.traversal)
+    # string = console.export_text()
 
-    with open("_console.py", mode="w", encoding="utf8") as f:
-        f.write(string)
+    # with open("_console.py", mode="w", encoding="utf8") as f:
+    #     f.write(string)
+
+    fr = fg.forward_decorators.rules
+    ft = fg.traversal
+
+    pprint(op.accept(PrintOperator()))
+
+    G = fr.accept(GenerateFlowGraph())
+
+    A = nx.nx_agraph.to_agraph(G)
+    A.draw("rules.png", prog="dot")
+
+    G2 = ft.accept(GenerateFlowGraph())
+
+    A2 = nx.nx_agraph.to_agraph(G2)
+    A2.draw("traversal.png", prog="dot")

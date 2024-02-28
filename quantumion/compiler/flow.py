@@ -94,8 +94,13 @@ class GenerateFlowGraph(Transformer):
     def visit_ForwardRules(self, model):
         G = nx.MultiDiGraph()
 
-        for rule in model.rules:
+        G.add_node("start")
+        for n, rule in enumerate(model.rules):
             elements = self.visit(rule)
+
+            if n == 0:
+                G.add_edges_from([("start", elements["node"], {"label": ""})])
+
             G.add_node(elements["node"])
             G.add_edges_from(elements["edges"])
 
@@ -121,9 +126,13 @@ class GenerateFlowGraph(Transformer):
     def visit_Traversal(self, model):
         G = nx.MultiDiGraph()
 
+        G.add_node("start")
         current_element = None
-        for site in model.sites:
+        for n, site in enumerate(model.sites):
             next_element = self.visit(site)
+
+            if n == 0:
+                G.add_edges_from([("start", next_element["node"], {"label": ""})])
 
             G.add_node(next_element["node"])
             if current_element is not None:
