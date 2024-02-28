@@ -252,6 +252,32 @@ class ForwardDecorators:
 
         return _forward_branch_from_emission
 
+    def forward_branch_from_subgraph_exit(self, branch):
+        def _forward_branch_from_subgraph_exit(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "forward_branch_from_subgraph_exit",
+                    ],
+                    destinations={f"{k}_branch": v for k, v in branch.items()},
+                )
+            )
+
+            @functools.wraps(method)
+            def _method(self, model: Any):
+                flowout = self.namespace[self.current_node](model)
+
+                self.next_node = branch[
+                    self.namespace[self.current_node].traversal.sites[-1].node
+                ]
+
+                return flowout
+
+            return _method
+
+        return _forward_branch_from_subgraph_exit
+
     def catch_error(self, redirect):
         def _catch_error(method):
             self.update_rule(
