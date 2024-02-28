@@ -32,33 +32,35 @@ A, C, J = Annihilation(), Creation(), Identity()
 class TestFlow(FlowGraph):
     nodes = [
         CanonicalizationFlow(name="n1"),
+        CanonicalizationFlow(name="n2"),
+        CanonicalizationFlow(name="n3"),
+        CanonicalizationFlow(name="n4"),
+        CanonicalizationFlow(name="n5"),
         FlowTerminal(name="terminal1"),
         FlowTerminal(name="terminal2"),
     ]
     rootnode = "n1"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.catch_error(redirect="terminal2")
+    @forward_decorators.catch_error(redirect="n3")
     @forward_decorators.forward_fixed_point(done="terminal1")
     def forward_n1(self, model):
         pass
 
-    pass
+    @forward_decorators.forward_return()
+    def forward_n2(self, model):
+        pass
 
+    @forward_decorators.forward_once(done="n2")
+    def forward_n3(self, model):
+        pass
 
-class TestFlow2(FlowGraph):
-    nodes = [
-        TestFlow(name="n1"),
-        FlowTerminal(name="terminal1"),
-        FlowTerminal(name="terminal2"),
-    ]
-    rootnode = "n1"
-    forward_decorators = ForwardDecorators()
+    @forward_decorators.forward_once(done="n2")
+    def forward_n4(self, model):
+        pass
 
-    @forward_decorators.forward_branch_from_subgraph_exit(
-        branch={"terminal1": "terminal1", "terminal2": "terminal2"}
-    )
-    def forward_n1(self, model):
+    @forward_decorators.forward_once(done="n2")
+    def forward_n5(self, model):
         pass
 
     pass
@@ -67,9 +69,11 @@ class TestFlow2(FlowGraph):
 ########################################################################################
 
 if __name__ == "__main__":
-    op = X + Y
+    op = X * Y * Z + Y
 
-    fg = TestFlow2(name="_")
+    fg = VerificationFlowGraphCreator(
+        verify=VerifyHilbertSpace(), transformer=DistributeMathExpr()
+    )(name="n1")
 
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
@@ -84,8 +88,6 @@ if __name__ == "__main__":
 
     fr = fg.forward_decorators.rules
     ft = fg.traversal
-
-    pprint(op.accept(PrintOperator()))
 
     G = fr.accept(GenerateFlowGraph())
 

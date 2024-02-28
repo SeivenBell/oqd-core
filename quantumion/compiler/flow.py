@@ -95,14 +95,28 @@ class GenerateFlowGraph(Transformer):
         G = nx.MultiDiGraph()
 
         G.add_node("start")
+        return_nodes = []
         for n, rule in enumerate(model.rules):
             elements = self.visit(rule)
+
+            if "forward_return" in rule.decorators:
+                assert rule.name.startswith("forward_")
+                node = rule.name[8:]
+                return_nodes.append(node)
 
             if n == 0:
                 G.add_edges_from([("start", elements["node"], {"label": ""})])
 
             G.add_node(elements["node"])
             G.add_edges_from(elements["edges"])
+
+        for edge in G.edges:
+            if edge[1] in return_nodes:
+                G.add_edges_from(
+                    [
+                        (edge[1], edge[0], {"label": "return"}),
+                    ]
+                )
 
         return G
 
@@ -609,7 +623,7 @@ def VerificationFlowGraphCreator(verify, transformer):
                 TransformerFlowNode(visitor=transformer, name="transformer"),
                 FlowTerminal(name="terminal"),
             ],
-            rootnode="g1",
+            rootnode="verify",
             forward_decorators=forward_decorators,
             forward_verify=forward_verify,
             forward_transformer=forward_transformer,
