@@ -104,6 +104,11 @@ class GatherPauli(AnalogCircuitTransformer):
                     op1=model.op2,
                     op2=model.op1,
                 )
+            if isinstance(model.op1, OperatorMul) and isinstance(model.op1.op2, Ladder):
+                return OperatorKron(
+                    op1=model.op2,
+                    op2=model.op1,
+                )
             if isinstance(model.op1, OperatorKron) and isinstance(
                 model.op1.op2, Union[Ladder, OperatorMul]
             ):
