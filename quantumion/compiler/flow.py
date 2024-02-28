@@ -6,10 +6,12 @@ import functools
 
 from pydantic import field_validator
 
+import networkx as nx
+
 ########################################################################################
 
 from quantumion.interface.base import TypeReflectBaseModel
-from quantumion.compiler.visitor import Visitor
+from quantumion.compiler.visitor import Visitor, Transformer
 from quantumion.compiler.analog import *
 from quantumion.compiler.math import *
 
@@ -34,6 +36,7 @@ __all__ = [
     "CanonicalizationFlow",
     "CanonicalizationFlow2",
     "VerificationFlowGraphCreator",
+    "GenerateFlowGraph",
 ]
 
 
@@ -82,6 +85,59 @@ class ForwardRules(TypeReflectBaseModel):
 
     class Config:
         validate_assignment = True
+
+
+########################################################################################
+
+
+class GenerateFlowGraph(Transformer):
+    def visit_ForwardRules(self, model):
+        G = nx.MultiDiGraph()
+
+        for rule in model.rules:
+            elements = self.visit(rule)
+            G.add_node(elements["node"])
+            G.add_edges_from(elements["edges"])
+
+        return G
+
+    def visit_ForwardRule(self, model):
+        assert model.name.startswith("forward_")
+        nodename = model.name[8:]
+
+        return {
+            "node": nodename,
+            "edges": [
+                (nodename, destination, {"label": key})
+                for key, destination in model.destinations.items()
+            ],
+        }
+
+    def visit_Traversal(self, model):
+        G = nx.MultiDiGraph()
+
+        current_element = None
+        for site in model.sites:
+            next_element = self.visit(site)
+
+            G.add_node(next_element["node"])
+            if current_element is not None:
+                G.add_edges_from(
+                    [
+                        (
+                            current_element["node"],
+                            next_element["node"],
+                            {"label": (current_element["site"], next_element["site"])},
+                        )
+                    ]
+                )
+
+            current_element = next_element
+
+        return G
+
+    def visit_TraversalSite(self, model):
+        return dict(node=model.node, site=model.site)
 
 
 ########################################################################################
