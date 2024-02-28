@@ -25,116 +25,46 @@ A, C, J = Annihilation(), Creation(), Identity()
 ########################################################################################
 
 
-def dummy_node(label):
-    def call(self, model):
-        if not hasattr(self, "used"):
-            self.used = False
-        else:
-            self.used = True
-
-        if self.used and False:
-            raise Exception("Node Used")
-
-        return FlowOut(model=model, emission=dict(used=self.used))
-
-    dummy_flow_node = type(
-        "DummyFlowNode{}".format(label),
-        (FlowNode,),
-        {
-            "__call__": call,
-        },
-    )
-
-    return dummy_flow_node
-
-
-DummyFlowNode = dummy_node(label=1)
-
-########################################################################################
-
-
-class TestVisitor(Visitor):
-    def visit_OperatorMul(self, model):
-        raise TypeError
-        pass
-
-    def visit_OperatorAdd(self, model):
-        raise AssertionError
-        pass
-
-
-########################################################################################
-
-
 class TestFlow(FlowGraph):
     nodes = [
-        VisitorFlowNode(visitor=TestVisitor(), name="n1"),
-        DummyFlowNode(name="n2"),
-        DummyFlowNode(name="n3"),
-        DummyFlowNode(name="n4"),
+        CanonicalizationFlow(name="n1"),
         FlowTerminal(name="terminal1"),
         FlowTerminal(name="terminal2"),
-        FlowTerminal(name="terminal3"),
-        FlowTerminal(name="terminal4"),
     ]
     rootnode = "n1"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.catch_errors_and_branch(
-        branch={AssertionError: "n2", TypeError: "n3"}
-    )
-    @forward_decorators.forward_once(done="terminal1")
+    @forward_decorators.catch_error(redirect="terminal2")
+    @forward_decorators.forward_fixed_point(done="terminal1")
     def forward_n1(self, model):
         pass
 
-    @forward_decorators.catch_error(redirect="terminal2")
-    @forward_decorators.forward_once(done="n4")
-    def forward_n2(self, model):
-        pass
+    pass
 
-    @forward_decorators.forward_branch_from_emission(
-        key="used", branch={True: "terminal3", False: "n4"}
+
+class TestFlow2(FlowGraph):
+    nodes = [
+        TestFlow(name="n1"),
+        FlowTerminal(name="terminal1"),
+        FlowTerminal(name="terminal2"),
+    ]
+    rootnode = "n1"
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.forward_branch_from_subgraph_exit(
+        branch={"terminal1": "terminal1", "terminal2": "terminal2"}
     )
-    def forward_n3(self, model):
+    def forward_n1(self, model):
         pass
 
-    @forward_decorators.catch_error(redirect="terminal4")
-    @forward_decorators.forward_return()
-    def forward_n4(self, model):
-        pass
+    pass
 
-
-########################################################################################
-
-# forward_decorators = ForwardDecorators()
-
-
-# @forward_decorators.catch_error(redirect="terminal2")
-# @forward_decorators.forward_once(done="terminal1")
-# def forward_g1(self, model):
-#     pass
-
-
-# TestFlow2 = type(
-#     "TestFlow2",
-#     (FlowGraph,),
-#     dict(
-#         nodes=[
-#             CanonicalizationFlow(name="g1"),
-#             FlowTerminal(name="terminal1"),
-#             FlowTerminal(name="terminal2"),
-#         ],
-#         rootnode="g1",
-#         forward_decorators=forward_decorators,
-#         forward_g1=forward_g1,
-#     ),
-# )
 
 ########################################################################################
 if __name__ == "__main__":
-    op = X * Z
+    op = X + Y
 
-    fg = TestFlow(name="g1", max_steps=10)
+    fg = TestFlow2(name="_")
 
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
@@ -146,6 +76,3 @@ if __name__ == "__main__":
 
     with open("_console.py", mode="w", encoding="utf8") as f:
         f.write(string)
-
-    pprint(fg.traversal)
-    # pprint(fg.forward_decorators.rules)

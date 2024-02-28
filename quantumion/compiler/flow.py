@@ -21,6 +21,7 @@ __all__ = [
     "ForwardRule",
     "ForwardRules",
     "ForwardDecorators",
+    "ForwardError",
     "FlowError",
     "FlowBase",
     "FlowOut",
@@ -32,6 +33,7 @@ __all__ = [
     "NormalOrderFlow",
     "CanonicalizationFlow",
     "CanonicalizationFlow2",
+    "VerificationFlowGraphCreator",
 ]
 
 
@@ -249,6 +251,32 @@ class ForwardDecorators:
             return _method
 
         return _forward_branch_from_emission
+
+    def forward_branch_from_subgraph_exit(self, branch):
+        def _forward_branch_from_subgraph_exit(method):
+            self.update_rule(
+                ForwardRule(
+                    name=method.__name__,
+                    decorators=[
+                        "forward_branch_from_subgraph_exit",
+                    ],
+                    destinations={f"{k}_branch": v for k, v in branch.items()},
+                )
+            )
+
+            @functools.wraps(method)
+            def _method(self, model: Any):
+                flowout = self.namespace[self.current_node](model)
+
+                self.next_node = branch[
+                    self.namespace[self.current_node].traversal.sites[-1].node
+                ]
+
+                return flowout
+
+            return _method
+
+        return _forward_branch_from_subgraph_exit
 
     def catch_error(self, redirect):
         def _catch_error(method):
@@ -490,6 +518,38 @@ class FlowGraph(FlowBase):
 ########################################################################################
 
 
+def VerificationFlowGraphCreator(verify, transformer):
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.catch_error(redirect="transformer")
+    @forward_decorators.forward_once(done="terminal")
+    def forward_verify(self, model):
+        pass
+
+    @forward_decorators.forward_return()
+    def forward_transformer(self, model):
+        pass
+
+    return type(
+        "VerificationFlowGraph",
+        (FlowGraph,),
+        dict(
+            nodes=[
+                VisitorFlowNode(visitor=verify, name="verify"),
+                TransformerFlowNode(visitor=transformer, name="transformer"),
+                FlowTerminal(name="terminal"),
+            ],
+            rootnode="g1",
+            forward_decorators=forward_decorators,
+            forward_verify=forward_verify,
+            forward_transformer=forward_transformer,
+        ),
+    )
+
+
+########################################################################################
+
+
 class NormalOrderFlow(FlowGraph):
     nodes = [
         TransformerFlowNode(visitor=NormalOrder(), name="normal"),
@@ -558,11 +618,11 @@ class CanonicalizationFlow(FlowGraph):
     def forward_proper(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gathermath2")
+    @forward_decorators.forward_detour(done="gatherpauli", detour="gathermath2")
     def forward_paulialgebra(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gatherpauli")
+    @forward_decorators.forward_fixed_point(done="paulialgebra")
     def forward_gathermath2(self, model):
         pass
 
@@ -633,11 +693,11 @@ class CanonicalizationFlow2(FlowGraph):
     def forward_proper(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gathermath2")
+    @forward_decorators.forward_detour(done="gatherpauli", detour="gathermath2")
     def forward_paulialgebra(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gatherpauli")
+    @forward_decorators.forward_fixed_point(done="paulialgebra")
     def forward_gathermath2(self, model):
         pass
 
