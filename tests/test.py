@@ -69,11 +69,9 @@ class TestFlow(FlowGraph):
 ########################################################################################
 
 if __name__ == "__main__":
-    op = X * Y * Z + Y
+    op = A * C
 
-    fg = VerificationFlowGraphCreator(
-        verify=VerifyHilbertSpace(), transformer=DistributeMathExpr()
-    )(name="n1")
+    fg = CanonicalizationFlow2(name="cf")
 
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
@@ -89,12 +87,11 @@ if __name__ == "__main__":
     fr = fg.forward_decorators.rules
     ft = fg.traversal
 
-    G = fr.accept(GenerateFlowGraph())
+    G = fr.accept(MermaidFlowGraph())
+    G2 = ft.accept(MermaidFlowGraph())
 
-    A = nx.nx_agraph.to_agraph(G)
-    A.draw("rules.png", prog="dot")
-
-    G2 = ft.accept(GenerateFlowGraph())
-
-    A2 = nx.nx_agraph.to_agraph(G2)
-    A2.draw("traversal.png", prog="dot")
+    with open("graph.md", mode="w") as f:
+        f.write("# FlowGraph\n")
+        f.write(G)
+        f.write("# Traversal\n")
+        f.write(G2)

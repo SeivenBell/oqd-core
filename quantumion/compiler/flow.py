@@ -37,6 +37,7 @@ __all__ = [
     "CanonicalizationFlow2",
     "VerificationFlowGraphCreator",
     "GenerateFlowGraph",
+    "MermaidFlowGraph"
 ]
 
 
@@ -163,6 +164,106 @@ class GenerateFlowGraph(Transformer):
             current_element = next_element
 
         return G
+
+    def visit_TraversalSite(self, model):
+        return dict(node=model.node, site=model.site)
+
+########################################################################################
+
+class MermaidFlowGraph(Transformer):
+    def visit_ForwardRules(self, model):
+        G = nx.MultiDiGraph()
+        mermaid_string = "```mermaid\ngraph TD\n"
+
+        G.add_node("start")
+        mermaid_string += "\nstart(Start)"
+        return_nodes = []
+        for n, rule in enumerate(model.rules):
+            elements = self.visit(rule)
+
+            if "forward_return" in rule.decorators:
+                assert rule.name.startswith("forward_")
+                node = rule.name[8:]
+                return_nodes.append(node)
+
+            if n == 0:
+                G.add_edges_from([("start", elements["node"], {"label": ""})])
+                mermaid_string += "\nstart --> {}".format(elements["node"])
+
+            G.add_node(elements["node"])
+            G.add_edges_from(elements["edges"])
+
+            mermaid_string += '\n{}("{}")'.format(elements["node"], elements["node"])
+
+            mermaid_string += "".join(
+                ['\n{}("{}")'.format(edge[1], edge[1]) for edge in elements["edges"]]
+            )
+
+            mermaid_string += "".join(
+                [
+                    '\n{} -- "{}" --> {}'.format(edge[0], edge[2]["label"], edge[1])
+                    for edge in elements["edges"]
+                ]
+            )
+
+        for edge in G.edges:
+            if edge[1] in return_nodes:
+                G.add_edges_from(
+                    [
+                        (edge[1], edge[0], {"label": "return"}),
+                    ]
+                )
+                mermaid_string += '\n{} -- "{}" --> {}'.format(
+                    edge[1], "return", edge[0]
+                )
+
+        mermaid_string += "\n```\n"
+        return mermaid_string
+
+    def visit_ForwardRule(self, model):
+        assert model.name.startswith("forward_")
+        node = model.name[8:]
+        edges = [
+            (node, destination, {"label": key})
+            for key, destination in model.destinations.items()
+        ]
+        if "forward_fixed_point" in model.decorators:
+            edges += [
+                (node, node, {"label": "repeat"}),
+            ]
+
+        return {
+            "node": node,
+            "edges": edges,
+        }
+
+    def visit_Traversal(self, model):
+        mermaid_string = "```mermaid\ngraph TD\n"
+
+        mermaid_string += "\nstart(Start)"
+        current_element = None
+        for n, site in enumerate(model.sites):
+            next_element = self.visit(site)
+
+            if n == 0:
+                mermaid_string += "\nstart --> {}".format(next_element["node"])
+
+            mermaid_string += '\n{}("{}")'.format(
+                next_element["node"], next_element["node"]
+            )
+
+            if current_element is not None:
+                mermaid_string += '\n{} -- "({},{})" --> {}'.format(
+                    current_element["node"],
+                    current_element["site"],
+                    next_element["site"],
+                    next_element["node"],
+                )
+
+            current_element = next_element
+
+        mermaid_string += "\n```\n"
+        return mermaid_string
 
     def visit_TraversalSite(self, model):
         return dict(node=model.node, site=model.site)
