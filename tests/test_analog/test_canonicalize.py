@@ -367,6 +367,16 @@ class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors, unittest.
         op = A@(Z*I)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
 
+    def test_ladder_prod_fail(self):
+        """ladder multiplication fail"""
+        op = (A*C*A)@X
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
+    def test_ladder_prod_pass(self):
+        """ladder multiplication pass"""
+        op = X@(A*C*A)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+
 @colorize(color=RED)
 class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
