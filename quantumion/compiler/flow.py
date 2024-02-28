@@ -103,14 +103,19 @@ class GenerateFlowGraph(Transformer):
 
     def visit_ForwardRule(self, model):
         assert model.name.startswith("forward_")
-        nodename = model.name[8:]
+        node = model.name[8:]
+        edges = [
+            (node, destination, {"label": key})
+            for key, destination in model.destinations.items()
+        ]
+        if "forward_fixed_point" in model.decorators:
+            edges += [
+                (node, node, {"label": "repeat"}),
+            ]
 
         return {
-            "node": nodename,
-            "edges": [
-                (nodename, destination, {"label": key})
-                for key, destination in model.destinations.items()
-            ],
+            "node": node,
+            "edges": edges,
         }
 
     def visit_Traversal(self, model):
