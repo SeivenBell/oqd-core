@@ -28,6 +28,7 @@ __all__ = [
     "CanonicalizationVerificationGatherPauli",
     "CanonicalizationVerificationNormalOrder",
     "CanonicalizationVerificationPruneIdentity",
+    "CanonicalizationVerificationSortedOrder",
 ]
 
 ########################################################################################
@@ -591,14 +592,30 @@ class CanonicalizationVerificationPruneIdentity(AnalogCircuitVisitor):
     >>> Distributed, Gathered
     """
     def visit_OperatorMul(self, model: OperatorMul):
-        print(model)
         if isinstance(model.op1, Identity) or isinstance(model.op2, Identity):
             raise CanonicalFormError("Prune Identity is not complete")
         self.visit(model.op1)
         self.visit(model.op2)
 
 class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
-    pass
+    """Assumptions:
+    Ideally this should be the very last step of the process as you should be sorting right before completion
+    """
+    def __init__(self):
+        self._current_term_index = None
+        super().__init__()
+
+    def visit_OperatorAdd(self, model: OperatorAdd):
+        if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, OperatorAdd):
+            raise CanonicalFormError("Sorting pre-requisites not met")
+        if self._current_term_index == None:
+            self._current_term_index = TermIndex().visit(model.op2)
+        elif TermIndex().visit(model.op2) > self._current_term_index:
+            raise CanonicalFormError("TermIndex {} and {} are not in sorted order".format(TermIndex().visit(model.op2), self._current_term_index))
+        else:
+            self._current_term_index = TermIndex().visit(model.op2)
+        self.visit(model.op1)
+
 if __name__ == '__main__':
     from rich import print as pprint
     from quantumion.compiler.analog import *

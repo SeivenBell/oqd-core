@@ -454,6 +454,40 @@ class TestCanonicalizationVerificationPruneIdentity(CanonicalFormErrors, unittes
         """Showing that expression does not need to be in proper order"""
         op = A*(C*A*(A*C*A*(C*C)*LI))
         self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+
+@colorize(color=BLUE)
+class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationSortedOrder()
+        super().__init__(methodName)
+
+    def test_simple_pass(self):
+        """Simple Pass"""
+        op = X+(4*Y) + Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_simple_fail(self):
+        """Simple Fail"""
+        op = X+(4*Y) + I
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_nested_pass(self):
+        """Nested Pass"""
+        op = (X@Y+(2*(3j)*(X@Y))) + (Y@I) + (Z@I)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_simple_pass_identical_operators(self):
+        """Pass with identical operators"""
+        op = X@I@Z + 2*X@I@Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_assumtion_pass(self):
+        """Hamiltonian needs to be distributed"""
+        op = (X+I)@Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())
