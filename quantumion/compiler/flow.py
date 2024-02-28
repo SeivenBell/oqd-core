@@ -33,6 +33,7 @@ __all__ = [
     "NormalOrderFlow",
     "CanonicalizationFlow",
     "CanonicalizationFlow2",
+    "VerificationFlowGraphCreator",
 ]
 
 
@@ -491,6 +492,38 @@ class FlowGraph(FlowBase):
 ########################################################################################
 
 
+def VerificationFlowGraphCreator(verify, transformer):
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.catch_error(redirect="transformer")
+    @forward_decorators.forward_once(done="terminal")
+    def forward_verify(self, model):
+        pass
+
+    @forward_decorators.forward_return()
+    def forward_transformer(self, model):
+        pass
+
+    return type(
+        "VerificationFlowGraph",
+        (FlowGraph,),
+        dict(
+            nodes=[
+                VisitorFlowNode(visitor=verify, name="verify"),
+                TransformerFlowNode(visitor=transformer, name="transformer"),
+                FlowTerminal(name="terminal"),
+            ],
+            rootnode="g1",
+            forward_decorators=forward_decorators,
+            forward_verify=forward_verify,
+            forward_transformer=forward_transformer,
+        ),
+    )
+
+
+########################################################################################
+
+
 class NormalOrderFlow(FlowGraph):
     nodes = [
         TransformerFlowNode(visitor=NormalOrder(), name="normal"),
@@ -559,11 +592,11 @@ class CanonicalizationFlow(FlowGraph):
     def forward_proper(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gathermath2")
+    @forward_decorators.forward_detour(done="gatherpauli", detour="gathermath2")
     def forward_paulialgebra(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gatherpauli")
+    @forward_decorators.forward_fixed_point(done="paulialgebra")
     def forward_gathermath2(self, model):
         pass
 
@@ -634,11 +667,11 @@ class CanonicalizationFlow2(FlowGraph):
     def forward_proper(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gathermath2")
+    @forward_decorators.forward_detour(done="gatherpauli", detour="gathermath2")
     def forward_paulialgebra(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gatherpauli")
+    @forward_decorators.forward_fixed_point(done="paulialgebra")
     def forward_gathermath2(self, model):
         pass
 

@@ -38,12 +38,14 @@ class TestFlow(FlowGraph):
     def forward_n1(self, model):
         pass
 
+    pass
+
 
 ########################################################################################
 if __name__ == "__main__":
-    op = X * Z
+    op = X * Z * Y
 
-    fg = TestFlow(name="_", max_steps=10)
+    fg = CanonicalizationFlow(name="_")
 
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
