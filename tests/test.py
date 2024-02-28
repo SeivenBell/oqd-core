@@ -31,21 +31,16 @@ A, C, J = Annihilation(), Creation(), Identity()
 
 class TestFlow(FlowGraph):
     nodes = [
-        CanonicalizationFlow(name="n1"),
-        CanonicalizationFlow(name="n2"),
-        FlowTerminal(name="terminal1"),
-        FlowTerminal(name="terminal2"),
+        CanonicalizationFlow(name="canonicalization"),
+        FlowTerminal(name="terminal"),
+        FlowTerminal(name="error"),
     ]
-    rootnode = "n1"
+    rootnode = "canonicalization"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.catch_error(redirect="terminal2")
-    @forward_decorators.forward_fixed_point(done="terminal1")
-    def forward_n1(self, model):
-        pass
-
-    @forward_decorators.forward_return()
-    def forward_n2(self, model):
+    @forward_decorators.catch_error(redirect="error")
+    @forward_decorators.forward_fixed_point(done="terminal")
+    def forward_canonicalization(self, model):
         pass
 
     pass
