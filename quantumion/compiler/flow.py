@@ -21,6 +21,7 @@ __all__ = [
     "ForwardRule",
     "ForwardRules",
     "ForwardDecorators",
+    "ForwardError",
     "FlowError",
     "FlowBase",
     "FlowOut",
