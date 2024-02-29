@@ -91,6 +91,14 @@ def graph_to_mkdocs(G, G2):
     if not os.path.exists(os.path.join(folder, "resources")):
         os.makedirs(os.path.join(folder, "resources"))
 
+    with open(os.path.join(folder, "resources/forwardrules.md"), mode="w") as f:
+        f.write("# ForwardRules\n")
+        f.write(G)
+
+    with open(os.path.join(folder, "resources/traversal.md"), mode="w") as f:
+        f.write("# Traversal\n")
+        f.write(G2)
+
     with open(os.path.join(folder, "resources/index.md"), mode="w") as f:
         f.write("# Content\n")
 
@@ -100,14 +108,6 @@ def graph_to_mkdocs(G, G2):
                 continue
             f.write(f"{n}. [{os.path.splitext(file)[0].title()}]({file})\n")
             n += 1
-
-    with open(os.path.join(folder, "resources/forwardrules.md"), mode="w") as f:
-        f.write("# ForwardRules\n")
-        f.write(G)
-
-    with open(os.path.join(folder, "resources/traversal.md"), mode="w") as f:
-        f.write("# Traversal\n")
-        f.write(G2)
 
     mkdocs_conf = DEFAULT_MKDOCS_CONF.copy()
     mkdocs_conf["nav"] += [
