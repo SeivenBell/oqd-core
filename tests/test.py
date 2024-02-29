@@ -11,6 +11,9 @@ from matplotlib import pyplot as plt
 
 import numpy as np
 
+from functools import reduce
+from quantumion.compiler.flow import FlowOut, Traversal
+
 ########################################################################################
 
 
@@ -304,7 +307,45 @@ def random_operator(terms, pauli, ladder, math_terms):
 
 ########################################################################################
 
+
+class TestFlowNode(FlowNode):
+    def __call__(self, model, traversal=Traversal()) -> FlowOut:
+        try:
+            if not traversal.sites[-1].emission["terminate"]:
+                return FlowOut(model=model, emission={"terminate": True})
+        except:
+            pass
+        return FlowOut(model=model + 1, emission={"terminate": False})
+
+
+class TestFlowGraph(FlowGraph):
+    nodes = [
+        TestFlowNode(name="n1"),
+        FlowTerminal(name="terminal"),
+    ]
+    rootnode = "n1"
+
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.forward_branch_from_emission(
+        key="terminate", branch={True: "terminal", False: "n1"}
+    )
+    def forward_n1(self, model):
+        pass
+
+
+########################################################################################
+
 if __name__ == "__main__":
+
+    model = MathNum(value=1)
+    fg = TestFlowGraph(name="_")
+    model = fg(model).model
+
+    pprint(model)
+
+    ########################################################################################
+
     # k = np.random.randint(1, 6)
     # expr = random_mathexpr(k)
     # pprint(expr.accept(PrintMathExpr()))
@@ -321,30 +362,28 @@ if __name__ == "__main__":
 
     ########################################################################################
 
-    from functools import reduce
+    # k = np.random.randint(1, 5)
+    # l = np.random.randint(1, 3)
+    # m = np.random.randint(1, 2)
+    # n = np.random.randint(1, 2)
+    # op = random_operator(k, l, m, n)
+    # # op = (
+    # #     (MathStr(string="(k + 1)") * (PauliI() @ Creation()))
+    # #     * (MathStr(string="(o + 1)") * (PauliX() @ Identity()))
+    # #     + MathStr(string="(-1 * 19 + 1)") * (PauliX() @ Creation())
+    # # ) * (MathStr(string="(cosh(-1 * (0.0 + 1j * 1.0)) + 1)") * (PauliY() @ Identity()))
 
-    k = np.random.randint(1, 5)
-    l = np.random.randint(1, 3)
-    m = np.random.randint(1, 2)
-    n = np.random.randint(1, 2)
-    op = random_operator(k, l, m, n)
-    # op = (
-    #     (MathStr(string="(k + 1)") * (PauliI() @ Creation()))
-    #     * (MathStr(string="(o + 1)") * (PauliX() @ Identity()))
-    #     + MathStr(string="(-1 * 19 + 1)") * (PauliX() @ Creation())
-    # ) * (MathStr(string="(cosh(-1 * (0.0 + 1j * 1.0)) + 1)") * (PauliY() @ Identity()))
+    # fg = CanonicalizationFlow(name="_")
 
-    fg = CanonicalizationFlow(name="_")
+    # pprint(op.accept(PrintOperator()))
 
-    pprint(op.accept(PrintOperator()))
+    # op = fg(op).model
+    # pprint(op.accept(PrintOperator()))
 
-    op = fg(op).model
-    pprint(op.accept(PrintOperator()))
+    # mermaid_string = MermaidOperator().emit(op)
 
-    mermaid_string = MermaidOperator().emit(op)
-
-    with open("test.md", mode="w") as f:
-        f.write(mermaid_string)
+    # with open("test.md", mode="w") as f:
+    #     f.write(mermaid_string)
 
     ########################################################################################
 
@@ -406,3 +445,5 @@ if __name__ == "__main__":
     # ft = fg.traversal
 
     # graph_to_mkdocs(mermaid_rules(fg), mermaid_traversal(ft), serve=args.serve)
+
+    pass

@@ -301,7 +301,7 @@ class ForwardDecorators:
 
             @functools.wraps(method)
             def _method(self, model: Any) -> FlowOut:
-                flowout = self.namespace[self.current_node](model)
+                flowout = self.namespace[self.current_node](model, self.traversal)
 
                 self.next_node = done
 
@@ -325,7 +325,7 @@ class ForwardDecorators:
 
             @functools.wraps(method)
             def _method(self, model: Any) -> FlowOut:
-                flowout = self.namespace[self.current_node](model)
+                flowout = self.namespace[self.current_node](model, self.traversal)
 
                 if model == flowout.model:
                     self.next_node = done
@@ -352,7 +352,7 @@ class ForwardDecorators:
 
             @functools.wraps(method)
             def _method(self, model: Any) -> FlowOut:
-                flowout = self.namespace[self.current_node](model)
+                flowout = self.namespace[self.current_node](model, self.traversal)
 
                 if model == flowout.model:
                     self.next_node = done
@@ -386,7 +386,7 @@ class ForwardDecorators:
                         "Previous site does not exist for forward_return."
                     )
 
-                flowout = self.namespace[self.current_node](model)
+                flowout = self.namespace[self.current_node](model, self.traversal)
 
                 return flowout
 
@@ -410,7 +410,7 @@ class ForwardDecorators:
 
             @functools.wraps(method)
             def _method(self, model: Any):
-                flowout = self.namespace[self.current_node](model)
+                flowout = self.namespace[self.current_node](model, self.traversal)
 
                 if isinstance(flowout.emission, dict):
                     emission_dict = flowout.emission
@@ -439,7 +439,7 @@ class ForwardDecorators:
 
             @functools.wraps(method)
             def _method(self, model: Any):
-                flowout = self.namespace[self.current_node](model)
+                flowout = self.namespace[self.current_node](model, self.traversal)
 
                 self.next_node = branch[
                     self.namespace[self.current_node].traversal.sites[-1].node
@@ -511,7 +511,7 @@ class FlowBase(ABC):
         pass
 
     @abstractmethod
-    def __call__(self, model: Any) -> "FlowOut":
+    def __call__(self, model: Any, traversal: Traversal = Traversal()) -> "FlowOut":
         pass
 
     @abstractproperty
@@ -533,7 +533,7 @@ class FlowNode(FlowBase):
     def __init__(self, name, **kwargs):
         super().__init__(name=name, **kwargs)
 
-    def __call__(self, model: Any) -> FlowOut:
+    def __call__(self, model: Any, traversal: Traversal = Traversal()) -> FlowOut:
         raise NotImplementedError
 
     @property
@@ -556,7 +556,7 @@ class VisitorFlowNode(FlowNode):
         super().__init__(**kwargs)
         pass
 
-    def __call__(self, model: Any) -> FlowOut:
+    def __call__(self, model: Any, traversal: Traversal = Traversal()) -> FlowOut:
         emission = self.visitor.emit(model)
         return FlowOut(model=model, emission=emission)
 
@@ -564,7 +564,7 @@ class VisitorFlowNode(FlowNode):
 
 
 class TransformerFlowNode(VisitorFlowNode):
-    def __call__(self, model: Any) -> FlowOut:
+    def __call__(self, model: Any, traversal: Traversal = Traversal()) -> FlowOut:
         return FlowOut(model=model.accept(self.visitor))
 
 
@@ -682,9 +682,9 @@ class FlowGraph(FlowBase):
 
         return _forward
 
-    def __call__(self, model) -> FlowOut:
-        for node in self:
-            model = node(model)
+    def __call__(self, model: Any, traversal: Traversal = Traversal()) -> FlowOut:
+        for forward in self:
+            model = forward(model)
         return FlowOut(model=model)
 
 
