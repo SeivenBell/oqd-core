@@ -39,7 +39,7 @@ class TestFlow(FlowGraph):
     forward_decorators = ForwardDecorators()
 
     @forward_decorators.catch_error(redirect="error")
-    @forward_decorators.forward_fixed_point(done="terminal")
+    @forward_decorators.forward_once(done="terminal")
     def forward_canonicalization(self, model):
         pass
 
@@ -49,9 +49,9 @@ class TestFlow(FlowGraph):
 ########################################################################################
 
 if __name__ == "__main__":
-    op = (X * Y) @ (A * C)
+    op = X * (Y + Z) @ (A * C)
 
-    fg = CanonicalizationFlow(name="cf")
+    fg = TestFlow(name="cf")
 
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
