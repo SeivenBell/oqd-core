@@ -76,7 +76,9 @@ if __name__ == "__main__":
         )
         for node in flowgraph.nodes:
             if isinstance(node, FlowGraph):
-                mermaid_string += "\n" + mermaid_rules(node, node.name) + "\n"
+                mermaid_string += "\n\t".join(
+                    ("\n" + mermaid_rules(node, node.name) + "\n").splitlines()
+                )
         return mermaid_string
 
     def mermaid_traversal(traversal, tabname="Full"):
