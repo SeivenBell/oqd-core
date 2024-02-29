@@ -85,19 +85,19 @@ DEFAULT_MKDOCS_CONF = {
 }
 
 
-def graph_to_mkdocs(G, G2):
+def graph_to_mkdocs(forward_rules_md, traversal_md, serve=False):
     folder = os.path.dirname(os.path.abspath(__file__))
 
     if not os.path.exists(os.path.join(folder, "resources")):
         os.makedirs(os.path.join(folder, "resources"))
 
-    with open(os.path.join(folder, "resources/forwardrules.md"), mode="w") as f:
-        f.write("# ForwardRules\n")
-        f.write(G)
+    with open(os.path.join(folder, "resources/forward rules.md"), mode="w") as f:
+        f.write("# Forward Rules\n")
+        f.write(forward_rules_md)
 
     with open(os.path.join(folder, "resources/traversal.md"), mode="w") as f:
         f.write("# Traversal\n")
-        f.write(G2)
+        f.write(traversal_md)
 
     with open(os.path.join(folder, "resources/index.md"), mode="w") as f:
         f.write("# Content\n")
@@ -118,3 +118,8 @@ def graph_to_mkdocs(G, G2):
 
     with open(os.path.join(folder, "mkdocs.yml"), mode="w") as f:
         yaml.dump(mkdocs_conf, f)
+
+    if serve:
+        import subprocess
+
+        subprocess.run(f'mkdocs serve -f {os.path.join(folder, "mkdocs.yml")}')

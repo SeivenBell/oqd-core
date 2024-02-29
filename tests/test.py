@@ -69,6 +69,16 @@ if __name__ == "__main__":
     fr = fg.forward_decorators.rules
     ft = fg.traversal
 
+    ########################################################################################
+
+    import argparse
+
+    from flowgraph.mkdocs import graph_to_mkdocs
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--serve", action="store_true")
+    args = parser.parse_args()
+
     def mermaid_rules(flowgraph, tabname="Full"):
         mermaid_string = '=== "{}"\n\t'.format(tabname.title())
         mermaid_string += "\n\t".join(
@@ -98,11 +108,4 @@ if __name__ == "__main__":
                 )
         return mermaid_string
 
-    G = mermaid_rules(fg)
-    G2 = mermaid_traversal(ft)
-
-    ########################################################################################
-
-    from flowgraph.mkdocs import graph_to_mkdocs
-
-    graph_to_mkdocs(G, G2)
+    graph_to_mkdocs(mermaid_rules(fg), mermaid_traversal(ft), serve=args.serve)
