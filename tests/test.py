@@ -74,7 +74,6 @@ if __name__ == "__main__":
                 mermaid_string += "\n### {}\n".format(
                     node.name.title()
                 ) + mermaid_rules(node)
-        print(mermaid_string)
         return mermaid_string
 
     def mermaid_traversal(traversal):

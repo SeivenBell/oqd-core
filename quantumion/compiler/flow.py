@@ -37,7 +37,7 @@ __all__ = [
     "CanonicalizationFlow2",
     "VerificationFlowGraphCreator",
     "GenerateFlowGraph",
-    "MermaidFlowGraph"
+    "MermaidFlowGraph",
 ]
 
 
@@ -168,15 +168,16 @@ class GenerateFlowGraph(Transformer):
     def visit_TraversalSite(self, model):
         return dict(node=model.node, site=model.site)
 
+
 ########################################################################################
+
 
 class MermaidFlowGraph(Transformer):
     def visit_ForwardRules(self, model):
         G = nx.MultiDiGraph()
-        mermaid_string = "```mermaid\ngraph TD\n"
+        mermaid_string = "```mermaid\nstateDiagram-v2\n"
 
         G.add_node("start")
-        mermaid_string += "\nstart(Start)"
         return_nodes = []
         for n, rule in enumerate(model.rules):
             elements = self.visit(rule)
@@ -188,20 +189,14 @@ class MermaidFlowGraph(Transformer):
 
             if n == 0:
                 G.add_edges_from([("start", elements["node"], {"label": ""})])
-                mermaid_string += "\nstart --> {}".format(elements["node"])
+                mermaid_string += "\n[*] --> {}".format(elements["node"])
 
             G.add_node(elements["node"])
             G.add_edges_from(elements["edges"])
 
-            mermaid_string += '\n{}("{}")'.format(elements["node"], elements["node"])
-
-            mermaid_string += "".join(
-                ['\n{}("{}")'.format(edge[1], edge[1]) for edge in elements["edges"]]
-            )
-
             mermaid_string += "".join(
                 [
-                    '\n{} -- "{}" --> {}'.format(edge[0], edge[2]["label"], edge[1])
+                    "\n{} --> {}: {}".format(edge[0], edge[1], edge[2]["label"])
                     for edge in elements["edges"]
                 ]
             )
@@ -213,9 +208,7 @@ class MermaidFlowGraph(Transformer):
                         (edge[1], edge[0], {"label": "return"}),
                     ]
                 )
-                mermaid_string += '\n{} -- "{}" --> {}'.format(
-                    edge[1], "return", edge[0]
-                )
+                mermaid_string += "\n{} --> {}: {}".format(edge[1], edge[0], "return")
 
         mermaid_string += "\n```\n"
         return mermaid_string
@@ -238,26 +231,21 @@ class MermaidFlowGraph(Transformer):
         }
 
     def visit_Traversal(self, model):
-        mermaid_string = "```mermaid\ngraph TD\n"
+        mermaid_string = "```mermaid\nstateDiagram-v2\n"
 
-        mermaid_string += "\nstart(Start)"
         current_element = None
         for n, site in enumerate(model.sites):
             next_element = self.visit(site)
 
             if n == 0:
-                mermaid_string += "\nstart --> {}".format(next_element["node"])
-
-            mermaid_string += '\n{}("{}")'.format(
-                next_element["node"], next_element["node"]
-            )
+                mermaid_string += "\n[*] --> {}".format(next_element["node"])
 
             if current_element is not None:
-                mermaid_string += '\n{} -- "({},{})" --> {}'.format(
+                mermaid_string += "\n{} --> {}: {},{}".format(
                     current_element["node"],
+                    next_element["node"],
                     current_element["site"],
                     next_element["site"],
-                    next_element["node"],
                 )
 
             current_element = next_element
@@ -266,7 +254,7 @@ class MermaidFlowGraph(Transformer):
         return mermaid_string
 
     def visit_TraversalSite(self, model):
-        return dict(node=model.node, site=model.site)
+        return dict(node=model.node, site=model.site, subtraversal=model.subtraversal)
 
 
 ########################################################################################
