@@ -51,7 +51,7 @@ class TestFlow(FlowGraph):
 if __name__ == "__main__":
     op = (X * Y) @ (A * C)
 
-    fg = TestFlow(name="cf")
+    fg = CanonicalizationFlow(name="cf")
 
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
@@ -67,7 +67,15 @@ if __name__ == "__main__":
     fr = fg.forward_decorators.rules
     ft = fg.traversal
 
-    G = fr.accept(MermaidFlowGraph())
+    def mermaid_rules(flowgraph):
+        mermaid_string = flowgraph.forward_decorators.rules.accept(MermaidFlowGraph())
+        for node in flowgraph.nodes:
+            if isinstance(node, FlowGraph):
+                mermaid_string += "\n### {}\n".format(
+                    node.name.title()
+                ) + mermaid_rules(node)
+        print(mermaid_string)
+        return mermaid_string
 
     def mermaid_traversal(traversal):
         mermaid_string = traversal.accept(MermaidFlowGraph())
@@ -78,6 +86,7 @@ if __name__ == "__main__":
                 ) + mermaid_traversal(site.subtraversal)
         return mermaid_string
 
+    G = mermaid_rules(fg)
     G2 = mermaid_traversal(ft)
 
     with open("graph.md", mode="w") as f:
