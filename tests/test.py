@@ -53,7 +53,7 @@ class TestFlow(FlowGraph):
 if __name__ == "__main__":
     op = X * (Y + Z) @ (A * C)
 
-    fg = TestFlow(name="cf")
+    fg = CanonicalizationFlow2(name="cf")
 
     op = fg(op).model
     pprint(op.accept(PrintOperator()))
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument("--serve", action="store_true")
     args = parser.parse_args()
 
-    def mermaid_rules(flowgraph, tabname="Full"):
+    def mermaid_rules(flowgraph, tabname="Main"):
         mermaid_string = '=== "{}"\n\t'.format(tabname.title())
         mermaid_string += "\n\t".join(
             flowgraph.forward_decorators.rules.accept(MermaidFlowGraph()).splitlines()
@@ -91,7 +91,7 @@ if __name__ == "__main__":
                 )
         return mermaid_string
 
-    def mermaid_traversal(traversal, tabname="Full"):
+    def mermaid_traversal(traversal, tabname="Main"):
         mermaid_string = '=== "{}"\n\t'.format(tabname.title())
         mermaid_string += "\n\t".join(traversal.accept(MermaidFlowGraph()).splitlines())
         for site in traversal.sites:
