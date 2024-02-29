@@ -31,7 +31,7 @@ A, C, J = Annihilation(), Creation(), Identity()
 
 class TestFlow(FlowGraph):
     nodes = [
-        CanonicalizationFlow(name="canonicalization"),
+        CanonicalizationFlow2(name="canonicalization"),
         FlowTerminal(name="terminal"),
         FlowTerminal(name="error"),
     ]
@@ -49,7 +49,7 @@ class TestFlow(FlowGraph):
 ########################################################################################
 
 if __name__ == "__main__":
-    op = A * C
+    op = (X * Y) @ (A * C)
 
     fg = TestFlow(name="cf")
 
@@ -68,7 +68,17 @@ if __name__ == "__main__":
     ft = fg.traversal
 
     G = fr.accept(MermaidFlowGraph())
-    G2 = ft.accept(MermaidFlowGraph())
+
+    def mermaid_traversal(traversal):
+        mermaid_string = traversal.accept(MermaidFlowGraph())
+        for site in traversal.sites:
+            if site.subtraversal:
+                mermaid_string += "\n### {} (site={})\n".format(
+                    site.node.title(), site.site
+                ) + mermaid_traversal(site.subtraversal)
+        return mermaid_string
+
+    G2 = mermaid_traversal(ft)
 
     with open("graph.md", mode="w") as f:
         f.write("# FlowGraph\n")
