@@ -8,6 +8,8 @@ from quantumion.interface.math import MathExpr
 from quantumion.compiler.visitor import Visitor, Transformer
 from quantumion.compiler.math import PrintMathExpr, VerbosePrintMathExpr
 
+from quantumion.utils.color import random_hexcolor
+
 ########################################################################################
 
 __all__ = [
@@ -15,6 +17,7 @@ __all__ = [
     "AnalogCircuitTransformer",
     "PrintOperator",
     "VerbosePrintOperator",
+    "MermaidOperator",
 ]
 
 
@@ -157,3 +160,96 @@ class VerbosePrintOperator(PrintOperator):
 
         string = "{} * {}".format(s2, s1)
         return string
+
+
+########################################################################################
+
+
+class MermaidOperator(Transformer):
+
+    def emit(self, model):
+        self.element = 0
+
+        self.mermaid_string = "```mermaid\ngraph TD\n"
+        model.accept(self)
+        self.mermaid_string += "".join(
+            [
+                f"classDef {model} stroke:{random_hexcolor()},stroke-width:3px\n"
+                for model in [
+                    "Pauli",
+                    "Ladder",
+                    "OperatorAdd",
+                    "OperatorScalarMul",
+                    "OperatorKron",
+                    "OperatorMul",
+                ]
+            ]
+        )
+        self.mermaid_string += "```\n"
+
+        return self.mermaid_string
+
+    def visit_MathExpr(self, model):
+        element = self.element
+        self.mermaid_string += 'element{}("{}<br/>{}<br/>{}"):::{}\n'.format(
+            self.element,
+            "MathExpr",
+            "-" * len("MathExpr"),
+            "expr = #quot;{}#quot;".format(model.accept(PrintMathExpr())),
+            "MathExpr",
+        )
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_Pauli(self, model):
+        element = self.element
+        self.mermaid_string += 'element{}("{}"):::{}\n'.format(
+            self.element, model.__class__.__name__, "Pauli"
+        )
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_Ladder(self, model):
+        element = self.element
+        self.mermaid_string += 'element{}("{}"):::{}\n'.format(
+            self.element, model.__class__.__name__, "Ladder"
+        )
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_OperatorBinaryOp(self, model):
+        left = self.visit(model.op1)
+        right = self.visit(model.op2)
+
+        element = self.element
+        self.mermaid_string += 'element{}("{}"):::{}\n'.format(
+            self.element,
+            model.__class__.__name__,
+            model.__class__.__name__,
+        )
+
+        self.mermaid_string += f"element{element} --> {left} & {right}\n"
+
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_OperatorScalarMul(self, model):
+        expr = self.visit(model.expr)
+        op = self.visit(model.op)
+
+        element = self.element
+        self.mermaid_string += 'element{}("{}"):::{}\n'.format(
+            self.element,
+            model.__class__.__name__,
+            model.__class__.__name__,
+        )
+
+        self.mermaid_string += f"element{element} --> {expr} & {op}\n"
+
+        self.element += 1
+
+        return f"element{element}"

@@ -2,13 +2,22 @@ import networkx as nx
 
 ########################################################################################
 
+from quantumion.interface.math import MathExpr
+from quantumion.interface.analog.operator import Operator
+
 from quantumion.compiler.visitor import Transformer
+from quantumion.compiler.flow.flowgraph import FlowGraph
+from quantumion.compiler.math import MermaidMathExpr
+from quantumion.compiler.analog.base import MermaidOperator
 
 ########################################################################################
 
 __all__ = [
     "NetworkXFlowGraph",
     "MermaidFlowGraph",
+    "markdown_flowgraph",
+    "markdown_flowrules",
+    "markdown_traversal",
 ]
 
 ########################################################################################
@@ -178,3 +187,64 @@ class MermaidFlowGraph(Transformer):
 
     def visit_TraversalSite(self, model):
         return dict(node=model.node, site=model.site, subtraversal=model.subtraversal)
+
+
+########################################################################################
+
+
+def markdown_flowrules(flowgraph, tabname="Main"):
+    mermaid_string = '=== "{}"\n\t'.format(tabname.title())
+    mermaid_string += "\n\t".join(
+        flowgraph.forward_decorators.rules.accept(MermaidFlowGraph()).splitlines()
+    )
+    for node in flowgraph.nodes:
+        if isinstance(node, FlowGraph):
+            mermaid_string += "\n\t".join(
+                ("\n" + markdown_flowrules(node, node.name) + "\n").splitlines()
+            )
+    return mermaid_string
+
+
+def markdown_traversal(traversal, tabname="Main"):
+    mermaid_string = '=== "{}"\n\t'.format(tabname.title())
+    mermaid_string += "\n\t".join(traversal.accept(MermaidFlowGraph()).splitlines())
+    for site in traversal.sites:
+        if site.subtraversal:
+            mermaid_string += "\n\t".join(
+                (
+                    "\n"
+                    + markdown_traversal(
+                        site.subtraversal,
+                        tabname=f"{site.node} (Site {site.site})",
+                    )
+                    + "\n"
+                ).splitlines()
+            )
+    return mermaid_string
+
+
+def markdown_flowgraph(traversal, tabname="Main"):
+    md_string = '=== "{}"\n\t'.format(tabname.title())
+    model = None
+    for site in traversal.sites:
+        if site.subtraversal:
+            md_string += "\n\t".join(
+                markdown_flowgraph(
+                    site.subtraversal, tabname=f"{site.node.title()} (Site {site.site})"
+                ).splitlines()
+            )
+            md_string += "\n\t"
+            continue
+        if site.model and model != site.model:
+            md_string += f'=== "{site.node.title()} (Site {site.site})"\n\t\t'
+            if isinstance(site.model, MathExpr):
+                md_string += "\n\t\t".join(
+                    MermaidMathExpr().emit(site.model).splitlines()
+                )
+            if isinstance(site.model, Operator):
+                md_string += "\n\t\t".join(
+                    MermaidOperator().emit(site.model).splitlines()
+                )
+            md_string += "\n\t"
+            model = site.model
+    return md_string
