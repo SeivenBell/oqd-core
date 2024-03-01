@@ -37,8 +37,7 @@ A, C, J = Annihilation(), Creation(), Identity()
 
 
 def random_hexcolor():
-    r = lambda: np.random.randint(0, 255)
-    return "#%02X%02X%02X" % (r(), r(), r())
+    return "#{:02X}{:02X}{:02X}".format(*np.random.randint(0, 255, 3))
 
 
 class MermaidMathExpr(Transformer):
@@ -50,7 +49,7 @@ class MermaidMathExpr(Transformer):
         model.accept(self)
         self.mermaid_string += "".join(
             [
-                f"classDef {model} stroke:{random_hexcolor()}\n"
+                f"classDef {model} stroke:{random_hexcolor()},stroke-width:3px\n"
                 for model in [
                     "MathAdd",
                     "MathSub",
@@ -149,7 +148,7 @@ class MermaidOperator(Transformer):
         model.accept(self)
         self.mermaid_string += "".join(
             [
-                f"classDef {model} stroke:{random_hexcolor()}\n"
+                f"classDef {model} stroke:{random_hexcolor()},stroke-width:3px\n"
                 for model in [
                     "Pauli",
                     "Ladder",
@@ -228,6 +227,40 @@ class MermaidOperator(Transformer):
         self.element += 1
 
         return f"element{element}"
+
+
+########################################################################################
+
+
+def mermaid_rules(flowgraph, tabname="Main"):
+    mermaid_string = '=== "{}"\n\t'.format(tabname.title())
+    mermaid_string += "\n\t".join(
+        flowgraph.forward_decorators.rules.accept(MermaidFlowGraph()).splitlines()
+    )
+    for node in flowgraph.nodes:
+        if isinstance(node, FlowGraph):
+            mermaid_string += "\n\t".join(
+                ("\n" + mermaid_rules(node, node.name) + "\n").splitlines()
+            )
+    return mermaid_string
+
+
+def mermaid_traversal(traversal, tabname="Main"):
+    mermaid_string = '=== "{}"\n\t'.format(tabname.title())
+    mermaid_string += "\n\t".join(traversal.accept(MermaidFlowGraph()).splitlines())
+    for site in traversal.sites:
+        if site.subtraversal:
+            mermaid_string += "\n\t".join(
+                (
+                    "\n"
+                    + mermaid_traversal(
+                        site.subtraversal,
+                        tabname=f"{site.node} (Site {site.site})",
+                    )
+                    + "\n"
+                ).splitlines()
+            )
+    return mermaid_string
 
 
 ########################################################################################
@@ -316,7 +349,6 @@ class TestFlowNode(FlowNode):
             return FlowOut(model=model + 1, emission={"terminate": False})
 
         if not traversal.sites[-1].emission["terminate"]:
-            raise Exception
             return FlowOut(model=model, emission={"terminate": True})
 
 
@@ -345,57 +377,12 @@ if __name__ == "__main__":
     fg = TestFlowGraph(name="_")
     model = fg(model).model
 
-    pprint(fg.traversal)
+    mermaid_string = MermaidMathExpr().emit(model)
+
+    with open("test.md", mode="w") as f:
+        f.write(mermaid_string)
 
     ########################################################################################
-
-    # k = np.random.randint(1, 6)
-    # expr = random_mathexpr(k)
-    # pprint(expr.accept(PrintMathExpr()))
-
-    # fg = MathCanonicalizationFlow(name="_")
-
-    # expr = fg(expr).model
-    # pprint(expr.accept(PrintMathExpr()))
-
-    # mermaid_string = MermaidMathExpr().emit(expr)
-
-    # with open("test.md", mode="w") as f:
-    #     f.write(mermaid_string)
-
-    ########################################################################################
-
-    # k = np.random.randint(1, 5)
-    # l = np.random.randint(1, 3)
-    # m = np.random.randint(1, 2)
-    # n = np.random.randint(1, 2)
-    # op = random_operator(k, l, m, n)
-    # # op = (
-    # #     (MathStr(string="(k + 1)") * (PauliI() @ Creation()))
-    # #     * (MathStr(string="(o + 1)") * (PauliX() @ Identity()))
-    # #     + MathStr(string="(-1 * 19 + 1)") * (PauliX() @ Creation())
-    # # ) * (MathStr(string="(cosh(-1 * (0.0 + 1j * 1.0)) + 1)") * (PauliY() @ Identity()))
-
-    # fg = CanonicalizationFlow(name="_")
-
-    # pprint(op.accept(PrintOperator()))
-
-    # op = fg(op).model
-    # pprint(op.accept(PrintOperator()))
-
-    # mermaid_string = MermaidOperator().emit(op)
-
-    # with open("test.md", mode="w") as f:
-    #     f.write(mermaid_string)
-
-    ########################################################################################
-
-    # op = X @ (A * C)
-
-    # fg = TestFlow(name="cf")
-
-    # op = fg(op).model
-    # pprint(op.accept(PrintOperator()))
 
     # # console = Console(record=True)
     # # with console.capture() as capture:
@@ -414,35 +401,6 @@ if __name__ == "__main__":
     # parser = argparse.ArgumentParser()
     # parser.add_argument("--serve", action="store_true")
     # args = parser.parse_args()
-
-    # def mermaid_rules(flowgraph, tabname="Main"):
-    #     mermaid_string = '=== "{}"\n\t'.format(tabname.title())
-    #     mermaid_string += "\n\t".join(
-    #         flowgraph.forward_decorators.rules.accept(MermaidFlowGraph()).splitlines()
-    #     )
-    #     for node in flowgraph.nodes:
-    #         if isinstance(node, FlowGraph):
-    #             mermaid_string += "\n\t".join(
-    #                 ("\n" + mermaid_rules(node, node.name) + "\n").splitlines()
-    #             )
-    #     return mermaid_string
-
-    # def mermaid_traversal(traversal, tabname="Main"):
-    #     mermaid_string = '=== "{}"\n\t'.format(tabname.title())
-    #     mermaid_string += "\n\t".join(traversal.accept(MermaidFlowGraph()).splitlines())
-    #     for site in traversal.sites:
-    #         if site.subtraversal:
-    #             mermaid_string += "\n\t".join(
-    #                 (
-    #                     "\n"
-    #                     + mermaid_traversal(
-    #                         site.subtraversal,
-    #                         tabname=f"{site.node} (Site {site.site})",
-    #                     )
-    #                     + "\n"
-    #                 ).splitlines()
-    #             )
-    #     return mermaid_string
 
     # fr = fg.forward_decorators.rules
     # ft = fg.traversal
