@@ -34,33 +34,6 @@ from quantumion.compiler.flow import *
 I, X, Y, Z, P, M = PauliI(), PauliX(), PauliY(), PauliZ(), PauliPlus(), PauliMinus()
 A, C, J = Annihilation(), Creation(), Identity()
 
-########################################################################################
-
-
-class MathCanonicalizationFlow(FlowGraph):
-    nodes = [
-        FlowTerminal(name="terminal"),
-        TransformerFlowNode(visitor=DistributeMathExpr(), name="dist"),
-        TransformerFlowNode(visitor=ProperOrderMathExpr(), name="proper"),
-        TransformerFlowNode(visitor=PartitionMathExpr(), name="part"),
-    ]
-    rootnode = "dist"
-    forward_decorators = ForwardDecorators()
-
-    @forward_decorators.forward_fixed_point(done="proper")
-    def forward_dist(self, model):
-        pass
-
-    @forward_decorators.forward_fixed_point(done="part")
-    def forward_proper(self, model):
-        pass
-
-    @forward_decorators.forward_fixed_point(done="terminal")
-    def forward_part(self, model):
-        pass
-
-    pass
-
 
 ########################################################################################
 
@@ -79,7 +52,7 @@ def random_mathexpr(terms):
                         str(np.random.randint(0, 26)),
                         chr(np.random.randint(0, 26) + 97),
                     ][np.random.randint(0, 2)],
-                    " j"[np.random.randint(0, 2)],
+                    ["", "* 1j"][np.random.randint(0, 2)],
                 )
                 + "+*"[np.random.randint(0, 2)]
                 for _ in range(terms)
