@@ -304,16 +304,16 @@ class CanonicalizationFlow2(FlowGraph):
     rootnode = "hspace"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.forward_once(done="distribute")
+    @forward_decorators.forward_once(done="gathermath")
     def forward_hspace(self, model):
+        pass
+
+    @forward_decorators.forward_detour(done="proper", detour="distribute")
+    def forward_gathermath(self, model):
         pass
 
     @forward_decorators.forward_fixed_point(done="gathermath")
     def forward_distribute(self, model):
-        pass
-
-    @forward_decorators.forward_fixed_point(done="proper")
-    def forward_gathermath(self, model):
         pass
 
     @forward_decorators.forward_fixed_point(done="paulialgebra")
