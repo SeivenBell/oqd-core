@@ -311,11 +311,13 @@ def random_operator(terms, pauli, ladder, math_terms):
 class TestFlowNode(FlowNode):
     def __call__(self, model, traversal=Traversal()) -> FlowOut:
         try:
-            if not traversal.sites[-1].emission["terminate"]:
-                return FlowOut(model=model, emission={"terminate": True})
+            traversal.sites[-1].emission["terminate"]
         except:
-            pass
-        return FlowOut(model=model + 1, emission={"terminate": False})
+            return FlowOut(model=model + 1, emission={"terminate": False})
+
+        if not traversal.sites[-1].emission["terminate"]:
+            raise Exception
+            return FlowOut(model=model, emission={"terminate": True})
 
 
 class TestFlowGraph(FlowGraph):
@@ -327,6 +329,7 @@ class TestFlowGraph(FlowGraph):
 
     forward_decorators = ForwardDecorators()
 
+    @forward_decorators.catch_error(redirect="terminal")
     @forward_decorators.forward_branch_from_emission(
         key="terminate", branch={True: "terminal", False: "n1"}
     )
@@ -342,7 +345,7 @@ if __name__ == "__main__":
     fg = TestFlowGraph(name="_")
     model = fg(model).model
 
-    pprint(model)
+    pprint(fg.traversal)
 
     ########################################################################################
 

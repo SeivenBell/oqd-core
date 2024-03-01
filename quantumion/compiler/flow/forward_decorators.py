@@ -255,7 +255,7 @@ class ForwardDecorators:
                     return flowout
                 except Exception as e:
                     self.next_node = redirect
-                    return FlowOut(model=model, emission=e)
+                    return FlowOut(model=model, emission=dict(error=e))
 
             return _method
 
@@ -280,7 +280,7 @@ class ForwardDecorators:
                     return flowout
                 except tuple(branch.keys()) as e:
                     self.next_node = branch[e.__class__]
-                    return FlowOut(model=model, emission=e)
+                    return FlowOut(model=model, emission=dict(error=e))
 
             return _method
 
