@@ -182,6 +182,7 @@ class MermaidOperator(Transformer):
                     "OperatorScalarMul",
                     "OperatorKron",
                     "OperatorMul",
+                    "MathExpr",
                 ]
             ]
         )
