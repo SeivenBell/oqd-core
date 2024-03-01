@@ -263,6 +263,33 @@ def mermaid_traversal(traversal, tabname="Main"):
     return mermaid_string
 
 
+def markdown_flow(traversal, tabname="Main"):
+    md_string = '=== "{}"\n\t'.format(tabname.title())
+    model = None
+    for site in traversal.sites:
+        if site.subtraversal:
+            md_string += "\n\t".join(
+                markdown_flow(
+                    site.subtraversal, tabname=f"{site.node.title()} (Site {site.site})"
+                ).splitlines()
+            )
+            md_string += "\n\t"
+            continue
+        if site.model and model != site.model:
+            md_string += f'=== "{site.node.title()} (Site {site.site})"\n\t\t'
+            if isinstance(site.model, MathExpr):
+                md_string += "\n\t\t".join(
+                    MermaidMathExpr().emit(site.model).splitlines()
+                )
+            if isinstance(site.model, Operator):
+                md_string += "\n\t\t".join(
+                    MermaidOperator().emit(site.model).splitlines()
+                )
+            md_string += "\n\t"
+            model = site.model
+    return md_string
+
+
 ########################################################################################
 
 
@@ -369,18 +396,27 @@ class TestFlowGraph(FlowGraph):
         pass
 
 
+class TestFlowGraph2(FlowGraph):
+    nodes = [
+        TestFlowGraph(name="g1"),
+        FlowTerminal(name="terminal"),
+    ]
+    rootnode = "g1"
+
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.forward_once(done="terminal")
+    def forward_g1(self, model):
+        pass
+
+
 ########################################################################################
 
 if __name__ == "__main__":
 
-    model = MathNum(value=1)
-    fg = TestFlowGraph(name="_")
+    model = MathStr(string="1")
+    fg = TestFlowGraph2(name="_")
     model = fg(model).model
-
-    mermaid_string = MermaidMathExpr().emit(model)
-
-    with open("test.md", mode="w") as f:
-        f.write(mermaid_string)
 
     ########################################################################################
 
@@ -394,17 +430,19 @@ if __name__ == "__main__":
 
     ########################################################################################
 
-    # import argparse
+    import argparse
 
-    # from flowgraph.mkdocs import graph_to_mkdocs
+    from flowgraph.mkdocs import graph_to_mkdocs
 
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--serve", action="store_true")
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--serve", action="store_true")
+    args = parser.parse_args()
 
-    # fr = fg.forward_decorators.rules
-    # ft = fg.traversal
+    fr = fg.forward_decorators.rules
+    ft = fg.traversal
 
-    # graph_to_mkdocs(mermaid_rules(fg), mermaid_traversal(ft), serve=args.serve)
+    graph_to_mkdocs(
+        mermaid_rules(fg), mermaid_traversal(ft), markdown_flow(ft), serve=args.serve
+    )
 
     pass

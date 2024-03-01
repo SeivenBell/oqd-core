@@ -85,7 +85,7 @@ DEFAULT_MKDOCS_CONF = {
 }
 
 
-def graph_to_mkdocs(forward_rules_md, traversal_md, serve=False):
+def graph_to_mkdocs(forward_rules_md, traversal_md, flowgraph_md, serve=False):
     folder = os.path.dirname(os.path.abspath(__file__))
 
     if not os.path.exists(os.path.join(folder, "resources")):
@@ -98,6 +98,10 @@ def graph_to_mkdocs(forward_rules_md, traversal_md, serve=False):
     with open(os.path.join(folder, "resources/traversal.md"), mode="w") as f:
         f.write("# Traversal\n")
         f.write(traversal_md)
+
+    with open(os.path.join(folder, "resources/flow graph.md"), mode="w") as f:
+        f.write("# Flow Graph\n")
+        f.write(flowgraph_md)
 
     with open(os.path.join(folder, "resources/index.md"), mode="w") as f:
         f.write("# Content\n")
