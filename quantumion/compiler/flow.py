@@ -60,6 +60,7 @@ class TraversalSite(TypeReflectBaseModel):
     node: str
     subtraversal: Optional["Traversal"] = None
     emission: Any = None
+    model: Any = None
 
 
 class Traversal(TypeReflectBaseModel):
@@ -670,6 +671,7 @@ class FlowGraph(FlowBase):
                     node=self.current_node,
                     subtraversal=self.namespace[self.current_node].traversal,
                     emission=flowout.emission,
+                    model=flowout.model,
                 ),
             ]
 
