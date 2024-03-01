@@ -17,6 +17,7 @@ __all__ = [
 class TraversalSite(TypeReflectBaseModel):
     site: str
     node: str
+    nodetype: List[str]
     subtraversal: Optional["Traversal"] = None
     emission: Any = None
     model: Any = None

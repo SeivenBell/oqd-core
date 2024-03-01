@@ -109,6 +109,10 @@ class FlowGraph(FlowBase):
                 TraversalSite(
                     site=str(self.current_step),
                     node=self.current_node,
+                    nodetype=[
+                        cls.__name__
+                        for cls in self.namespace[self.current_node].__class__.__mro__
+                    ],
                 ),
             ]
             raise StopIteration
@@ -120,6 +124,10 @@ class FlowGraph(FlowBase):
                 TraversalSite(
                     site=str(self.current_step),
                     node=self.current_node,
+                    nodetype=[
+                        cls.__name__
+                        for cls in self.namespace[self.current_node].__class__.__mro__
+                    ],
                     subtraversal=self.namespace[self.current_node].traversal,
                     emission=flowout.emission,
                     model=flowout.model,
