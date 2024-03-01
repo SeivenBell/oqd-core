@@ -223,20 +223,22 @@ def markdown_traversal(traversal, tabname="Main"):
     return mermaid_string
 
 
-def markdown_flowgraph(traversal, tabname="Main"):
+def markdown_flowgraph(traversal, tabname="Main", prefix=""):
     md_string = '=== "{}"\n\t'.format(tabname.title())
     model = None
     for site in traversal.sites:
         if site.subtraversal:
             md_string += "\n\t".join(
                 markdown_flowgraph(
-                    site.subtraversal, tabname=f"{site.node.title()} (Site {site.site})"
+                    site.subtraversal,
+                    tabname=f"{site.node.title()} (Site {site.site})",
+                    prefix=(prefix + "." if prefix else "") + site.node.title(),
                 ).splitlines()
             )
             md_string += "\n\t"
             continue
         if site.model and model != site.model:
-            md_string += f'=== "{site.node.title()} (Site {site.site})"\n\t\t'
+            md_string += f'=== "{prefix+"." if prefix else ""}{site.node.title()} (Site {site.site})"\n\t\t'
             if isinstance(site.model, MathExpr):
                 md_string += "\n\t\t".join(
                     MermaidMathExpr().emit(site.model).splitlines()
