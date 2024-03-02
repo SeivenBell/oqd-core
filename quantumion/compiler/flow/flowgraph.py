@@ -212,32 +212,46 @@ class MathCanonicalizationFlow(FlowGraph):
 ########################################################################################
 
 
+class DistributionFlow(FlowGraph):
+    nodes = [
+        FlowTerminal(name="terminal"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute1"),
+        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute2"),
+    ]
+    rootnode = "distribute1"
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.forward_fixed_point(done="gathermath")
+    def forward_distribute1(self, model):
+        pass
+
+    @forward_decorators.forward_detour(done="terminal", detour="distribute2")
+    def forward_gathermath(self, model):
+        pass
+
+    @forward_decorators.forward_fixed_point(done="gathermath")
+    def forward_distribute2(self, model):
+        pass
+
+
 class NormalOrderFlow(FlowGraph):
     nodes = [
+        FlowTerminal(name="terminal"),
         TransformerFlowNode(visitor=NormalOrder(), name="normal"),
-        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
-        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
+        DistributionFlow(name="distribution"),
         TransformerFlowNode(visitor=ProperOrder(), name="proper"),
         TransformerFlowNode(visitor=PruneIdentity(), name="prune"),
-        FlowTerminal(name="terminal"),
     ]
     rootnode = "normal"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.forward_once(done="distribute")
+    @forward_decorators.forward_once(done="distribution")
     def forward_normal(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gathermath")
-    def forward_distribute(self, model):
-        pass
-
-    @forward_decorators.forward_fixed_point(done="proper")
-    def forward_gathermath(self, model):
-        pass
-
-    @forward_decorators.forward_fixed_point(done="prune")
-    def forward_proper(self, model):
+    @forward_decorators.forward_once(done="prune")
+    def forward_distribution(self, model):
         pass
 
     @forward_decorators.forward_fixed_point(done="terminal")
@@ -252,9 +266,7 @@ class CanonicalizationFlow(FlowGraph):
     nodes = [
         FlowTerminal(name="terminal"),
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
-        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute1"),
-        TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute2"),
+        DistributionFlow(name="distribution"),
         TransformerFlowNode(visitor=ProperOrder(), name="proper"),
         TransformerFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
         TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
@@ -266,20 +278,12 @@ class CanonicalizationFlow(FlowGraph):
     rootnode = "hspace"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.forward_once(done="distribute1")
+    @forward_decorators.forward_once(done="distribution")
     def forward_hspace(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="gathermath")
-    def forward_distribute1(self, model):
-        pass
-
-    @forward_decorators.forward_detour(done="proper", detour="distribute2")
-    def forward_gathermath(self, model):
-        pass
-
-    @forward_decorators.forward_fixed_point(done="gathermath")
-    def forward_distribute2(self, model):
+    @forward_decorators.forward_once(done="proper")
+    def forward_distribution(self, model):
         pass
 
     @forward_decorators.forward_fixed_point(done="paulialgebra")
