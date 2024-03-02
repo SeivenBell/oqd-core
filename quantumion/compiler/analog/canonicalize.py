@@ -357,31 +357,6 @@ class CanonicalFormError(Exception):
     """
     pass
 
-class CanonicalizationVerificationOpSeq(AnalogCircuitVisitor): # check using SortedOrder
-    def __init__(self):
-        self._current_pauli = None
-        self._map_pauli_top_idx = {
-            'PauliI': 0,
-            'PauliX': 1,
-            'PauliY': 2,
-            'PauliZ': 3
-        }
-    def visit_OperatorScalarMul(self, model: OperatorScalarMul): # single register
-        if isinstance(model.op, (PauliX, PauliY, PauliZ, PauliI)):
-            if self._current_pauli == None:
-                self._current_pauli = model.op
-            elif self._map_pauli_top_idx[model.op.__class__.__name__] < self._map_pauli_top_idx[self._current_pauli.__class__.__name__]:
-                raise CanonicalFormError("{} is before {}".format(model.op.__class__.__name__, self._current_pauli.__class__.__name__))
-    
-    def visit_OperatorAdd(self, model: OperatorAdd):
-        if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, OperatorScalarMul):
-            self.visit(model.op2)
-            self.visit(model.op1)
-        elif isinstance(model.op1, OperatorScalarMul) and isinstance(model.op2, OperatorScalarMul):
-            self.visit(model.op1)
-            self.visit(model.op2)
-        else:
-            raise CanonicalFormError("Incorrect canonical addition")
 class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
     def __init__(self):
         self.allowed_ops = Union[
@@ -652,11 +627,11 @@ if __name__ == '__main__':
     test_op = Z+(2*(X@(2*I)+Y))
     test_op = Z*(2*I)+ ((5*Y) + 8*Z) ### showing gathermathexpr not req
     test_op = 2*(Z+I) + 3*((A+Y) + Z) ### showing distribute is req
-    test_op = Z+(Y*(Y*Y))
+    test_op = (A*C*A)@X
     pprint(test_op.accept(VerbosePrintOperator()))
     pprint(test_op)
     #pprint(test_op.accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()))#.accept(PrintOperator()))
-    pprint(test_op.accept(CanonicalizationVerificationPauliAlgebra()))
+    pprint(test_op.accept(GatherPauli()))
     ########################################################################
     ### assumptions are needed -> without some assumptions of tree structure this is impossible.
 
