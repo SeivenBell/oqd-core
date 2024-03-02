@@ -252,8 +252,9 @@ class CanonicalizationFlow(FlowGraph):
     nodes = [
         FlowTerminal(name="terminal"),
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute1"),
         TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath"),
-        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute"),
+        TransformerFlowNode(visitor=OperatorDistribute(), name="distribute2"),
         TransformerFlowNode(visitor=ProperOrder(), name="proper"),
         TransformerFlowNode(visitor=PauliAlgebra(), name="paulialgebra"),
         TransformerFlowNode(visitor=GatherMathExpr(), name="gathermath2"),
@@ -265,16 +266,20 @@ class CanonicalizationFlow(FlowGraph):
     rootnode = "hspace"
     forward_decorators = ForwardDecorators()
 
-    @forward_decorators.forward_once(done="gathermath")
+    @forward_decorators.forward_once(done="distribute1")
     def forward_hspace(self, model):
         pass
 
-    @forward_decorators.forward_detour(done="proper", detour="distribute")
+    @forward_decorators.forward_fixed_point(done="gathermath")
+    def forward_distribute1(self, model):
+        pass
+
+    @forward_decorators.forward_detour(done="proper", detour="distribute2")
     def forward_gathermath(self, model):
         pass
 
     @forward_decorators.forward_fixed_point(done="gathermath")
-    def forward_distribute(self, model):
+    def forward_distribute2(self, model):
         pass
 
     @forward_decorators.forward_fixed_point(done="paulialgebra")
