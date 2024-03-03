@@ -68,8 +68,8 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
     def test_complicated_addition_false(self):
-        """Complicated addition test of non canonical operator"""
-        op =  1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A) + 7 * (Z @ A*C)
+        """Complicated addition test of non canonical operator (A*C is not normal ordered)"""
+        op =  1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + (Z @ (A*A)) + 7 * (Z @ (A*C))
         self.assertCanonicalFormErrorRaised(operator=op)
 
     def test_pauli_tensor_and_ladder_multiplication_true(self):
