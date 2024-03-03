@@ -199,355 +199,378 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationOperatorDistribute()
+        super().__init__(methodName)
 
     def test_pauli_simple_fail(self):
         """Simple failure with pauli"""
         op = ((2*X) + Y) @ Z
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_ladder_simple_fail(self):
         """Simple failure with pauli and ladder"""
         op = ((2*X) + A) @ Z
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_simple_pass(self):
         """Simple pass with pauli"""
         op = (2*X)@Z + Y@Z
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_ladder_simple_pass(self):
         """Simple pass with pauli"""
         op = (2*X)@Z + Y@Z + 2*(A*A*A*C)*(C*A*A)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_nested_fail(self):
         """Simple failure with nested pauli"""
         op = Y*(X@(X@X*(X+X)))
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_nested_pass(self):
         """Simple pass with nested pauli"""
         op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A) + 7 * (Z @ A*C)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_nested_multiplication_pass(self):
         """Nested multiplication passing test"""
         op = 3*(2*(2+7)*7*(X@Y@Y@Z@(A*A*C*LI))) + (2j+7)*7*(X@Z@X@Z@(A*A*C*LI*A*A))
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_complex_nested_pass(self):
         """Complicated pass with nested pauli and ladder"""
         op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A*A*A*A*A*C+A*C*C*C) + 7 * (Z @ A*C)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_complex_nested_fail(self):
         """Complicated fail with nested pauli and ladder"""
         op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ (A*A*A*A*A*A*C+A*C*C*C)) + 7 * (Z @ A*C)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_complex_pauli_fail(self):
         """Complicated test with complex numers"""
         op = 2*(X@(7*Y*(1j+2)*Y)) + 6*(Z@(-3j*Y)) #2*(X@(7*Y*(1j)*Y)) + 6*(Z@(-3j*Y)) 
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_addition_pauli_scalar_multiple_simple(self):
         """Pauli addition with scalar multiple passes"""
         op = 3* (X + Y)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_addition_pauli_scalar_multiple_nested(self):
         """Pauli addition with scalar multiple passes with nested operations"""
         op = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A))
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_subtraction_pauli(self):
         """Pauli Subtarction Fail"""
         op = X * (X - Y)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationOperatorDistribute())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationGatherMathExpr(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationGatherMathExpr()
+        super().__init__(methodName)
 
     def test_pauli_simple_pass(self):
         """Simple Pauli passing"""
         op = 2*(X@Z) + Y@Z
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_simple_fail(self):
         """Simple Pauli failing"""
         op = (2*X)@Z + Y@Z
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_simple_fail_one_term(self):
         """Simple Pauli failing with 1 term"""
         op = X * ((2+3)*X)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_complicated_pass(self):
         """Complicated test passing with pauli and ladders"""
         op = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*A*C*LI)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_complicated_fail(self):
         """Complicated test failing with pauli and ladders"""
         op = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*(1*A)*C*LI)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_addition_pauli_scalar_multiple_nested_fail(self):
         """Pauli addition fail with scalar multiple passes with nested operations"""
         op = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A))
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_nested_ops_fail(self):
         """Nested scalar multiplications of Paulis fail"""
         op = (3*(3*(3*(X*Y))))
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_pauli_ladder_nested_ops_pass(self):
         """Nested scalar multiplications pass"""
         op = (3 * 3 * 3) * ((X * Y) @ (A*C))
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherMathExpr())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationProperOrder(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationProperOrder()
+        super().__init__(methodName)
 
     def test_simple_pauli_pass(self):
         """Simple tensor product in proper order"""
         op = (X @ Y) @ Z
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_pauli_pass(self):
         """Simple tensor product not in proper order"""
         op = X @ (Y @ Z)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_simple_pauli_with_other_ops_pass(self):
         """Simple tensor product with other operations in proper order"""
         op = (X @ (2*Y + Z@(A*C*A))) @ Z
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_pauli_with_other_ops_pass(self):
         """Simple tensor product with other operations not in proper order"""
         op = X @ ((2*Y + Z@(A*C*A)) @ Z)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_nested_paulis_v1(self):
         """Nested structure with nested addition not in proper order"""
         op = I + (X + (2*Y)+Z)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_nested_paulis_pass_v2(self):
         """Nested structure with nested addition in proper order"""
         op = (I + X) + ((2*Y) + Z)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_nested_paulis_pass_with_brackets(self):
         """Nested structure with nested addition in proper order with brackets"""
         op = ((I + X) + (2*Y))+Z
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
         
     def test_nested_paulis_pass_without_brackets(self):
         """Nested structure with nested addition in proper order with brackets (i.e. using Python default)"""
         op = I + X + (2*Y) + Z
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_nested_tensor_prod_paulis_multiplication_fail(self):
         """Nested structure with nested multiplication (4j*(2...)) not in proper order"""
         op = (A @ C) @ (4j*(2 * (X + (2*Y)+Z)))
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_nested_tensor_prod_paulis_multiplication_pass(self):
         """Nested structure with nested multiplication (4j*...) in proper order"""
         op = (A @ C) @ ((4j* 2) * (X + (2*Y)+Z))
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationProperOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationPauliAlgebra(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationPauliAlgebra()
+        super().__init__(methodName)
 
     def test_simple_pass(self):
         """Simple Pauli Pass"""
         op = X@X + Z@X
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_fail(self):
         """Simple Pauli Fail"""
         op = X@X + Z@(X*X)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_nested_pass(self):
         """Simple nested Pauli test pass"""
         op = I@I@X@(X-Z)@(A*A) + Z@(X@(X@(X+Z)))@(A*C*A*C*C)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_nested_fail(self):
         """Simple nested Pauli test fail because of X * I"""
         op = I@I@X@(X-Z)@(A*A) + Z@(X@(X@((X*I)+Z)))@(A*C*A*C*C)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_pass(self):
         """Showing test passing due to assumption"""
         op = X*(2*Y)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_pass_v2(self):
         """Showing test passing due to assumption: GatherMathExpr needs to be done before further PauliAlgebra can be done"""
         op = X*((1j)*Y)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPauliAlgebra())        
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)        
 
 @colorize(color=GREEN)
 class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationGatherPauli()
+        super().__init__(methodName)
 
     def test_simple_pass(self):
         """Simple pass"""
         op = X@X@Y@(A*C*LI)@A
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_fail(self):
         """Simple fail"""
         op = X@X@Y@(A*C*LI)@A@I
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_complicated_addition_pass(self):
         """Complicated Addition pass"""
         op = X@X@Y@(A*C*LI)@A + I@I@I@I@C@C ##  X@(A*A)@A+I@C@C
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_adddition_fail(self):
         """Simple Addition fail"""
         op = X@X@Y@(A*C*LI)@A@I + I@I@I@I@C@C
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
         
     def test_simple_addition_pass(self):
         """Simple Addition pass"""
         op = X@(A*A)@A+I@C@C
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_addition_pass(self):
         """Assumption Single Nested Addition pass"""
         op = (Y+I)@A@X
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_assumtion_nested_addition_pass(self):
         """Assumption double Nested Addition pass"""
         op = (Y+I)@A@(Z+I)# +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_simple_nested_addition_pass(self):
         """Error not found when Ladder @ PauliAddition"""
         op = A@(Z+I)# +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_simple_nested_subtraction_pass(self):
         """Error not found when Ladder @ PauliSubtraction"""
         op = A@(Z+I)# +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_simple_nested_product_fail(self):
         """Error found when Ladder @ PauliMultiplication"""
         op = A@(Z*I)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_ladder_prod_fail(self):
         """ladder multiplication fail"""
         op = (A*C*A)@X
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_ladder_prod_pass(self):
         """ladder multiplication pass"""
         op = X@(A*C*A)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationGatherPauli())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
 @colorize(color=RED)
 class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
 
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationNormalOrder()
+        super().__init__(methodName)
+
     def test_simple_pass(self):
         """Simple pass"""
         op = X@X@Y@(C*A)@A
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_fail(self):
         """Simple fail"""
         op = X@X@Y@(A*C)@A
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_simple_pass_only_ladders(self):
         """Simple pass with only ladders"""
         op = (C*C*C*A)@C@LI
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_fail_only_ladders(self):
         """Simple fail with only ladders"""
         op = (C*C*C*A)@C@LI
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_addition_pass(self):
         """Simple pass with addition"""
         op = X@X@Y@(C*A)@A + I@I@I@C@C
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_addition_fail(self):
         """Simple fail with addition"""
         op = X@X@Y@(C*A*C)@A + I@I@I@C@C
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_simple_starting_with_ladder_pass_v1(self):
         """Starting with ladder pass  v1"""
         op = (C*A)@(Z+I)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_starting_with_ladder_fail_v1(self):
         """Starting with ladder fail  v1"""
         op = (C*A*C)@(Z+I)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_simple_starting_with_single_ladder_pass_v1(self):
         """Starting with single ladder pass  v1"""
         op = C@(Z+I)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_starting_with_single_ladder_tensors(self):
         """Starting with ladder pass  v1"""
         op = C@A@C@LI@A@C@(Z+I)@X@Y
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_only_ladder_addition_without_distribution(self):
         """Error not detected when we do only ladder operations without distribution of ladders"""
         op = A*(A+C)
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_only_ladder_addition_with_distribution(self):
         """Error detected when we do only ladder operation with distribution of ladders"""
         op = (A*A)+(A*C)
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationNormalOrder())    
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)    
 
 @colorize(color=RED)
 class TestCanonicalizationVerificationPruneIdentity(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
 
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = CanonicalizationVerificationPruneIdentity()
+        super().__init__(methodName)
+
     def test_simple_pass(self):
         """Simple pass"""
         op = X@X@Y@(C*A)@A
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_addition_pass(self):
         """Simple pass"""
         op = A@LI@LI + C@C@LI
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_simple_fail(self):
         """Simple pass"""
         op = X@X@Y@(C*A*LI)@A
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_show_proper_order_not_needed(self):
         """Showing that expression does not need to be in proper order"""
         op = A*(C*A*(A*C*A*(C*C)*LI))
-        self.assertCanonicalFormErrorRaised(operator=op, visitor=CanonicalizationVerificationPruneIdentity())
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors, unittest.TestCase):
