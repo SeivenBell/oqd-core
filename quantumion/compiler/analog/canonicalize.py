@@ -359,6 +359,7 @@ class CanonicalFormError(Exception):
 
 class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
     def __init__(self):
+        super().__init__()
         self.allowed_ops = Union[
             OperatorTerminal,
             OperatorMul,
@@ -441,6 +442,7 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
 
 class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
     def __init__(self):
+        super().__init__()
         self.allowed_ops = Union[
                 OperatorTerminal,
                 Ladder,
