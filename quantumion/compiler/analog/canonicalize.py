@@ -533,6 +533,9 @@ class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
         super().__init__()
         self.pauli_tracker = False
 
+    def reset(self):
+        self.pauli_tracker = False
+
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorAdd, OperatorSub)):
             self.visit_OperatorAddSub(model)
@@ -567,6 +570,9 @@ class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
     """
     def __init__(self):
         super().__init__()
+        self.creation_tracker = False
+
+    def reset(self):
         self.creation_tracker = False
 
     def _visit(self, model: Any) -> Any:
