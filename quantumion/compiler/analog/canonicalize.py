@@ -364,13 +364,24 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
             OperatorMul,
             OperatorKron,
         ]
+
+        self.add_allowed_ops = Union[
+            OperatorTerminal,
+            OperatorMul,
+            OperatorKron,
+            OperatorScalarMul,
+        ]
+        self.creation_tracker = False
+
     def visit_OperatorAdd(self, model: OperatorAdd):
-        if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, OperatorScalarMul):
+        if isinstance(model.op2, model.__class__):
+            raise CanonicalFormError("Incorrect Proper Ordering in Addition")
+        if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, self.add_allowed_ops):
             self.visit(model.op1)
             self.visit(model.op2)
-        elif isinstance(model.op1, OperatorScalarMul) and isinstance(model.op2, OperatorScalarMul):
+        elif isinstance(model.op1, self.add_allowed_ops) and isinstance(model.op2, self.add_allowed_ops):
             self.visit(model.op1)
-            self.visit(model.op2)        
+            self.visit(model.op2)
         else:
             raise CanonicalFormError("Incorrect canonical addition")
         
@@ -381,21 +392,37 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         """
         OpMul should not have OpKron and Anhilitation or something else. It should not have opkron at all
         """
-        if isinstance(model.op1, OperatorMul): # check op2 ladder
-            self.visit(model=model.op1)
+        if (isinstance(model.op1, Annihilation) or isinstance(model.op2, Annihilation)):
+            if self.creation_tracker:
+                raise CanonicalFormError("Ladders are not in Normal order")
 
-        if isinstance(model.op2, OperatorMul): # check op1 ladder
-            self.visit(model = model.op2)
+        if isinstance(model.op1, Identity) or isinstance(model.op2, Identity):
+            raise CanonicalFormError("Idenitities should not be present in Normal order")
+
+        if isinstance(model.op2, model.__class__):
+            raise CanonicalFormError("Incorrect Proper Ordering in Operator Multiplication")
 
         if not (isinstance(model.op1, _allowed_prod_ops) and isinstance(model.op2, _allowed_prod_ops)):
             raise CanonicalFormError("Incorrect canonical Operator multiplication") # pauli algebra not fully applied
-
         
+        if isinstance(model.op1, OperatorMul): # check op2 ladder
+            if isinstance(model.op2, Creation):
+                self.creation_tracker = True
+            self.visit(model=model.op1)
+
+        if isinstance(model.op1, Ladder) and isinstance(model.op2, Ladder): # Terminal
+            if isinstance(model.op1, Annihilation) and isinstance(model.op2, Creation):
+                raise CanonicalFormError("Ladders are not in Normal order")
+            self.creation_tracker = False
+
     def visit_OperatorKron(self, model: OperatorKron):
+        if isinstance(model.op2, model.__class__):
+            raise CanonicalFormError("Incorrect Proper Ordering in Operator kron")
+
         if isinstance(model.op1, (OperatorMul, OperatorKron)):
             self.visit(model=model.op1)
         
-        if isinstance(model.op2, (OperatorMul, OperatorKron)): # ProperOrder: no need and raise error for not proper order
+        if isinstance(model.op2, (OperatorMul)): # ProperOrder: no need and raise error for not proper order
             self.visit(model=model.op2)
         
         if not(isinstance(model.op1, self.allowed_ops) and isinstance(model.op2, self.allowed_ops)): # terminal

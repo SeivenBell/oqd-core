@@ -44,14 +44,14 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         #self.assertTrue(test_function(operator = op, visitor=CanonicalizationVerificationAddition()))
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
-    def test_simple_addition_false(self):
-        """Simple addition test of non canonical operator"""
+    def test_simple_addition_pass(self):
+        """Simple addition test of canonical operator with Pauli as terminal"""
         op =  1*I + X
-        self.assertCanonicalFormErrorRaised(operator=op)
+        self.assertCanonicalFormErrorNotRaised(operator=op)
 
     def test_complicated_addition_true(self):
         """Complicated addition test of canonical operator"""
-        op =  1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + 6* (Z @ (A*A)) + 7 * (Z @ (A*C))
+        op =  1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + 6* (Z @ (A*A)) + 7 * (Z @ (C*A))
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
     @unittest.skip("The issue of brackets seems to be resolved")
@@ -64,7 +64,7 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
 
     def test_complicated_addition_pass_with_all_bracket(self):
         """Complicated addition test of canonical operator without missing brackets"""
-        op =  1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + 6* (Z @ (A*A)) + 7 * (Z @ (A*C))
+        op =  1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + 6* (Z @ (A*A)) + 7 * (Z @ (C*A))
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
     def test_complicated_addition_false(self):
@@ -74,7 +74,7 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
 
     def test_pauli_tensor_and_ladder_multiplication_true(self):
         """Complicated pauli tensor product and ladder multiplication"""
-        op = 2*(I @ (A*C) @ X @ (C*A*A*A*C*LI*A)) 
+        op = 2*(I @ (C*A) @ X @ (C*A*A*A*A)) 
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
     def test_pauli_tensor_and_ladder_multiplication_false_v1(self):
@@ -103,15 +103,99 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         self.assertCanonicalFormErrorRaised(operator=op)
     
     def test_subtraction(self):
+        """Raise error for subtraction"""
         op = 3*X - 2*Y
         self.assertCanonicalFormErrorRaised(operator=op)
 
-    @unittest.skip("Not implemenyed yet")
-    def test_proper(self):
-        op = X @ (Y @ Z)
+    def test_proper_addition_fail(self):
+        """Raise error for improper order in addition"""
+        op = 1*X + (1*Y + (1*Z))
         self.assertCanonicalFormErrorRaised(operator=op)
 
+    def test_proper_addition_pass(self):
+        """Do not Raise error for proper order in addition"""
+        op = (X + 2*Y) + Z
+        self.assertCanonicalFormErrorNotRaised(operator=op)
 
+    def test_proper_multiplication_fail(self):
+        """Raise error for improper order in multiplication"""
+        op = 1*A * (1*LI * (1*LI))
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_proper_multiplication_pass(self):
+        """Do not Raise error for proper order in multiplication"""
+        op = (C * C) * A
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
+    def test_proper_addmul_fail(self):
+        """Raise error for improper order in addmul"""
+        op = A + C*(C*C) + Z
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_proper_addmul_pass(self):
+        """Do not Raise error for proper order in addmul"""
+        op = A + (C*C)*C + LI
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
+    def test_proper_kron_fail(self):
+        """Raise error for improper order in kron"""
+        op = A @ (LI @ LI)
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_proper_multiplication_pass(self):
+        """Do not Raise error for proper order in kron"""
+        op = (C @ C) @ A
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
+    def test_proper_addmullron_fail(self):
+        """Raise error for improper order in addmulkron"""
+        op = X@Y@A + Z@(I@((C*C)*C)) + Z@I@LI
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_proper_addmulkron_pass(self):
+        """Do not Raise error for proper order in addmulkron"""
+        op = X@Y@A + (Z@I)@((C*C)*C) + Z@I@LI
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
+    def test_normal_order_pass_simple(self):
+        """Simple Normal Order pass"""
+        op = X@Z@(C*C* C*A) + X@Z@(A*A*A)
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
+    def test_normal_order_pass_complicated(self):
+        """Simple Normal Order pass with tensor products"""
+        op = X@Z@(C*C*C*A*A) @(C*A) + X@Z@(A*A*A)@(C*A)
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
+    def test_normal_order_fail_simple(self):
+        """Simple Normal Order fail"""
+        op = X@Z@(C*A*C*A) + X@Z@(A*A*A)
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_normal_order_fail_complicated(self):
+        """Simple Normal Order fail with tensor products"""
+        op = X@Z@(C*C) @(C*A) + X@Z@(A*A*A)@(A*C)
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_normal_order_fail_identity_complicated(self):
+        """Simple Normal Order fail with tensor products for identity"""
+        op = X@Z@(C*C*LI* C*A*A) @(C*A) + X@Z@(A*A*A)@(C*A)
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_pauli_identity_fail(self):
+        """Complicated pauli tensor product and ladder multiplication"""
+        op = 2*(I @ (C*A) @ X @ (C*A*A*A*LI*LI*A)) 
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_pauli_identity_fail_terminal_v1(self):
+        """Terminal Identity fail v1"""
+        op = 2*A*I
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_pauli_identity_fail_terminal_v2(self):
+        """Terminal Identity fail double identity"""
+        op = 2*I*I
+        self.assertCanonicalFormErrorRaised(operator=op)
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
