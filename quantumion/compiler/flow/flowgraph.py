@@ -250,8 +250,12 @@ class NormalOrderFlow(FlowGraph):
     def forward_normal(self, model):
         pass
 
-    @forward_decorators.forward_once(done="prune")
+    @forward_decorators.forward_once(done="proper")
     def forward_distribution(self, model):
+        pass
+
+    @forward_decorators.forward_fixed_point(done="prune")
+    def forward_proper(self, model):
         pass
 
     @forward_decorators.forward_fixed_point(done="terminal")
