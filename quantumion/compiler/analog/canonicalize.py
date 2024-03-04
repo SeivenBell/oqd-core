@@ -469,6 +469,10 @@ class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
         else:
             self.visit(model = model.op)
 
+    def visit_OperatorSub(self, model: OperatorSub):
+        if isinstance(model, OperatorSub):
+            raise CanonicalFormError("Subtraction of terms present")
+
 class CanonicalizationVerificationGatherMathExpr(AnalogCircuitVisitor):
     """Assuming that OperatorDistribute has already been fully ran"""
     def _visit(self, model: Any) -> Any:
