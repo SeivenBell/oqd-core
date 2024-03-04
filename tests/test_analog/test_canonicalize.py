@@ -585,6 +585,11 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors, unittest.
         op = X+(4*Y) + Z
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
+    def test_simple_fail_2_terms(self):
+        """Simple fail with 2 terms"""
+        op = X+I
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
     def test_simple_fail(self):
         """Simple Fail"""
         op = X+(4*Y) + I
@@ -602,9 +607,39 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors, unittest.
 
     def test_assumtion_pass(self):
         """Hamiltonian needs to be distributed"""
-        op = (X+I)@Z
+        op = (I+X)@Z
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
+    def test_simple_pass_ladder(self):
+        """Simple Pass ladder"""
+        op = C*A + (C*A*A*A)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_simple_fail_ladder(self):
+        """Simple fail ladder"""
+        op = (C*A*A*A)+(C*A)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_simple_pass_ladder_3_terms(self):
+        """Simple Pass ladder 3 terms"""
+        op = C*A + (C*A*A*A) + (C*C*A*A) 
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_simple_fail_ladder_3_terms(self):
+        """Simple fail ladder 3 terms"""
+        op = C*A + (C*C*A*A) + (C*A*A*A) 
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_simple_pass_ladder_pauli(self):
+        """Simple pass ladder-pauli 3 terms: Pauli's are given precedence in order of importance"""
+        op = X@(C*A) + Y@(C*C*A*A) + Z@(C*A*A*A) 
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+
+    def test_simple_fail_ladder_pauli(self):
+        """Simple fail ladder-pauli 3 terms: Pauli's are given precedence in order of importance"""
+        op = X@(C*A) + I@(C*A*A*A) + Z@(C*C*A*A) 
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 if __name__ == '__main__':
     unittest.main()
     #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())

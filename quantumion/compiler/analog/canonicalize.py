@@ -624,9 +624,15 @@ class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
         self._current_term_index = None
         super().__init__()
 
+    def reset(self):
+        self._current_term_index = None
+
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, OperatorAdd):
             raise CanonicalFormError("Sorting pre-requisites not met")
+        if isinstance(model.op1, (OperatorTerminal, OperatorMul, OperatorKron)) and isinstance(model.op2, (OperatorTerminal, OperatorMul, OperatorKron)):
+            if TermIndex().visit(model.op1) > TermIndex().visit(model.op2):
+                raise CanonicalFormError("TermIndex {} and {} are not in sorted order".format(TermIndex().visit(model.op1), TermIndex().visit(model.op2)))
         if self._current_term_index == None:
             self._current_term_index = TermIndex().visit(model.op2)
         elif TermIndex().visit(model.op2) > self._current_term_index:
