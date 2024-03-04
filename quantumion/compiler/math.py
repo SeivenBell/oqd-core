@@ -2,9 +2,11 @@ from typing import Any, Union
 
 ########################################################################################
 
+from quantumion.interface.math import *
+
 from quantumion.compiler.visitor import Transformer
 
-from quantumion.interface.math import *
+from quantumion.utils.color import random_hexcolor
 
 ########################################################################################
 
@@ -14,6 +16,7 @@ __all__ = [
     "PartitionMathExpr",
     "DistributeMathExpr",
     "ProperOrderMathExpr",
+    "MermaidMathExpr",
 ]
 
 ########################################################################################
@@ -133,6 +136,108 @@ class VerbosePrintMathExpr(PrintMathExpr):
 
     def visit_MathPow(self, model: MathPow):
         return self.visit_MathBinaryOp(model)
+
+
+########################################################################################
+
+
+class MermaidMathExpr(Transformer):
+
+    def emit(self, model):
+        self.element = 0
+
+        self.mermaid_string = "```mermaid\ngraph TD\n"
+        model.accept(self)
+        self.mermaid_string += "".join(
+            [
+                f"classDef {model} stroke:{random_hexcolor()},stroke-width:3px\n"
+                for model in [
+                    "MathAdd",
+                    "MathSub",
+                    "MathMul",
+                    "MathDiv",
+                    "MathFunc",
+                    "MathNum",
+                    "MathVar",
+                    "MathImag",
+                ]
+            ]
+        )
+        self.mermaid_string += "```\n"
+
+        return self.mermaid_string
+
+    def visit_MathImag(self, model):
+        element = self.element
+        self.mermaid_string += 'element{}("{}"):::{}\n'.format(
+            self.element,
+            model.__class__.__name__,
+            model.__class__.__name__,
+        )
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_MathVar(self, model):
+        element = self.element
+        self.mermaid_string += 'element{}("{}<br/>{}<br/>{}"):::{}\n'.format(
+            self.element,
+            model.__class__.__name__,
+            "-" * len(model.__class__.__name__),
+            "name = #quot;{}#quot;".format(model.name),
+            model.__class__.__name__,
+        )
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_MathNum(self, model):
+        element = self.element
+        self.mermaid_string += 'element{}("{}<br/>{}<br/>{}"):::{}\n'.format(
+            self.element,
+            model.__class__.__name__,
+            "-" * len(model.__class__.__name__),
+            "value = {}".format(model.value),
+            model.__class__.__name__,
+        )
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_MathBinaryOp(self, model):
+        left = self.visit(model.expr1)
+        right = self.visit(model.expr2)
+
+        element = self.element
+        self.mermaid_string += 'element{}("{}"):::{}\n'.format(
+            self.element,
+            model.__class__.__name__,
+            model.__class__.__name__,
+        )
+
+        self.mermaid_string += f"element{element} --> {left} & {right}\n"
+
+        self.element += 1
+
+        return f"element{element}"
+
+    def visit_MathFunc(self, model):
+        expr = self.visit(model.expr)
+
+        element = self.element
+        self.mermaid_string += 'element{}("{}<br/>{}<br/>{}"):::{}\n'.format(
+            self.element,
+            model.__class__.__name__,
+            "-" * len(model.__class__.__name__),
+            "func = {}".format(model.func),
+            model.__class__.__name__,
+        )
+
+        self.mermaid_string += f"element{element} --> {expr}\n"
+
+        self.element += 1
+
+        return f"element{element}"
 
 
 ########################################################################################
