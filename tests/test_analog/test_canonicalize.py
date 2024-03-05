@@ -230,7 +230,7 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, un
 
     def test_pauli_nested_pass(self):
         """Simple pass with nested pauli"""
-        op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A) + 7 * (Z @ A*C)
+        op  = 1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + (Z @ (A*A)) + 7 * (Z @ (A*C))
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_nested_multiplication_pass(self):
@@ -240,7 +240,7 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, un
 
     def test_complex_nested_pass(self):
         """Complicated pass with nested pauli and ladder"""
-        op  = 1*(I @ A*A) + 3*(X @ A*A) + 7*(Y @ A*A) + (Z @ A*A*A*A*A*A*C+A*C*C*C) + 7 * (Z @ A*C)
+        op  = 1*(I @ (A*A)) + 3*(X @ (A*A)) + 7*(Y @ (A*A)) + (Z @ ((A*A*A*A*A*A*C*A*C*C*C))) + 7 * (Z @ (A*C))
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_complex_nested_fail(self):
@@ -266,6 +266,11 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, un
     def test_subtraction_pauli(self):
         """Pauli Subtarction Fail"""
         op = X * (X - Y)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_multiplication_distribution(self):
+        """Pauli hyp Fail"""
+        op = (X@C)*(Y@LI)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
 @colorize(color=BLUE)
