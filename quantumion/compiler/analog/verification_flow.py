@@ -100,7 +100,8 @@ class VerificationFlow(FlowGraph):
                                         transformer = GatherPauli())(name="gatherpauli"),
         VisitorFlowNode(visitor=CanonicalizationVerificationNormalOrder(),name="NormalOrderVerifier"),
         VerificationNormalOrderFlow(name = "NormalOrderFlow"),
-        TransformerFlowNode(visitor=SortedOrder(),name="sortedorder"),
+        VerificationFlowGraphCreator(verify = CanonicalizationVerificationSortedOrder(),
+                                        transformer = SortedOrder())(name="sortedorder"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
@@ -139,6 +140,6 @@ class VerificationFlow(FlowGraph):
     def forward_NormalOrderFlow(self, model):
         pass
 
-    @forward_decorators.forward_fixed_point(done="terminal")
+    @forward_decorators.forward_once(done="terminal")
     def forward_sortedorder(self, model):
         pass
