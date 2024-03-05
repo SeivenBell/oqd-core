@@ -438,7 +438,7 @@ class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors, unittest.
         
     def test_simple_addition_pass(self):
         """Simple Addition pass"""
-        op = X@(A*A)@A+I@C@C
+        op = X@(A*A)@A+ I@C@C
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
     def test_assumption_addition_pass(self):
@@ -597,13 +597,18 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors, unittest.
 
     def test_nested_pass(self):
         """Nested Pass"""
-        op = (X@Y+(2*(3j)*(X@Y))) + (Y@I) + (Z@I)
+        op = (X@Y+(2*(3j)*(X@Z))) + (Y@I) + (Z@I)
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
-    def test_simple_pass_identical_operators(self):
-        """Pass with identical operators"""
+    def test_nested_fail(self):
+        """Nested fail because of I@Y. This tests if it works with OperatorScalarMul"""
+        op = (X@Y+(2*(3j)*(I@Y))) + (Y@I) + (Z@I)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_simple_fail_identical_operators(self):
+        """Fail with identical operators"""
         op = X@I@Z + 2*X@I@Z
-        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
     def test_assumtion_pass(self):
         """Hamiltonian needs to be distributed"""
@@ -635,17 +640,49 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors, unittest.
         op = X@(C*A) + Y@(C*C*A*A) + Z@(C*A*A*A) 
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
-
     def test_simple_fail_ladder_pauli(self):
         """Simple fail ladder-pauli 3 terms: Pauli's are given precedence in order of importance"""
         op = X@(C*A) + I@(C*A*A*A) + Z@(C*C*A*A) 
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_scalar_mul_pass(self):
+        """Simple pass with scalar mul"""
+        op = X +Y+2*2*Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_scalar_mul_fail(self):
+        """Simple fail with scalar mul because of repeated operator"""
+        op = X +Y+2*2*Z + Z
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+    
+    def test_scalar_mul_pass_with_ladder(self):
+        """Simple pass with scalar mul with ladders"""
+        op = 2*(X@X@(C*A*A)) + 2*(Y@Y@(C*A)) + 3*(Z@Z@(C*A))
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_scalar_mul_fail_with_ladder(self):
+        """Simple fail with scalar mul with ladders because ladders are not sorted"""
+        op = 2*(X@X@(C*A*A)) + 2*(X@X@(C*A)) + 3*(Z@Z@(C*A))
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_scalar_mul_fail_duplicate(self):
+        """Simple fail with duplicates"""
+        op = X + X
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_scalar_mul_fail_duplicate_more_terms(self):
+        """Error Not raised with duplicates with more terms"""
+        op = I@X + X@X + X@Y + X@Z + Y@X + Y@Y + Y@Z + I@X 
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_scalar_mul_fail_duplicate_complex(self):
+        """Simple fail with duplicates with ladder"""
+        op = 2*(X@X@(C*A*A)) + 9*(X@X@(C*A*A)) + 3*(Z@Z@(C*A))
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_nested_fail_duplicate(self):
+        """Nested fail due to duplicate operators"""
+        op = (X@Y+(2*(3j)*(X@Y))) + (Y@I) + (Z@I)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 if __name__ == '__main__':
     unittest.main()
-    #node = 2 * PauliX() @ (2 * PauliY() * 3) @ (MathStr(string='5*t') * PauliZ()) + (2 * PauliY() +  3 * PauliY()) @ (MathStr(string='5*t') * PauliZ())
-    # X, Y, Z, I = PauliX(), PauliY(), PauliZ(), PauliI()
-    # node = X  @ Y @ Annihilation()@ Z
-    # pprint(node)
-    # pprint(node.accept(SeparatePauliLadder()))
-    # #pprint(node.accept(GatherMathExpr()))
-    # pprint(node.accept(DeNestOpMulKron()).accept(DeNestOpMulKron()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(GatherMathExpr()).accept(ProperKronOrder()).accept(SeparatePauliLadder()).accept(PrintOperator()))

@@ -622,23 +622,38 @@ class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
     """
     def __init__(self):
         self._current_term_index = None
+        self._term_indices = []
+        self._allowed_nodes = Union[
+            OperatorTerminal,
+            OperatorMul,
+            OperatorKron,
+            OperatorScalarMul,
+        ]
         super().__init__()
 
     def reset(self):
         self._current_term_index = None
+        self._term_indices = []
 
     def visit_OperatorAdd(self, model: OperatorAdd):
-        if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, OperatorAdd):
-            raise CanonicalFormError("Sorting pre-requisites not met")
-        if isinstance(model.op1, (OperatorTerminal, OperatorMul, OperatorKron)) and isinstance(model.op2, (OperatorTerminal, OperatorMul, OperatorKron)):
+        if isinstance(model.op1, self._allowed_nodes) and isinstance(model.op2, self._allowed_nodes):
             if TermIndex().visit(model.op1) > TermIndex().visit(model.op2):
                 raise CanonicalFormError("TermIndex {} and {} are not in sorted order".format(TermIndex().visit(model.op1), TermIndex().visit(model.op2)))
+            elif TermIndex().visit(model.op1) in self._term_indices or TermIndex().visit(model.op1) in self._term_indices or TermIndex().visit(model.op1) == TermIndex().visit(model.op2):
+                raise CanonicalFormError("Duplicate terms present")
+        
         if self._current_term_index == None:
             self._current_term_index = TermIndex().visit(model.op2)
+            self._term_indices.append(self._current_term_index)
+
         elif TermIndex().visit(model.op2) > self._current_term_index:
             raise CanonicalFormError("TermIndex {} and {} are not in sorted order".format(TermIndex().visit(model.op2), self._current_term_index))
+        elif TermIndex().visit(model.op2) in self._term_indices:
+            raise CanonicalFormError("Duplicate terms of {} present".format(model.op2))
         else:
             self._current_term_index = TermIndex().visit(model.op2)
+            self._term_indices.append(self._current_term_index)
+
         self.visit(model.op1)
 
 if __name__ == '__main__':
