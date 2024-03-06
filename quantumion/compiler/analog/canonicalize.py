@@ -462,7 +462,9 @@ class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
             super(self.__class__, self)._visit(model)
     
     def visit_OperatorMulKron(self, model: (OperatorMul, OperatorKron)):
-        if not(isinstance(model.op1, self.allowed_ops) and isinstance(model.op2, self.allowed_ops)):
+        if isinstance(model, OperatorMul) and isinstance(model.op1, OperatorKron) and isinstance(model.op2, OperatorKron):
+            raise CanonicalFormError("Incomplete Operator Distribution (multiplication of OperatorKron present)")
+        elif not(isinstance(model.op1, self.allowed_ops) and isinstance(model.op2, self.allowed_ops)):
             raise CanonicalFormError("Incomplete Operator Distribution")
         else:
             self.visit(model.op1)

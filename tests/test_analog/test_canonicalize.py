@@ -268,9 +268,39 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, un
         op = X * (X - Y)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
-    def test_multiplication_distribution(self):
-        """Pauli hyp Fail"""
+    def test_multiplication_OperatorKron_distribution(self):
+        """Multiplication of OperatorKron should fail as op can be further simplified by distribution"""
         op = (X@C)*(Y@LI)
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
+
+    def test_multiplication_OperatorScalarMul_distribution_v1(self):
+        """Multiplication of OperatorScalarMul should just as op cannot be further simplified by distribution (needs MathExpr) v1"""
+        op = (X)*(2*Y)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_multiplication_OperatorScalarMul_distribution_v2(self):
+        """Multiplication of OperatorScalarMul should just as op cannot be further simplified by distribution (needs MathExpr) v2"""
+        op = (X@C)*(2*(Y@LI))
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_multiplication_OperatorScalarMul_distribution_v3(self):
+        """Multiplication of OperatorScalarMul should just as op cannot be further simplified by distribution (needs MathExpr) v3"""
+        op = (2*(X@C))*(Y@LI)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_multiplication_OperatorScalarMul_distribution_v3(self):
+        """Multiplication of OperatorScalarMul should just as op cannot be further simplified by distribution (needs MathExpr) v3"""
+        op = (2*(X@C))*(2*(Y@LI))
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_multiplication_OperatorScalarMul_distribution_v4(self):
+        """Multiplication of OperatorScalarMul should just as op cannot be further simplified by distribution (needs MathExpr) v4"""
+        op = (Y@LI)*(2*(X@C))*(Y@LI)
+        self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
+
+    def test_multiplication_OperatorScalarMul_distribution_pass(self):
+        """Error raised as op can be further simplified (i.e. specifically (X@C)*(Y@LI))"""
+        op = (X@C)*(Y@LI)*(2*(X@C))*(Y@LI)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
 
 @colorize(color=BLUE)
