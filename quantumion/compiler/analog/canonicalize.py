@@ -293,45 +293,42 @@ class SortedOrder(AnalogCircuitTransformer):
                     ),
                 )
 
-            i = 0
-            while True:
-                if term1[i] > term2[i]:
-                    return OperatorAdd(
-                        op1=self.visit(OperatorAdd(op1=model.op1.op1, op2=model.op2)),
-                        op2=model.op1.op2,
-                    )
-                if term1[i] < term2[i]:
-                    return OperatorAdd(op1=self.visit(model.op1), op2=model.op2)
-                if term1[i] == term2[i]:
-                    i += 1
-                    continue
+            elif term1 > term2:
+                return OperatorAdd(
+                    op1=self.visit(OperatorAdd(op1=model.op1.op1, op2=model.op2)),
+                    op2=model.op1.op2,
+                )
 
-        term1 = TermIndex().visit(model.op1)
-        term2 = TermIndex().visit(model.op2)
+            elif term1 < term2:
+                return OperatorAdd(op1=self.visit(model.op1), op2=model.op2)
 
-        if term1 == term2:
-            expr1 = (
-                model.op1.expr
-                if isinstance(model.op1, OperatorScalarMul)
-                else MathNum(value=1)
-            )
-            expr2 = (
-                model.op2.expr
-                if isinstance(model.op2, OperatorScalarMul)
-                else MathNum(value=1)
-            )
-            op = model.op2.op if isinstance(model.op2, OperatorScalarMul) else model.op2
-            return OperatorScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+        else:
+            term1 = TermIndex().visit(model.op1)
+            term2 = TermIndex().visit(model.op2)
 
-        i = 0
-        while True:
-            if term1[i] > term2[i]:
+            if term1 == term2:
+                expr1 = (
+                    model.op1.expr
+                    if isinstance(model.op1, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                expr2 = (
+                    model.op2.expr
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                op = (
+                    model.op2.op
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else model.op2
+                )
+                return OperatorScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+
+            elif term1 > term2:
                 return OperatorAdd(
                     op1=model.op2,
                     op2=model.op1,
                 )
-            if term1[i] < term2[i]:
+
+            elif term1 < term2:
                 return OperatorAdd(op1=model.op1, op2=model.op2)
-            if term1[i] == term2[i]:
-                i += 1
-                continue
