@@ -274,6 +274,8 @@ class TermIndex(AnalogCircuitTransformer):
         return term
 
     def visit_OperatorMul(self, model: OperatorMul):
+        if not(isinstance(model.op1, (Ladder, model.__class__)) and isinstance(model.op2, (Ladder, model.__class__))):
+            raise CanonicalFormError("More simplification required for Term Index")
         term1 = self.visit(model.op1)
         term2 = self.visit(model.op2)
         return [term1[0] + term2[0], term1[1] + term2[1]]
@@ -363,6 +365,7 @@ class CanonicalFormError(Exception):
     pass
 
 class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
+    ## assuming VerifyHilbertSpace runs without issues
     def __init__(self):
         super().__init__()
         self.allowed_ops = Union[
@@ -378,13 +381,37 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
             OperatorScalarMul,
         ]
         self.creation_tracker = False
+        self._term_indices = []
+        self._current_term_index = None
 
     def reset(self):
         self.creation_tracker = False
+        self._term_indices = []
+        self._current_term_index = None
 
     def visit_OperatorAdd(self, model: OperatorAdd):
+
         if isinstance(model.op2, model.__class__):
             raise CanonicalFormError("Incorrect Proper Ordering in Addition")
+
+        if isinstance(model.op1, self.add_allowed_ops) and isinstance(model.op2, self.add_allowed_ops):
+            if TermIndex().visit(model.op1) > TermIndex().visit(model.op2):
+                raise CanonicalFormError("TermIndex {} and {} are not in sorted order".format(TermIndex().visit(model.op1), TermIndex().visit(model.op2)))
+            elif TermIndex().visit(model.op1) in self._term_indices or TermIndex().visit(model.op1) in self._term_indices or TermIndex().visit(model.op1) == TermIndex().visit(model.op2):
+                raise CanonicalFormError("Duplicate terms present")
+        
+        if self._current_term_index == None:
+            self._current_term_index = TermIndex().visit(model.op2)
+            self._term_indices.append(self._current_term_index)
+
+        elif TermIndex().visit(model.op2) > self._current_term_index:
+            raise CanonicalFormError("TermIndex {} and {} are not in sorted order".format(TermIndex().visit(model.op2), self._current_term_index))
+        elif TermIndex().visit(model.op2) in self._term_indices:
+            raise CanonicalFormError("Duplicate terms of {} present".format(model.op2))
+        else:
+            self._current_term_index = TermIndex().visit(model.op2)
+            self._term_indices.append(self._current_term_index)
+    
         if isinstance(model.op1, OperatorAdd) and isinstance(model.op2, self.add_allowed_ops):
             self.visit(model.op1)
             self.visit(model.op2)
