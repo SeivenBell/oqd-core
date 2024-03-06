@@ -4,6 +4,7 @@ from typing import Any, Union
 
 from quantumion.interface.math import MathNum, MathImag, MathAdd, MathExpr
 from quantumion.interface.analog import *
+from quantumion.compiler.analog.verify import *
 
 from quantumion.compiler.analog.base import AnalogCircuitTransformer, AnalogCircuitVisitor
 
@@ -390,6 +391,11 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         self._current_term_index = None
 
     def visit_OperatorAdd(self, model: OperatorAdd):
+
+        try:
+            model.accept(VerifyHilbertSpace())
+        except AssertionError:
+            raise CanonicalFormError("Hilbert Space Verification failed. Please check for dimension errors")
 
         if isinstance(model.op2, model.__class__):
             raise CanonicalFormError("Incorrect Proper Ordering in Addition")

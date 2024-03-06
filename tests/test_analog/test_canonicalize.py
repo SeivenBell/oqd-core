@@ -230,7 +230,6 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
     def test_sorted_order_ladder_pauli_pass_complicated(self):
         """Sorted Order Pauli pass complicated"""
         op = 2*(X@(A*A*A)) + 3*(X@(C*A*A)) + 3*(Y@(C*C*A)) + 1*(Z@(C*C*C))
-        pprint(op.accept(TermIndex()))
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
     def test_sorted_order_ladder_pauli_fail_complicated(self):
@@ -243,9 +242,19 @@ class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
         op = 2*((X@X)@(A*A*A)) + 3*((X@Y)@(C*A*A)) + 3*((Y@Y)@(C*C*A)) + 1*((Z@I)@(C*C*C))
         self.assertCanonicalFormErrorNotRaised(operator=op)
 
-    def test_hup(self):
-        """dim test"""
+    def test_hilbert_space_fail(self):
+        """Added Incorrect Dimensions"""
         op = (X@X) + Z
+        self.assertCanonicalFormErrorRaised(operator=op)
+
+    def test_hilbert_space_pass(self):
+        """Added Correct Dimensions"""
+        op = (X@X) + (Z@Y)
+        self.assertCanonicalFormErrorNotRaised(operator=op)
+
+    def test_hilbert_space_fail_ladder(self):
+        """Added Incorrect Dimensions"""
+        op = (X@X) + (Z@Y)
         self.assertCanonicalFormErrorNotRaised(operator=op)
 @colorize(color=BLUE)
 class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors, unittest.TestCase):
