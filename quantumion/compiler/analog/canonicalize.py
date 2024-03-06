@@ -220,25 +220,25 @@ class NormalOrder(AnalogCircuitTransformer):
 
 class TermIndex(AnalogCircuitTransformer):
     def visit_PauliI(self, model: PauliI):
-        return [0]
+        return 0
 
     def visit_PauliX(self, model: PauliX):
-        return [1]
+        return 1
 
     def visit_PauliY(self, model: PauliY):
-        return [2]
+        return 2
 
     def visit_PauliZ(self, model: PauliZ):
-        return [3]
+        return 3
 
     def visit_Identity(self, model: Identity):
-        return [0, 0]
+        return (0, 0)
 
     def visit_Annihilation(self, model: Annihilation):
-        return [1, 0]
+        return (1, 0)
 
     def visit_Creation(self, model: Annihilation):
-        return [1, 1]
+        return (1, 1)
 
     def visit_OperatorAdd(self, model: OperatorAdd):
         term1 = (
@@ -256,11 +256,13 @@ class TermIndex(AnalogCircuitTransformer):
     def visit_OperatorMul(self, model: OperatorMul):
         term1 = self.visit(model.op1)
         term2 = self.visit(model.op2)
-        return [term1[0] + term2[0], term1[1] + term2[1]]
+        return (term1[0] + term2[0], term1[1] + term2[1])
 
     def visit_OperatorKron(self, model: OperatorKron):
         term1 = self.visit(model.op1)
+        term1 = term1 if isinstance(term1, list) else [term1]
         term2 = self.visit(model.op2)
+        term2 = term2 if isinstance(term2, list) else [term2]
         return term1 + term2
 
 
