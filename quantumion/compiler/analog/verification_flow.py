@@ -30,6 +30,7 @@ class VerificationPauliAlgebraFlow(FlowGraph):
                                         transformer = PauliAlgebra())(name="paulialgebra"),
         VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherMathExpr(),
                                         transformer = GatherMathExpr())(name="gathermathexpr"),
+        VisitorFlowNode(visitor = CanonicalizationVerificationPauliAlgebra(), name="paulialgebra_verifier"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "paulialgebra"
@@ -39,8 +40,13 @@ class VerificationPauliAlgebraFlow(FlowGraph):
     def forward_paulialgebra(self, model):
         pass
 
-    @forward_decorators.forward_once(done="terminal")
+    @forward_decorators.forward_once(done="paulialgebra_verifier")
     def forward_gathermathexpr(self, model):
+        pass
+
+    @forward_decorators.catch_error(redirect="paulialgebra")
+    @forward_decorators.forward_once(done="terminal")
+    def forward_paulialgebra_verifier(self, model):
         pass
 
 class VerificationNormalOrderFlow(FlowGraph):
@@ -79,8 +85,7 @@ class VerificationDistributionFlow(FlowGraph):
                                         transformer = OperatorDistribute())(name="distribute"),
         VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherMathExpr(),
                                         transformer = GatherMathExpr())(name="gathermathexpr"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
-                                        transformer = OperatorDistribute())(name="distribute_misc"),
+        VisitorFlowNode(visitor = CanonicalizationVerificationOperatorDistribute(), name="distribution_verifier"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "distribute"
@@ -89,12 +94,13 @@ class VerificationDistributionFlow(FlowGraph):
     def forward_distribute(self, model):
         pass
 
-    @forward_decorators.forward_once(done="distribute_misc")
+    @forward_decorators.forward_once(done="distribution_verifier")
     def forward_gathermathexpr(self, model):
         pass
 
+    @forward_decorators.catch_error(redirect="distribute")
     @forward_decorators.forward_once(done="terminal")
-    def forward_distribute_misc(self, model):
+    def forward_distribution_verifier(self, model):
         pass
 
 
