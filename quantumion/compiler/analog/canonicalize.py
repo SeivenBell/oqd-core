@@ -200,7 +200,7 @@ class NormalOrder(AnalogCircuitTransformer):
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op2, Creation):
             if isinstance(model.op1, Annihilation):
-                return OperatorSub(
+                return OperatorAdd(
                     op1=OperatorMul(op1=model.op2, op2=model.op1), op2=Identity()
                 )
             if isinstance(model.op1, OperatorMul) and isinstance(
@@ -208,7 +208,7 @@ class NormalOrder(AnalogCircuitTransformer):
             ):
                 return OperatorMul(
                     op1=self.visit(model.op1.op1),
-                    op2=OperatorSub(
+                    op2=OperatorAdd(
                         op1=OperatorMul(op1=model.op2, op2=model.op1.op2),
                         op2=Identity(),
                     ),
