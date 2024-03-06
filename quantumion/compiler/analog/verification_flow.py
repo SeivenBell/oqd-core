@@ -52,10 +52,6 @@ class VerificationNormalOrderFlow(FlowGraph):
                                         transformer = GatherMathExpr())(name="gathermathexpr"),
         VerificationFlowGraphCreator(verify = CanonicalizationVerificationProperOrder(),
                                         transformer = ProperOrder())(name="properorder"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationPruneIdentity(),
-                                        transformer = PruneIdentity())(name="pruneidentity"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
-                                        transformer = OperatorDistribute())(name="distribute_subtraction"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "normalorder"
@@ -73,26 +69,39 @@ class VerificationNormalOrderFlow(FlowGraph):
     def forward_gathermathexpr(self, model):
         pass
 
-    @forward_decorators.forward_once(done="pruneidentity")
+    @forward_decorators.forward_once(done="terminal")
     def forward_properorder(self, model):
         pass
 
-    @forward_decorators.forward_once(done="distribute_subtraction")
-    def forward_pruneidentity(self, model):
+class VerificationDistributionFlow(FlowGraph):
+    nodes = [
+        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
+                                        transformer = OperatorDistribute())(name="distribute"),
+        VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherMathExpr(),
+                                        transformer = GatherMathExpr())(name="gathermathexpr"),
+        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
+                                        transformer = OperatorDistribute())(name="distribute_misc"),
+        FlowTerminal(name="terminal"),
+    ]
+    rootnode = "distribute"
+    forward_decorators = ForwardDecorators()
+    @forward_decorators.forward_once(done="gathermathexpr")
+    def forward_distribute(self, model):
+        pass
+
+    @forward_decorators.forward_once(done="distribute_misc")
+    def forward_gathermathexpr(self, model):
         pass
 
     @forward_decorators.forward_once(done="terminal")
-    def forward_distribute_subtraction(self, model):
+    def forward_distribute_misc(self, model):
         pass
 
 
 class VerificationFlow(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
-                                        transformer = OperatorDistribute())(name="distribute"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherMathExpr(),
-                                        transformer = GatherMathExpr())(name="gathermathexpr"),
+        VerificationDistributionFlow(name = "DistributionFlow"),
         VerificationFlowGraphCreator(verify = CanonicalizationVerificationProperOrder(),
                                         transformer = ProperOrder())(name="properorder"),
         VerificationPauliAlgebraFlow(name = "PauliAlgebraFlow"),
@@ -100,6 +109,10 @@ class VerificationFlow(FlowGraph):
                                         transformer = GatherPauli())(name="gatherpauli"),
         VisitorFlowNode(visitor=CanonicalizationVerificationNormalOrder(),name="NormalOrderVerifier"),
         VerificationNormalOrderFlow(name = "NormalOrderFlow"),
+        VerificationFlowGraphCreator(verify = CanonicalizationVerificationPruneIdentity(),
+                                        transformer = PruneIdentity())(name="pruneidentity"),
+        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
+                                        transformer = OperatorDistribute())(name="distribute_subtraction"),
         VerificationFlowGraphCreator(verify = CanonicalizationVerificationSortedOrder(),
                                         transformer = SortedOrder())(name="sortedorder"),
         FlowTerminal(name="terminal"),
@@ -107,16 +120,12 @@ class VerificationFlow(FlowGraph):
     rootnode = "hspace"
     forward_decorators = ForwardDecorators()
     #### pauli algebra and nornal order need to be done just once. so we should make subgraphs for them
-    @forward_decorators.forward_once(done="distribute")
+    @forward_decorators.forward_once(done="DistributionFlow")
     def forward_hspace(self, model):
         pass
 
-    @forward_decorators.forward_once(done="gathermathexpr")
-    def forward_distribute(self, model):
-        pass
-
     @forward_decorators.forward_once(done="properorder")
-    def forward_gathermathexpr(self, model):
+    def forward_DistributionFlow(self, model):
         pass
 
     @forward_decorators.forward_once(done="PauliAlgebraFlow")
@@ -132,12 +141,20 @@ class VerificationFlow(FlowGraph):
         pass
 
     @forward_decorators.catch_error(redirect="NormalOrderFlow")
-    @forward_decorators.forward_once(done="sortedorder")
+    @forward_decorators.forward_once(done="pruneidentity")
     def forward_NormalOrderVerifier(self, model):
         pass
 
     @forward_decorators.forward_once(done="NormalOrderVerifier")
     def forward_NormalOrderFlow(self, model):
+        pass
+
+    @forward_decorators.forward_once(done="distribute_subtraction")
+    def forward_pruneidentity(self, model):
+        pass
+
+    @forward_decorators.forward_once(done="sortedorder")
+    def forward_distribute_subtraction(self, model):
         pass
 
     @forward_decorators.forward_once(done="terminal")
