@@ -203,24 +203,14 @@ class NormalOrder(AnalogCircuitTransformer):
                 return OperatorAdd(
                     op1=OperatorMul(op1=model.op2, op2=model.op1), op2=Identity()
                 )
-            if isinstance(model.op1, OperatorMul) and isinstance(
-                model.op1.op2, Annihilation
-            ):
-                return OperatorMul(
-                    op1=self.visit(model.op1.op1),
-                    op2=OperatorAdd(
-                        op1=OperatorMul(op1=model.op2, op2=model.op1.op2),
-                        op2=Identity(),
-                    ),
-                )
             if isinstance(model.op1, Identity):
                 return OperatorMul(op1=model.op2, op2=model.op1)
             if isinstance(model.op1, OperatorMul) and isinstance(
-                model.op1.op2, Identity
+                model.op1.op2, (Annihilation, Identity)
             ):
                 return OperatorMul(
                     op1=self.visit(model.op1.op1),
-                    op2=OperatorMul(op1=model.op2, op2=model.op1.op2),
+                    op2=self.visit(OperatorMul(op1=model.op1.op2, op2=model.op2)),
                 )
         return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
