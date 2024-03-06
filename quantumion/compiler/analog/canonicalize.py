@@ -379,6 +379,9 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         ]
         self.creation_tracker = False
 
+    def reset(self):
+        self.creation_tracker = False
+
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op2, model.__class__):
             raise CanonicalFormError("Incorrect Proper Ordering in Addition")
@@ -596,11 +599,13 @@ class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
         if isinstance(model.op2, Creation):
             self.creation_tracker = True
             self.visit(model.op1)
+        if isinstance(model.op1, Annihilation) and isinstance(model.op2, Creation):
+            raise CanonicalFormError("Terminal Ladders are not in Normal order")
         if isinstance(model.op1, Annihilation) or isinstance(model.op2, Annihilation):
             if self.creation_tracker:
                 raise CanonicalFormError("Ladders are not in Normal order")
-            self.visit(model.op1)
-            self.visit(model.op2)
+        self.visit(model.op2)
+        self.visit(model.op1)
 
     def visit_OperatorAddSubMulKron(self, model: Union[OperatorAdd, OperatorSub, OperatorMul, OperatorKron]):
         self.creation_tracker = False

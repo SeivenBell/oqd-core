@@ -579,6 +579,16 @@ class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors, unittest.
         op = (A*A)+(A*C)
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)    
 
+    def test_terminal_ladder_normal_order(self):
+        """Test if A*C (terminal gives error)"""
+        op = (A*C)*LI
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)    
+
+    def test_just_terminal_ladder_normal_order(self):
+        """Test if just A*C (terminal gives error)"""
+        op = A*C
+        self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)   
+
 @colorize(color=RED)
 class TestCanonicalizationVerificationPruneIdentity(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
