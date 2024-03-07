@@ -58,6 +58,7 @@ class VerificationNormalOrderFlow(FlowGraph):
                                         transformer = GatherMathExpr())(name="gathermathexpr"),
         VerificationFlowGraphCreator(verify = CanonicalizationVerificationProperOrder(),
                                         transformer = ProperOrder())(name="properorder"),
+        VisitorFlowNode(visitor = CanonicalizationVerificationNormalOrder(), name = "normalorder_verifier"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "normalorder"
@@ -75,8 +76,13 @@ class VerificationNormalOrderFlow(FlowGraph):
     def forward_gathermathexpr(self, model):
         pass
 
-    @forward_decorators.forward_once(done="terminal")
+    @forward_decorators.forward_once(done="normalorder_verifier")
     def forward_properorder(self, model):
+        pass
+
+    @forward_decorators.catch_error(redirect="normalorder")
+    @forward_decorators.forward_once(done="terminal")
+    def forward_normalorder_verifier(self, model):
         pass
 
 class VerificationDistributionFlow(FlowGraph):
