@@ -211,27 +211,17 @@ class NormalOrder(AnalogCircuitTransformer):
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op2, Creation):
             if isinstance(model.op1, Annihilation):
-                return OperatorSub(
+                return OperatorAdd(
                     op1=OperatorMul(op1=model.op2, op2=model.op1), op2=Identity()
-                )
-            if isinstance(model.op1, OperatorMul) and isinstance(
-                model.op1.op2, Annihilation
-            ):
-                return OperatorMul(
-                    op1=self.visit(model.op1.op1),
-                    op2=OperatorSub(
-                        op1=OperatorMul(op1=model.op2, op2=model.op1.op2),
-                        op2=Identity(),
-                    ),
                 )
             if isinstance(model.op1, Identity):
                 return OperatorMul(op1=model.op2, op2=model.op1)
             if isinstance(model.op1, OperatorMul) and isinstance(
-                model.op1.op2, Identity
+                model.op1.op2, (Annihilation, Identity)
             ):
                 return OperatorMul(
                     op1=self.visit(model.op1.op1),
-                    op2=OperatorMul(op1=model.op2, op2=model.op1.op2),
+                    op2=self.visit(OperatorMul(op1=model.op1.op2, op2=model.op2)),
                 )
         return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
@@ -241,25 +231,25 @@ class NormalOrder(AnalogCircuitTransformer):
 
 class TermIndex(AnalogCircuitTransformer):
     def visit_PauliI(self, model: PauliI):
-        return [0]
+        return 0
 
     def visit_PauliX(self, model: PauliX):
-        return [1]
+        return 1
 
     def visit_PauliY(self, model: PauliY):
-        return [2]
+        return 2
 
     def visit_PauliZ(self, model: PauliZ):
-        return [3]
+        return 3
 
     def visit_Identity(self, model: Identity):
-        return [0, 0]
+        return (0, 0)
 
     def visit_Annihilation(self, model: Annihilation):
-        return [1, 0]
+        return (1, 0)
 
     def visit_Creation(self, model: Annihilation):
-        return [1, 1]
+        return (1, 1)
 
     def visit_OperatorAdd(self, model: OperatorAdd):
         term1 = (
@@ -279,11 +269,13 @@ class TermIndex(AnalogCircuitTransformer):
             raise CanonicalFormError("More simplification required for Term Index")
         term1 = self.visit(model.op1)
         term2 = self.visit(model.op2)
-        return [term1[0] + term2[0], term1[1] + term2[1]]
+        return (term1[0] + term2[0], term1[1] + term2[1])
 
     def visit_OperatorKron(self, model: OperatorKron):
         term1 = self.visit(model.op1)
+        term1 = term1 if isinstance(term1, list) else [term1]
         term2 = self.visit(model.op2)
+        term2 = term2 if isinstance(term2, list) else [term2]
         return term1 + term2
 
 
@@ -316,48 +308,45 @@ class SortedOrder(AnalogCircuitTransformer):
                     ),
                 )
 
-            i = 0
-            while True:
-                if term1[i] > term2[i]:
-                    return OperatorAdd(
-                        op1=self.visit(OperatorAdd(op1=model.op1.op1, op2=model.op2)),
-                        op2=model.op1.op2,
-                    )
-                if term1[i] < term2[i]:
-                    return OperatorAdd(op1=self.visit(model.op1), op2=model.op2)
-                if term1[i] == term2[i]:
-                    i += 1
-                    continue
+            elif term1 > term2:
+                return OperatorAdd(
+                    op1=self.visit(OperatorAdd(op1=model.op1.op1, op2=model.op2)),
+                    op2=model.op1.op2,
+                )
 
-        term1 = TermIndex().visit(model.op1)
-        term2 = TermIndex().visit(model.op2)
+            elif term1 < term2:
+                return OperatorAdd(op1=self.visit(model.op1), op2=model.op2)
 
-        if term1 == term2:
-            expr1 = (
-                model.op1.expr
-                if isinstance(model.op1, OperatorScalarMul)
-                else MathNum(value=1)
-            )
-            expr2 = (
-                model.op2.expr
-                if isinstance(model.op2, OperatorScalarMul)
-                else MathNum(value=1)
-            )
-            op = model.op2.op if isinstance(model.op2, OperatorScalarMul) else model.op2
-            return OperatorScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+        else:
+            term1 = TermIndex().visit(model.op1)
+            term2 = TermIndex().visit(model.op2)
 
-        i = 0
-        while True:
-            if term1[i] > term2[i]:
+            if term1 == term2:
+                expr1 = (
+                    model.op1.expr
+                    if isinstance(model.op1, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                expr2 = (
+                    model.op2.expr
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                op = (
+                    model.op2.op
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else model.op2
+                )
+                return OperatorScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+
+            elif term1 > term2:
                 return OperatorAdd(
                     op1=model.op2,
                     op2=model.op1,
                 )
-            if term1[i] < term2[i]:
+
+            elif term1 < term2:
                 return OperatorAdd(op1=model.op1, op2=model.op2)
-            if term1[i] == term2[i]:
-                i += 1
-                continue
 
 class CanonicalFormError(Exception):
     """
@@ -701,4 +690,3 @@ if __name__ == '__main__':
     from quantumion.compiler.analog import *
     X, Y, Z, I = PauliX(), PauliY(), PauliZ(), PauliI()
     A, C, LI =  Annihilation(), Creation(), Identity()
-
