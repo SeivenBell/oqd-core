@@ -38,6 +38,9 @@ __all__ = [
 
 
 class PruneIdentity(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+    """
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (Identity, PauliI)):
             return self.visit(model.op2)
@@ -47,6 +50,9 @@ class PruneIdentity(AnalogCircuitTransformer):
 
 
 class PauliAlgebra(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder
+    """
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, Pauli) and isinstance(model.op2, Pauli):
             if isinstance(model.op1, PauliI):
@@ -72,6 +78,9 @@ class PauliAlgebra(AnalogCircuitTransformer):
 
 
 class GatherMathExpr(AnalogCircuitTransformer):
+    """
+    Assumptions: OperatorDistribute (sometimes)
+    """
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorMul, OperatorKron)):
             return self.visit_OperatorMulKron(model)
@@ -110,6 +119,9 @@ class GatherMathExpr(AnalogCircuitTransformer):
 
 
 class GatherPauli(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    """
     def visit_OperatorKron(self, model: OperatorKron):
         if isinstance(model.op2, Pauli):
             if isinstance(model.op1, Ladder):
@@ -136,6 +148,9 @@ class GatherPauli(AnalogCircuitTransformer):
 
 
 class OperatorDistribute(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr (sometimes)
+    """
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (OperatorAdd, OperatorSub)):
             return model.op1.__class__(
@@ -188,6 +203,9 @@ class OperatorDistribute(AnalogCircuitTransformer):
 
 
 class ProperOrder(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute
+    """
     def _visit(self, model: Any):
         if isinstance(model, (OperatorAdd, OperatorMul, OperatorKron)):
             return self.visit_OperatorAddMulKron(model)
@@ -210,6 +228,9 @@ class ProperOrder(AnalogCircuitTransformer):
 
 
 class NormalOrder(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    """
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op2, Creation):
             if isinstance(model.op1, Annihilation):
@@ -232,6 +253,11 @@ class NormalOrder(AnalogCircuitTransformer):
 
 
 class TermIndex(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+    (without NormalOrder, TermIndex is not useful. For example, TermIndex of A*C and C*A is the same (2,1).
+    Hence, NormalOrder is a requirement.
+    """
     def visit_PauliI(self, model: PauliI):
         return 0
 
@@ -282,6 +308,10 @@ class TermIndex(AnalogCircuitTransformer):
 
 
 class SortedOrder(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+                 PruneIdentity
+    """
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd):
             term1 = TermIndex().visit(model.op1.op2)
@@ -352,7 +382,8 @@ class SortedOrder(AnalogCircuitTransformer):
 
 class ScaleTerms(AnalogCircuitTransformer):
     """
-    Assumes all canonicalization transformations till SortedOrder
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+                 PruneIdentity, SortedOrder
     """
     def _visit(self, model: Any):
         if not isinstance(model, (OperatorAdd)):
