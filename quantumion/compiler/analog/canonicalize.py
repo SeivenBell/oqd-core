@@ -2,9 +2,9 @@ from typing import Any, Union
 
 ########################################################################################
 
-from quantumion.interface.math import MathNum, MathImag, MathAdd
+from quantumion.interface.math import MathNum, MathImag, MathAdd, MathExpr
 from quantumion.interface.analog import *
-
+from quantumion.compiler.analog.error import *
 from quantumion.compiler.analog.base import AnalogCircuitTransformer
 
 ########################################################################################
@@ -19,21 +19,28 @@ __all__ = [
     "NormalOrder",
     "TermIndex",
     "SortedOrder",
+    "ScaleTerms",
 ]
 
 ########################################################################################
 
 
 class PruneIdentity(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+    """
     def visit_OperatorMul(self, model: OperatorMul):
-        if isinstance(model.op1, (Identity, PauliI)):
+        if isinstance(model.op1, (Identity)):
             return self.visit(model.op2)
-        if isinstance(model.op2, (Identity, PauliI)):
+        if isinstance(model.op2, (Identity)):
             return self.visit(model.op1)
         return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
 
 class PauliAlgebra(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder
+    """
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, Pauli) and isinstance(model.op2, Pauli):
             if isinstance(model.op1, PauliI):
@@ -59,6 +66,9 @@ class PauliAlgebra(AnalogCircuitTransformer):
 
 
 class GatherMathExpr(AnalogCircuitTransformer):
+    """
+    Assumptions: OperatorDistribute (sometimes)
+    """
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorMul, OperatorKron)):
             return self.visit_OperatorMulKron(model)
@@ -97,6 +107,9 @@ class GatherMathExpr(AnalogCircuitTransformer):
 
 
 class GatherPauli(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    """
     def visit_OperatorKron(self, model: OperatorKron):
         if isinstance(model.op2, Pauli):
             if isinstance(model.op1, Ladder):
@@ -123,6 +136,9 @@ class GatherPauli(AnalogCircuitTransformer):
 
 
 class OperatorDistribute(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr (sometimes)
+    """
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (OperatorAdd, OperatorSub)):
             return model.op1.__class__(
@@ -175,6 +191,9 @@ class OperatorDistribute(AnalogCircuitTransformer):
 
 
 class ProperOrder(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute
+    """
     def _visit(self, model: Any):
         if isinstance(model, (OperatorAdd, OperatorMul, OperatorKron)):
             return self.visit_OperatorAddMulKron(model)
@@ -197,6 +216,9 @@ class ProperOrder(AnalogCircuitTransformer):
 
 
 class NormalOrder(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    """
     def visit_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op2, Creation):
             if isinstance(model.op1, Annihilation):
@@ -219,6 +241,11 @@ class NormalOrder(AnalogCircuitTransformer):
 
 
 class TermIndex(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+    (without NormalOrder, TermIndex is not useful. For example, TermIndex of A*C and C*A is the same (2,1).
+    Hence, NormalOrder is a requirement.
+    """
     def visit_PauliI(self, model: PauliI):
         return 0
 
@@ -254,6 +281,8 @@ class TermIndex(AnalogCircuitTransformer):
         return term
 
     def visit_OperatorMul(self, model: OperatorMul):
+        if not(isinstance(model.op1, (Ladder, model.__class__)) and isinstance(model.op2, (Ladder, model.__class__))):
+            raise CanonicalFormError("More simplification required for Term Index")
         term1 = self.visit(model.op1)
         term2 = self.visit(model.op2)
         return (term1[0] + term2[0], term1[1] + term2[1])
@@ -267,6 +296,11 @@ class TermIndex(AnalogCircuitTransformer):
 
 
 class SortedOrder(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+                 PruneIdentity
+    (SortedOrder and ScaleTerms can be run in either order)
+    """
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd):
             term1 = TermIndex().visit(model.op1.op2)
@@ -334,3 +368,28 @@ class SortedOrder(AnalogCircuitTransformer):
 
             elif term1 < term2:
                 return OperatorAdd(op1=model.op1, op2=model.op2)
+
+class ScaleTerms(AnalogCircuitTransformer):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+                 PruneIdentity
+    (SortedOrder and ScaleTerms can be run in either order)
+    """
+    def _visit(self, model: Any):
+        if not isinstance(model, (OperatorAdd)):
+            return self.visit_OperatorNotOpAdd(model)
+        return super(self.__class__, self)._visit(model)
+
+    def visit_OperatorAdd(self, model: OperatorAdd):
+        return OperatorAdd(op1=self.visit(model.op1), op2=self.visit(model.op2))
+    
+    def visit_OperatorNotOpAdd(self, model: Any):
+        if isinstance(model, OperatorScalarMul):
+            return model
+        return OperatorScalarMul(expr=1, op = model)
+
+if __name__ == '__main__':
+    from rich import print as pprint
+    from quantumion.compiler.analog import *
+    X, Y, Z, I = PauliX(), PauliY(), PauliZ(), PauliI()
+    A, C, LI =  Annihilation(), Creation(), Identity()
