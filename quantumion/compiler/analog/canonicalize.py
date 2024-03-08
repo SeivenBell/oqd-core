@@ -42,9 +42,9 @@ class PruneIdentity(AnalogCircuitTransformer):
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
     """
     def visit_OperatorMul(self, model: OperatorMul):
-        if isinstance(model.op1, (Identity, PauliI)):
+        if isinstance(model.op1, (Identity)):
             return self.visit(model.op2)
-        if isinstance(model.op2, (Identity, PauliI)):
+        if isinstance(model.op2, (Identity)):
             return self.visit(model.op1)
         return OperatorMul(op1=self.visit(model.op1), op2=self.visit(model.op2))
 
