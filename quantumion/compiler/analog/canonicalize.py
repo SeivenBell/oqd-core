@@ -348,6 +348,23 @@ class SortedOrder(AnalogCircuitTransformer):
             elif term1 < term2:
                 return OperatorAdd(op1=model.op1, op2=model.op2)
 
+class ScaleTerms(AnalogCircuitTransformer):
+    """
+    Assumes all canonicalization transformations till SortedOrder
+    """
+    def _visit(self, model: Any):
+        if not isinstance(model, (OperatorAdd)):
+            return self.visit_OperatorNotOpAdd(model)
+        return super(self.__class__, self)._visit(model)
+
+    def visit_OperatorAdd(self, model: OperatorAdd):
+        return OperatorAdd(op1=self.visit(model.op1), op2=self.visit(model.op2))
+    
+    def visit_OperatorNotOpAdd(self, model: Any):
+        if isinstance(model, OperatorScalarMul):
+            return model
+        return OperatorScalarMul(expr=1, op = model)
+
 class CanonicalFormError(Exception):
     """
     Error class for canonical form (maybe we need it to put it elsewhere)
