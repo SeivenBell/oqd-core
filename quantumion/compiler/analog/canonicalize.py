@@ -20,6 +20,7 @@ __all__ = [
     "NormalOrder",
     "TermIndex",
     "SortedOrder",
+    "ScaleTerms",
     "CanonicalizationVerificationOperator",
     "CanonicalFormError",
     "CanonicalizationVerificationOperatorDistribute",
@@ -30,6 +31,7 @@ __all__ = [
     "CanonicalizationVerificationNormalOrder",
     "CanonicalizationVerificationPruneIdentity",
     "CanonicalizationVerificationSortedOrder",
+    "CanonicalizationVerificationScaleTerms",
 ]
 
 ########################################################################################
@@ -701,6 +703,20 @@ class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
             self._term_indices.append(self._current_term_index)
 
         self.visit(model.op1)
+
+class CanonicalizationVerificationScaleTerms(AnalogCircuitVisitor):
+    def _visit(self, model: Any):
+        if not isinstance(model, (OperatorAdd)):
+            return self.visit_OperatorNotOpAdd(model)
+        return super(self.__class__, self)._visit(model)
+    
+    def visit_OperatorAdd(self, model: OperatorAdd):
+        self.visit(model.op2)
+        self.visit(model.op1)
+
+    def visit_OperatorNotOpAdd(self, model: Any):
+        if not isinstance(model, OperatorScalarMul):
+            raise CanonicalFormError("Term {} is not scaled".format(model))
 
 if __name__ == '__main__':
     from rich import print as pprint
