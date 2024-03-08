@@ -311,6 +311,7 @@ class SortedOrder(AnalogCircuitTransformer):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
                  PruneIdentity
+    (SortedOrder and ScaleTerms can be run in either order)
     """
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd):
@@ -383,7 +384,8 @@ class SortedOrder(AnalogCircuitTransformer):
 class ScaleTerms(AnalogCircuitTransformer):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
-                 PruneIdentity, SortedOrder
+                 PruneIdentity
+    (SortedOrder and ScaleTerms can be run in either order)
     """
     def _visit(self, model: Any):
         if not isinstance(model, (OperatorAdd)):
