@@ -13,6 +13,7 @@ from quantumion.compiler.visitor import Visitor
 from quantumion.compiler.analog import *
 from quantumion.compiler.math import *
 from quantumion.compiler.analog.canonicalize import *
+from quantumion.compiler.analog.verify import *
 from quantumion.compiler.flow import *
 
 ########################################################################################

@@ -1,5 +1,7 @@
 from quantumion.interface.analog import *
 from quantumion.compiler.analog.canonicalize import *
+from quantumion.compiler.analog.verify import *
+from quantumion.compiler.analog.error import *
 from quantumion.compiler.analog.base import *
 from rich import print as pprint
 import unittest
