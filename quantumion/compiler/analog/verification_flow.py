@@ -127,6 +127,8 @@ class VerificationFlow(FlowGraph):
                                         transformer = OperatorDistribute())(name="distribute_subtraction"),
         VerificationFlowGraphCreator(verify = CanonicalizationVerificationSortedOrder(),
                                         transformer = SortedOrder())(name="sortedorder"),
+        VerificationFlowGraphCreator(verify = CanonicalizationVerificationScaleTerms(),
+                                        transformer = ScaleTerms())(name="scaleterms"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
@@ -169,6 +171,10 @@ class VerificationFlow(FlowGraph):
     def forward_distribute_subtraction(self, model):
         pass
 
-    @forward_decorators.forward_once(done="terminal")
+    @forward_decorators.forward_once(done="scaleterms")
     def forward_sortedorder(self, model):
+        pass
+
+    @forward_decorators.forward_once(done="terminal")
+    def forward_scaleterms(self, model):
         pass
