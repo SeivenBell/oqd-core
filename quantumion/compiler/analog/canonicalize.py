@@ -408,6 +408,9 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         if isinstance(model.op2, model.__class__):
             raise CanonicalFormError("Incorrect Proper Ordering in Addition")
 
+        if not(isinstance(model.op1, (OperatorAdd, OperatorScalarMul)) and isinstance(model.op2, (OperatorAdd, OperatorScalarMul))):
+            raise CanonicalFormError("Some terms are not scaled in the operator")
+
         if isinstance(model.op1, self.add_allowed_ops) and isinstance(model.op2, self.add_allowed_ops):
             if TermIndex().visit(model.op1) > TermIndex().visit(model.op2):
                 raise CanonicalFormError("TermIndex {} and {} are not in sorted order".format(TermIndex().visit(model.op1), TermIndex().visit(model.op2)))
