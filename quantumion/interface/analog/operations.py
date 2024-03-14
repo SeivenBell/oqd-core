@@ -22,13 +22,13 @@ class AnalogOperation(VisitableBaseModel):
     pass
 
 class AnalogGate(AnalogOperation):
-    duration: float
     hamiltonian: Operator
     dissipation: Dissipation
 
 
 class Evolve(AnalogOperation):
     key: Literal["evolve"] = "evolve"
+    duration: float
     gate: Union[AnalogGate, str]
 
 
@@ -69,10 +69,10 @@ class AnalogCircuit(AnalogOperation):
     def define(self, id: str, gate: AnalogGate):
         self.definitions.append((id, gate))
 
-    def evolve(self, gate: AnalogGate):
+    def evolve(self, gate: AnalogGate, duration: float):
         if not isinstance(gate, AnalogGate):
             raise ValidationError
-        self.sequence.append(Evolve(gate=gate))
+        self.sequence.append(Evolve(duration=duration, gate=gate))
 
     def measure(self, qreg: List[NonNegativeInt], qmode: List[NonNegativeInt]):
         self.sequence.append(Measure(qreg=qreg, qmode=qmode))
