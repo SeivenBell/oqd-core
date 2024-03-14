@@ -1,7 +1,7 @@
 from quantumion.interface.analog.operations import *
 from quantumion.compiler.analog.canonicalize import *
 from quantumion.interface.analog.operator import *
-from quantumion.simulation.analog.base import *
+from quantumion.compiler.analog.base import AnalogInterfaceTransformer
 from typing import Union
     
 class RegisterInformation(AnalogInterfaceTransformer):

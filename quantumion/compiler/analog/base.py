@@ -16,6 +16,8 @@ __all__ = [
     "AnalogCircuitIonsAnalysis",
     "PrintOperator",
     "VerbosePrintOperator",
+    "AnalogInterfaceVisitor",
+    "AnalogInterfaceTransformer",
 ]
 
 
@@ -29,6 +31,12 @@ class AnalogCircuitVisitor(Visitor):
 class AnalogCircuitTransformer(Transformer):
     pass
 
+class AnalogInterfaceVisitor(Visitor):
+    pass
+
+
+class AnalogInterfaceTransformer(Transformer):
+    pass
 
 class AnalogCircuitIonsAnalysis(AnalogCircuitVisitor):
     def __init__(self):
