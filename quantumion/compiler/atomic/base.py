@@ -1,4 +1,4 @@
-from quantumion.compiler.visitor import Visitor, Transform
+from quantumion.compiler.visitor import Visitor, Transformer
 from quantumion.interface.atomic.register import Register
 
 ########################################################################################
@@ -8,7 +8,7 @@ class AtomicProgramVisitor(Visitor):
     pass
 
 
-class AtomicProgramTransform(Transform):
+class AtomicProgramTransformer(Transformer):
     pass
 
 

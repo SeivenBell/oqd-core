@@ -7,26 +7,46 @@ build-backend = "setuptools.build_meta"
 name = "quantumion"
 version = "0.0.0"
 requires-python = ">=3.10"
-dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.23.2",
-    "starlette>=0.27.0",
-    "pydantic>=2.4",
-    "pydantic-numpy",
-    "h5py",
-    "redis",
-    "rq",
-    "requests",
-    "rich",
-]
+dependencies = ["pydantic>=2.4", "h5py", "requests", "rich"]
 
 [project.optional-dependencies]
+docs = [
+    "pymdown-extensions",
+    "mkdocstrings",
+    "mkdocs-material",
+    "mkdocstrings-python",
+]
+test = ["unittest", "unittest_prettify"]
 qutip = ["qutip"]
 tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
-docs = ["pymdown-extensions", "mkdocstrings", "mkdocs-material", "mkdocstrings-python"]
-
-all = ["qutip", "tensorcircuit", "matplotlib", "qiskit"]
-
+server = [
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "uvicorn[standard]>=0.23.2",
+    "starlette>=0.27.0",
+    "redis",
+    "rq",
+    "fastapi>=0.104.0",
+    "sqlalchemy",
+    "asyncpg",
+    "python-multipart",
+]
+all = [
+    "qutip",
+    "tensorcircuit",
+    "matplotlib",
+    "qiskit",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "uvicorn[standard]>=0.23.2",
+    "starlette>=0.27.0",
+    "redis",
+    "rq",
+    "fastapi>=0.104.0",
+    "sqlalchemy",
+    "asyncpg",
+    "python-multipart",
+]
 
 [tool.setuptools]
 packages = ["quantumion"]
