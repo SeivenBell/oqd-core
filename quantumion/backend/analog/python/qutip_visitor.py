@@ -1,13 +1,32 @@
-from quantumion.compiler.analog.base import AnalogInterfaceTransformer
+from quantumion.compiler.analog.base import AnalogInterfaceTransformer, AnalogCircuitTransformer
 from quantumion.interface.analog.operator import *
 from quantumion.interface.analog.operations import *
+import qutip as qt
 from rich import print as pprint
 
 __all__ = [
     "QutipBackendTransformer",
+    "QutipConvertTransformer",
 ]
 class QutipExperiment(AnalogInterfaceTransformer):
     """Transformer to run an experiment (maybe use visitor?)"""
+
+class QutipConvertTransformer(AnalogCircuitTransformer):
+
+    def visit_PauliI(self, model: PauliI):
+        return qt.qeye(2)
+
+    def visit_PauliX(self, model: PauliX):
+        return qt.sigmax()
+    
+    def visit_PauliY(self, model: PauliY):
+        return qt.sigmay()
+
+    def visit_PauliZ(self, model: PauliZ):
+        return qt.sigmaz()
+    
+    def visit_OperatorKron(self, model: OperatorKron):
+        return qt.tensor(self.visit(model.op1), self.visit(model.op2))
 
 class QutipBackendTransformer(AnalogInterfaceTransformer):
     """convert task to QutipObj without running (maybe use visitor?)
