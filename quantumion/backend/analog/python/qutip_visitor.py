@@ -14,7 +14,7 @@ import itertools
 __all__ = [
     "QutipBackendTransformer",
     "QutipConvertTransformer",
-    "QutipExperimentTransform",
+    "QutipExperimentEvolve",
     "MetricsToQutipObjects",
     "TaskArgsAnalog",
     "Expectation",
@@ -58,6 +58,40 @@ class QutipExperiment(VisitableBaseModel):
     n_qmode: NonNegativeInt
     args: TaskArgsAnalog
     ## should have everything to define a qutip exp
+
+class QutipExperimentEvolve(AnalogInterfaceTransformer):
+    def __init__(self):
+        super().__init__()
+        self._current_state = None
+        self._qutip_metrics = None
+
+    def visit_QutipExperiment(self, model: QutipExperiment):
+        dims = model.n_qreg * [2] + model.n_qmode * [model.args.fock_cutoff]
+        initial_state = qt.tensor([qt.basis(d, 0) for d in dims])
+
+        self._qutip_metrics = model.args.metrics
+
+        self._current_state = initial_state
+
+        self._dt = model.args.dt
+
+        return self.visit(model.instructions)
+
+    def visit_QutipOperation(self, model: QutipOperation):
+        duration = model.duration
+        tspan = np.linspace(
+            0, duration, round(duration / self._dt)
+        )  # create time vector    
+
+        options = qt.solver.Options(store_final_state=True)
+
+        result_qobj = qt.sesolve(
+            model.hamiltonian, self._current_state, tspan, e_ops= self._qutip_metrics, options=options
+        )
+
+        self._current_state = result_qobj.final_state
+
+        return result_qobj
 
 
 class QutipConvertTransformer(AnalogCircuitTransformer):
