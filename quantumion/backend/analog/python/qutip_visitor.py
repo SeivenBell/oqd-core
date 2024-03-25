@@ -132,10 +132,10 @@ class MetricsToQutipObjects(AnalogInterfaceTransformer): # task analog to taskqu
 
     def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
         return lambda t, psi: entanglement_entropy_vn(
-                t, psi, model.qreg, model.qmode, circuit.n_qreg, circuit.n_qmode
+                t, psi, model.qreg, model.qmode, self.n_qreg, self.n_qmode
             )
     def visit_Expectation(self, model: Expectation):
-        return lambda t, psi: qt.expect(model.operator.accept(QutipConvertTransformer(self.fock_cutoff), psi)) #model.operator.accept(QutipBackendTransformer())
+        return lambda t, psi: qt.expect(model.operator.accept(QutipConvertTransformer(self.fock_cutoff)), psi) #model.operator.accept(QutipBackendTransformer())
 
 class QutipBackendTransformer(AnalogInterfaceTransformer):
     """convert task to QutipObj without running (maybe use visitor?)
