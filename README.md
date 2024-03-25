@@ -49,7 +49,7 @@ git clone https://github.com/OpenQuantumDesign/quantumion
 Deploy with docker compose:
 ```bash
 cd docker
-docker compose up -d
+sudo docker compose up -d
 ```
 By default, the webserver is deployed to:
 ```
