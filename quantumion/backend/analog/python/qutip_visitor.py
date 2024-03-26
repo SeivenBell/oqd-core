@@ -33,13 +33,8 @@ class QutipExperiment(VisitableBaseModel):
     n_qmode: NonNegativeInt
     args: TaskArgsAnalog
 
-class TaskResultAnalog(VisitableBaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    layer: Literal["analog"] = "analog"
-    times: list[float] = []
-    state: qt.Qobj = None
-    metrics: dict[str, List[Union[float, int]]] = {}
-    counts: dict[str, int] = {}
+    def run(self):
+        return self.accept(QutipExperimentEvolve())
 
 class QutipExperimentMeasure(AnalogInterfaceTransformer):
     def __init__(self, state):
@@ -62,13 +57,15 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
     def __init__(self):
         super().__init__()
         self._current_state = None
-        self._qutip_metrics = None
 
     def visit_QutipExperiment(self, model: QutipExperiment) -> TaskResultAnalog:
         dims = model.n_qreg * [2] + model.n_qmode * [model.args.fock_cutoff]
         initial_state = qt.tensor([qt.basis(d, 0) for d in dims])
 
-        self._qutip_metrics = model.args.metrics
+        self._qutip_metrics = model.args.accept(MetricsToQutipObjects(
+            n_qreg = model.n_qreg,
+            n_qmode = model.n_qmode,
+        ))
 
         self._current_state = initial_state
 
@@ -77,7 +74,7 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
         results = self.visit(model.instructions)
 
         times = []
-        metrics = {key: np.empty(0) for key in model.args.metrics.keys()}
+        metrics = {key: np.empty(0) for key in self._qutip_metrics.keys()}
         for idx, result in enumerate(results):
             times = np.hstack([times, result.times + model.instructions[idx-1].duration if idx != 0 else result.times])
             metrics = {key: np.hstack([metrics[key], result.expect[key]]) for key in metrics.keys()}
@@ -173,10 +170,9 @@ class MetricsToQutipObjects(AnalogInterfaceTransformer): # task analog to taskqu
             super(self.__class__, self)._visit(model)
 
     
-    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog):
-        model.metrics = self.visit(model.metrics)
+    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog) -> dict:
         self.fock_cutoff = model.fock_cutoff
-        return model
+        return self.visit(model.metrics)
 
     def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
         return lambda t, psi: entanglement_entropy_vn(
@@ -198,10 +194,8 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
             instructions=self.visit(model.sequence), 
             n_qreg=model.n_qreg, 
             n_qmode = model.n_qmode, 
-            args=self.args.accept(MetricsToQutipObjects(
-                n_qreg = model.n_qreg, 
-                n_qmode = model.n_qmode
-        )))
+            args=self.args
+        )
     
     def visit_Evolve(self, model: Evolve):
         return QutipOperation(hamiltonian=self.visit(model.gate), duration=model.duration)
