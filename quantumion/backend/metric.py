@@ -1,5 +1,5 @@
 from typing import List, Union
-from pydantic import BaseModel
+from quantumion.interface.base import VisitableBaseModel
 from pydantic.types import NonNegativeInt
 
 ########################################################################################
@@ -9,16 +9,16 @@ from quantumion.interface.analog.operator import Operator
 ########################################################################################
 
 
-class Expectation(BaseModel):
-    operator: List[Operator]
+class Expectation(VisitableBaseModel):
+    operator: Operator
 
 
-class EntanglementEntropyVN(BaseModel):
+class EntanglementEntropyVN(VisitableBaseModel):
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []
 
 
-class EntanglementEntropyReyni(BaseModel):
+class EntanglementEntropyReyni(VisitableBaseModel):
     alpha: NonNegativeInt = 1
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []

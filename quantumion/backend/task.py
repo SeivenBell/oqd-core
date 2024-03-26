@@ -1,12 +1,14 @@
 from dataclasses import dataclass, field
 import numpy as np
 from typing import Union, List, Dict, Literal
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from quantumion.interface.base import VisitableBaseModel
+import qutip as qt
 
 ########################################################################################
 
-from quantumion.interface.math import ComplexFloat
-from quantumion.interface.analog.circuit import AnalogCircuit
+#from quantumion.interface.math import ComplexFloat
+from quantumion.interface.analog.operations import AnalogCircuit
 from quantumion.interface.digital.circuit import DigitalCircuit
 from quantumion.interface.atomic.program import AtomicProgram
 
@@ -26,7 +28,7 @@ class DataAnalog:
 ########################################################################################sss
 
 
-class TaskArgsAnalog(BaseModel):
+class TaskArgsAnalog(VisitableBaseModel):
     layer: Literal["analog"] = "analog"
     n_shots: int = 10
     fock_cutoff: int = 4
@@ -34,12 +36,12 @@ class TaskArgsAnalog(BaseModel):
     metrics: Dict[str, Metric] = {}
 
 
-class TaskResultAnalog(BaseModel):
+class TaskResultAnalog(VisitableBaseModel):
     layer: Literal["analog"] = "analog"
-    times: list[float] = []
-    state: list[ComplexFloat] = None
-    metrics: dict[str, List[Union[float, int]]] = {}
-    counts: dict[str, int] = {}
+    times: List[float] = []
+    state: List = None # list of complex float
+    metrics: Dict[str, List[Union[float, int]]] = {}
+    counts: Dict[str, int] = {}
     runtime: float = None
 
 
@@ -54,7 +56,7 @@ class TaskArgsDigital(BaseModel):
 class TaskResultDigital(BaseModel):
     layer: Literal["digital"] = "digital"
     counts: dict[str, int] = {}
-    state: List[ComplexFloat] = []
+    state: List = []#List[ComplexFloat] = [] ## need to change this back
 
 
 ########################################################################################

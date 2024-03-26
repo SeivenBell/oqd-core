@@ -3,6 +3,8 @@ from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
 from quantumion.compiler.math import VerbosePrintMathExpr
 from quantumion.interface.analog.operations import *
+from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog
+from quantumion.backend.metric import *
 from typing import Any, Union, List, Tuple, Literal, Dict
 import qutip as qt
 from pydantic import BaseModel, ConfigDict
@@ -17,33 +19,8 @@ __all__ = [
     "QutipExperimentEvolve",
     "MetricsToQutipObjects",
     "TaskArgsAnalog",
-    "Expectation",
-    "EntanglementEntropyVN",
+    "QutipExperiment",
 ]
-
-##############################################################
-class Expectation(VisitableBaseModel):
-    operator: Operator
-
-class EntanglementEntropyVN(VisitableBaseModel):
-    qreg: List[NonNegativeInt] = []
-    qmode: List[NonNegativeInt] = []
-
-
-class EntanglementEntropyReyni(VisitableBaseModel):
-    alpha: NonNegativeInt = 1
-    qreg: List[NonNegativeInt] = []
-    qmode: List[NonNegativeInt] = []
-
-
-Metric = Union[EntanglementEntropyVN, EntanglementEntropyReyni, Expectation]
-##############################################################
-class TaskArgsAnalog(VisitableBaseModel):
-    layer: Literal["analog"] = "analog"
-    n_shots: int = 10
-    fock_cutoff: int = 4
-    dt: float = 0.1
-    metrics: Dict[str, Metric] = {}
 
 class QutipOperation(VisitableBaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
