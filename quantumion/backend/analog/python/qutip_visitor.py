@@ -81,13 +81,13 @@ class QutipExperimentMeasure(AnalogInterfaceTransformer):
         bitstrings = ["".join(map(str, shot)) for shot in shots]
         return {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
 
-class QutipExperimentEvolve(AnalogInterfaceTransformer) -> TaskResultAnalog:
+class QutipExperimentEvolve(AnalogInterfaceTransformer):
     def __init__(self):
         super().__init__()
         self._current_state = None
         self._qutip_metrics = None
 
-    def visit_QutipExperiment(self, model: QutipExperiment):
+    def visit_QutipExperiment(self, model: QutipExperiment) -> TaskResultAnalog:
         dims = model.n_qreg * [2] + model.n_qmode * [model.args.fock_cutoff]
         initial_state = qt.tensor([qt.basis(d, 0) for d in dims])
 
