@@ -27,8 +27,15 @@ class RegisterInformation(AnalogInterfaceTransformer):
         for elem in visit_out:
             if elem != visit_out[0]:
                 raise Exception("Incorrect Dimensions between AnalogGates")
-        model.n_qreg, model.n_qmode = visit_out[0]
-        return model
+        n_qreg, n_qmode = visit_out[0]
+        return AnalogCircuit(
+            sequence = model.sequence,
+            n_qreg = n_qreg,
+            n_qmode = n_qmode,
+            definitions = model.definitions,
+            qreg = model.qreg,
+            qmode = model.qmode
+        )
     
     def visit_Evolve(self, model: Evolve):
         return self.visit(model.gate)
