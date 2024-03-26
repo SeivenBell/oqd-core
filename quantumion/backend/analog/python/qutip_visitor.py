@@ -47,19 +47,41 @@ class TaskArgsAnalog(VisitableBaseModel):
 
 class QutipOperation(VisitableBaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    hamiltonian: list[Tuple[qt.Qobj, str]] #list[qt.qobj.Qobj] # good for ensuring correct type # for consistency we will always define this way
+    hamiltonian: list[Tuple[qt.Qobj, str]]
     duration: float
     
 class QutipExperiment(VisitableBaseModel):
-    # model_config = ConfigDict(arbitrary_types_allowed=True)
-    # initial_state: Union[qt.Qobj, None] = None
     instructions: list[QutipOperation]
     n_qreg: NonNegativeInt
     n_qmode: NonNegativeInt
     args: TaskArgsAnalog
-    ## should have everything to define a qutip exp
 
-class QutipExperimentEvolve(AnalogInterfaceTransformer):
+class TaskResultAnalog(VisitableBaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    layer: Literal["analog"] = "analog"
+    times: list[float] = []
+    state: qt.Qobj = None
+    metrics: dict[str, List[Union[float, int]]] = {}
+    counts: dict[str, int] = {}
+
+class QutipExperimentMeasure(AnalogInterfaceTransformer):
+    def __init__(self, state):
+        super().__init__()
+        self._state = state
+
+    def visit_QutipExperiment(self, model: QutipExperiment):
+        probs = np.power(np.abs(self._state.full()), 2).squeeze()
+        n_shots = model.args.n_shots
+        inds = np.random.choice(len(probs), size=n_shots, p=probs)
+        opts = model.n_qreg * [[0, 1]] + model.n_qmode * [
+            list(range(model.args.fock_cutoff))
+        ]
+        bases = list(itertools.product(*opts))
+        shots = np.array([bases[ind] for ind in inds])
+        bitstrings = ["".join(map(str, shot)) for shot in shots]
+        return {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
+
+class QutipExperimentEvolve(AnalogInterfaceTransformer) -> TaskResultAnalog:
     def __init__(self):
         super().__init__()
         self._current_state = None
@@ -75,7 +97,22 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
 
         self._dt = model.args.dt
 
-        return self.visit(model.instructions)
+        results = self.visit(model.instructions)
+
+        times = []
+        metrics = {key: np.empty(0) for key in model.args.metrics.keys()}
+        for idx, result in enumerate(results):
+            times = np.hstack([times, result.times + model.instructions[idx-1].duration if idx != 0 else result.times])
+            metrics = {key: np.hstack([metrics[key], result.expect[key]]) for key in metrics.keys()}
+
+        return TaskResultAnalog(
+            times = times,
+            metrics = metrics,
+            state = results[-1].final_state,
+            counts = model.accept(
+                visitor = QutipExperimentMeasure(state=results[-1].final_state)
+            )
+        )
 
     def visit_QutipOperation(self, model: QutipOperation):
         duration = model.duration
