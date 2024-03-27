@@ -76,7 +76,7 @@ class TaskArgsAnalog(VisitableBaseModel):
 class TaskResultAnalog(VisitableBaseModel):
     layer: Literal["analog"] = "analog"
     times: List[float] = []
-    state: List = None # list of complex float
+    state: List[ComplexFloat] = []
     metrics: Dict[str, List[Union[float, int]]] = {}
     counts: Dict[str, int] = {}
     runtime: float = None
