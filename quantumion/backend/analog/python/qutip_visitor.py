@@ -4,6 +4,7 @@ from quantumion.interface.base import VisitableBaseModel
 from quantumion.compiler.math import VerbosePrintMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
+from quantumion.backend.analog.python.qutip_interface import QutipExperiment, QutipOperation
 from quantumion.backend.metric import *
 from typing import Any, Union, List, Tuple, Literal, Dict
 import qutip as qt
@@ -15,26 +16,9 @@ import itertools
 
 __all__ = [
     "QutipBackendTransformer",
-    "QutipConvertTransformer",
     "QutipExperimentEvolve",
-    "MetricsToQutipObjects",
-    "TaskArgsAnalog",
-    "QutipExperiment",
 ]
 
-class QutipOperation(VisitableBaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    hamiltonian: list[Tuple[qt.Qobj, str]]
-    duration: float
-    
-class QutipExperiment(VisitableBaseModel):
-    instructions: list[QutipOperation]
-    n_qreg: NonNegativeInt
-    n_qmode: NonNegativeInt
-    args: TaskArgsAnalog
-
-    def run(self):
-        return self.accept(QutipExperimentEvolve())
 
 class QutipExperimentMeasure(AnalogInterfaceTransformer):
     def __init__(self, state):
