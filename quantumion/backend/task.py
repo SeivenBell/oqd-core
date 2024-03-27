@@ -67,7 +67,7 @@ class DataAnalog:
 
 class TaskArgsAnalog(VisitableBaseModel):
     layer: Literal["analog"] = "analog"
-    n_shots: int = 10
+    n_shots: Union[int, None] = 10
     fock_cutoff: int = 4
     dt: float = 0.1
     metrics: Dict[str, Metric] = {}

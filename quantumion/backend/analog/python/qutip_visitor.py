@@ -42,6 +42,8 @@ class QutipExperimentMeasure(AnalogInterfaceTransformer):
         self._state = state
 
     def visit_QutipExperiment(self, model: QutipExperiment):
+        if model.args.n_shots is None:
+            return {}
         probs = np.power(np.abs(self._state.full()), 2).squeeze()
         n_shots = model.args.n_shots
         inds = np.random.choice(len(probs), size=n_shots, p=probs)
