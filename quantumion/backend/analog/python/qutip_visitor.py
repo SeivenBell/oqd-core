@@ -3,7 +3,7 @@ from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
 from quantumion.compiler.math import VerbosePrintMathExpr
 from quantumion.interface.analog.operations import *
-from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog
+from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from quantumion.backend.metric import *
 from typing import Any, Union, List, Tuple, Literal, Dict
 import qutip as qt
@@ -82,7 +82,7 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
         return TaskResultAnalog(
             times = times,
             metrics = metrics,
-            state = results[-1].final_state,
+            state = list(map(ComplexFloat.cast_from_np_complex128, results[-1].final_state.full().squeeze())), #results[-1].final_state.full(), # convert to complexfloat
             counts = model.accept(
                 visitor = QutipExperimentMeasure(state=results[-1].final_state)
             )
