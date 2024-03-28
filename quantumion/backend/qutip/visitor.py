@@ -13,7 +13,7 @@ from rich import print as pprint
 import numpy as np
 from pydantic.types import NonNegativeInt
 import itertools
-
+import time
 __all__ = [
     "QutipBackendTransformer",
     "QutipExperimentEvolve",
@@ -57,7 +57,9 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
 
         self._dt = model.args.dt
 
+        start_time = time.time()
         results = self.visit(model.instructions)
+        time_taken = time.time()-start_time
 
         times = []
         metrics = {key: np.empty(0) for key in self._qutip_metrics.keys()}
@@ -75,7 +77,8 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
             state = list(map(ComplexFloat.cast_from_np_complex128, results[-1].final_state.full().squeeze())), #results[-1].final_state.full(), # convert to complexfloat
             counts = model.accept(
                 visitor = QutipExperimentMeasure(state=results[-1].final_state)
-            )
+            ),
+            runtime=time_taken
         )
 
     def visit_QutipOperation(self, model: QutipOperation):
