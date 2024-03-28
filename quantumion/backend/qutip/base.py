@@ -4,6 +4,9 @@ from quantumion.compiler.analog.interface import RegisterInformation
 from quantumion.backend.task import Task
 
 ########################################################################################
+__all__ = [
+    'QutipBackend',
+]
 
 class QutipBackend():
 
