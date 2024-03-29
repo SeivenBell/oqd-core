@@ -1,3 +1,5 @@
+import numpy as np
+
 def amplitude(state: list):
     amplitudes = []
     for x in state:
