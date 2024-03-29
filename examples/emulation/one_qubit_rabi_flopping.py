@@ -36,7 +36,7 @@ if __name__ == "__main__":
         metrics={
             "Z": Expectation(operator= (1*(Z))),
         },
-        dt=0.1,
+        dt=1e-4,
     )
 
     task = Task(program = ac, args = args)
