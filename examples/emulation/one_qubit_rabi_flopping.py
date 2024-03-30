@@ -11,10 +11,7 @@ import qutip as qt
 import numpy as np
 from rich import print as pprint
 from quantumion.backend import QutipBackend
-from examples.emulation.utils import amplitude
-import matplotlib.pyplot as plt
-import seaborn as sns
-colors = sns.color_palette(palette="Set2", n_colors=10)
+from examples.emulation.utils import plot_metrics_counts
 
 
 
@@ -49,33 +46,5 @@ if __name__ == "__main__":
     results = backend.run(experiment = experiment)
     pprint(results)
 
-    fig, axs = plt.subplots(3, 1, figsize=[8, 8])
+    plot_metrics_counts(results = results, experiment_name = 'one-qubit-rabi-flopping.png')
 
-    ax = axs[0]
-    for k, (name, obs) in enumerate(results.metrics.items()):
-        ax.plot(results.times, obs, label=f"$<{name}>$", color=colors[2])
-    ax.legend()
-    ax.set(xlabel="Time", ylabel="Expectation value")
-
-    ax = axs[1]
-    x = np.arange(len(results.counts.keys()))
-    
-    ax.bar(x=x, height=amplitude(state = results.state), color=colors[2])
-    ax.set(xlabel="Basis state", ylabel="Probability")
-
-    ax = axs[2]
-    x = list(results.counts.keys())
-    counts = list(results.counts.values())
-
-    ax.bar(x=x, height=counts, color=colors[2])
-    ax.set(xlabel="Basis state", ylabel="Number of samples")
-
-    fig.tight_layout()
-
-    plot_directory = 'examples/emulation/plots/'
-
-    if not os.path.exists(plot_directory):
-        os.makedirs(plot_directory)
-
-    dirname = plot_directory + 'one-qubit-rabi-flopping.png'
-    plt.savefig(dirname)

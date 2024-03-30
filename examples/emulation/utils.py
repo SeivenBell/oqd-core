@@ -1,15 +1,18 @@
+import os
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+colors = sns.color_palette(palette="Set2", n_colors=10)
 
-def amplitude(state: list):
-    amplitudes = []
+def _get_probabilities(state: list):
+    probabililities = []
     for x in state:
-        amplitudes.append(np.sqrt(x.real**2 + x.imag**2))
-    return amplitudes
+        probabililities.append(np.sqrt(x.real**2 + x.imag**2)**2)
+    return probabililities
 
-def generate_complete_dictionary(input_dict):
+def _generate_complete_dictionary(input_dict):
 
     n = len(list(input_dict.keys())[0])
-    print(n)
 
     complete_dict = {}
     # Generate all possible binary strings of length n
@@ -24,3 +27,35 @@ def generate_complete_dictionary(input_dict):
     complete_dict.update(input_dict)
     
     return {k: complete_dict[k] for k in sorted(complete_dict)}
+
+def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/emulation/plots/'):
+
+    fig, axs = plt.subplots(3, 1, figsize=[8, 8])
+
+    ax = axs[0]
+    for k, (name, obs) in enumerate(results.metrics.items()):
+        ax.plot(results.times, obs, label=f"$<{name}>$", color=colors[k])
+    ax.legend()
+    ax.set(xlabel="Time", ylabel="Expectation value")
+
+    ax = axs[1]
+    full_counts = _generate_complete_dictionary(results.counts)
+    x = list(full_counts.keys())
+    
+    ax.bar(x=x, height=_get_probabilities(state = results.state), color=colors[2])
+    ax.set(xlabel="Basis state", ylabel="Probability")
+
+
+    ax = axs[2]
+    counts = list(full_counts.values())
+
+    ax.bar(x=x, height=counts, color=colors[3])
+    ax.set(xlabel="Basis state", ylabel="Number of samples")
+
+    fig.tight_layout()
+
+    if not os.path.exists(plot_directory):
+        os.makedirs(plot_directory)
+
+    dirname = plot_directory + experiment_name
+    plt.savefig(dirname)
