@@ -1,6 +1,6 @@
-from quantumion.backend.qutip.visitor import QutipBackendTransformer, QutipExperimentEvolve
+from quantumion.backend.qutip.visitor import QutipBackendTransformer, QutipExperimentEvolve, QutipTaskArgsCanonicalization
 from quantumion.backend.qutip.interface import QutipExperiment
-from quantumion.compiler.analog.interface import RegisterInformation
+from quantumion.compiler.analog.interface import RegisterInformation, AnalogCircuitCanonicalization
 from quantumion.backend.task import Task
 
 ########################################################################################
@@ -11,8 +11,8 @@ __all__ = [
 class QutipBackend():
 
     def compile(self, task: Task):
-        circuit = task.program
-        args = task.args
+        circuit = task.program.accept(AnalogCircuitCanonicalization())
+        args = task.args.accept(QutipTaskArgsCanonicalization())
         return circuit.accept(RegisterInformation()).accept(QutipBackendTransformer(args=args))
 
     def run(self, task: Task = None, experiment: QutipExperiment = None):
