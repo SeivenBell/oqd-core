@@ -18,6 +18,8 @@ __all__ = [
     "PrintOperator",
     "VerbosePrintOperator",
     "MermaidOperator",
+    "AnalogInterfaceVisitor",
+    "AnalogInterfaceTransformer",
 ]
 
 
@@ -31,6 +33,12 @@ class AnalogCircuitVisitor(Visitor):
 class AnalogCircuitTransformer(Transformer):
     pass
 
+class AnalogInterfaceVisitor(Visitor):
+    pass
+
+
+class AnalogInterfaceTransformer(Transformer):
+    pass
 
 ########################################################################################
 

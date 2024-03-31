@@ -1,3 +1,2 @@
 from .operator import *
-from .circuit import *
-from .gate import *
+from .operations import *
