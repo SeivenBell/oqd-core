@@ -52,7 +52,7 @@ if __name__ == "__main__":
             "Z^0": Expectation(operator= (1*(Z@I))),
             "Z^1": Expectation(operator= (1*(I@Z))),
         },
-        dt=1e-4,
+        dt=1e-2,
     )
 
     task = Task(program = ac, args = args)
@@ -63,6 +63,6 @@ if __name__ == "__main__":
     pprint(experiment)
 
     results = backend.run(experiment = experiment)
-    pprint(results)
+    pprint(results.state)
 
     plot_metrics_counts(results = results, experiment_name = 'bell-state-preparation.png')

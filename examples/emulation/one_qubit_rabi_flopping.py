@@ -44,7 +44,7 @@ if __name__ == "__main__":
     pprint(experiment)
 
     results = backend.run(experiment = experiment)
-    pprint(results)
+    pprint(results.state)
 
     plot_metrics_counts(results = results, experiment_name = 'one-qubit-rabi-flopping.png')
 
