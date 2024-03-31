@@ -42,7 +42,7 @@ def _generate_complete_dictionary(input_dict):
 
 def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/emulation/plots/'):
 
-    fig, axs = plt.subplots(3, 1, figsize=[8, 8])
+    fig, axs = plt.subplots(4, 1, figsize=[12, 12])
 
     ax = axs[0]
     for k, (name, obs) in enumerate(results.metrics.items()):
