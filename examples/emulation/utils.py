@@ -10,6 +10,18 @@ def _get_probabilities(state: list):
         probabililities.append(np.sqrt(x.real**2 + x.imag**2)**2)
     return probabililities
 
+def _get_amplitude(state: list, componenet = 'real'):
+    amplitudes = []
+    for x in state:
+        if componenet == 'real':
+            amplitudes.append(x.real)
+        elif componenet == 'imag':
+            amplitudes.append(x.imag)
+        else:
+            KeyError
+    return amplitudes
+
+
 def _generate_complete_dictionary(input_dict):
 
     n = len(list(input_dict.keys())[0])
@@ -51,6 +63,12 @@ def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/emu
 
     ax.bar(x=x, height=counts, color=colors[3])
     ax.set(xlabel="Basis state", ylabel="Number of samples")
+
+    ax = axs[3]
+    ax.bar(x=x, height=_get_amplitude(state = results.state, componenet = 'real'), color=colors[5], label = 'Real component')
+    ax.bar(x=x, height=_get_amplitude(state = results.state, componenet = 'imag'), color=colors[7], label = 'Imaginary component')
+    plt.legend()
+    ax.set(xlabel="Basis state", ylabel="Amplitude")
 
     fig.tight_layout()
 
