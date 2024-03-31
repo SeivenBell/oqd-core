@@ -6,6 +6,7 @@ This repo contains code for the frontend and backend of the OQD stack.
 - [Quick Start](#quickstart) <br/>
   - [The Stack](#stack) <br/>
 - [Installation](#installation) <br/>
+  - [Environment](#environment) <br/>  
   - [Client](#client) <br/>
   - [Server](#server) <br/>
      - [Docker Compose](#docker-compose) <br/>
@@ -15,6 +16,7 @@ This repo contains code for the frontend and backend of the OQD stack.
   - [Backends](#backends) <br/>
     - [Software](#software) <br/>
     - [Hardware](#hardware) <br/>
+- [Jupyter](#jupyter) <br/>    
 - [Documentation](#documentation) <br/>
 - [Acknowledgements](#acknowledgements) <br/>
 - [References](#references) <br/>
@@ -23,9 +25,39 @@ This repo contains code for the frontend and backend of the OQD stack.
 
 ## Quick Start <a name="quickstart"></a>
 ### The Stack <a name="stack"></a>
-![Stack](docs/imgs/OQD_stack.png)
+![Stack]
+
+```mermaid
+flowchart LR
+    Digital[Digital Circuit] --> openQASM(openQASM) 
+    
+    Analog[Analog Circuit] --> openQSIM(openQSIM)
+    Atomic[Atomic Protocol] ---> openAPL(openAPL)
+  
+    openQSIM --> |compile| openAPL
+    openQASM --> |compile| openAPL
+
+    openQSIM ----> Qutip
+    openQSIM ----> Quantumoptics.jl
+
+    openQASM ----> TensorCircuit
+    openQASM ----> PastaQ.jl
+    
+    openAPL ---> Hardware{Bare metal}
+    openAPL ---> IonSim.jl
+    
+    
+```
 
 ## Installation <a name="installation"></a>
+
+### Suggested installation environment <a name="environment"></a>
+
+Create Conda virtual environment and activate:
+```bash
+conda create -n quantumion python=3.10
+conda activate quantumion
+```
 
 ### Client <a name="client"></a>
 Clone the repository using the following command :
@@ -34,6 +66,7 @@ git clone https://github.com/OpenQuantumDesign/quantumion
 ```
 Install with pip :
 ```bash
+pip install -r requirements.txt
 pip install .
 ```
 
@@ -46,6 +79,7 @@ Clone the repository using the following command :
 ```bash
 git clone https://github.com/OpenQuantumDesign/quantumion
 ```
+For Docker installation follow [Install Docker](https://docs.docker.com/engine/install/ubuntu/)
 Deploy with docker compose:
 ```bash
 cd docker
@@ -92,6 +126,14 @@ Planned supported hardware backends include:
 - [Quantum Information with Trapped-ions (QITI Lab)](https://qiti.iqc.uwaterloo.ca/publications/) Blade Trap $\left( ^{171}\mathrm{Yb}^+ \right)$
 - [QuantumIon](https://tqt.uwaterloo.ca/project-details/quantumion-an-open-access-quantum-computing-platform/) $\left( ^{138}\mathrm{Ba}^+ \right)$
 
+## Jupyter
+To install Jupyter support in the virtual environment:
+```bash
+pip install ipykernel
+python -m ipykernel install --user --name quantumion --display-name "quantumion"
+pip install rise
+```
+
 
 ## Documentation <a name="documentation"></a>
 
@@ -103,9 +145,11 @@ pip install .[docs]
 ```
 To deploy the documentation server locally:
 ```
-mkdocs serve
+mkdocs serve -a localhost:8001
 ```
-After deployment, the documentation can be accessed from http://127.0.0.1:8000
+After deployment, the documentation can be accessed from http://127.0.0.1:8001
+
+
 
 
 ## Acknowledgements <a name="acknowledgements"></a>
