@@ -20,7 +20,9 @@ $$
 
 Our analog circuit will have one gate, which describes this Hamiltonian.
 ``` py
-from quantumion.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
+from quantumion.interface.analog.circuit  import  AnalogCircuit
+from quantumion.interface.analog.gate     import  AnalogGate
+from quantumion.interface.analog.operator import  PauliX, PauliZ, PauliI
 
 circuit = AnalogCircuit()
 circuit.evolve(
@@ -28,13 +30,15 @@ circuit.evolve(
         duration=1.0, 
         hamiltonian=[PauliX @ PauliX, PauliZ @ PauliI, PauliI @ PauliZ],
     )
-)    
+) 
 ```
 
 Let's now generalize this to a quantum system with `n` qubits.
 ``` py
-from quantumion.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
-from quantumion.analog.math import tensor
+from quantumion.interface.analog.circuit  import  AnalogCircuit
+from quantumion.interface.analog.gate     import  AnalogGate
+from quantumion.interface.analog.operator import  PauliX, PauliZ, PauliI
+from quantumion.utils.math import tensor
 
 n = 10
 circuit = AnalogCircuit()
@@ -48,14 +52,14 @@ circuit.evolve(
         duration=1.0, 
         hamiltonian=hamiltonian
     )
-)    
+)   
 ```
 We will emulate this quantum evolution on two classical backends. 
 The first is a wrapper around Qutip, the second a wrapper around the QuantumOptics.jl package.
 ```py
-from backends.analog.python.qutip import QutipBackend
-from backends.analog.julia.quantumoptics import QuantumOpticsBackend
-from backends.task import Task, TaskArgsAnalog
+from quantumion.backend.analog.python.qutip import QutipBackend
+from quantumion.backend.analog.julia.quantumoptics import QuantumOpticsBackend
+from quantumion.backend.task import Task, TaskArgsAnalog
 
 args = TaskArgsAnalog(
     n_shots=100,
@@ -69,7 +73,7 @@ result = backend.run(task)
 
 ````py 
 import matplotlib.pyplot as plt
-from backends.metric import Expectation, EntanglementEntropyVN
+from quantumion.backend.metric import Expectation, EntanglementEntropyVN
 
 metrics = {
     'entanglement_entropy': EntanglementEntropyVN(qreg=[i for i in range(n//2)]),
@@ -79,6 +83,7 @@ args = TaskArgsAnalog(
     n_shots=100,
     fock_cutoff=4,
     metrics=metrics,
+    dt=0.01
 )
 task = Task(program=circuit, args=args)
 backend = QutipBackend()

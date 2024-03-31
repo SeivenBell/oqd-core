@@ -56,15 +56,15 @@ class Operator(VisitableBaseModel):
         eq = (self.pauli == other.pauli) and (self.ladder == other.ladder)
         return eq
 
-    # def __add__(self, other):
-    #     if not isinstance(other, Operator):
-    #         raise TypeError(f"unsupported operand types for '{type(self)}' and '{type(other)}'")
-    #
-    #     assert (self.n_qreg == other.n_qreg) and (self.n_qmode == self.n_qmode)
-    #
-    #     if (self.qreg == other.qreg) and (self.qmode == other.qmode):
-    #         coefficient = self.coefficient + other.coefficient
-    #         return Operator(coefficient=coefficient, qreg=self.qreg, qmode=self.qmode)
+    def __add__(self, other):
+         if not isinstance(other, Operator):
+             raise TypeError(f"unsupported operand types for '{type(self)}' and '{type(other)}'")
+    
+         assert (self.n_qreg == other.n_qreg) and (self.n_qmode == self.n_qmode)
+    
+         if (self.n_qreg == other.n_qreg) and (self.n_qmode == other.n_qmode):
+             coefficient = self.coefficient + other.coefficient
+             return Operator(coefficient=coefficient, pauli=self.pauli, qreg=self.n_qreg, qmode=self.n_qmode)
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):

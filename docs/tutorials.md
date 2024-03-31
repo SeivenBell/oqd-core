@@ -41,9 +41,9 @@ In `quantumion`, time evolution is specified as an **analog gate** ([`AnalogGate
 For example, to implement the one-qubit Rabi flopping from above,
 ```py
 import numpy as np
-from quantumion.analog.circuit import AnalogCircuit
-from quantumion.analog.gate import AnalogGate
-from quantumion.analog.operator import PauliX
+from quantumion.interface.analog.circuit  import  AnalogCircuit
+from quantumion.interface.analog.gate     import  AnalogGate
+from quantumion.interface.analog.operator import  PauliX, PauliZ, PauliI
 
 circuit = AnalogCircuit()
 circuit.evolve(
@@ -61,23 +61,22 @@ Hamiltonians are represented using Pauli and ladder operators, which act on the 
 ### Defining analog gates
 Let's start by creating a more complex Hamiltonian, composed of Pauli operators on the qubit registers.
 ```py
-from quantumion.analog.operator import PauliX, PauliY, PauliZ, PauliI
+from quantumion.interface.analog.operator import  PauliX, PauliY, PauliZ, PauliI
 
 print(PauliX * PauliX == PauliI)
 print(PauliY * PauliY == PauliI)
 print(PauliZ * PauliZ == PauliI)
->>> true
 ```
 
 ```py
-from quantumion.analog.operator import PauliX
+from quantumion.interface.analog.operator import PauliX
 interaction = PauliX @ PauliX
 ``` 
 Here, an interaction operator, $\sigma_x \otimes \sigma_x$, 
 is defined as the tensor product using the `@` method in Python.
 Operator objects [`Operator`](reference.md) can (largely) be manipulated like normal Python objects.
 ```py
-from quantumion.analog.operator import PauliX
+from quantumion.interface.analog.operator import PauliX
 print(PauliX + PauliX == 2 * PauliX)
 >>> True
 ``` 
@@ -87,11 +86,11 @@ print(PauliX + PauliX == 2 * PauliX)
 Digital quantum circuits, or the gate-based model.
 ```py
 import numpy as np
-from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import Gate, H, CNOT
+from quantumion.interface.digital.circuit import DigitalCircuit
+from quantumion.interface.digital.gate import Gate, H, CNOT
 
-circuit = DigitalCircuit()
-circuit.add(H)
+circuit_digital = DigitalCircuit()
+circuit_digital.add(H)
 ```
 
 
@@ -102,11 +101,18 @@ Each mode has a suite of backend classical emulators for designing,
 benchmarking, and studying programs run on quantum computers.
 
 ```py
-from backends.analog import QutipBackend
-from backends.task import Task, TaskArgsAnalog
+from quantumion.backend.analog.python.qutip import QutipBackend
+from quantumion.backend.analog.julia.quantumoptics import QuantumOpticsBackend
+from quantumion.backend.task import Task, TaskArgsAnalog
 
+args = TaskArgsAnalog(
+    n_shots=100,
+    fock_cutoff=4,
+    dt=0.01,
+)
+task = Task(program=circuit, args=args)
 backend = QutipBackend()
-backend.run(task)
+result = backend.run(task)
 ```
 
 
