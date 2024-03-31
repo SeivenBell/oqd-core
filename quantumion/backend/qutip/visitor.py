@@ -17,8 +17,37 @@ import time
 __all__ = [
     "QutipBackendTransformer",
     "QutipExperimentEvolve",
+    "QutipTaskArgsCanonicalization",
 ]
 
+class QutipTaskArgsCanonicalization(AnalogInterfaceTransformer):
+    def __init__(self, flow_graph = VerificationFlow(name="_", max_steps=1000)):
+        super().__init__()
+        self.fg = flow_graph
+
+    def _visit(self, model: Any):
+        if isinstance(model, dict):
+            return {
+                key: self.visit(metric)
+                for (key, metric) in model.items()
+            }
+        else:
+            super(self.__class__, self)._visit(model)
+
+    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog) -> TaskArgsAnalog:
+        return TaskArgsAnalog(
+            layer = model.layer,
+            n_shots = model.n_shots,
+            dt = model.dt,
+            metrics = self.visit(model.metrics)
+        )
+
+    def visit_Expectation(self, model: Expectation) -> Expectation:
+        canonical_model = self.fg(model.operator).model
+        canonical_model.accept(CanonicalizationVerificationOperator())
+        return Expectation(
+            operator = canonical_model
+        )
 
 class QutipExperimentMeasure(AnalogInterfaceTransformer):
     def __init__(self, state):
