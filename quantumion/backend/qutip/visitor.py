@@ -5,6 +5,8 @@ from quantumion.compiler.math import VerbosePrintMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation
+from quantumion.compiler.analog.verification_flow import VerificationFlow
+from quantumion.compiler.analog.verify import CanonicalizationVerificationOperator
 from quantumion.backend.metric import *
 from typing import Any, Union, List, Tuple, Literal, Dict
 import qutip as qt

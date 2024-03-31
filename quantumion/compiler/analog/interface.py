@@ -2,8 +2,10 @@ from quantumion.interface.analog.operations import *
 from quantumion.compiler.analog.canonicalize import *
 from quantumion.interface.analog.operator import *
 from quantumion.compiler.analog.base import AnalogInterfaceTransformer
+from quantumion.compiler.analog.verification_flow import VerificationFlow
+from quantumion.compiler.analog.verify import CanonicalizationVerificationOperator
 from typing import Union
-    
+
 class RegisterInformation(AnalogInterfaceTransformer):
     """
     Assumes all hamiltonians in AnalogSystem are in canonical form
