@@ -58,6 +58,9 @@ class RegisterInformation(AnalogInterfaceTransformer):
         return (space1[0] + space2[0], space1[1] + space2[1])
 
 class AnalogCircuitCanonicalization(AnalogInterfaceTransformer):
+    def __init__(self, flow_graph = VerificationFlow(name="_", max_steps=1000)):
+        super().__init__()
+        self.fg = flow_graph
 
     def visit_AnalogCircuit(self, model: AnalogCircuit) -> AnalogCircuit:
         return AnalogCircuit(
@@ -76,13 +79,8 @@ class AnalogCircuitCanonicalization(AnalogInterfaceTransformer):
         )
 
     def visit_AnalogGate(self, model: AnalogGate) -> AnalogGate:
-        fg = VerificationFlow(name="_", max_steps=1000)
-        canonical_model = fg(model.hamiltonian).model
-        pprint("Original model hhh {}".format(model.hamiltonian))
-        pprint("Verification flowed model hhh {}".format(canonical_model))
-        pprint("Printed: {}".format(canonical_model.accept(VerbosePrintOperator())))
-        pprint(canonical_model.accept(CanonicalizationVerificationOperator()))
-        pprint("\n--------------------\n")
+        canonical_model = self.fg(model.hamiltonian).model
+        canonical_model.accept(CanonicalizationVerificationOperator())
         return AnalogGate(
             hamiltonian = canonical_model,
             dissipation = model.dissipation
