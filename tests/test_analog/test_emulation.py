@@ -28,6 +28,7 @@ def get_amplitude_arrays(state: list):
 
 class TestListClose(unittest.TestCase):
     def assertListsClose(self, list1, list2, tolerance=0.001):
+        self.assertEqual(len(list1), len(list2), msg = "The input lists have different length")
         for elem1, elem2 in zip(list1, list2):
             self.assertAlmostEqual(elem1, elem2, delta=tolerance)
 
@@ -71,16 +72,42 @@ class QutipEmulation(TestListClose, unittest.TestCase):
     def test_bell_state_standard(self):
         """Standard Bell State preparation"""
 
-        Hx = AnalogGate(hamiltonian= -(np.pi / 4) * X, dissipation=Dissipation())
+        # 1-qubit & 2-qubit Rabi frequencies
+        w1 = 2 * np.pi * 1
+        w2 = 2 * np.pi * 0.1
+
+        Hii = AnalogGate(hamiltonian= 1*(I @ I), dissipation=Dissipation())
+        Hxi = AnalogGate(hamiltonian= 1*(X @ I), dissipation=Dissipation())
+        Hyi = AnalogGate(hamiltonian= 1*(Y @ I), dissipation=Dissipation())
+        Hxx = AnalogGate(hamiltonian= 1*(X @ X), dissipation=Dissipation())
+        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X), dissipation=Dissipation())
+        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I), dissipation=Dissipation())
+        Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I), dissipation=Dissipation())
 
         ac = AnalogCircuit()
-        ac.evolve(duration=1, gate=Hx)
-        ac.evolve(duration=1, gate=Hx)
-        ac.evolve(duration=1, gate=Hx)
+
+        # Hadamard
+        ac.evolve(duration = (3 * np.pi) / 2, gate = Hii)
+        ac.evolve(duration = np.pi / 2, gate = Hxi)
+        ac.evolve(duration = np.pi / 4, gate = Hmyi)
+
+        # CNOT
+        ac.evolve(duration = np.pi / 4, gate = Hyi)
+        ac.evolve(duration = np.pi / 4, gate = Hxx)
+        ac.evolve(duration = np.pi / 4, gate = Hmix)
+        ac.evolve(duration = np.pi / 4, gate = Hmxi)
+        ac.evolve(duration = np.pi / 4, gate = Hmyi)
+        ac.evolve(duration = np.pi / 4, gate = Hii)
 
         #define task args
         args = TaskArgsAnalog(
-            dt=1e-3,
+            n_shots=100,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= (1*(Z@I))),
+                "Z^1": Expectation(operator= (1*(I@Z))),
+            },
+            dt=1e-2,
         )
 
         task = Task(program = ac, args = args)
@@ -92,9 +119,13 @@ class QutipEmulation(TestListClose, unittest.TestCase):
         real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
 
         with self.subTest():
-            self.assertListsClose(real_amplitudes, [-0.707, 0])
+            self.assertListsClose(real_amplitudes, [0.707, 0, 0, 0.707])
         with self.subTest():
-            self.assertListsClose(imag_amplitudes, [0, 0.707])
+            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^0'][-1], 0, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
 
 if __name__ == '__main__':
     unittest.main()
