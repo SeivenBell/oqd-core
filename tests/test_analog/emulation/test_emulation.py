@@ -62,17 +62,6 @@ class QutipEmulation(TestListClose, unittest.TestCase):
 
         ac, args = bell_state_standard_protocol()
 
-        #define task args
-        args = TaskArgsAnalog(
-            n_shots=100,
-            fock_cutoff=4,
-            metrics={
-                "Z^0": Expectation(operator= (1*(Z@I))),
-                "Z^1": Expectation(operator= (1*(I@Z))),
-            },
-            dt=1e-2,
-        )
-
         task = Task(program = ac, args = args)
 
         backend = QutipBackend()
@@ -89,6 +78,30 @@ class QutipEmulation(TestListClose, unittest.TestCase):
             self.assertAlmostEqual(results.metrics['Z^0'][-1], 0, delta=0.001)
         with self.subTest():
             self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
+
+    def test_ghz_state(self):
+        """Standard GHz State preparation"""
+
+        ac, args = three_qubit_GHz_protocol()
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [0.707, 0, 0, 0, 0, 0, 0, 0.707])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^0'][-1], 0, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^2'][-1], 0, delta=0.001)
 
 if __name__ == '__main__':
     unittest.main()
