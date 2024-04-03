@@ -46,6 +46,8 @@ Statement = Union[Measure, Evolve, Initialize]
 
 class AnalogCircuit(AnalogOperation):
     """
+    Class representing a quantum information experiment represented in terms of analog operations.
+
     Args:
         qreg (list[NonNegativeInt]): indices of the qubit registers
         qmode (list[NonNegativeInt]): indices of the bosonic mode registers
