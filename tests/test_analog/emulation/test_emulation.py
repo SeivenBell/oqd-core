@@ -7,6 +7,7 @@ from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
 from quantumion.backend import QutipBackend
+from tests.test_analog.emulation.standard_protocols import *
 import numpy as np
 from rich import print as pprint
 import unittest
@@ -39,20 +40,7 @@ class QutipEmulation(TestListClose, unittest.TestCase):
     def test_one_qubit_rabi_flopping(self):
         """One qubit rabi flopping"""
 
-        Hx = AnalogGate(hamiltonian= -(np.pi / 4) * X, dissipation=Dissipation())
-
-        ac = AnalogCircuit()
-        ac.evolve(duration=1, gate=Hx)
-        ac.evolve(duration=1, gate=Hx)
-        ac.evolve(duration=1, gate=Hx)
-
-        #define task args
-        args = TaskArgsAnalog(
-            metrics={
-                "Z": Expectation(operator= (1*(Z))),
-            },
-            dt=1e-3,
-        )
+        ac, args = one_qubit_rabi_flopping_protocol()
 
         task = Task(program = ac, args = args)
 
@@ -72,32 +60,7 @@ class QutipEmulation(TestListClose, unittest.TestCase):
     def test_bell_state_standard(self):
         """Standard Bell State preparation"""
 
-        # 1-qubit & 2-qubit Rabi frequencies
-        w1 = 2 * np.pi * 1
-        w2 = 2 * np.pi * 0.1
-
-        Hii = AnalogGate(hamiltonian= 1*(I @ I), dissipation=Dissipation())
-        Hxi = AnalogGate(hamiltonian= 1*(X @ I), dissipation=Dissipation())
-        Hyi = AnalogGate(hamiltonian= 1*(Y @ I), dissipation=Dissipation())
-        Hxx = AnalogGate(hamiltonian= 1*(X @ X), dissipation=Dissipation())
-        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X), dissipation=Dissipation())
-        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I), dissipation=Dissipation())
-        Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I), dissipation=Dissipation())
-
-        ac = AnalogCircuit()
-
-        # Hadamard
-        ac.evolve(duration = (3 * np.pi) / 2, gate = Hii)
-        ac.evolve(duration = np.pi / 2, gate = Hxi)
-        ac.evolve(duration = np.pi / 4, gate = Hmyi)
-
-        # CNOT
-        ac.evolve(duration = np.pi / 4, gate = Hyi)
-        ac.evolve(duration = np.pi / 4, gate = Hxx)
-        ac.evolve(duration = np.pi / 4, gate = Hmix)
-        ac.evolve(duration = np.pi / 4, gate = Hmxi)
-        ac.evolve(duration = np.pi / 4, gate = Hmyi)
-        ac.evolve(duration = np.pi / 4, gate = Hii)
+        ac, args = bell_state_standard_protocol()
 
         #define task args
         args = TaskArgsAnalog(
