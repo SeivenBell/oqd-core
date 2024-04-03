@@ -49,9 +49,9 @@ classDiagram
   }
 ```
 
-::: quantumion.interface.analog.circuit.AnalogCircuit
+::: quantumion.interface.analog.operations.AnalogCircuit
 
-::: quantumion.interface.analog.gate.AnalogGate
+::: quantumion.interface.analog.operations.AnalogGate
 
 ::: quantumion.interface.analog.operator.Operator
 
