@@ -170,4 +170,4 @@ gen/
 
 /docs/src/notebooks/*
 .scratch/
-scripts/
+_scripts/
