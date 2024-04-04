@@ -1,3 +1,3 @@
 # Bash script to run unit tests in test directory
-python3 -m unittest discover tests/test_analog -v # runs tests in test_analog
+python -m unittest discover tests/test_analog -v # runs tests in test_analog
 echo Done!
