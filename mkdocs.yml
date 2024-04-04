@@ -10,6 +10,7 @@ nav:
   - Reference: reference.md
   - Explanation: explanation.md
   - Compilation: compilation.md
+  - Demos: demos.md
 
 
 use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
