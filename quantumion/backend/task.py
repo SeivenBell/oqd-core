@@ -1,13 +1,11 @@
 from dataclasses import dataclass, field
 import numpy as np
-from typing import Union, List, Dict, Literal
-from pydantic import BaseModel, ConfigDict
-from quantumion.interface.base import VisitableBaseModel
-import qutip as qt
+from typing import Union, List, Dict, Literal, Annotated
+from pydantic import BaseModel, BeforeValidator
 
 ########################################################################################
 
-#from quantumion.interface.math import ComplexFloat
+from quantumion.interface.base import VisitableBaseModel
 from quantumion.interface.analog.operations import AnalogCircuit
 from quantumion.interface.digital.circuit import DigitalCircuit
 from quantumion.interface.atomic.program import AtomicProgram
@@ -16,14 +14,18 @@ from quantumion.backend.metric import Metric
 
 ########################################################################################
 
+
 class ComplexFloat(BaseModel):
     real: float
     imag: float
 
     @classmethod
-    def cast_from_np_complex128(cls, np_complex128):
-        """Converts a numpy complex128 datatype to custom ComplexFloat"""
-        return cls(real=np_complex128.real, imag=np_complex128.imag)
+    def cast(cls, x):
+        if isinstance(x, ComplexFloat):
+            return x
+        if isinstance(x, complex):
+            return cls(real=x.real, imag=x.imag)
+        raise TypeError("Invalid type for argument x")
 
     def __add__(self, other):
         if isinstance(other, ComplexFloat):
@@ -52,7 +54,12 @@ class ComplexFloat(BaseModel):
 
     def __rmul__(self, other):
         return self * other
+
+
+CastComplexFloat = Annotated[ComplexFloat, BeforeValidator(ComplexFloat.cast)]
+
 ########################################################################################
+
 
 @dataclass
 class DataAnalog:
@@ -76,7 +83,7 @@ class TaskArgsAnalog(VisitableBaseModel):
 class TaskResultAnalog(VisitableBaseModel):
     layer: Literal["analog"] = "analog"
     times: List[float] = []
-    state: List[ComplexFloat] = []
+    state: List[CastComplexFloat] = []
     metrics: Dict[str, List[Union[float, int]]] = {}
     counts: Dict[str, int] = {}
     runtime: float = None
@@ -93,7 +100,7 @@ class TaskArgsDigital(BaseModel):
 class TaskResultDigital(BaseModel):
     layer: Literal["digital"] = "digital"
     counts: dict[str, int] = {}
-    state: List[ComplexFloat] = []
+    state: List[CastComplexFloat] = []
 
 
 ########################################################################################
