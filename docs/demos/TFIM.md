@@ -11,6 +11,7 @@ $$
 H = \sigma^x_1 \sigma^x_2 + \sigma^z_1 + \sigma^z_2
 $$
 
+## Implementation
 We will go through this step by step. First we get the necessary imports:
 ``` py
 from quantumion.interface.analog.operator import *
@@ -70,6 +71,7 @@ The `Task` object can be directly simulated by the `run()` method.
 ``` py
 results = backend.run(task = task)
 ```
+## Results
 
 Finally we can plot the metrics and relevant statistics from the final quantum state:
 
