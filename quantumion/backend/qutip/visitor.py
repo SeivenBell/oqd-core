@@ -44,6 +44,12 @@ class QutipTaskArgsCanonicalization(AnalogInterfaceTransformer):
             metrics = self.visit(model.metrics)
         )
 
+    def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
+        return EntanglementEntropyVN(qreg = model.qreg, qmode = model.qmode)
+    
+    def visit_EntanglementEntropyReyni(self, model: EntanglementEntropyVN):
+        return EntanglementEntropyReyni(alpha = model.alpha, qreg = model.qreg, qmode = model.qmode)
+
     def visit_Expectation(self, model: Expectation) -> Expectation:
         canonical_model = self.fg(model.operator).model
         canonical_model.accept(CanonicalizationVerificationOperator())
