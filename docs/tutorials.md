@@ -25,7 +25,7 @@
 
 
 ## Analog mode
-In analog mode, the central object is an `AnalogCircuit`. 
+In analog mode, the central object is an `AnalogCircuit`. An instance of `AnalogCircuit` can be evolved for duration `t` according to an `AnalogGate`. The `AnalogGate` contains a hamiltonian `H` which is an instance of `Operator`. 
 As an example, we will perform a Rabi flopping experiment, where one qubit evolves under a driving field.
 The (time-independent) Hamiltonian, which govens the quantum evolution, is,
 $$
@@ -41,16 +41,15 @@ In `quantumion`, time evolution is specified as an **analog gate** ([`AnalogGate
 For example, to implement the one-qubit Rabi flopping from above,
 ```py
 import numpy as np
-from quantumion.analog.circuit import AnalogCircuit
-from quantumion.analog.gate import AnalogGate
-from quantumion.analog.operator import PauliX
+from quantumion.interface.analog.operator import PauliX
+from quantumion.interface.analog.dissipation import Dissipation
+from quantumion.interface.analog.operations import AnalogGate, AnalogCircuit
 
 circuit = AnalogCircuit()
+gate = AnalogGate(hamiltonian= -(np.pi / 4) * PauliX(), dissipation=Dissipation())
 circuit.evolve(
-    AnalogGate(
-        duration=1.0, 
-        hamiltonian=[np.pi * PauliX],
-    )
+    duration = 1.0,
+    gate = H
 )
 ```
 In the first lines, we import the relevant objects for analog mode -- the circuit, gate, and operator objects.
@@ -60,28 +59,27 @@ Hamiltonians are represented using Pauli and ladder operators, which act on the 
 
 ### Defining analog gates
 Let's start by creating a more complex Hamiltonian, composed of Pauli operators on the qubit registers.
-```py
-from quantumion.analog.operator import PauliX, PauliY, PauliZ, PauliI
-
-print(PauliX * PauliX == PauliI)
-print(PauliY * PauliY == PauliI)
-print(PauliZ * PauliZ == PauliI)
->>> true
-```
 
 ```py
-from quantumion.analog.operator import PauliX
-interaction = PauliX @ PauliX
+from quantumion.interface.analog.operator import PauliX
+interaction = PauliX() @ PauliX()
 ``` 
 Here, an interaction operator, $\sigma_x \otimes \sigma_x$, 
 is defined as the tensor product using the `@` method in Python.
 Operator objects [`Operator`](reference.md) can (largely) be manipulated like normal Python objects.
-```py
-from quantumion.analog.operator import PauliX
-print(PauliX + PauliX == 2 * PauliX)
->>> True
-``` 
 
+!!! Optional
+
+    In our language we represent all operators as abstract syntax trees. this the operator 
+    ``` PauliX() @ PauliX()``` 
+    would be reprsented as the tree:
+    ```mermaid
+    graph TD;
+        A[@] --> B["PauliX()"]
+        A --> C["PauliX()"]
+    ```
+
+We will go through concrete examples of how to get started with this in [Analog Demos](demos.md)
 
 ## Digital mode
 Digital quantum circuits, or the gate-based model.
