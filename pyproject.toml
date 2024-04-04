@@ -31,10 +31,6 @@ server = [
     "asyncpg",
     "python-multipart",
 ]
-test = [
-    "unittest",
-    "unittest_prettify",
-]
 all = [
     "qutip",
     "tensorcircuit",
