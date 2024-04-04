@@ -2,7 +2,11 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from functools import reduce
+from quantumion.interface.analog.operator import *
 colors = sns.color_palette(palette="Set2", n_colors=10)
+
+X, Y, Z, I, A, C, J = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
 
 def _get_probabilities(state: list):
     probabililities = []
@@ -39,6 +43,24 @@ def _generate_complete_dictionary(input_dict):
     complete_dict.update(input_dict)
     
     return {k: complete_dict[k] for k in sorted(complete_dict)}
+
+def _tfim_generator(n):
+    field = [[Z if i == j else I for i in range(n)] for j in range(n)]
+    interaction = [X if i in (i, (i+1)%n) else I for i in range(n)]
+    return field, interaction
+
+def tfim_hamiltonian(field = None, interaction = None, n = None):
+    field_hamiltonian, interaction_hamiltonian = None, None
+    if (n is not None) and (field is not None or interaction is not None):
+        raise TypeError("(field, interaction) and N provided leading to ambiguidty")
+    if n is not None:
+        field, interaction = _tfim_generator(n=n)
+    if field is not None:
+        for idx, term in enumerate(field):
+            field_hamiltonian = reduce(lambda x, y: x @ y, term) if idx == 0 else field_hamiltonian + reduce(lambda x, y: x @ y, term)
+    if interaction is not None:
+        interaction_hamiltonian = reduce(lambda x, y: x @ y, interaction)
+    return field_hamiltonian, interaction_hamiltonian
 
 def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/emulation/plots/'):
 
