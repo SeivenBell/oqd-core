@@ -51,15 +51,8 @@ classDiagram
 
 ::: quantumion.interface.analog.operations.AnalogCircuit
 
-::: quantumion.interface.analog.operations.AnalogGate
-
-::: quantumion.interface.analog.operator.Operator
-
 
 # Digital mode
-::: quantumion.interface.digital.circuit.DigitalCircuit
-
-::: quantumion.interface.digital.gate.Gate
 
 
 # Atomic mode

@@ -1,10 +1,6 @@
-# Compilation
+# Compilation flow
 
-## Visitor
-
-## Flow
-
-### Examples
+## Examples
 === "FlowNode"
     ```mermaid
     flowchart LR
@@ -59,7 +55,7 @@
         ```
         ///
 
-### Forward Decorators
+## Forward Decorators
 === "Forward Once"
     ```python linenums="1"
     forward_decorators = ForwardDecorators()
@@ -275,7 +271,7 @@
     classDef hidden display: none;
     ```
 
-#### Forward Rules
+### Forward Rules
 A FlowGraph can instantiate a ForwardDecorators object as a class attribute. When a method of ForwardDecorators are used, the logic is recorded to a ForwardRules object as a ForwardRule object.
 === "Forward Once"
     ```python linenums="1"
