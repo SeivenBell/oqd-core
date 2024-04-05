@@ -9,17 +9,14 @@ colors = sns.color_palette(palette="Set2", n_colors=10)
 X, Y, Z, I, A, C, J = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
 
 def _get_probabilities(state: list):
-    probabililities = []
-    for x in state:
-        probabililities.append(np.sqrt(x.real**2 + x.imag**2)**2)
-    return probabililities
+    return [x.real**2 + x.imag**2 for x in state]
 
-def _get_amplitude(state: list, componenet = 'real'):
+def _get_amplitude(state: list, component = 'real'):
     amplitudes = []
     for x in state:
-        if componenet == 'real':
+        if component == 'real':
             amplitudes.append(x.real)
-        elif componenet == 'imag':
+        elif component == 'imag':
             amplitudes.append(x.imag)
         else:
             KeyError
@@ -62,7 +59,7 @@ def tfim_hamiltonian(field = None, interaction = None, n = None):
         interaction_hamiltonian = reduce(lambda x, y: x @ y, interaction)
     return field_hamiltonian, interaction_hamiltonian
 
-def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/emulation/plots/'):
+def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/experiments/plots/'):
 
     fig, axs = plt.subplots(4, 1, figsize=[12, 12])
 
@@ -87,8 +84,8 @@ def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/emu
     ax.set(xlabel="Basis state", ylabel="Number of samples")
 
     ax = axs[3]
-    ax.bar(x=x, height=_get_amplitude(state = results.state, componenet = 'real'), color=colors[5], label = 'Real component')
-    ax.bar(x=x, height=_get_amplitude(state = results.state, componenet = 'imag'), color=colors[7], label = 'Imaginary component')
+    ax.bar(x=x, height=_get_amplitude(state = results.state, component = 'real'), color=colors[5], label = 'Real component')
+    ax.bar(x=x, height=_get_amplitude(state = results.state, component = 'imag'), color=colors[7], label = 'Imaginary component')
     plt.legend()
     ax.set(xlabel="Basis state", ylabel="Amplitude")
 

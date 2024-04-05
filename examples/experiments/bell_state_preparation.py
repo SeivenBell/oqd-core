@@ -1,7 +1,5 @@
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
@@ -28,13 +26,13 @@ if __name__ == "__main__":
     w1 = 2 * np.pi * 1
     w2 = 2 * np.pi * 0.1
 
-    Hii = AnalogGate(hamiltonian=1 * (I @ I), dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian=1 * (X @ I), dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian=1 * (Y @ I), dissipation=Dissipation())
-    Hxx = AnalogGate(hamiltonian=1 * (X @ X), dissipation=Dissipation())
-    Hmix = AnalogGate(hamiltonian=(-1) * (I @ X), dissipation=Dissipation())
-    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I)
+    Hxx = AnalogGate(hamiltonian= X @ X)
+    Hmix = AnalogGate(hamiltonian=(-1) * (I @ X))
+    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I))
+    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I))
 
     ac = AnalogCircuit()
 
@@ -56,8 +54,8 @@ if __name__ == "__main__":
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Z^0": Expectation(operator=(1 * (Z @ I))),
-            "Z^1": Expectation(operator=(1 * (I @ Z))),
+            "Z^0": Expectation(operator=(Z @ I)),
+            "Z^1": Expectation(operator=(I @ Z)),
         },
         dt=1e-2,
     )

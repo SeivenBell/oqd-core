@@ -14,9 +14,7 @@ from rich import print as pprint
 import numpy as np
 
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
 from quantumion.backend import QutipBackend
@@ -31,7 +29,7 @@ Then we define the `AnalogGate` object
 """For simplicity we initialize the X Operator"""
 X = PauliX()
     
-H = AnalogGate(hamiltonian= -(np.pi / 4) * X, dissipation=Dissipation())
+H = AnalogGate(hamiltonian= -(np.pi / 4) * X)
 ```
 
 Then we define the `AnalogCircuit` object and evolve it according to the hamiltonian defined above

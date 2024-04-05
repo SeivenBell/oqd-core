@@ -1,7 +1,5 @@
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
@@ -21,7 +19,7 @@ X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), C
 
 def one_qubit_rabi_flopping_protocol():
 
-    Hx = AnalogGate(hamiltonian= -(np.pi / 4) * X, dissipation=Dissipation())
+    Hx = AnalogGate(hamiltonian= -(np.pi / 4) * X)
 
     ac = AnalogCircuit()
     ac.evolve(duration=1, gate=Hx)
@@ -33,7 +31,7 @@ def one_qubit_rabi_flopping_protocol():
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Z": Expectation(operator= (1*(Z))),
+            "Z": Expectation(operator= Z),
         },
         dt=1e-3,
     )
@@ -42,13 +40,13 @@ def one_qubit_rabi_flopping_protocol():
 
 def bell_state_standard_protocol():
 
-    Hii = AnalogGate(hamiltonian= 1*(I @ I), dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= 1*(X @ I), dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= 1*(Y @ I), dissipation=Dissipation())
-    Hxx = AnalogGate(hamiltonian= 1*(X @ X), dissipation=Dissipation())
-    Hmix = AnalogGate(hamiltonian= (-1)*(I @ X), dissipation=Dissipation())
-    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I)
+    Hxx = AnalogGate(hamiltonian= X @ X)
+    Hmix = AnalogGate(hamiltonian= (-1)*(I @ X))
+    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I))
+    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I))
 
     ac = AnalogCircuit()
 
@@ -70,8 +68,8 @@ def bell_state_standard_protocol():
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Z^0": Expectation(operator= (1*(Z@I))),
-            "Z^1": Expectation(operator= (1*(I@Z))),
+            "Z^0": Expectation(operator= Z@I),
+            "Z^1": Expectation(operator= I@Z),
         },
         dt=1e-2,
     )
@@ -81,20 +79,20 @@ def bell_state_standard_protocol():
 def three_qubit_GHz_protocol():
 
     # Hadamard on first qubit
-    Hii = AnalogGate(hamiltonian= 1*(I @ I @ I), dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= 1*(X @ I @ I), dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= 1*(Y @ I @ I), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I @ I)
 
     # CNOT on Second
-    Hxx2 = AnalogGate(hamiltonian= 1*(X @ X @ I), dissipation=Dissipation())
-    Hmix2 = AnalogGate(hamiltonian= (-1)*(I @ X @ I), dissipation=Dissipation())
+    Hxx2 = AnalogGate(hamiltonian= X @ X @ I)
+    Hmix2 = AnalogGate(hamiltonian= (-1)*(I @ X @ I))
     
-    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I @ I), dissipation=Dissipation())
+    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I @ I))
+    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I @ I))
 
     # CNOT on Third
-    Hxx3 = AnalogGate(hamiltonian= 1*(X @ I @ X), dissipation=Dissipation())
-    Hmix3 = AnalogGate(hamiltonian= (-1)*(I @ I @ X), dissipation=Dissipation())
+    Hxx3 = AnalogGate(hamiltonian= X @ I @ X)
+    Hmix3 = AnalogGate(hamiltonian= (-1)*(I @ I @ X))
     ac = AnalogCircuit()
 
     # Hadamard
@@ -123,9 +121,9 @@ def three_qubit_GHz_protocol():
         n_shots=500,
         fock_cutoff=4,
         metrics={
-            "Z^0": Expectation(operator= (1*(Z@I@I))),
-            "Z^1": Expectation(operator= (1*(I@Z@I))),
-            "Z^2": Expectation(operator= (1*(I@I@Z))),
+            "Z^0": Expectation(operator= Z@I@I),
+            "Z^1": Expectation(operator= I@Z@I),
+            "Z^2": Expectation(operator= I@I@Z),
         },
         dt=1e-2,
     )
@@ -145,8 +143,8 @@ class TestListClose(unittest.TestCase):
         for elem1, elem2 in zip(list1, list2):
             self.assertAlmostEqual(elem1, elem2, delta=tolerance)
 
-@colorize(color=MAGENTA)
-class QutipEmulation(TestListClose, unittest.TestCase):
+@colorize(color=BLUE)
+class QutipBackendSimulation(TestListClose, unittest.TestCase):
     maxDiff = None
 
     def test_one_qubit_rabi_flopping(self):
@@ -215,6 +213,163 @@ class QutipEmulation(TestListClose, unittest.TestCase):
         with self.subTest():
             self.assertAlmostEqual(results.metrics['Z^2'][-1], 0, delta=0.001)
 
+    def test_identity_operation_simple(self):
+        """Simple Identity operation using inverse"""
+        H1 = AnalogGate(hamiltonian= (-1)*X)
+        H1_inv = AnalogGate(hamiltonian= X)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate=H1)
+        ac.evolve(duration=1, gate=H1_inv)
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=100,
+            fock_cutoff=4,
+            metrics={
+                "Z": Expectation(operator= Z),
+            },
+            dt=1e-3,
+        )
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z'][-1], 1, delta=0.001)
+
+    def test_identity_operation_nesed(self):
+        """Nested Identity operation using inverse"""
+        H1 = AnalogGate(hamiltonian= (-1)*X)
+        H1_inv = AnalogGate(hamiltonian= X)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=100,
+            fock_cutoff=4,
+            metrics={
+                "Z": Expectation(operator= Z),
+            },
+            dt=1e-3,
+        )
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z'][-1], 1, delta=0.001)
+
+
+    def test_identity_operation_three_qubit_simple(self):
+        """Simple Identity operation using inverse for 3 qubits"""
+        H1 = AnalogGate(hamiltonian= (-1) * (X @ Y @ Z))
+        H1_inv = AnalogGate(hamiltonian= X @ Y @ Z)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I@I),
+                "Z^1": Expectation(operator= I@Z@I),
+                "Z^2": Expectation(operator= I@I@Z),
+            },
+            dt=1e-2,
+        )
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^0'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^1'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^2'][-1], 1, delta=0.001)
+
+    def test_identity_operation_three_qubit_nested(self):
+        """Nested Identity operation using inverse for 3 qubits"""
+        H1 = AnalogGate(hamiltonian= (-1) * (X @ Y @ Z))
+        H1_inv = AnalogGate(hamiltonian= X@ Y @ Z)
+
+        H2 = AnalogGate(hamiltonian= (-1) * (X @ X @ X))
+        H2_inv = AnalogGate(hamiltonian= X @ X @ X)
+
+        H3 = AnalogGate(hamiltonian= (-1) * (I @ X @ I))
+        H3_inv = AnalogGate(hamiltonian= I @ X @ I)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate=H1)
+        ac.evolve(duration=1, gate=H1_inv)
+        ac.evolve(duration=1, gate=H2)
+        ac.evolve(duration=1, gate=H2_inv)
+        ac.evolve(duration=1, gate=H3)
+        ac.evolve(duration=1, gate=H3_inv)
+
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I@I),
+                "Z^1": Expectation(operator= I@Z@I),
+                "Z^2": Expectation(operator= I@I@Z),
+            },
+            dt=1e-2,
+        )
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^0'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^1'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^2'][-1], 1, delta=0.001)
 
 @colorize(color=BLUE)
 class QutipCanonicalization(TestListClose, unittest.TestCase):
@@ -225,7 +380,7 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
 
         _, args = one_qubit_rabi_flopping_protocol()
 
-        Hx = AnalogGate(hamiltonian= -(np.pi / 8) * (2*X), dissipation=Dissipation())
+        Hx = AnalogGate(hamiltonian= -(np.pi / 8) * (2*X))
 
         ac = AnalogCircuit()
         ac.evolve(duration=1, gate=Hx)
@@ -252,13 +407,13 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
 
         _, args = bell_state_standard_protocol()
 
-        Hii = AnalogGate(hamiltonian= 1*(I @ I), dissipation=Dissipation())
-        Hxi = AnalogGate(hamiltonian= (X @ I), dissipation=Dissipation()) # Scalar Multiplication not given
-        Hyi = AnalogGate(hamiltonian= 1*(Y @ I), dissipation=Dissipation())
-        Hxx = AnalogGate(hamiltonian= 1*(X @ (I*X*I)), dissipation=Dissipation()) # multiplication by identity
-        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X), dissipation=Dissipation())
-        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I), dissipation=Dissipation())
-        Hmyi = AnalogGate(hamiltonian= (-0.5)*(Y @ (2*I)), dissipation=Dissipation()) # scalar multiplication
+        Hii = AnalogGate(hamiltonian= 1*(I @ I))
+        Hxi = AnalogGate(hamiltonian= (X @ I)) # Scalar Multiplication not given
+        Hyi = AnalogGate(hamiltonian= 1*(Y @ I))
+        Hxx = AnalogGate(hamiltonian= 1*(X @ (I*X*I))) # multiplication by identity
+        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X))
+        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I))
+        Hmyi = AnalogGate(hamiltonian= (-0.5)*(Y @ (2*I))) # scalar multiplication
 
         ac = AnalogCircuit()
 
@@ -291,5 +446,8 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
             self.assertAlmostEqual(results.metrics['Z^0'][-1], 0, delta=0.001)
         with self.subTest():
             self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
+
+
+
 if __name__ == '__main__':
     unittest.main()

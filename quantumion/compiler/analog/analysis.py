@@ -2,8 +2,6 @@ from quantumion.interface.analog.operations import *
 from quantumion.compiler.analog.canonicalize import *
 from quantumion.interface.analog.operator import *
 from quantumion.compiler.analog.base import AnalogInterfaceTransformer
-from quantumion.compiler.analog.verification_flow import VerificationFlow
-from quantumion.compiler.analog.verify import CanonicalizationVerificationOperator
 from typing import Union
 
 class RegisterInformation(AnalogInterfaceTransformer):
@@ -59,31 +57,3 @@ class RegisterInformation(AnalogInterfaceTransformer):
         space2 = self.visit(model.op2)
         return (space1[0] + space2[0], space1[1] + space2[1])
 
-class AnalogCircuitCanonicalization(AnalogInterfaceTransformer):
-    def __init__(self, flow_graph = VerificationFlow(name="_", max_steps=1000)):
-        super().__init__()
-        self.fg = flow_graph
-
-    def visit_AnalogCircuit(self, model: AnalogCircuit) -> AnalogCircuit:
-        return AnalogCircuit(
-            sequence = self.visit(model.sequence),
-            n_qreg = model.n_qreg,
-            n_qmode = model.n_qmode,
-            definitions = model.definitions,
-            qreg = model.qreg,
-            qmode = model.qmode
-        )
-    def visit_Evolve(self, model: Evolve) -> Evolve:
-        return Evolve(
-            key = model.key,
-            duration = model.duration,
-            gate = self.visit(model.gate)
-        )
-
-    def visit_AnalogGate(self, model: AnalogGate) -> AnalogGate:
-        canonical_model = self.fg(model.hamiltonian).model
-        canonical_model.accept(CanonicalizationVerificationOperator())
-        return AnalogGate(
-            hamiltonian = canonical_model,
-            dissipation = model.dissipation
-        )

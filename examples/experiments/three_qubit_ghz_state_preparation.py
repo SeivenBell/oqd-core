@@ -1,7 +1,5 @@
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
@@ -24,20 +22,20 @@ if __name__ == "__main__":
     )
 
     # Hadamard on first qubit
-    Hii = AnalogGate(hamiltonian=1 * (I @ I @ I), dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian=1 * (X @ I @ I), dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian=1 * (Y @ I @ I), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I @ I)
 
     # CNOT on Second
-    Hxx2 = AnalogGate(hamiltonian=1 * (X @ X @ I), dissipation=Dissipation())
-    Hmix2 = AnalogGate(hamiltonian=(-1) * (I @ X @ I), dissipation=Dissipation())
+    Hxx2 = AnalogGate(hamiltonian= X @ X @ I)
+    Hmix2 = AnalogGate(hamiltonian=(-1) * (I @ X @ I))
 
-    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I @ I), dissipation=Dissipation())
+    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I @ I))
+    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I @ I))
 
     # CNOT on Third
-    Hxx3 = AnalogGate(hamiltonian=1 * (X @ I @ X), dissipation=Dissipation())
-    Hmix3 = AnalogGate(hamiltonian=(-1) * (I @ I @ X), dissipation=Dissipation())
+    Hxx3 = AnalogGate(hamiltonian= X @ I @ X)
+    Hmix3 = AnalogGate(hamiltonian=(-1) * (I @ I @ X))
     ac = AnalogCircuit()
 
     # Hadamard
@@ -66,9 +64,9 @@ if __name__ == "__main__":
         n_shots=500,
         fock_cutoff=4,
         metrics={
-            "Z^0": Expectation(operator=(1 * (Z @ I @ I))),
-            "Z^1": Expectation(operator=(1 * (I @ Z @ I))),
-            "Z^2": Expectation(operator=(1 * (I @ I @ Z))),
+            "Z^0": Expectation(operator= Z @ I @ I),
+            "Z^1": Expectation(operator= I @ Z @ I),
+            "Z^2": Expectation(operator= I @ I @ Z),
         },
         dt=1e-2,
     )

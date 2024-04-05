@@ -30,7 +30,7 @@ class CanonicalFormErrors(unittest.TestCase):
             self.assertCanonicalFormErrorRaised(operator=operator, visitor=visitor)
         print(context.exception)
 
-@colorize(color=MAGENTA)
+@colorize(color=BLUE)
 class TestCanonicalizationVerification(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
 
@@ -506,7 +506,7 @@ class TestCanonicalizationVerificationPauliAlgebra(CanonicalFormErrors, unittest
         op = X*((1j)*Y)
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)        
 
-@colorize(color=GREEN)
+@colorize(color=BLUE)
 class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
     def __init__(self, methodName: str = "runTest") -> None:
@@ -573,7 +573,7 @@ class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors, unittest.
         op = X@(A*C*A)
         self.assertCanonicalFormErrorNotRaised(operator=op, visitor=self._visitor)
 
-@colorize(color=RED)
+@colorize(color=BLUE)
 class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
 
@@ -651,7 +651,7 @@ class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors, unittest.
         op = A*C
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)   
 
-@colorize(color=RED)
+@colorize(color=BLUE)
 class TestCanonicalizationVerificationPruneIdentity(CanonicalFormErrors, unittest.TestCase):
     maxDiff = None
 

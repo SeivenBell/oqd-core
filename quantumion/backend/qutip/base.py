@@ -2,12 +2,12 @@ from quantumion.backend.qutip.visitor import (
     QutipBackendTransformer,
     QutipExperimentEvolve,
     QutipTaskArgsCanonicalization,
+    AnalogCircuitCanonicalization,
 )
 from quantumion.backend.base import BackendBase
 from quantumion.backend.qutip.interface import QutipExperiment
-from quantumion.compiler.analog.interface import (
+from quantumion.compiler.analog.analysis import (
     RegisterInformation,
-    AnalogCircuitCanonicalization,
 )
 from quantumion.backend.task import Task
 

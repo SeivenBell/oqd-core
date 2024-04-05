@@ -1,13 +1,9 @@
-import os
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
-import qutip as qt
 import numpy as np
 from rich import print as pprint
 from quantumion.backend import QutipBackend
@@ -26,7 +22,7 @@ if __name__ == "__main__":
         Identity(),
     )
 
-    Hx = AnalogGate(hamiltonian=-(np.pi / 4) * X, dissipation=Dissipation())
+    Hx = AnalogGate(hamiltonian=-(np.pi / 4) * X)
 
     ac = AnalogCircuit()
     ac.evolve(duration=1, gate=Hx)
@@ -38,7 +34,7 @@ if __name__ == "__main__":
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Z": Expectation(operator=(1 * (Z))),
+            "Z": Expectation(operator=Z),
         },
         dt=1e-3,
     )
