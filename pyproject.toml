@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 name = "quantumion"
 version = "0.0.0"
 requires-python = ">=3.10"
-dependencies = ["pydantic>=2.4", "h5py", "requests", "rich"]
+dependencies = ["pydantic>=2.4", "h5py", "requests", "matplotlib", "rich"]
 
 [project.optional-dependencies]
 docs = [
@@ -17,8 +17,7 @@ docs = [
     "mkdocstrings-python",
 ]
 test = ["unittest", "unittest_prettify"]
-qutip = ["qutip"]
-tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
+qutip = ["qutip~=4.7.3"]
 server = [
     "python-jose[cryptography]",
     "passlib[bcrypt]",
@@ -32,10 +31,7 @@ server = [
     "python-multipart",
 ]
 all = [
-    "qutip",
-    "tensorcircuit",
-    "matplotlib",
-    "qiskit",
+    "qutip~=4.7.3",
     "python-jose[cryptography]",
     "passlib[bcrypt]",
     "uvicorn[standard]>=0.23.2",
