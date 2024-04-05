@@ -30,6 +30,10 @@ __all__ = [
 
 
 class Operator(TypeReflectBaseModel):
+    """
+    Class representing a quantum operator
+    """
+
     def __neg__(self):
         return OperatorScalarMul(op=self, expr=MathNum(value=-1))
 

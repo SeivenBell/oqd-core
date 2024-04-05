@@ -20,10 +20,11 @@ nav:
     - TFIM: demos/TFIM.md
 - API Reference:
   - Interfaces:
+    - Data Structures: reference/interface-base.md
     - Digital: reference/digital-interface.md
     - Analog: reference/analog-interface.md
     - Atomic: reference/atomic-interface.md
-    - Utilities: reference/utils.md
+  - Utilities: reference/utils.md
 
 
 use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
