@@ -16,7 +16,6 @@ import numpy as np
 from quantumion.interface.analog.operator import *
 from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
 from quantumion.backend import QutipBackend

@@ -1,7 +1,6 @@
 from quantumion.interface.analog.operator import *
 from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
@@ -28,13 +27,13 @@ if __name__ == "__main__":
     w1 = 2 * np.pi * 1
     w2 = 2 * np.pi * 0.1
 
-    Hii = AnalogGate(hamiltonian= I @ I, dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= X @ I, dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= Y @ I, dissipation=Dissipation())
-    Hxx = AnalogGate(hamiltonian= X @ X, dissipation=Dissipation())
-    Hmix = AnalogGate(hamiltonian=(-1) * (I @ X), dissipation=Dissipation())
-    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I)
+    Hxx = AnalogGate(hamiltonian= X @ X)
+    Hmix = AnalogGate(hamiltonian=(-1) * (I @ X))
+    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I))
+    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I))
 
     ac = AnalogCircuit()
 

@@ -1,7 +1,6 @@
 from quantumion.interface.analog.operator import *
 from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
-from quantumion.compiler.analog.interface import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
