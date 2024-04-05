@@ -2,10 +2,6 @@
 
 Let's implement the single qubit Rabi Flopping,
 $$
-H = \sum_{\langle ij \rangle} \sigma^x_i \sigma^x_j + h \sum_i \sigma^z_i
-$$
-
-$$
 H = -\frac{\pi}{4}\sigma^x
 $$
 
