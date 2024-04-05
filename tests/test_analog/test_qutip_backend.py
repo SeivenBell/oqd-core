@@ -1,5 +1,4 @@
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
@@ -144,7 +143,7 @@ class TestListClose(unittest.TestCase):
         for elem1, elem2 in zip(list1, list2):
             self.assertAlmostEqual(elem1, elem2, delta=tolerance)
 
-@colorize(color=MAGENTA)
+@colorize(color=BLUE)
 class QutipEmulation(TestListClose, unittest.TestCase):
     maxDiff = None
 
@@ -290,5 +289,164 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
             self.assertAlmostEqual(results.metrics['Z^0'][-1], 0, delta=0.001)
         with self.subTest():
             self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
+
+    def test_identity_operation_simple(self):
+        """Simple Identity operation using inverse"""
+        Hmxi = AnalogGate(hamiltonian= (-1)*X)
+        Hxi = AnalogGate(hamiltonian= X)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate=Hmxi)
+        ac.evolve(duration=1, gate=Hxi)
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=100,
+            fock_cutoff=4,
+            metrics={
+                "Z": Expectation(operator= Z),
+            },
+            dt=1e-3,
+        )
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z'][-1], 1, delta=0.001)
+
+    def test_identity_operation_nesed(self):
+        """Nested Identity operation using inverse"""
+        Hmxi = AnalogGate(hamiltonian= (-1)*X)
+        Hxi = AnalogGate(hamiltonian= X)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate=Hmxi)
+        ac.evolve(duration=1, gate=Hxi)
+        ac.evolve(duration=1, gate=Hmxi)
+        ac.evolve(duration=1, gate=Hxi)
+        ac.evolve(duration=1, gate=Hmxi)
+        ac.evolve(duration=1, gate=Hxi)
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=100,
+            fock_cutoff=4,
+            metrics={
+                "Z": Expectation(operator= Z),
+            },
+            dt=1e-3,
+        )
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z'][-1], 1, delta=0.001)
+
+
+    def test_identity_operation_three_qubit_simple(self):
+        """Simple Identity operation using inverse for 3 qubits"""
+        Hmxi = AnalogGate(hamiltonian= (-1) * (X @ Y @ Z))
+        Hxi = AnalogGate(hamiltonian= X@ Y @ Z)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate=Hmxi)
+        ac.evolve(duration=1, gate=Hxi)
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I@I),
+                "Z^1": Expectation(operator= I@Z@I),
+                "Z^2": Expectation(operator= I@I@Z),
+            },
+            dt=1e-2,
+        )
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^0'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^1'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^2'][-1], 1, delta=0.001)
+
+    def test_identity_operation_three_qubit_nested(self):
+        """Nested Identity operation using inverse for 3 qubits"""
+        H1 = AnalogGate(hamiltonian= (-1) * (X @ Y @ Z))
+        H1_inv = AnalogGate(hamiltonian= X@ Y @ Z)
+
+        H2 = AnalogGate(hamiltonian= (-1) * (X @ X @ X))
+        H2_inv = AnalogGate(hamiltonian= X @ X @ X)
+
+        H3 = AnalogGate(hamiltonian= (-1) * (I @ X @ I))
+        H3_inv = AnalogGate(hamiltonian= I @ X @ I)
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate=H1)
+        ac.evolve(duration=1, gate=H1_inv)
+        ac.evolve(duration=1, gate=H2)
+        ac.evolve(duration=1, gate=H2_inv)
+        ac.evolve(duration=1, gate=H3)
+        ac.evolve(duration=1, gate=H3_inv)
+
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I@I),
+                "Z^1": Expectation(operator= I@Z@I),
+                "Z^2": Expectation(operator= I@I@Z),
+            },
+            dt=1e-2,
+        )
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [1, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0, 0, 0, 0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^0'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^1'][-1], 1, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^2'][-1], 1, delta=0.001)
+
 if __name__ == '__main__':
     unittest.main()

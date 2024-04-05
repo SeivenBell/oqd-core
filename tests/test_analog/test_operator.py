@@ -15,7 +15,7 @@ from unittest_prettify.colorize import (
 def test_function(operator: Operator, visitor = PrintOperator()) -> Operator:
     return operator.accept(visitor=visitor)
 #######################################################
-@colorize(color=GREEN)
+@colorize(color=BLUE)
 class TestRealFinalStringPrintOp(unittest.TestCase):
     """Testing the final string produced with the actual for real number expressions"""
     maxDiff = None
@@ -126,7 +126,7 @@ class TestRealFinalStringPrintOp(unittest.TestCase):
     def test_pauli_multiple_minus_nested(self):
         raise NotImplementedError
 
-@colorize(color=MAGENTA)
+@colorize(color=BLUE)
 class TestComplexFinalStringPrintOp(unittest.TestCase):
     """Testing the final string produced with the actual for complex number expressions"""
     def test_pauli_left_img(self):
@@ -258,7 +258,7 @@ class TestRealFinalStringVerbosePrintOp(unittest.TestCase):
     def test_pauli_multiple_minus_nested_V(self):
         raise NotImplementedError
 
-@colorize(color=MAGENTA)
+@colorize(color=BLUE)
 class TestComplexFinalStringVerbosePrintOp(unittest.TestCase):
     """Testing the final string produced with the actual for complex number expressions"""
     def test_pauli_left_img_V(self):
