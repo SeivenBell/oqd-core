@@ -144,7 +144,7 @@ class TestListClose(unittest.TestCase):
             self.assertAlmostEqual(elem1, elem2, delta=tolerance)
 
 @colorize(color=BLUE)
-class QutipEmulation(TestListClose, unittest.TestCase):
+class QutipBackendSimulation(TestListClose, unittest.TestCase):
     maxDiff = None
 
     def test_one_qubit_rabi_flopping(self):
@@ -212,83 +212,6 @@ class QutipEmulation(TestListClose, unittest.TestCase):
             self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
         with self.subTest():
             self.assertAlmostEqual(results.metrics['Z^2'][-1], 0, delta=0.001)
-
-
-@colorize(color=BLUE)
-class QutipCanonicalization(TestListClose, unittest.TestCase):
-    maxDiff = None
-
-    def test_one_qubit_rabi_flopping(self):
-        """One qubit rabi flopping canonicalization"""
-
-        _, args = one_qubit_rabi_flopping_protocol()
-
-        Hx = AnalogGate(hamiltonian= -(np.pi / 8) * (2*X))
-
-        ac = AnalogCircuit()
-        ac.evolve(duration=1, gate=Hx)
-        ac.evolve(duration=1, gate=Hx)
-        ac.evolve(duration=1, gate=Hx)
-
-        task = Task(program = ac, args = args)
-
-        backend = QutipBackend()
-
-        results = backend.run(task = task)
-
-        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
-
-        with self.subTest():
-            self.assertListsClose(real_amplitudes, [-0.707, 0])
-        with self.subTest():
-            self.assertListsClose(imag_amplitudes, [0, 0.707])
-        with self.subTest():
-            self.assertAlmostEqual(results.metrics['Z'][-1], 0, delta=0.001)
-
-    def test_bell_state_standard(self):
-        """Standard Bell State preparation canonicalization"""
-
-        _, args = bell_state_standard_protocol()
-
-        Hii = AnalogGate(hamiltonian= 1*(I @ I))
-        Hxi = AnalogGate(hamiltonian= (X @ I)) # Scalar Multiplication not given
-        Hyi = AnalogGate(hamiltonian= 1*(Y @ I))
-        Hxx = AnalogGate(hamiltonian= 1*(X @ (I*X*I))) # multiplication by identity
-        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X))
-        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I))
-        Hmyi = AnalogGate(hamiltonian= (-0.5)*(Y @ (2*I))) # scalar multiplication
-
-        ac = AnalogCircuit()
-
-        # Hadamard
-        ac.evolve(duration = (3 * np.pi) / 2, gate = Hii)
-        ac.evolve(duration = np.pi / 2, gate = Hxi)
-        ac.evolve(duration = np.pi / 4, gate = Hmyi)
-
-        # CNOT
-        ac.evolve(duration = np.pi / 4, gate = Hyi)
-        ac.evolve(duration = np.pi / 4, gate = Hxx)
-        ac.evolve(duration = np.pi / 4, gate = Hmix)
-        ac.evolve(duration = np.pi / 4, gate = Hmxi)
-        ac.evolve(duration = np.pi / 4, gate = Hmyi)
-        ac.evolve(duration = np.pi / 4, gate = Hii)
-
-        task = Task(program = ac, args = args)
-
-        backend = QutipBackend()
-
-        results = backend.run(task = task)
-
-        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
-
-        with self.subTest():
-            self.assertListsClose(real_amplitudes, [0.707, 0, 0, 0.707])
-        with self.subTest():
-            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0])
-        with self.subTest():
-            self.assertAlmostEqual(results.metrics['Z^0'][-1], 0, delta=0.001)
-        with self.subTest():
-            self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
 
     def test_identity_operation_simple(self):
         """Simple Identity operation using inverse"""
@@ -447,6 +370,84 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
             self.assertAlmostEqual(results.metrics['Z^1'][-1], 1, delta=0.001)
         with self.subTest():
             self.assertAlmostEqual(results.metrics['Z^2'][-1], 1, delta=0.001)
+
+@colorize(color=BLUE)
+class QutipCanonicalization(TestListClose, unittest.TestCase):
+    maxDiff = None
+
+    def test_one_qubit_rabi_flopping(self):
+        """One qubit rabi flopping canonicalization"""
+
+        _, args = one_qubit_rabi_flopping_protocol()
+
+        Hx = AnalogGate(hamiltonian= -(np.pi / 8) * (2*X))
+
+        ac = AnalogCircuit()
+        ac.evolve(duration=1, gate=Hx)
+        ac.evolve(duration=1, gate=Hx)
+        ac.evolve(duration=1, gate=Hx)
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [-0.707, 0])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0.707])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z'][-1], 0, delta=0.001)
+
+    def test_bell_state_standard(self):
+        """Standard Bell State preparation canonicalization"""
+
+        _, args = bell_state_standard_protocol()
+
+        Hii = AnalogGate(hamiltonian= 1*(I @ I))
+        Hxi = AnalogGate(hamiltonian= (X @ I)) # Scalar Multiplication not given
+        Hyi = AnalogGate(hamiltonian= 1*(Y @ I))
+        Hxx = AnalogGate(hamiltonian= 1*(X @ (I*X*I))) # multiplication by identity
+        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X))
+        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I))
+        Hmyi = AnalogGate(hamiltonian= (-0.5)*(Y @ (2*I))) # scalar multiplication
+
+        ac = AnalogCircuit()
+
+        # Hadamard
+        ac.evolve(duration = (3 * np.pi) / 2, gate = Hii)
+        ac.evolve(duration = np.pi / 2, gate = Hxi)
+        ac.evolve(duration = np.pi / 4, gate = Hmyi)
+
+        # CNOT
+        ac.evolve(duration = np.pi / 4, gate = Hyi)
+        ac.evolve(duration = np.pi / 4, gate = Hxx)
+        ac.evolve(duration = np.pi / 4, gate = Hmix)
+        ac.evolve(duration = np.pi / 4, gate = Hmxi)
+        ac.evolve(duration = np.pi / 4, gate = Hmyi)
+        ac.evolve(duration = np.pi / 4, gate = Hii)
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        real_amplitudes, imag_amplitudes = get_amplitude_arrays(results.state)
+
+        with self.subTest():
+            self.assertListsClose(real_amplitudes, [0.707, 0, 0, 0.707])
+        with self.subTest():
+            self.assertListsClose(imag_amplitudes, [0, 0, 0, 0])
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^0'][-1], 0, delta=0.001)
+        with self.subTest():
+            self.assertAlmostEqual(results.metrics['Z^1'][-1], 0, delta=0.001)
+
+
 
 if __name__ == '__main__':
     unittest.main()
