@@ -292,12 +292,12 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
 
     def test_identity_operation_simple(self):
         """Simple Identity operation using inverse"""
-        Hmxi = AnalogGate(hamiltonian= (-1)*X)
-        Hxi = AnalogGate(hamiltonian= X)
+        H1 = AnalogGate(hamiltonian= (-1)*X)
+        H1_inv = AnalogGate(hamiltonian= X)
 
         ac = AnalogCircuit()
-        ac.evolve(duration=1, gate=Hmxi)
-        ac.evolve(duration=1, gate=Hxi)
+        ac.evolve(duration=1, gate=H1)
+        ac.evolve(duration=1, gate=H1_inv)
         #define task args
         args = TaskArgsAnalog(
             n_shots=100,
@@ -324,16 +324,16 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
 
     def test_identity_operation_nesed(self):
         """Nested Identity operation using inverse"""
-        Hmxi = AnalogGate(hamiltonian= (-1)*X)
-        Hxi = AnalogGate(hamiltonian= X)
+        H1 = AnalogGate(hamiltonian= (-1)*X)
+        H1_inv = AnalogGate(hamiltonian= X)
 
         ac = AnalogCircuit()
-        ac.evolve(duration=1, gate=Hmxi)
-        ac.evolve(duration=1, gate=Hxi)
-        ac.evolve(duration=1, gate=Hmxi)
-        ac.evolve(duration=1, gate=Hxi)
-        ac.evolve(duration=1, gate=Hmxi)
-        ac.evolve(duration=1, gate=Hxi)
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
         #define task args
         args = TaskArgsAnalog(
             n_shots=100,
@@ -361,12 +361,12 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
 
     def test_identity_operation_three_qubit_simple(self):
         """Simple Identity operation using inverse for 3 qubits"""
-        Hmxi = AnalogGate(hamiltonian= (-1) * (X @ Y @ Z))
-        Hxi = AnalogGate(hamiltonian= X@ Y @ Z)
+        H1 = AnalogGate(hamiltonian= (-1) * (X @ Y @ Z))
+        H1_inv = AnalogGate(hamiltonian= X @ Y @ Z)
 
         ac = AnalogCircuit()
-        ac.evolve(duration=1, gate=Hmxi)
-        ac.evolve(duration=1, gate=Hxi)
+        ac.evolve(duration=1, gate = H1)
+        ac.evolve(duration=1, gate = H1_inv)
         #define task args
         args = TaskArgsAnalog(
             n_shots=500,
