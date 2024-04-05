@@ -9,10 +9,7 @@ colors = sns.color_palette(palette="Set2", n_colors=10)
 X, Y, Z, I, A, C, J = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
 
 def _get_probabilities(state: list):
-    probabililities = []
-    for x in state:
-        probabililities.append(np.sqrt(x.real**2 + x.imag**2)**2)
-    return probabililities
+    return [x.real**2 + x.imag**2 for x in state]
 
 def _get_amplitude(state: list, component = 'real'):
     amplitudes = []
