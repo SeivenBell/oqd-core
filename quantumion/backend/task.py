@@ -124,6 +124,14 @@ class TaskResultAtomic(BaseModel):
 
 
 class Task(BaseModel):
+    """
+    Class representing a task to run a quantum experiment with some arguments
+
+    Attributes:
+        program (Union[AnalogCircuit, DigitalCircuit, AtomicProgram]): Quantum experiment to run
+        args (Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]): Arguments for the quantum experiment
+    """
+
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
 

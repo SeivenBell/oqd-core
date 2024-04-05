@@ -37,6 +37,7 @@ nav:
       - Operators: reference/operator-interface.md
     - Atomic: reference/atomic-interface.md
   - Backends:
+    - Task: reference/task-backend.md
     - Qutip: reference/qutip-backend.md
   - Utilities: reference/utils.md
 

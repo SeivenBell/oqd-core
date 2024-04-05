@@ -57,11 +57,11 @@ args = TaskArgsAnalog(
 )
 ```
 
-We can then wrap the [`AnalogCircuit`][quantumion.interface.analog.operations.AnalogCircuit] and the args to a `Task` object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
+We can then wrap the [`AnalogCircuit`][quantumion.interface.analog.operations.AnalogCircuit] and the args to a [`Task`][quantumion.backend.task.Task] object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
 
 ## Running the simulation
 === "Compile & Simulate"
-    The `Task` can be compiled first to a [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object and then this [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
+    The [`Task`][quantumion.backend.task.Task] can be compiled first to a [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object and then this [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
 
     ``` py
     backend = QutipBackend()
@@ -70,7 +70,7 @@ We can then wrap the [`AnalogCircuit`][quantumion.interface.analog.operations.An
     ```
 
 === "Directly Simulate"
-    The `Task` object can be directly simulated by the `run()` method. 
+    The [`Task`][quantumion.backend.task.Task] object can be directly simulated by the `run()` method. 
 
     ``` py
     backend = QutipBackend()
