@@ -50,7 +50,4 @@ classDiagram
   }
 ```
 
-::: quantumion.interface.analog.operations
-    options:
-      show_root_heading: true
-    show_source: false
+::: quantumion.interface.analog
