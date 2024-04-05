@@ -1,4 +1,4 @@
-from typing import List, Tuple, Literal, Union
+from typing import List, Tuple, Literal, Union, Optional
 from pydantic import ValidationError
 from pydantic.types import NonNegativeInt
 
@@ -27,7 +27,7 @@ class AnalogGate(AnalogOperation):
     """
     Class representing an analog gate composed of Hamiltonian terms and dissipation terms
 
-    Args:
+    Attributes:
         hamiltonian (Operator): Hamiltonian terms of the gate
         dissipation (Dissipation): Dissipative terms of the gate
     """
@@ -40,7 +40,7 @@ class Evolve(AnalogOperation):
     """
     Class representing an evolution by an analog gate in the analog circuit
 
-    Args:
+    Attributes:
         duration (float): Duration of the evolution
         gate (AnalogGate): Analog gate to evolve by
     """
@@ -54,9 +54,9 @@ class Measure(AnalogOperation):
     """
     Class representing a measurement in the analog circuit
 
-    Args:
-        qreg (list[NonNegativeInt], optional): Indices of the qubit quantum register to measure. Default: None
-        qmode (list[NonNegativeInt], optional): Indices of the modal quantum register to measure. Default: None
+    Attributes:
+        qreg (Optional[List[NonNegativeInt]]): Indices of the qubit quantum register to measure. Default: `None`
+        qmode (Optional[List[NonNegativeInt]]): Indices of the modal quantum register to measure. Default: `None`
     """
 
     key: Literal["measure"] = "measure"
@@ -82,11 +82,11 @@ class AnalogCircuit(AnalogOperation):
     """
     Class representing a quantum information experiment represented in terms of analog operations.
 
-    Args:
-        qreg (list[NonNegativeInt]): Indices of the qubit registers
-        qmode (list[NonNegativeInt]): Indices of the bosonic mode registers
-        definitions (list[tuple[str, AnalogGate]]): Definitions of gates to unique string identifiers
-        sequence (list[Statement]): Sequence of statements, including initialize, evolve, measure
+    Attributes:
+        qreg (List[NonNegativeInt]): Indices of the qubit registers
+        qmode (List[NonNegativeInt]): Indices of the bosonic mode registers
+        definitions (List[Tuple[str, AnalogGate]]): Definitions of gates to unique string identifiers
+        sequence (List[Union[Measure, Evolve, Initialize]]): Sequence of statements, including initialize, evolve, measure
 
     """
 
