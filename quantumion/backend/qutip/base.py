@@ -26,7 +26,7 @@ class QutipBackend(BackendBase):
             QutipBackendTransformer(args=args)
         )
 
-    def run(self, task: Task = None, experiment: QutipExperiment = None):
+    def run(self, *, task: Task = None, experiment: QutipExperiment = None):
         if task is not None and experiment is not None:
             raise TypeError("Both task and experiment are given as inputs to run")
         if experiment is None:
