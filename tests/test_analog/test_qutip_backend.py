@@ -33,7 +33,7 @@ def one_qubit_rabi_flopping_protocol():
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Z": Expectation(operator= (1*(Z))),
+            "Z": Expectation(operator= Z),
         },
         dt=1e-3,
     )
@@ -42,10 +42,10 @@ def one_qubit_rabi_flopping_protocol():
 
 def bell_state_standard_protocol():
 
-    Hii = AnalogGate(hamiltonian= 1*(I @ I), dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= 1*(X @ I), dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= 1*(Y @ I), dissipation=Dissipation())
-    Hxx = AnalogGate(hamiltonian= 1*(X @ X), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I, dissipation=Dissipation())
+    Hxi = AnalogGate(hamiltonian= X @ I, dissipation=Dissipation())
+    Hyi = AnalogGate(hamiltonian= Y @ I, dissipation=Dissipation())
+    Hxx = AnalogGate(hamiltonian= X @ X, dissipation=Dissipation())
     Hmix = AnalogGate(hamiltonian= (-1)*(I @ X), dissipation=Dissipation())
     Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I), dissipation=Dissipation())
     Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I), dissipation=Dissipation())
@@ -70,8 +70,8 @@ def bell_state_standard_protocol():
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Z^0": Expectation(operator= (1*(Z@I))),
-            "Z^1": Expectation(operator= (1*(I@Z))),
+            "Z^0": Expectation(operator= Z@I),
+            "Z^1": Expectation(operator= I@Z),
         },
         dt=1e-2,
     )
@@ -81,19 +81,19 @@ def bell_state_standard_protocol():
 def three_qubit_GHz_protocol():
 
     # Hadamard on first qubit
-    Hii = AnalogGate(hamiltonian= 1*(I @ I @ I), dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= 1*(X @ I @ I), dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= 1*(Y @ I @ I), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I @ I, dissipation=Dissipation())
+    Hxi = AnalogGate(hamiltonian= X @ I @ I, dissipation=Dissipation())
+    Hyi = AnalogGate(hamiltonian= Y @ I @ I, dissipation=Dissipation())
 
     # CNOT on Second
-    Hxx2 = AnalogGate(hamiltonian= 1*(X @ X @ I), dissipation=Dissipation())
+    Hxx2 = AnalogGate(hamiltonian= X @ X @ I, dissipation=Dissipation())
     Hmix2 = AnalogGate(hamiltonian= (-1)*(I @ X @ I), dissipation=Dissipation())
     
     Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I @ I), dissipation=Dissipation())
     Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I @ I), dissipation=Dissipation())
 
     # CNOT on Third
-    Hxx3 = AnalogGate(hamiltonian= 1*(X @ I @ X), dissipation=Dissipation())
+    Hxx3 = AnalogGate(hamiltonian= X @ I @ X, dissipation=Dissipation())
     Hmix3 = AnalogGate(hamiltonian= (-1)*(I @ I @ X), dissipation=Dissipation())
     ac = AnalogCircuit()
 
@@ -123,9 +123,9 @@ def three_qubit_GHz_protocol():
         n_shots=500,
         fock_cutoff=4,
         metrics={
-            "Z^0": Expectation(operator= (1*(Z@I@I))),
-            "Z^1": Expectation(operator= (1*(I@Z@I))),
-            "Z^2": Expectation(operator= (1*(I@I@Z))),
+            "Z^0": Expectation(operator= Z@I@I),
+            "Z^1": Expectation(operator= I@Z@I),
+            "Z^2": Expectation(operator= I@I@Z),
         },
         dt=1e-2,
     )

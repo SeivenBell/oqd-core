@@ -38,7 +38,7 @@ if __name__ == "__main__":
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Z": Expectation(operator=(1 * (Z))),
+            "Z": Expectation(operator=Z),
         },
         dt=1e-3,
     )
