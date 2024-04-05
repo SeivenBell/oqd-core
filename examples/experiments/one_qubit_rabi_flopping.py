@@ -1,12 +1,9 @@
-import os
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
 from quantumion.backend.qutip.visitor import *
 from quantumion.interface.math import MathStr
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
-import qutip as qt
 import numpy as np
 from rich import print as pprint
 from quantumion.backend import QutipBackend

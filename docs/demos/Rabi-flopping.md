@@ -14,7 +14,6 @@ from rich import print as pprint
 import numpy as np
 
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
