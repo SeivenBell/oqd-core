@@ -50,4 +50,4 @@ classDiagram
   }
 ```
 
-::: quantumion.interface.analog.operations.AnalogCircuit
+::: quantumion.interface.analog.operations
