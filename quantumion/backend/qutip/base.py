@@ -1,3 +1,7 @@
+from typing import Optional
+
+########################################################################################
+
 from quantumion.backend.qutip.visitor import (
     QutipBackendTransformer,
     QutipExperimentEvolve,
@@ -18,8 +22,17 @@ __all__ = [
 
 
 class QutipBackend(BackendBase):
+    """
+    Class representing the Qutip backend
+    """
 
     def compile(self, task: Task):
+        """
+        Method for compiling a task to a [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment]
+
+        Args:
+            task (Task): Quantum experiment to compile
+        """
         circuit = task.program.accept(AnalogCircuitCanonicalization())
         args = task.args.accept(QutipTaskArgsCanonicalization())
         return circuit.accept(RegisterInformation()).accept(
@@ -27,6 +40,13 @@ class QutipBackend(BackendBase):
         )
 
     def run(self, *, task: Task = None, experiment: QutipExperiment = None):
+        """
+        Method to run a
+
+        Args:
+            task (Optional[Task]): Quantum experiment to run as a [`Task`][quantumion.backend.task.Task] object
+            experiment (Optional[QutipExperiment]): Quantum experiment to run as a [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object
+        """
         if task is not None and experiment is not None:
             raise TypeError("Both task and experiment are given as inputs to run")
         if experiment is None:
