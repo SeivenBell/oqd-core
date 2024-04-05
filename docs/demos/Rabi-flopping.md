@@ -11,8 +11,8 @@ $$
 
 ## Implementation
 We will go through this step by step. First we get the necessary imports:
-``` py
 /// details | Imports
+``` py
 from rich import print as pprint
 
 import numpy as np
