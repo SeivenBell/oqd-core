@@ -52,18 +52,6 @@ The you can run the bash script below to run all unit tests:
 bash tests/test.sh   
 ```
 
-### Documentation <a name="Documentation"></a>
-For documentation first install with pip:
-
-```bash
-pip install -e ".[docs]"
-```
-
-The you can load the docs using:
-```bash
-mkdocs serve   
-```
-
 ### Server <a name="server"></a>
 The webserver is a [Uvicorn](https://www.uvicorn.org/) ASGI webserver with a [REST API](https://restfulapi.net/) defined with [Pydantic](https://docs.pydantic.dev/latest/) and [FastAPI](https://fastapi.tiangolo.com/). \
 The webserver handles queuing jobs with a [Redis](https://redis.io/) cache and [Redis Queue (RQ)](https://python-rq.org/) worker.
