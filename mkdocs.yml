@@ -5,6 +5,14 @@ site_description: Open Quantum Design - the world's first open-source quantum co
 repo_name: OpenQuantumDesign/quantumion
 repo_url: https://github.com/OpenQuantumDesign/quantumion
 
+copyright: Copyright &copy; 2024 Open Quantum Design
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/OpenQuantumDesign
+      name: Open Quantum Design GitHub
+
 nav:  
 - Get Started:
   - Welcome to Open Quantum Design: index.md
@@ -42,14 +50,14 @@ theme:
     primary: teal
     accent: pink
     toggle:
-      icon: material/lightbulb
+      icon: material/weather-sunny
       name: Switch to dark mode
   - media: '(prefers-color-scheme: dark)'
     scheme: slate
     primary: teal
     accent: pink
     toggle:
-      icon: material/lightbulb-outline
+      icon: material/weather-night  
       name: Switch to light mode
 
   features:
