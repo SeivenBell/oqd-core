@@ -2,6 +2,8 @@
 site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
 #site_url: http://0.0.0.0:8000
+repo_name: OpenQuantumDesign/quantumion
+repo_url: https://github.com/OpenQuantumDesign/quantumion
 
 nav:  
 - Get Started:
@@ -26,6 +28,7 @@ nav:
 
 use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
 
+
 theme:
   name: material
 
@@ -49,7 +52,6 @@ theme:
       name: Switch to light mode
 
   features:
-  - search
   - search.suggest
   - search.highlight
   - content.tabs.link
@@ -65,6 +67,7 @@ theme:
   - toc.follow
 
 plugins:
+  - search:
   - mkdocstrings:
       handlers:
         python:
