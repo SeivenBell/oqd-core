@@ -37,7 +37,6 @@ if __name__ == "__main__":
         field=field, interaction=interaction
     )
     hamiltonian = field_hamiltonian + interaction_hamiltonian
-    pprint(hamiltonian.accept(PrintOperator()))
 
     H = AnalogGate(hamiltonian=hamiltonian, dissipation=Dissipation())
 
@@ -49,7 +48,7 @@ if __name__ == "__main__":
         n_shots=100,
         fock_cutoff=4,
         metrics={
-            "Entanglement Entropy": EntanglementEntropyVN(qreg=[0]),
+            "Entanglement Entropy": EntanglementEntropyVN(qreg=[i for i in range(n//2)]),
         },
         dt=1e-2,
     )

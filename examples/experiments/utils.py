@@ -62,7 +62,7 @@ def tfim_hamiltonian(field = None, interaction = None, n = None):
         interaction_hamiltonian = reduce(lambda x, y: x @ y, interaction)
     return field_hamiltonian, interaction_hamiltonian
 
-def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/emulation/plots/'):
+def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/experiments/plots/'):
 
     fig, axs = plt.subplots(4, 1, figsize=[12, 12])
 
