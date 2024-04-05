@@ -3,14 +3,13 @@ site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
 #site_url: http://0.0.0.0:8000
 
-nav:
+nav:  
 - Get Started:
-  - Welcome to Open Quantum Design: get-started/index.md
+  - Welcome to Open Quantum Design: index.md
   - Installation: get-started/installation.md
   - Tutorials: get-started/tutorials.md
   - How-to guides: get-started/how-to-guides.md
 - Explanation:
-  - Explanation: explanation/explanation.md
   - Visitor: explanation/visitor.md
   - Compilation flow: explanation/compilation-flow.md
 - Demos:
@@ -19,6 +18,7 @@ nav:
     - TFIM: demos/TFIM.md
 - API Reference:
   - Interfaces:
+    - Digital: reference/digital-interface.md
     - Analog: reference/analog-interface.md
     - Atomic: reference/atomic-interface.md
 
@@ -48,6 +48,7 @@ theme:
       name: Switch to light mode
 
   features:
+  - search
   - search.suggest
   - search.highlight
   - content.tabs.link
@@ -55,9 +56,12 @@ theme:
   - content.code.annotate
   - content.code.copy
   - content.code.select
-  # - navigation.indexes
-  - navigation.path
   - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.sections
+  - navigation.top
+  - navigation.prune
+  - toc.follow
 
 plugins:
   - mkdocstrings:
@@ -75,11 +79,7 @@ plugins:
             signature_crossrefs: true
           import:
             - https://docs.python.org/3/objects.inv
-  # - mkdocstrings:
-  #     handlers:
-  #       python:
-  #         options:
-  #           docstring_style: google
+            - https://docs.pydantic.dev/latest/objects.inv
 
 
 markdown_extensions:

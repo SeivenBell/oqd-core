@@ -37,7 +37,7 @@ U = e^{i t H}
 $$
 
 ### Creating an analog quantum circuit
-In `quantumion`, time evolution is specified as an **analog gate** ([`AnalogGate`](reference.md)).
+In `quantumion`, time evolution is specified as an **analog gate** (`AnalogGate`).
 For example, to implement the one-qubit Rabi flopping from above,
 ```py
 import numpy as np
@@ -66,7 +66,7 @@ interaction = PauliX() @ PauliX()
 ``` 
 Here, an interaction operator, $\sigma_x \otimes \sigma_x$, 
 is defined as the tensor product using the `@` method in Python.
-Operator objects [`Operator`](reference.md) can (largely) be manipulated like normal Python objects.
+Operator objects `Operator` can (largely) be manipulated like normal Python objects.
 
 !!! Optional
 
@@ -79,7 +79,7 @@ Operator objects [`Operator`](reference.md) can (largely) be manipulated like no
         A --> C["PauliX()"]
     ```
 
-We will go through concrete examples of how to get started with this in [Analog Demos](demos.md)
+We will go through concrete examples of how to get started with this in Analog Demos
 
 ## Digital mode
 Digital quantum circuits, or the gate-based model.

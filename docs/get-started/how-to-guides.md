@@ -88,7 +88,7 @@ plt.plot(result.times, result.metrics['entanglement_entropy'])
 
 ````
 
-![Entropy of entanglement](img/plots/entropy_entanglement.png) 
+![Entropy of entanglement](../img/plots/entropy_entanglement.png) 
 
 ## Digital
 
