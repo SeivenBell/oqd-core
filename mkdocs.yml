@@ -18,7 +18,9 @@ nav:
     - Rabi flopping: demos/Rabi-flopping.md
     - TFIM: demos/TFIM.md
 - API Reference:
-  - Reference: reference/reference.md
+  - Interfaces:
+    - Analog: reference/analog-interface.md
+    - Atomic: reference/atomic-interface.md
 
 
 use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment

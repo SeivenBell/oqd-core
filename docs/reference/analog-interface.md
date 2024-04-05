@@ -1,11 +1,12 @@
+
+# Analog interface
+
 !!! note
 
     This part of the project documentation focuses on
     an **information-oriented** approach. Use it as a
     reference for the technical implementation of the
     project code.
-
-## Analog mode
 
 ``` mermaid
 classDiagram
@@ -50,9 +51,3 @@ classDiagram
 ```
 
 ::: quantumion.interface.analog.operations.AnalogCircuit
-
-
-# Digital mode
-
-
-# Atomic mode
