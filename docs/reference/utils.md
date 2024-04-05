@@ -1,3 +1,3 @@
 # Utilities
 
-::: quantumion.utils.color
+::: quantumion.utils

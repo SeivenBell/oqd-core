@@ -102,7 +102,10 @@ plugins:
           import:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
-            - https://qutip.readthedocs.io/en/qutip-4.7.x/objects.inv 
+            - https://qutip.readthedocs.io/en/qutip-4.7.x/objects.inv
+            - https://pandas.pydata.org/docs/objects.inv
+            - https://matplotlib.org/stable/objects.inv
+            - https://numpy.org/doc/stable/objects.inv
 
 
 markdown_extensions:
