@@ -84,7 +84,10 @@ Finally we can plot the metrics and relevant statistics from the final quantum s
 
 
 ``` py
-plot_metrics_counts(results = results, experiment_name = 'tfim_2_site.png')
+plot_metrics_counts(
+    results = results,
+    experiment_name = "tfim_2_site.png",
+)
 ```
 
 The generated image is like:

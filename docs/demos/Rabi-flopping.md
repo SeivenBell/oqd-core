@@ -78,7 +78,10 @@ Finally we can plot the metrics and relevant statistics from the final quantum s
 
 
 ``` py
-plot_metrics_counts(results = results, experiment_name = 'one-qubit-rabi-flopping.png')
+plot_metrics_counts(
+    results = results,
+    experiment_name = "one-qubit-rabi-flopping.png",
+)
 ```
 
 The generated image is like:
