@@ -1,118 +1,162 @@
-from operator import mul
-from functools import reduce
-from typing import List, Literal, Union
-
-########################################################################################
-
-from quantumion.interface.base import VisitableBaseModel
-from quantumion.interface.math import ComplexFloat
-from quantumion.utils.math import levi_civita
+from quantumion.interface.base import TypeReflectBaseModel
+from quantumion.interface.math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
 
 ########################################################################################
 
 __all__ = [
     "Operator",
+    "OperatorTerminal",
+    "Pauli",
     "PauliI",
     "PauliX",
     "PauliY",
     "PauliZ",
+    "PauliPlus",
+    "PauliMinus",
+    "Ladder",
     "Creation",
     "Annihilation",
     "Identity",
+    "OperatorBinaryOp",
+    "OperatorAdd",
+    "OperatorSub",
+    "OperatorMul",
+    "OperatorScalarMul",
+    "OperatorKron",
 ]
+
 
 ########################################################################################
 
 
-class Operator(VisitableBaseModel):
-    """
-    Examples:
-        >>> PauliX = Operator(coefficient=1.0, pauli=["x"])
-        >>> Destroy = Operator(coefficient=1.0, ladder=[[-1]])
-        >>> Create = Operator(coefficient=1.0, ladder=[[1]])
+class Operator(TypeReflectBaseModel):
+    def __neg__(self):
+        return OperatorScalarMul(op=self, expr=MathNum(value=-1))
 
-    Args:
-        coefficient (int, float, ComplexFloat): time-independent coefficient of the operator
-        pauli (list["x", "y", "z", "i"]): Pauli operator on qubit index
-        ladder (list[list[-1, 0, +1]]): Ladder operator(s) on mode index
-    """
+    def __pos__(self):
+        return self
 
-    coefficient: Union[int, float, ComplexFloat] = 1.0
-    pauli: List[Literal["x", "y", "z", "i"]] = []
-    ladder: List[List[Literal[-1, 0, 1]]] = []
+    def __add__(self, other):
+        return OperatorAdd(op1=self, op2=other)
 
-    @property
-    def n_qreg(self):
-        return len(self.pauli)
-
-    @property
-    def n_qmode(self):
-        return len(self.ladder)
-
-    def __eq__(self, other):
-        if not isinstance(other, Operator):
-            raise TypeError
-
-        eq = (self.pauli == other.pauli) and (self.ladder == other.ladder)
-        return eq
-
-    # def __add__(self, other):
-    #     if not isinstance(other, Operator):
-    #         raise TypeError(f"unsupported operand types for '{type(self)}' and '{type(other)}'")
-    #
-    #     assert (self.n_qreg == other.n_qreg) and (self.n_qmode == self.n_qmode)
-    #
-    #     if (self.qreg == other.qreg) and (self.qmode == other.qmode):
-    #         coefficient = self.coefficient + other.coefficient
-    #         return Operator(coefficient=coefficient, qreg=self.qreg, qmode=self.qmode)
-
-    def __mul__(self, other):
-        if isinstance(other, (int, float)):
-            return Operator(
-                coefficient=self.coefficient * other,
-                pauli=self.pauli,
-                ladder=self.ladder,
-            )
-
-        elif isinstance(other, Operator):
-            qreg, phases = list(zip(*list(map(levi_civita, self.pauli, other.pauli))))
-            phase = reduce(mul, phases, 1)
-            coefficient = phase * self.coefficient * other.coefficient
-            qmode = [a + b for a, b in zip(self.ladder, other.ladder)]
-            return Operator(coefficient=coefficient, pauli=qreg, ladder=qmode)
-
-        else:
-            return TypeError
-
-    def __rmul__(self, other):
-        return self * other
+    def __sub__(self, other):
+        return OperatorSub(op1=self, op2=other)
 
     def __matmul__(self, other):
-        if not isinstance(other, Operator):
-            raise TypeError
+        if isinstance(other, MathExpr):
+            raise TypeError(
+                "Tried Kron product between Operator and MathExpr. "
+                + "Scalar multiplication of MathExpr and Operator should be bracketed when perfoming Kron product."
+            )
+        return OperatorKron(op1=self, op2=other)
 
-        qreg = self.pauli + other.pauli
-        qmode = self.ladder + other.ladder
-        coefficient = self.coefficient * other.coefficient
+    def __mul__(self, other):
+        if isinstance(other, Operator):
+            return OperatorMul(op1=self, op2=other)
+        else:
+            return OperatorScalarMul(op=self, expr=other)
 
-        return Operator(coefficient=coefficient, pauli=qreg, ladder=qmode)
+    def __rmul__(self, other):
+        other = MathExpr.cast(other)
+        return self * other
 
-    def __rmatmul__(self, other):
-        return other @ self
-
-
-PauliX = Operator(pauli=["x"])
-PauliY = Operator(pauli=["y"])
-PauliZ = Operator(pauli=["z"])
-PauliI = Operator(pauli=["i"])
-
-Creation = Operator(ladder=[[-1]])
-Annihilation = Operator(ladder=[[1]])
-Identity = Operator(ladder=[[0]])
+    pass
 
 
-if __name__ == "__main__":
-    op = Operator(pauli=["x"], ladder=[[-1, 1]])
-    print(op)
+########################################################################################
 
-    print((PauliI * PauliX) @ (Creation * Annihilation))
+
+class OperatorTerminal(Operator):
+    pass
+
+
+########################################################################################
+
+
+class Pauli(OperatorTerminal):
+    pass
+
+
+class PauliI(Pauli):
+    pass
+
+
+class PauliX(Pauli):
+    pass
+
+
+class PauliY(Pauli):
+    pass
+
+
+class PauliZ(Pauli):
+    pass
+
+
+def PauliPlus():
+    return OperatorAdd(
+        op1=PauliX(),
+        op2=OperatorScalarMul(
+            op=PauliY(), expr=MathMul(expr1=MathImag(), expr2=MathNum(value=1))
+        ),
+    )
+
+
+def PauliMinus():
+    return OperatorAdd(
+        op1=PauliX(),
+        op2=OperatorScalarMul(
+            op=PauliY(), expr=MathMul(expr1=MathImag(), expr2=MathNum(value=-1))
+        ),
+    )
+
+
+########################################################################################
+
+
+class Ladder(OperatorTerminal):
+    pass
+
+
+class Creation(Ladder):
+    pass
+
+
+class Annihilation(Ladder):
+    pass
+
+
+class Identity(Ladder):
+    pass
+
+
+########################################################################################
+
+
+class OperatorScalarMul(Operator):
+    op: Operator
+    expr: CastMathExpr
+
+
+class OperatorBinaryOp(Operator):
+    pass
+
+
+class OperatorAdd(OperatorBinaryOp):
+    op1: Operator
+    op2: Operator
+
+
+class OperatorSub(OperatorBinaryOp):
+    op1: Operator
+    op2: Operator
+
+
+class OperatorMul(OperatorBinaryOp):
+    op1: Operator
+    op2: Operator
+
+
+class OperatorKron(OperatorBinaryOp):
+    op1: Operator
+    op2: Operator

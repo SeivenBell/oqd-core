@@ -1,1 +1,1 @@
-from .base import DigitalCircuitVisitor, DigitalCircuitTransform
+from .base import DigitalCircuitVisitor, DigitalCircuitTransformer

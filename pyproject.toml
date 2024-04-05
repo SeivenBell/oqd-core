@@ -8,25 +8,48 @@ name = "quantumion"
 version = "0.0.0"
 requires-python = ">=3.10"
 dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.23.2",
-    "starlette>=0.27.0",
     "pydantic>=2.4",
-    "pydantic-numpy",
     "h5py",
-    "redis",
-    "rq",
     "requests",
+    "matplotlib",
     "rich",
+    "qutip~=4.7.3",
+    "networkx",
+    "seaborn",
 ]
 
 [project.optional-dependencies]
-qutip = ["qutip"]
-tensorcircuit = ["tensorcircuit", "matplotlib", "qiskit"]
-docs = ["pymdown-extensions", "mkdocstrings", "mkdocs-material", "mkdocstrings-python"]
-
-all = ["qutip", "tensorcircuit", "matplotlib", "qiskit"]
-
+docs = [
+    "pymdown-extensions",
+    "mkdocstrings",
+    "mkdocs-material",
+    "mkdocstrings-python",
+]
+test = ["unittest_prettify"]
+server = [
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "uvicorn[standard]>=0.23.2",
+    "starlette>=0.27.0",
+    "redis",
+    "rq",
+    "fastapi>=0.104.0",
+    "sqlalchemy",
+    "asyncpg",
+    "python-multipart",
+]
+all = [
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "uvicorn[standard]>=0.23.2",
+    "starlette>=0.27.0",
+    "redis",
+    "rq",
+    "fastapi>=0.104.0",
+    "sqlalchemy",
+    "asyncpg",
+    "python-multipart",
+]
 
 [tool.setuptools]
 packages = ["quantumion"]

@@ -1,5 +1,5 @@
 from .base import (
     AtomicProgramVisitor,
-    AtomicProgramTransform,
+    AtomicProgramTransformer,
     AtomicProgramIonsAnalysis,
 )
