@@ -18,19 +18,23 @@ nav:
   - Welcome to Open Quantum Design: index.md
   - Installation: get-started/installation.md
   - Tutorials: get-started/tutorials.md
-  - How-to guides: get-started/how-to-guides.md
+  - How-to Guides: get-started/how-to-guides.md
 - Explanation:
   - Visitor: explanation/visitor.md
-  - Compilation flow: explanation/compilation-flow.md
+  - Compilation Flow: explanation/compilation-flow.md
 - Demos:
   - Analog:
-    - Rabi flopping: demos/Rabi-flopping.md
+    - Rabi Flopping: demos/Rabi-flopping.md
     - TFIM: demos/TFIM.md
-- API reference:
+- API Reference:
   - Interfaces:
-    - Data structures: reference/interface-base.md
+    - Data Structures: reference/interface-base.md
+    - Math Expression: reference/math-interface.md
     - Digital: reference/digital-interface.md
-    - Analog: reference/analog-interface.md
+    - Analog:
+      - Dissipation: reference/dissipation-interface.md
+      - Operations: reference/operations-interface.md
+      - Operators: reference/operator-interface.md
     - Atomic: reference/atomic-interface.md
   - Backends:
     - Qutip: reference/qutip-backend.md

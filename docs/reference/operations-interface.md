@@ -1,5 +1,5 @@
 
-# Analog interface
+# Operations interface
 
 !!! note
 
@@ -50,4 +50,4 @@ classDiagram
   }
 ```
 
-::: quantumion.interface.analog
+::: quantumion.interface.analog.operations
