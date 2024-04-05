@@ -371,6 +371,30 @@ class QutipBackendSimulation(TestListClose, unittest.TestCase):
         with self.subTest():
             self.assertAlmostEqual(results.metrics['Z^2'][-1], 1, delta=0.001)
 
+    def test_metrics_count_none(self):
+        """Testing without metrics and counts"""
+
+        ac, _ = one_qubit_rabi_flopping_protocol()
+
+        #define task args
+        args = TaskArgsAnalog(
+            n_shots=None,
+            fock_cutoff=4,
+            metrics = {},
+            dt=1e-3,
+        )
+
+        task = Task(program = ac, args = args)
+
+        backend = QutipBackend()
+
+        results = backend.run(task = task)
+
+        with self.subTest():
+            self.assertEqual(results.counts, {})
+        with self.subTest():
+            self.assertEqual(results.metrics, {})
+
 @colorize(color=BLUE)
 class QutipCanonicalization(TestListClose, unittest.TestCase):
     maxDiff = None
