@@ -14,12 +14,12 @@ def _get_probabilities(state: list):
         probabililities.append(np.sqrt(x.real**2 + x.imag**2)**2)
     return probabililities
 
-def _get_amplitude(state: list, componenet = 'real'):
+def _get_amplitude(state: list, component = 'real'):
     amplitudes = []
     for x in state:
-        if componenet == 'real':
+        if component == 'real':
             amplitudes.append(x.real)
-        elif componenet == 'imag':
+        elif component == 'imag':
             amplitudes.append(x.imag)
         else:
             KeyError
@@ -87,8 +87,8 @@ def plot_metrics_counts(results, experiment_name, plot_directory = 'examples/exp
     ax.set(xlabel="Basis state", ylabel="Number of samples")
 
     ax = axs[3]
-    ax.bar(x=x, height=_get_amplitude(state = results.state, componenet = 'real'), color=colors[5], label = 'Real component')
-    ax.bar(x=x, height=_get_amplitude(state = results.state, componenet = 'imag'), color=colors[7], label = 'Imaginary component')
+    ax.bar(x=x, height=_get_amplitude(state = results.state, component = 'real'), color=colors[5], label = 'Real component')
+    ax.bar(x=x, height=_get_amplitude(state = results.state, component = 'imag'), color=colors[7], label = 'Imaginary component')
     plt.legend()
     ax.set(xlabel="Basis state", ylabel="Amplitude")
 
