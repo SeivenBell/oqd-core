@@ -32,10 +32,13 @@ from examples.emulation.utils import plot_metrics_counts
 Then we define the [`AnalogGate`][quantumion.interface.analog.operations.AnalogGate] object
 
 ``` py
-"""For simplicity we initialize all Operators"""
-X, Y, Z, I, A, C, J = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
+"""For simplicity we initialize some Operators"""
+X, Z, I = PauliX(), PauliZ(), PauliI()
     
-H = AnalogGate(hamiltonian= (X @ X) + (Z @ I) + (I @ Z), dissipation=Dissipation())
+H = AnalogGate(
+    hamiltonian= (X @ X) + (Z @ I) + (I @ Z),
+    dissipation=Dissipation(),
+)
 ```
 
 Then we define the [`AnalogCircuit`][quantumion.interface.analog.operations.AnalogCircuit] object and evolve it according to the hamiltonian defined above
