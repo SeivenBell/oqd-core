@@ -26,7 +26,7 @@ if __name__ == "__main__":
         Identity(),
     )
 
-    Hx = AnalogGate(hamiltonian=-(np.pi / 4) * X, dissipation=Dissipation())
+    Hx = AnalogGate(hamiltonian=-(np.pi / 4) * X)
 
     ac = AnalogCircuit()
     ac.evolve(duration=1, gate=Hx)

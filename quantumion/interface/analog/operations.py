@@ -23,7 +23,7 @@ class AnalogOperation(VisitableBaseModel):
 
 class AnalogGate(AnalogOperation):
     hamiltonian: Operator
-    dissipation: Dissipation
+    dissipation: Dissipation = Dissipation()
 
 
 class Evolve(AnalogOperation):

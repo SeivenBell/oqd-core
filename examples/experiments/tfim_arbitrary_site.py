@@ -38,7 +38,7 @@ if __name__ == "__main__":
     )
     hamiltonian = field_hamiltonian + interaction_hamiltonian
 
-    H = AnalogGate(hamiltonian=hamiltonian, dissipation=Dissipation())
+    H = AnalogGate(hamiltonian=hamiltonian)
 
     ac = AnalogCircuit()
     ac.evolve(duration=1, gate=H)

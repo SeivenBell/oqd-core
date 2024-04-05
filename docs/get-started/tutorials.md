@@ -46,7 +46,7 @@ from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import AnalogGate, AnalogCircuit
 
 circuit = AnalogCircuit()
-gate = AnalogGate(hamiltonian= -(np.pi / 4) * PauliX(), dissipation=Dissipation())
+gate = AnalogGate(hamiltonian= -(np.pi / 4) * PauliX())
 circuit.evolve(
     duration = 1.0,
     gate = H

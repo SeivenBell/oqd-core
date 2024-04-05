@@ -31,7 +31,7 @@ Then we define the `AnalogGate` object
 """For simplicity we initialize the X Operator"""
 X = PauliX()
     
-H = AnalogGate(hamiltonian= -(np.pi / 4) * X, dissipation=Dissipation())
+H = AnalogGate(hamiltonian= -(np.pi / 4) * X)
 ```
 
 Then we define the `AnalogCircuit` object and evolve it according to the hamiltonian defined above

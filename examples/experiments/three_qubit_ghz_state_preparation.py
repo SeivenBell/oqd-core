@@ -24,20 +24,20 @@ if __name__ == "__main__":
     )
 
     # Hadamard on first qubit
-    Hii = AnalogGate(hamiltonian= I @ I @ I, dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= X @ I @ I, dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= Y @ I @ I, dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I @ I)
 
     # CNOT on Second
-    Hxx2 = AnalogGate(hamiltonian= X @ X @ I, dissipation=Dissipation())
-    Hmix2 = AnalogGate(hamiltonian=(-1) * (I @ X @ I), dissipation=Dissipation())
+    Hxx2 = AnalogGate(hamiltonian= X @ X @ I)
+    Hmix2 = AnalogGate(hamiltonian=(-1) * (I @ X @ I))
 
-    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I @ I), dissipation=Dissipation())
+    Hmxi = AnalogGate(hamiltonian=(-1) * (X @ I @ I))
+    Hmyi = AnalogGate(hamiltonian=(-1) * (Y @ I @ I))
 
     # CNOT on Third
-    Hxx3 = AnalogGate(hamiltonian= X @ I @ X, dissipation=Dissipation())
-    Hmix3 = AnalogGate(hamiltonian=(-1) * (I @ I @ X), dissipation=Dissipation())
+    Hxx3 = AnalogGate(hamiltonian= X @ I @ X)
+    Hmix3 = AnalogGate(hamiltonian=(-1) * (I @ I @ X))
     ac = AnalogCircuit()
 
     # Hadamard

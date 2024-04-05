@@ -21,7 +21,7 @@ X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), C
 
 def one_qubit_rabi_flopping_protocol():
 
-    Hx = AnalogGate(hamiltonian= -(np.pi / 4) * X, dissipation=Dissipation())
+    Hx = AnalogGate(hamiltonian= -(np.pi / 4) * X)
 
     ac = AnalogCircuit()
     ac.evolve(duration=1, gate=Hx)
@@ -42,13 +42,13 @@ def one_qubit_rabi_flopping_protocol():
 
 def bell_state_standard_protocol():
 
-    Hii = AnalogGate(hamiltonian= I @ I, dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= X @ I, dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= Y @ I, dissipation=Dissipation())
-    Hxx = AnalogGate(hamiltonian= X @ X, dissipation=Dissipation())
-    Hmix = AnalogGate(hamiltonian= (-1)*(I @ X), dissipation=Dissipation())
-    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I), dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I)
+    Hxx = AnalogGate(hamiltonian= X @ X)
+    Hmix = AnalogGate(hamiltonian= (-1)*(I @ X))
+    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I))
+    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I))
 
     ac = AnalogCircuit()
 
@@ -81,20 +81,20 @@ def bell_state_standard_protocol():
 def three_qubit_GHz_protocol():
 
     # Hadamard on first qubit
-    Hii = AnalogGate(hamiltonian= I @ I @ I, dissipation=Dissipation())
-    Hxi = AnalogGate(hamiltonian= X @ I @ I, dissipation=Dissipation())
-    Hyi = AnalogGate(hamiltonian= Y @ I @ I, dissipation=Dissipation())
+    Hii = AnalogGate(hamiltonian= I @ I @ I)
+    Hxi = AnalogGate(hamiltonian= X @ I @ I)
+    Hyi = AnalogGate(hamiltonian= Y @ I @ I)
 
     # CNOT on Second
-    Hxx2 = AnalogGate(hamiltonian= X @ X @ I, dissipation=Dissipation())
-    Hmix2 = AnalogGate(hamiltonian= (-1)*(I @ X @ I), dissipation=Dissipation())
+    Hxx2 = AnalogGate(hamiltonian= X @ X @ I)
+    Hmix2 = AnalogGate(hamiltonian= (-1)*(I @ X @ I))
     
-    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I @ I), dissipation=Dissipation())
-    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I @ I), dissipation=Dissipation())
+    Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I @ I))
+    Hmyi = AnalogGate(hamiltonian= (-1)*(Y @ I @ I))
 
     # CNOT on Third
-    Hxx3 = AnalogGate(hamiltonian= X @ I @ X, dissipation=Dissipation())
-    Hmix3 = AnalogGate(hamiltonian= (-1)*(I @ I @ X), dissipation=Dissipation())
+    Hxx3 = AnalogGate(hamiltonian= X @ I @ X)
+    Hmix3 = AnalogGate(hamiltonian= (-1)*(I @ I @ X))
     ac = AnalogCircuit()
 
     # Hadamard
@@ -225,7 +225,7 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
 
         _, args = one_qubit_rabi_flopping_protocol()
 
-        Hx = AnalogGate(hamiltonian= -(np.pi / 8) * (2*X), dissipation=Dissipation())
+        Hx = AnalogGate(hamiltonian= -(np.pi / 8) * (2*X))
 
         ac = AnalogCircuit()
         ac.evolve(duration=1, gate=Hx)
@@ -252,13 +252,13 @@ class QutipCanonicalization(TestListClose, unittest.TestCase):
 
         _, args = bell_state_standard_protocol()
 
-        Hii = AnalogGate(hamiltonian= 1*(I @ I), dissipation=Dissipation())
-        Hxi = AnalogGate(hamiltonian= (X @ I), dissipation=Dissipation()) # Scalar Multiplication not given
-        Hyi = AnalogGate(hamiltonian= 1*(Y @ I), dissipation=Dissipation())
-        Hxx = AnalogGate(hamiltonian= 1*(X @ (I*X*I)), dissipation=Dissipation()) # multiplication by identity
-        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X), dissipation=Dissipation())
-        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I), dissipation=Dissipation())
-        Hmyi = AnalogGate(hamiltonian= (-0.5)*(Y @ (2*I)), dissipation=Dissipation()) # scalar multiplication
+        Hii = AnalogGate(hamiltonian= 1*(I @ I))
+        Hxi = AnalogGate(hamiltonian= (X @ I)) # Scalar Multiplication not given
+        Hyi = AnalogGate(hamiltonian= 1*(Y @ I))
+        Hxx = AnalogGate(hamiltonian= 1*(X @ (I*X*I))) # multiplication by identity
+        Hmix = AnalogGate(hamiltonian= (-1)*(I @ X))
+        Hmxi = AnalogGate(hamiltonian= (-1)*(X @ I))
+        Hmyi = AnalogGate(hamiltonian= (-0.5)*(Y @ (2*I))) # scalar multiplication
 
         ac = AnalogCircuit()
 
