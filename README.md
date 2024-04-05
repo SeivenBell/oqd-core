@@ -1,5 +1,7 @@
 
 # Open Quantum Design (OQD) Stack
+[![CI](https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml/badge.svg)](https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml)
+
 This repo contains code for the frontend and backend of the OQD stack.
 
 ## Table of contents
@@ -50,18 +52,6 @@ pip install -e ".[test]"
 The you can run the bash script below to run all unit tests:
 ```bash
 bash tests/test.sh   
-```
-
-### Documentation <a name="Documentation"></a>
-For documentation first install with pip:
-
-```bash
-pip install -e ".[docs]"
-```
-
-The you can load the docs using:
-```bash
-mkdocs serve   
 ```
 
 ### Server <a name="server"></a>
