@@ -1,9 +1,8 @@
 # Demos
 
 ## Analog Demos
-[Rabi Flopping](demos/Rabi-flopping.md)
-
-[TFIM](demos/TFIM.md)
+- [Rabi flopping](demos/Rabi-flopping.md)
+- [Transverse field Ising model (TFIM)](demos/TFIM.md)
 
 
 ## Digital Demos

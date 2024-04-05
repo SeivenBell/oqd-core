@@ -1,4 +1,4 @@
-# Transverse Field Ising Model
+# Transverse field Ising model (TFIM)
 
 Let's implement our favourite Hamiltonian -- the transverse-field Ising model.
 The general Hamiltonian looks like,
@@ -55,22 +55,22 @@ args = TaskArgsAnalog(
 
 We can then wrap the `AnalogCircuit` and the args to a `Task` object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
 
-### Compile and then Simulate
+## Running the simulation
+=== "Compile & Simulate"
+    The `Task` can be compiled first to a `QuTipExperiment` object and then this `QuTipExperiment` object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
 
-The `Task` can be compiled first to a `QuTipExperiment` object and then this `QuTipExperiment` object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
+    ``` py
+    experiment = backend.compile(task = task)
+    results = backend.run(experiment = experiment)
+    ```
 
-``` py
-experiment = backend.compile(task = task)
-results = backend.run(experiment = experiment)
-```
+=== "Directly Simulate"
+    The `Task` object can be directly simulated by the `run()` method. 
 
-### Directly Simulate
+    ``` py
+    results = backend.run(task = task)
+    ```
 
-The `Task` object can be directly simulated by the `run()` method. 
-
-``` py
-results = backend.run(task = task)
-```
 ## Results
 
 Finally we can plot the metrics and relevant statistics from the final quantum state:

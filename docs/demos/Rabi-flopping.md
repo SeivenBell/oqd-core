@@ -1,4 +1,4 @@
-# Single Qubit Rabi Flopping
+# Single qubit Rabi flopping
 
 Let's implement the single qubit Rabi Flopping,
 $$
@@ -11,6 +11,7 @@ $$
 
 ## Implementation
 We will go through this step by step. First we get the necessary imports:
+/// details | Imports
 ``` py
 from quantumion.interface.analog.operator import *
 from quantumion.interface.analog.dissipation import Dissipation
@@ -22,6 +23,7 @@ from quantumion.backend import QutipBackend
 from examples.emulation.utils import plot_metrics_counts
 from rich import print as pprint
 ```
+///
 
 Then we define the `AnalogGate` object
 
@@ -55,22 +57,22 @@ args = TaskArgsAnalog(
 
 We can then wrap the `AnalogCircuit` and the args to a `Task` object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
 
-### Compile and then Simulate
+## Running the simulation
+=== "Compile & Simulate"
+    The `Task` can be compiled first to a `QuTipExperiment` object and then this `QuTipExperiment` object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
 
-The `Task` can be compiled first to a `QuTipExperiment` object and then this `QuTipExperiment` object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
+    ``` py
+    experiment = backend.compile(task = task)
+    results = backend.run(experiment = experiment)
+    ```
 
-``` py
-experiment = backend.compile(task = task)
-results = backend.run(experiment = experiment)
-```
+=== "Directly Simulate"
+    The `Task` object can be directly simulated by the `run()` method. 
 
-### Directly Simulate
+    ``` py
+    results = backend.run(task = task)
+    ```
 
-The `Task` object can be directly simulated by the `run()` method. 
-
-``` py
-results = backend.run(task = task)
-```
 ## Results
 
 Finally we can plot the metrics and relevant statistics from the final quantum state:
