@@ -1,6 +1,7 @@
 
 # Open Quantum Design (OQD) Stack
 [![CI](https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml/badge.svg)](https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml)
+
 This repo contains code for the frontend and backend of the OQD stack.
 
 ## Table of contents
