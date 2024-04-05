@@ -13,7 +13,12 @@ $$
 
 ## Implementation
 We will go through this step by step. First we get the necessary imports:
+/// details | Imports
 ``` py
+from rich import print as pprint
+
+import numpy as np
+
 from quantumion.interface.analog.operator import *
 from quantumion.interface.analog.dissipation import Dissipation
 from quantumion.interface.analog.operations import *
@@ -21,9 +26,10 @@ from quantumion.compiler.analog.interface import *
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
 from quantumion.backend import QutipBackend
+
 from examples.emulation.utils import plot_metrics_counts
-from rich import print as pprint
 ```
+///
 
 Then we define the `AnalogGate` object
 
@@ -60,6 +66,7 @@ We can then wrap the `AnalogCircuit` and the args to a `Task` object and run usi
     The `Task` can be compiled first to a `QuTipExperiment` object and then this `QuTipExperiment` object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
 
     ``` py
+    backend = QutipBackend()
     experiment = backend.compile(task = task)
     results = backend.run(experiment = experiment)
     ```
@@ -68,6 +75,7 @@ We can then wrap the `AnalogCircuit` and the args to a `Task` object and run usi
     The `Task` object can be directly simulated by the `run()` method. 
 
     ``` py
+    backend = QutipBackend()
     results = backend.run(task = task)
     ```
 
