@@ -36,6 +36,33 @@ Install with pip :
 ```bash
 pip install .
 ```
+You will then need to add the package to your path using:
+
+```bash
+export PYTHONPATH=$PYTHONPATH:PATH-TO-PACKAGE
+```
+### Test <a name="test"></a>
+For testing first install with pip:
+
+```bash
+pip install -e ".[test]"
+```
+The you can run the bash script below to run all unit tests:
+```bash
+bash tests/test.sh   
+```
+
+### Documentation <a name="Documentation"></a>
+For documentation first install with pip:
+
+```bash
+pip install -e ".[docs]"
+```
+
+The you can load the docs using:
+```bash
+mkdocs serve   
+```
 
 ### Server <a name="server"></a>
 The webserver is a [Uvicorn](https://www.uvicorn.org/) ASGI webserver with a [REST API](https://restfulapi.net/) defined with [Pydantic](https://docs.pydantic.dev/latest/) and [FastAPI](https://fastapi.tiangolo.com/). \
@@ -63,6 +90,13 @@ http://{HOST_IP}:8000/docs
 - [Redoc](https://redocly.com/redoc/)
 ```
 http://{HOST_IP}:8000/redoc
+```
+## Getting Started <a name="Getting Started"></a>
+
+To get started you can run one of the example scripts provided. For example, to run the 3 qubit GHz state protocol you can run:
+
+```bash
+python examples/experiments/three_qubit_ghz_state_preparation.py 
 ```
 
 ## Contents <a name="contents"></a>
