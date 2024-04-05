@@ -26,12 +26,14 @@ nav:
   - Analog:
     - Rabi flopping: demos/Rabi-flopping.md
     - TFIM: demos/TFIM.md
-- API Reference:
+- API reference:
   - Interfaces:
-    - Data Structures: reference/interface-base.md
+    - Data structures: reference/interface-base.md
     - Digital: reference/digital-interface.md
     - Analog: reference/analog-interface.md
     - Atomic: reference/atomic-interface.md
+  - Backends:
+    - Qutip: reference/qutip-backend.md
   - Utilities: reference/utils.md
 
 
@@ -95,6 +97,7 @@ plugins:
           import:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
+            - https://qutip.readthedocs.io/en/qutip-4.7.x/objects.inv 
 
 
 markdown_extensions:

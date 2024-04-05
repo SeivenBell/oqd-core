@@ -1,3 +1,3 @@
-# Data Structures
+# Data structures
 
 ::: quantumion.interface.base
