@@ -170,14 +170,12 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
             0, duration, round(duration / self._dt)
         )  # create time vector
 
-        options = qt.solver.Options(store_final_state=True)
-
         result_qobj = qt.sesolve(
             model.hamiltonian,
             self._current_state,
             tspan,
             e_ops=self._qutip_metrics,
-            options=options,
+            options={"store_states": True},
         )
 
         self._current_state = result_qobj.final_state
