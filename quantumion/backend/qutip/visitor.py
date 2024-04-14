@@ -146,11 +146,11 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
                 [times, result_times + duration_tracker if idx != 0 else result_times]
             )
 
-            for key in metrics.keys():
+            for i, key in enumerate(metrics.keys()):
                 result_expect = (
-                    result.expect[key][1:] if idx != 0 else result.expect[key]
+                    result.expect[i][1:] if idx != 0 else result.expect[i]
                 )
-                metrics.update({key: np.hstack([metrics[key], result_expect.real])})
+                metrics.update({key: np.hstack([metrics[key], result_expect])})
 
         return TaskResultAnalog(
             times=times,
