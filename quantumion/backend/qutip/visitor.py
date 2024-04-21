@@ -32,22 +32,6 @@ class AnalogCircuitCanonicalization(AnalogInterfaceTransformer):
         super().__init__()
         self.fg = flow_graph
 
-    def visit_AnalogCircuit(self, model: AnalogCircuit) -> AnalogCircuit:
-        return AnalogCircuit(
-            sequence = self.visit(model.sequence),
-            n_qreg = model.n_qreg,
-            n_qmode = model.n_qmode,
-            definitions = model.definitions,
-            qreg = model.qreg,
-            qmode = model.qmode
-        )
-    def visit_Evolve(self, model: Evolve) -> Evolve:
-        return Evolve(
-            key = model.key,
-            duration = model.duration,
-            gate = self.visit(model.gate)
-        )
-
     def visit_AnalogGate(self, model: AnalogGate) -> AnalogGate:
         canonical_model = self.fg(model.hamiltonian).model
         canonical_model.accept(CanonicalizationVerificationOperator())
