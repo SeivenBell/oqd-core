@@ -49,23 +49,7 @@ class QutipTaskArgsCanonicalization(AnalogInterfaceTransformer):
         if isinstance(model, dict):
             return {key: self.visit(metric) for (key, metric) in model.items()}
         else:
-            super(self.__class__, self)._visit(model)
-
-    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog) -> TaskArgsAnalog:
-        return TaskArgsAnalog(
-            layer=model.layer,
-            n_shots=model.n_shots,
-            dt=model.dt,
-            metrics=self.visit(model.metrics),
-        )
-
-    def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
-        return EntanglementEntropyVN(qreg=model.qreg, qmode=model.qmode)
-
-    def visit_EntanglementEntropyReyni(self, model: EntanglementEntropyVN):
-        return EntanglementEntropyReyni(
-            alpha=model.alpha, qreg=model.qreg, qmode=model.qmode
-        )
+            return super(self.__class__, self)._visit(model)
 
     def visit_Expectation(self, model: Expectation) -> Expectation:
         canonical_model = self.fg(model.operator).model
@@ -231,7 +215,7 @@ class MetricsToQutipObjects(
         if isinstance(model, dict):
             return {key: self.visit(metric) for (key, metric) in model.items()}
         else:
-            super(self.__class__, self)._visit(model)
+            return super(self.__class__, self)._visit(model)
 
     def visit_TaskArgsAnalog(self, model: TaskArgsAnalog) -> dict:
         self.fock_cutoff = model.fock_cutoff
