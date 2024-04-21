@@ -13,7 +13,9 @@ dependencies = [
     "requests",
     "matplotlib",
     "rich",
-    "qutip~=4.7.3",
+    "qutip~=5.0.1",
+    "Cython~=3.0.10",
+    "filelock~=3.13.4",
     "networkx",
     "seaborn",
 ]

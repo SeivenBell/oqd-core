@@ -32,22 +32,6 @@ class AnalogCircuitCanonicalization(AnalogInterfaceTransformer):
         super().__init__()
         self.fg = flow_graph
 
-    def visit_AnalogCircuit(self, model: AnalogCircuit) -> AnalogCircuit:
-        return AnalogCircuit(
-            sequence = self.visit(model.sequence),
-            n_qreg = model.n_qreg,
-            n_qmode = model.n_qmode,
-            definitions = model.definitions,
-            qreg = model.qreg,
-            qmode = model.qmode
-        )
-    def visit_Evolve(self, model: Evolve) -> Evolve:
-        return Evolve(
-            key = model.key,
-            duration = model.duration,
-            gate = self.visit(model.gate)
-        )
-
     def visit_AnalogGate(self, model: AnalogGate) -> AnalogGate:
         canonical_model = self.fg(model.hamiltonian).model
         canonical_model.accept(CanonicalizationVerificationOperator())
@@ -143,14 +127,14 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
                 else 0
             )
             times = np.hstack(
-                [times, result_times + duration_tracker if idx != 0 else result_times]
+                [times, [t + duration_tracker for t in result_times] if idx != 0 else result_times]
             )
 
-            for key in metrics.keys():
+            for i, key in enumerate(metrics.keys()):
                 result_expect = (
-                    result.expect[key][1:] if idx != 0 else result.expect[key]
+                    result.expect[i][1:] if idx != 0 else result.expect[i]
                 )
-                metrics.update({key: np.hstack([metrics[key], result_expect.real])})
+                metrics.update({key: np.hstack([metrics[key], result_expect])})
 
         return TaskResultAnalog(
             times=times,
@@ -170,14 +154,12 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
             0, duration, round(duration / self._dt)
         )  # create time vector
 
-        options = qt.solver.Options(store_final_state=True)
-
         result_qobj = qt.sesolve(
             model.hamiltonian,
             self._current_state,
             tspan,
             e_ops=self._qutip_metrics,
-            options=options,
+            options={"store_states": True},
         )
 
         self._current_state = result_qobj.final_state
