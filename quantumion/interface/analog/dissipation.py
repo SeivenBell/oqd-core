@@ -1,3 +1,5 @@
+from typing import Optional
+
 from quantumion.interface.base import VisitableBaseModel
 
 ########################################################################################
