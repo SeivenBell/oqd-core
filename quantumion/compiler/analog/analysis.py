@@ -22,6 +22,9 @@ class RegisterInformation(AnalogInterfaceTransformer):
         #return model
         return self.visit(model.hamiltonian)
     
+    def visit_TaskArgsAnalog(self,model):
+        return model
+    
     def visit_AnalogCircuit(self, model: AnalogCircuit):
         visit_out = self.visit(model.sequence)
         for elem in visit_out:
