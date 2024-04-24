@@ -10,4 +10,4 @@ __all__ = [
 
 
 class Dissipation(VisitableBaseModel):
-    jumps: int = None  # todo: discuss ir for dissipation
+    jumps: Optional[int] = None  # todo: discuss ir for dissipation
