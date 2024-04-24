@@ -76,7 +76,7 @@ class GatherMathExpr(AnalogCircuitTransformer):
             return self.visit_OperatorAddSub(model)
         if isinstance(model, Operator):
             return model
-        raise TypeError
+        return super(self.__class__, self)._visit(model)
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         if isinstance(model.op, OperatorScalarMul):
@@ -376,7 +376,7 @@ class ScaleTerms(AnalogCircuitTransformer):
     (SortedOrder and ScaleTerms can be run in either order)
     """
     def _visit(self, model: Any):
-        if not isinstance(model, (OperatorAdd)):
+        if isinstance(model, Operator):
             return self.visit_OperatorNotOpAdd(model)
         return super(self.__class__, self)._visit(model)
 
