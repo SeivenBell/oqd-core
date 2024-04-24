@@ -123,7 +123,7 @@ class TaskResultAtomic(BaseModel):
 ########################################################################################
 
 
-class Task(BaseModel):
+class Task(VisitableBaseModel):
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
 
