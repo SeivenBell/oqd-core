@@ -11,6 +11,7 @@ from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation
 from quantumion.compiler.analog.verification_flow import VerificationFlow
 from quantumion.compiler.analog.verify import CanonicalizationVerificationOperator
 from quantumion.backend.metric import *
+from quantumion.backend.task import Task
 from typing import Any, Union, List, Tuple, Literal, Dict
 import qutip as qt
 from pydantic import BaseModel, ConfigDict
@@ -240,6 +241,9 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
     def __init__(self, args):
         super().__init__()
         self.args = args
+
+    def visit_Task(self, model: Task):
+        return self.visit(model.program)
 
     def visit_AnalogCircuit(self, model: AnalogCircuit):
         return QutipExperiment(
