@@ -111,6 +111,7 @@ Planned supported software backends include:
   - [QuantumOptics.jl](https://docs.qojulia.org/search/?q=calcium)
 - Trapped-ion Physics Simulator
   - [IonSim.jl](https://www.ionsim.org/)
+
 #### Hardware <a name="hardware"></a>
 Planned supported hardware backends include:
 - [Quantum Information with Trapped-ions (QITI Lab)](https://qiti.iqc.uwaterloo.ca/publications/) Blade Trap $\left( ^{171}\mathrm{Yb}^+ \right)$
@@ -123,7 +124,7 @@ Documentation is implemented with [MkDocs](https://www.mkdocs.org/) and can be r
 
 To install the dependencies for documentation, run:
 ```
-pip install .[docs]
+pip install -e ".[docs]"
 ```
 To deploy the documentation server locally:
 ```
