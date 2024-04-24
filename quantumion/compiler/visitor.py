@@ -27,6 +27,14 @@ class Visitor:
         ):
             [self.visit(element) for element in model]
 
+        if isinstance(model, dict):
+            for key, value in model.items():
+                if isinstance(key, VisitableBaseModel):
+                    self.visit(key)
+                
+                if isinstance(value, VisitableBaseModel):
+                    self.visit(value)
+
         if isinstance(model, VisitableBaseModel):
             new_fields = {}
             for key in model.model_fields.keys():
@@ -49,6 +57,17 @@ class Transformer(Visitor):
             (list,),
         ):
             new_model = model.__class__([self.visit(element) for element in model])
+
+        elif isinstance(model, dict):
+            new_model = {}
+            for key, value in model.items():
+                if isinstance(key, VisitableBaseModel):
+                    key = self.visit(key)
+                
+                if isinstance(value, VisitableBaseModel):
+                    value = self.visit(value)
+                    
+                new_model[key] = value
 
         if isinstance(model, VisitableBaseModel):
             new_fields = {}
