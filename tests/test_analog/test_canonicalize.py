@@ -830,5 +830,88 @@ class TestCanonicalizationVerificationScaleTerms(CanonicalFormErrors, unittest.T
         op = 2*(X@Z@Z@(C*A))  + Z + 2*(Y@Z) + 1*A + 1*(C*C) + 1*I + 1*Z
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
     
+@colorize(color=BLUE)
+class TestVerifyHilbertSpace(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
+
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = VerifyHilbertSpace()
+        super().__init__(methodName)
+
+    def test_simple_space_1_pass_1(self):
+        """Addition pass for space_1 version 1"""
+        op = X + Y + Z + I
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_simple_space_1_pass_2(self):
+        """Addition pass for space_1 version 2"""
+        op = X + Y
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_simple_single_term_pass_2(self):
+        """Addition pass for single terms version 2"""
+        op = X
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_simple_space_1_fail_1(self):
+        """Addition fail for space_1 terms version 1"""
+        op = X + A + Z + I
+        self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
+    def test_complicated_5_terms_pass(self):
+        """Complicated nested assition pass"""
+        op = (X@((X@Y@Y)+(Y@Z@I))@(Y+Z))+(X@Y@I@Z@I)+(X@Y@I@Z@I)
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_multiplication_pass(self):
+        """Simple Multiplication pass"""
+        op = X*X + Y*Y
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_multiplication_complicated_pass(self):
+        """Multiplication complicated pass"""
+        op = (X*X)@Y + Z@(Y*Y) + I@(I*Z)
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_multiplication_complicated_fail(self):
+        """Multiplication complicated fail"""
+        op = (X*X)@Y + Z@(Y*Y) + I@(I*Z)@Z
+        self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
+    def test_multiplication_fail(self):
+        """Simple Multiplication fail"""
+        op = X*A + Y*Y + 3*Z
+        self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
+    def test_multiplication_fail_annhiliation(self):
+        """Simple Multiplication fail for incorrect addition"""
+        op = X*I + Y*Y + A*C
+        self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
+    def test_complicated_5_terms_fail(self):
+        """Complicated nested assition fail because of (X@Y@A@Z@I)"""
+        op = (X@((X@Y@Y)+(Y@Z@I))@(Y+Z))+(X@Y@A@Z@I)+(X@Y@I@Z@I)
+        self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
+    def test_complicated_pass(self):
+        """Nested complicated pass"""
+        op = (X*X)@Y + Z@(Y*Y) + I@(I+Z) + (X*X*X*Y*Z)@(Z+I+Y)
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_complicated_scal_mul_padd(self):
+        """Nested complicated pass with scalar mul"""
+        op = (X*X)@Y + Z@(Y*(1*Y)) + 1*(I@(I+(1*Z))) + (X*X*X*Y*Z)@(Z+I+(1*Y))
+        test_function(operator=op, visitor=self._visitor)
+
+    def test_complicated_fail(self):
+        """Nested complicated fail"""
+        op = (X*X)@Y + C@(Y*Y) + I@(I+Z) + (X*X*X*Y*Z)@(Z+I+Y)
+        self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
+    def test_complicated_scal_mul_fail(self):
+        """Nested complicated fail with scalar mul"""
+        op = (X*X)@Y + 1*(1*(C)@(Y*Y)) + I@(I+Z) + (X*X*X*Y*Z)@(Z+I+Y)
+        self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
 if __name__ == '__main__':
     unittest.main()

@@ -143,40 +143,41 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         if isinstance(model, OperatorSub):
             raise CanonicalFormError("Subtraction of terms present")
 
-class VerifyHilbertSpace(AnalogCircuitTransformer):
+class VerifyHilbertSpace(AnalogCircuitVisitor):
     def _visit(self, model):
         if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul)):
-            return self.visit_OperatorAddSubMul(model)
-        raise TypeError
+            self.visit_OperatorAddSubMul(model)
+        else:
+            super(self.__class__, self)._visit(model)
 
-    def visit_Pauli(self, model):
-        return (1, 0)
+    def visit_Pauli(self, model: Pauli):
+        self.space_temp = (1,0)
 
-    def visit_Ladder(self, model):
-        return (0, 1)
+    def visit_Ladder(self, model: Ladder):
+        self.space_temp = (0,1)
 
-    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
-        return self.visit(model.op)
+    def visit_OperatorKron(self, model: OperatorKron):
 
-    def visit_OperatorAddSubMul(
-        self, model: Union[OperatorAdd, OperatorSub, OperatorMul]
-    ):
-        space1 = self.visit(model.op1)
-        space2 = self.visit(model.op2)
+        self.visit(model.op1)
+        op1_space = self.space_temp
 
-        assert space1 == space2, (
+        self.visit(model.op2)
+        op2_space = self.space_temp
+
+        self.space_temp = tuple(map(sum, zip(op1_space, op2_space)))
+            
+    def visit_OperatorAddSubMul(self, model: Union[OperatorAdd, OperatorSub, OperatorMul]):
+        self.visit(model.op1)
+        left = self.space_temp
+
+        self.visit(model.op2)
+        right = self.space_temp
+
+        assert left == right, (
             "\nInconsistent Hilbert space between:"
             + f"\n\t{model.op1.accept(PrintOperator())}"
             + f"\n\t{model.op2.accept(PrintOperator())}"
         )
-        return space1
-
-    def visit_OperatorKron(self, model: OperatorKron):
-        space1 = self.visit(model.op1)
-        space2 = self.visit(model.op2)
-
-        space = (space1[0] + space2[0], space1[1] + space2[1])
-        return space
 
 class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
     def __init__(self):
@@ -395,7 +396,7 @@ class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
 
 class CanonicalizationVerificationScaleTerms(AnalogCircuitVisitor):
     def _visit(self, model: Any):
-        if not isinstance(model, (OperatorAdd)):
+        if isinstance(model, Operator):
             return self.visit_OperatorNotOpAdd(model)
         return super(self.__class__, self)._visit(model)
     
