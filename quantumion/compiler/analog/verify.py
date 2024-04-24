@@ -8,6 +8,9 @@ from quantumion.compiler.analog.base import *
 from quantumion.compiler.analog.error import *
 from quantumion.compiler.analog.canonicalize import *
 
+from quantumion.backend.task import TaskArgsAnalog
+from quantumion.backend.metric import Expectation
+
 ########################################################################################
 
 __all__ = [

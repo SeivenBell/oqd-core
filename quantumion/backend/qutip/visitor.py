@@ -238,11 +238,8 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
     Basically compiles down to qutip object using transformers.
     """
 
-    def __init__(self, args):
-        super().__init__()
-        self.args = args
-
     def visit_Task(self, model: Task):
+        self.args = model.args # Without args we cannot define a QutipExperiment
         return self.visit(model.program)
 
     def visit_AnalogCircuit(self, model: AnalogCircuit):
