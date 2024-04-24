@@ -179,6 +179,25 @@ class VerifyHilbertSpace(AnalogCircuitVisitor):
             + f"\n\t{model.op2.accept(PrintOperator())}"
         )
 
+    def visit_AnalogCircuit(self, model: AnalogCircuit):
+        for idx, instruction in enumerate(model.sequence):
+            self.visit(instruction)
+            if idx == 0:
+                first_space_dim = self.space_temp 
+            elif self.space_temp != first_space_dim:
+                raise Exception("Incorrect dimensions between AnalogGates {} and {}".format(model.sequence[idx].gate.hamiltonian.accept(PrintOperator()), model.sequence[idx-1].gate.hamiltonian.accept(PrintOperator())))
+            
+    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog):
+        first_expectation = True
+        for metric in model.metrics.values():
+            self.visit(metric)
+            if isinstance(metric, Expectation) and first_expectation == True:
+                first_space_dim = self.space_temp
+                first_expectation = False
+            elif isinstance(metric, Expectation) and self.space_temp != first_space_dim:
+                print(self.space_temp)
+                raise Exception("Incorrect dimensions in Task")
+
 class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
     def __init__(self):
         super().__init__()
