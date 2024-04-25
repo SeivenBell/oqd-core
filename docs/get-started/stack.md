@@ -1,31 +1,7 @@
 
-# Open Quantum Design (OQD) Stack
-[![CI](https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml/badge.svg)](https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml)
-
-This repo contains code for the frontend and backend of the OQD stack.
-
-## Table of contents
-- [Quick Start](#quickstart) <br/>
-  - [The Stack](#stack) <br/>
-- [Installation](#installation) <br/>
-  - [Client](#client) <br/>
-  - [Server](#server) <br/>
-     - [Docker Compose](#docker-compose) <br/>
-- [Contents](#contents) <br/>
-  - [Frontends](#frontends) <br/>
-  - [Intermediate Representations](#intermediate-representations) <br/>
-  - [Backends](#backends) <br/>
-    - [Software](#software) <br/>
-    - [Hardware](#hardware) <br/>
-- [Documentation](#documentation) <br/>
-- [Acknowledgements](#acknowledgements) <br/>
-- [References](#references) <br/>
-
-
+# Get started with the full stack
 
 ## Quick Start <a name="quickstart"></a>
-### The Stack <a name="stack"></a>
-![Stack](docs/imgs/OQD_stack.png)
 
 ## Installation <a name="installation"></a>
 
@@ -96,24 +72,28 @@ Python packages with [Pydantic](https://docs.pydantic.dev/latest/) support for e
 
 ### Intermediate Representations <a name="intermediate-representations"></a>
 The semantics defining an experiment for the different layers of the stack is defined by Backus-Naur Form (BNFs) in the following repos:
-- [OpenQSIM](https://github.com/OpenQuantumDesign/openqsim)
-- [OpenAPL](https://github.com/OpenQuantumDesign/openapl)
+* [OpenQSIM](https://github.com/OpenQuantumDesign/openqsim)
+* [OpenAPL](https://github.com/OpenQuantumDesign/openapl)
 
 ### Backends <a name="backends"></a>
 
 #### Software <a name="software"></a>
 Planned supported software backends include:
+
 - Digital Circuit
-  - [Tensor Circuit](https://github.com/tencent-quantum-lab/tensorcircuit)
-  - [Yao](https://yaoquantum.org/)
+    - [Tensor Circuit](https://github.com/tencent-quantum-lab/tensorcircuit)
+    - [Yao.jl](https://yaoquantum.org/)
+
 - Analog Circuit
-  - [Qutip](https://qutip.org/)
-  - [QuantumOptics.jl](https://docs.qojulia.org/search/?q=calcium)
+    - [Qutip](https://qutip.org/)
+    - [QuantumOptics.jl](https://docs.qojulia.org/search/?q=calcium)
+
 - Trapped-ion Physics Simulator
-  - [IonSim.jl](https://www.ionsim.org/)
+    - [IonSim.jl](https://www.ionsim.org/)
 
 #### Hardware <a name="hardware"></a>
 Planned supported hardware backends include:
+
 - [Quantum Information with Trapped-ions (QITI Lab)](https://qiti.iqc.uwaterloo.ca/publications/) Blade Trap $\left( ^{171}\mathrm{Yb}^+ \right)$
 - [QuantumIon](https://tqt.uwaterloo.ca/project-details/quantumion-an-open-access-quantum-computing-platform/) $\left( ^{138}\mathrm{Ba}^+ \right)$
 
