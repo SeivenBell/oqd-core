@@ -4,9 +4,10 @@
     This documentation is still under development, please feel to contribute! © Open Quantum Design
 
 
-## The stack
-    
+# ![Open Quantum Design](docs/img/oqd-logo-text.png)
 
+
+## The stack
 ```mermaid
 flowchart LR
     Digital[Digital Circuit] --> openQASM(openQASM) 
@@ -25,6 +26,10 @@ flowchart LR
     
     openAPL ---> Hardware{Bare metal}
     openAPL ---> IonSim.jl
-    
-    
 ```
+
+[//]: # ({%)
+
+[//]: # (   include-markdown "../examples/bell_state.ipynb")
+
+[//]: # (%})

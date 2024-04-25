@@ -2,10 +2,11 @@
 site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
 #site_url: http://0.0.0.0:8000
-repo_name: OpenQuantumDesign/quantumion
-repo_url: https://github.com/OpenQuantumDesign/quantumion
+repo_name: OpenQuantumDesign/midstack
+repo_url: https://github.com/OpenQuantumDesign/midstack
 
 copyright: Copyright &copy; 2024 Open Quantum Design
+docs_dir: .
 
 extra:
   social:
@@ -15,31 +16,32 @@ extra:
 
 nav:  
 - Get Started:
-  - Welcome to Open Quantum Design: index.md
-  - Installation: get-started/installation.md
-  - Tutorials: get-started/tutorials.md
-  - How-to Guides: get-started/how-to-guides.md
-- Explanation:
-  - Visitor: explanation/visitor.md
-  - Compilation Flow: explanation/compilation-flow.md
-- Demos:
+    - The Stack: docs/index.md
+    - Installation: docs/get-started/installation.md
+- Tutorials: docs/get-started/tutorials.md
+- How-to Guides:
   - Analog:
-    - Rabi Flopping: demos/Rabi-flopping.md
-    - TFIM: demos/TFIM.md
+    - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
+    - Bell state preparation: examples/bell_state.ipynb
+    - GHZ state preparation: examples/ghz_state.ipynb
+    - Ising model: examples/ising_model.ipynb
+- Explanation:
+  - Visitor: docs/explanation/visitor.md
+  - Compilation Flow: docs/explanation/compilation-flow.md
 - API Reference:
   - Interfaces:
-    - Data Structures: reference/interface-base.md
-    - Math Expression: reference/math-interface.md
-    - Digital: reference/digital-interface.md
+    - Data Structures: docs/reference/interface-base.md
+    - Math Expression: docs/reference/math-interface.md
+    - Digital: docs/reference/digital-interface.md
     - Analog:
-      - Dissipation: reference/dissipation-interface.md
-      - Operations: reference/operations-interface.md
-      - Operators: reference/operator-interface.md
-    - Atomic: reference/atomic-interface.md
+      - Dissipation: docs/reference/dissipation-interface.md
+      - Operations: docs/reference/operations-interface.md
+      - Operators: docs/reference/operator-interface.md
+    - Atomic: docs/reference/atomic-interface.md
   - Backends:
-    - Task: reference/task-backend.md
-    - Qutip: reference/qutip-backend.md
-  - Utilities: reference/utils.md
+    - Task: docs/reference/task-backend.md
+    - Qutip: docs/reference/qutip-backend.md
+  - Utilities: docs/reference/utils.md
 
 
 use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
@@ -48,8 +50,8 @@ use_directory_urls: false  # good for opening HTML files directly, but should be
 theme:
   name: material
 
-  logo: img/oqd-logo.png
-  favicon: img/oqd-logo.png
+  logo: docs/img/oqd-logo.png
+  favicon: docs/img/oqd-logo.png
 
   palette:
   - media: '(prefers-color-scheme: light)'
@@ -84,6 +86,13 @@ theme:
 
 plugins:
   - search:
+  - same-dir:
+  - mknotebooks:
+      execute: false
+      timeout: 100
+      allow_errors: True
+#      enable_default_jupyter_cell_styling: false
+#      enable_default_pandas_dataframe_styling: false
   - mkdocstrings:
       handlers:
         python:
