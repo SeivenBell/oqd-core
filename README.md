@@ -10,9 +10,7 @@
 [//]: # ([![Documentation Status]&#40;https://readthedocs.org/projects/queso/badge/?version=latest&#41;]&#40;https://queso.readthedocs.io/en/latest/?badge=latest&#41;)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 ![versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)
-[![GitHub Workflow Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/ki3-qbt/graph-compiler/actions)
-
-[//]: # ([![CI]&#40;https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml/badge.svg&#41;]&#40;https://github.com/OpenQuantumDesign/quantumion/actions/workflows/CI.yml&#41;)
+[![CI](https://github.com/OpenQuantumDesign/midstack/actions/workflows/CI.yml/badge.svg)](https://github.com/OpenQuantumDesign/midstack/actions/workflows/CI.yml)
 
 </div>
 
