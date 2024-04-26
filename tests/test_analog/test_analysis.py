@@ -3,6 +3,8 @@ from quantumion.compiler.analog.canonicalize import *
 from quantumion.compiler.analog.verify import *
 from quantumion.compiler.analog.error import *
 from quantumion.compiler.analog.base import *
+from quantumion.backend.task import Task, TaskArgsAnalog
+from quantumion.backend.metric import Expectation
 from rich import print as pprint
 import unittest
 from quantumion.interface.math import *
@@ -100,6 +102,184 @@ class TestVerifyHilbertSpace(unittest.TestCase):
         """Nested complicated fail with scalar mul"""
         op = (X*X)@Y + 1*(1*(C)@(Y*Y)) + I@(I+Z) + (X*X*X*Y*Z)@(Z+I+Y)
         self.assertRaises(AssertionError, lambda: test_function(operator=op, visitor=self._visitor))
+
+    def test_analog_gate_pass(self):
+        "Test analog gate pass"
+        gate = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        test_function(operator=gate, visitor=self._visitor)
+
+    def test_analog_gate_fail(self):
+        "Test analog gate fail"
+        gate = AnalogGate(hamiltonian=X@Y+ Z@A + I@Z)
+        self.assertRaises(AssertionError, lambda: test_function(operator=gate, visitor=self._visitor))
+
+    def test_analog_circuit_pass(self):
+        "Test analog circuit pass"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Y+ Z@X + I@Z)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        test_function(operator=ac, visitor=self._visitor)
+
+    def test_analog_circuit_fail(self):
+        "Test analog circuit fail"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Y+ Z@A + I@Z)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        self.assertRaises(AssertionError, lambda: test_function(operator=ac, visitor=self._visitor))
+
+    def test_analog_circuit_fail_scalmul(self):
+        "Test analog circuit fail with scalar mul"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + 2*(I@Z))
+        gate2 = AnalogGate(hamiltonian=X@Y+ 1*(Z@A) + I@Z)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        self.assertRaises(AssertionError, lambda: test_function(operator=ac, visitor=self._visitor))
+
+    def test_analog_circuit_fail_inter_gates(self):
+        "Test analog circuit fail inter gates"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Y@Z+ Z@Z@Z + I@Z@Y)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        self.assertRaises(Exception, lambda: test_function(operator=ac, visitor=self._visitor))
+
+    def test_task_pass(self):
+        "Test task pass simple"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate1, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I),
+                "Z^1": Expectation(operator= I@Z),
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        test_function(operator=task, visitor=self._visitor)
+
+    def test_task_fail(self):
+        "Test task fail among gates"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Y@Z+ Z@I@I + I@Z@I)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I),
+                "Z^1": Expectation(operator= I@Z),
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        self.assertRaises(Exception, lambda: test_function(operator=task, visitor=self._visitor))
+
+    def test_task_fail_gates_task(self):
+        "Test task fail between gates and task metrics"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Z+ Z@I + 1*(I@I))
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I@I),
+                "Z^1": Expectation(operator= I@Z@I),
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        self.assertRaises(ValueError, lambda: test_function(operator=task, visitor=self._visitor))
+
+    def test_task_fail_gates_task_scalmul(self):
+        "Test task fail between gates and task metrics with scalar multiplication"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Z+ (1*Z)@I + 1*(I@I))
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I@I),
+                "Z^1": Expectation(operator= I@(1*Z)@I),
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        self.assertRaises(ValueError, lambda: test_function(operator=task, visitor=self._visitor))
+
+    def test_task_fail_multiplication(self):
+        "Test task fail in gates for invalid operation"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@(I*A) + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I),
+                "Z^1": Expectation(operator= I@Z),
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        self.assertRaises(AssertionError, lambda: test_function(operator=task, visitor=self._visitor))
+
+    def test_task_fail_ladder(self):
+        "Test task fail between gates and args for invalid ladder"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        gate2 = AnalogGate(hamiltonian=X@Y+ Z@I + I@Z)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@I),
+                "Z^1": Expectation(operator= I@A),
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        self.assertRaises(ValueError, lambda: test_function(operator=task, visitor=self._visitor))
+
+    def test_task_pass_annhiliation(self):
+        "Test task fail between gates and args for invalid ladder"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@A+ Z@LI + I@C)
+        gate2 = AnalogGate(hamiltonian=X@A+ Z@C + I@LI)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@LI),
+                "Z^1": Expectation(operator= I@A),
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        test_function(operator=task, visitor=self._visitor)
 
 if __name__ == '__main__':
     unittest.main()
