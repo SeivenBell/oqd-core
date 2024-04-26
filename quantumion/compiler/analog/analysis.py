@@ -2,6 +2,7 @@ from quantumion.interface.analog.operations import *
 from quantumion.compiler.analog.canonicalize import *
 from quantumion.interface.analog.operator import *
 from quantumion.compiler.analog.base import AnalogInterfaceTransformer
+from quantumion.compiler.analog.verify import VerifyHilbertSpace
 from typing import Union
 
 class RegisterInformation(AnalogInterfaceTransformer):
@@ -19,6 +20,15 @@ class RegisterInformation(AnalogInterfaceTransformer):
         return model
     
     def visit_AnalogCircuit(self, model: AnalogCircuit):
+        """
+        Note that we assume VerifyHilbertSpace has passed on model as without VerifyHilbertSpace passing,
+        this visitor will produce incorrect results. As an additional safety check we again run VerifyHilbertSpace
+        before visiting AnalogCircuit node
+        """
+        try:
+            model.accept(VerifyHilbertSpace())
+        except:
+            raise ValueError("Different Hilbert spaces encountered during Hilbert Space Verification")
         for idx, instruction in enumerate(model.sequence):
             self.visit(instruction)
             if idx == 0:
