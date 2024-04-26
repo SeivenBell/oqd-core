@@ -281,5 +281,47 @@ class TestVerifyHilbertSpace(unittest.TestCase):
         task = Task(program=ac, args = args)
         test_function(node=task, visitor=self._visitor)
 
+    def test_task_pass_entropy(self):
+        "Test pass with Entropy"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@A+ Z@LI + I@C)
+        gate2 = AnalogGate(hamiltonian=X@A+ Z@C + I@LI)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator = Z@LI),
+                "Z^1": Expectation(operator = I@A),
+                "Entanglement Entropy": EntanglementEntropyVN(qreg=[i for i in range(1)]),
+
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        test_function(node=task, visitor=self._visitor)
+
+    def test_task_fail_entropy(self):
+        "Test pass with Entropy"
+        ac = AnalogCircuit()
+        gate1 = AnalogGate(hamiltonian=X@A+ Z@LI + I@C)
+        gate2 = AnalogGate(hamiltonian=X@A+ Z@C + I@LI)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator = A@LI),
+                "Z^1": Expectation(operator = I@A),
+                "Entanglement Entropy": EntanglementEntropyVN(qreg=[i for i in range(1)]),
+
+            },
+            dt=1e-2,
+        )
+        task = Task(program=ac, args = args)
+        self.assertRaises(ValueError, lambda: test_function(node=task, visitor=self._visitor))
+
 if __name__ == '__main__':
     unittest.main()
