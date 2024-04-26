@@ -3,13 +3,11 @@ from typing import Union, Any
 ########################################################################################
 
 from quantumion.interface.analog import *
+from quantumion.interface.base import VisitableBaseModel
 
 from quantumion.compiler.analog.base import *
 from quantumion.compiler.analog.error import *
 from quantumion.compiler.analog.canonicalize import *
-
-from quantumion.backend.task import TaskArgsAnalog
-from quantumion.backend.metric import Expectation
 
 ########################################################################################
 
@@ -147,9 +145,31 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
             raise CanonicalFormError("Subtraction of terms present")
 
 class VerifyHilbertSpace(AnalogCircuitVisitor):
+    """
+    We should not have:
+    def visit_AnalogGate(self, model: AnalogGate):
+        self.visit(model.hamiltonian)
+    This is because, then the default visitor will not be activated and thus, the global space dimension will
+    not be recorded. 
+    """
+    def __init__(self):
+        super().__init__()
+        self.global_space = None
+
+    def reset(self):
+        self.global_space = None
+
     def _visit(self, model):
         if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul)):
             self.visit_OperatorAddSubMul(model)
+        elif isinstance(model, VisitableBaseModel) and not isinstance(model, Operator):
+            for key in model.__dict__.keys():
+                self.visit(getattr(model, key))
+                if not isinstance(model, Operator) and isinstance(getattr(model, key), Operator):
+                    if self.global_space == None:
+                        self.global_space = self.space_temp
+                    elif self.global_space != self.space_temp:
+                        raise ValueError("Different Hilbert spaces encountered. Please check the dimensions of Args and gates.")
         else:
             super(self.__class__, self)._visit(model)
 
@@ -189,17 +209,6 @@ class VerifyHilbertSpace(AnalogCircuitVisitor):
                 first_space_dim = self.space_temp 
             elif self.space_temp != first_space_dim:
                 raise Exception("Incorrect dimensions between AnalogGates {} and {}".format(model.sequence[idx].gate.hamiltonian.accept(PrintOperator()), model.sequence[idx-1].gate.hamiltonian.accept(PrintOperator())))
-            
-    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog):
-        first_expectation = True
-        for metric in model.metrics.values():
-            self.visit(metric)
-            if isinstance(metric, Expectation) and first_expectation == True:
-                first_space_dim = self.space_temp
-                first_expectation = False
-            elif isinstance(metric, Expectation) and self.space_temp != first_space_dim:
-                print(self.space_temp)
-                raise Exception("Incorrect dimensions in Task")
 
 class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
     def __init__(self):
