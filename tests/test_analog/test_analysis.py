@@ -3,8 +3,9 @@ from quantumion.compiler.analog.canonicalize import *
 from quantumion.compiler.analog.verify import *
 from quantumion.compiler.analog.error import *
 from quantumion.compiler.analog.base import *
+from quantumion.compiler.analog.analysis import RegisterInformation
 from quantumion.backend.task import Task, TaskArgsAnalog
-from quantumion.backend.metric import Expectation
+from quantumion.backend.metric import Expectation, EntanglementEntropyVN
 from rich import print as pprint
 import unittest
 from quantumion.interface.math import *
@@ -322,6 +323,213 @@ class TestVerifyHilbertSpace(unittest.TestCase):
         )
         task = Task(program=ac, args = args)
         self.assertRaises(ValueError, lambda: test_function(node=task, visitor=self._visitor))
+
+@colorize(color=BLUE)
+class TestRegisterInformation(unittest.TestCase):
+    maxDiff = None
+
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._visitor = RegisterInformation()
+        super().__init__(methodName)
+
+    def test_simple_pass_operators(self):
+        """Test to see operators are unaffected"""
+        op = X + Y + Z + I
+        model_out = test_function(node=op, visitor=self._visitor)
+        self.assertEqual(op, model_out)
+
+    def test_simple_pass_gates(self):
+        """Test to see operators are unaffected"""
+        op = X + Y + Z + I
+        gate = AnalogGate(hamiltonian = op)
+
+        model_out = test_function(node = gate, visitor = self._visitor)
+        self.assertEqual(gate, model_out)
+
+
+    def test_simple_pass_evolve(self):
+        """Test to see evolve objects are unaffected"""
+        op = X + Y + Z + I
+        gate = AnalogGate(hamiltonian=op)
+        evolve = Evolve(gate=gate, duration=1)
+
+        model_out = test_function(node=evolve, visitor=self._visitor)
+        self.assertEqual(evolve, model_out)
+
+    def test_simple_pass_circuit(self):
+        """Test to see that circuit is modified"""
+
+        ac = AnalogCircuit()
+        op = X + Y + Z + I
+        gate = AnalogGate(hamiltonian=op)
+        ac.evolve(gate=gate, duration=1)
+
+        model_out = test_function(node=ac, visitor=self._visitor)
+
+        with self.subTest():
+            self.assertTrue(isinstance(model_out, AnalogCircuit))   
+        with self.subTest():
+            self.assertIsNone(ac.n_qreg)
+        with self.subTest():
+            self.assertIsNone(ac.n_qmode)
+        with self.subTest():
+            self.assertEqual(model_out.n_qreg, 1)
+        with self.subTest():
+            self.assertEqual(model_out.n_qmode, 0)
+
+    def test_simple_pass_with_ladder(self):
+        """Test to see that circuit is modified with ladders"""
+
+        ac = AnalogCircuit()
+        op1 = X@A@C + Z@C@A
+        op2 = X@A@C + Z@C@C
+        gate1 = AnalogGate(hamiltonian=op1)
+        gate2 = AnalogGate(hamiltonian=op2)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+
+        model_out = test_function(node=ac, visitor=self._visitor)
+
+        with self.subTest():
+            self.assertTrue(isinstance(model_out, AnalogCircuit))   
+        with self.subTest():
+            self.assertIsNone(ac.n_qreg)
+        with self.subTest():
+            self.assertIsNone(ac.n_qmode)
+        with self.subTest():
+            self.assertEqual(model_out.n_qreg, 1)
+        with self.subTest():
+            self.assertEqual(model_out.n_qmode, 2)
+
+    def test_complicated_pass_with_ladder(self):
+        """Test to see that circuit is modified with ladder multiplications"""
+
+        ac = AnalogCircuit()
+        op1 = X@A@C + Z@C@(A*A*C)
+        op2 = X@A@(C*A*C*LI) + Z@C@C
+        gate1 = AnalogGate(hamiltonian=op1)
+        gate2 = AnalogGate(hamiltonian=op2)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+
+        model_out = test_function(node=ac, visitor=self._visitor)
+
+        with self.subTest():
+            self.assertTrue(isinstance(model_out, AnalogCircuit))   
+        with self.subTest():
+            self.assertIsNone(ac.n_qreg)
+        with self.subTest():
+            self.assertIsNone(ac.n_qmode)
+        with self.subTest():
+            self.assertEqual(model_out.n_qreg, 1)
+        with self.subTest():
+            self.assertEqual(model_out.n_qmode, 2)
+
+    def test_simple_pass_task(self):
+        """Test to see that task is modified"""
+
+        ac = AnalogCircuit()
+        op = X + Y + Z + I
+        gate = AnalogGate(hamiltonian=op)
+        ac.evolve(gate=gate, duration=1)
+
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z),
+                "Z^1": Expectation(operator= Z),
+            },
+            dt=1e-2,
+        )
+
+        task = Task(program = ac, args = args)
+
+        model_out = test_function(node=task, visitor=self._visitor)
+
+        with self.subTest():
+            self.assertTrue(isinstance(model_out, Task))   
+        with self.subTest():
+            self.assertIsNone(task.program.n_qreg)
+        with self.subTest():
+            self.assertIsNone(task.program.n_qmode)
+        with self.subTest():
+            self.assertEqual(model_out.program.n_qreg, 1)
+        with self.subTest():
+            self.assertEqual(model_out.program.n_qmode, 0)
+
+    def test_simple_pass_task_ladder(self):
+        """Test to see that task is modified with ladders"""
+
+        ac = AnalogCircuit()
+        op1 = X@A@C + Z@C@(A*A*C)
+        op2 = X@A@(C*A*C*LI) + Z@C@C
+        gate1 = AnalogGate(hamiltonian=op1)
+        gate2 = AnalogGate(hamiltonian=op2)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@A@C),
+                "Z^1": Expectation(operator= Z@A@A),
+            },
+            dt=1e-2,
+        )
+
+        task = Task(program = ac, args = args)
+
+        model_out = test_function(node=task, visitor=self._visitor)
+
+        with self.subTest():
+            self.assertTrue(isinstance(model_out, Task))   
+        with self.subTest():
+            self.assertIsNone(task.program.n_qreg)
+        with self.subTest():
+            self.assertIsNone(task.program.n_qmode)
+        with self.subTest():
+            self.assertEqual(model_out.program.n_qreg, 1)
+        with self.subTest():
+            self.assertEqual(model_out.program.n_qmode, 2)
+
+
+    def test_simple_fail_circuit(self):
+        """Test to see if errors are raised for incorrect operation"""
+
+        ac = AnalogCircuit()
+        op = X + A + Z + I
+        gate = AnalogGate(hamiltonian=op)
+        ac.evolve(gate=gate, duration=1)
+        self.assertRaises(ValueError, lambda: test_function(node=ac, visitor=self._visitor))
+
+    def test_complicated_fail_task_ladder(self):
+        """Test to see that task fails when there is incorrect operation"""
+
+        ac = AnalogCircuit()
+        op1 = X@A@C + Z@C@(A*LI)
+        op2 = X@A@(X*LI) + Z@C@C
+        gate1 = AnalogGate(hamiltonian=op1)
+        gate2 = AnalogGate(hamiltonian=op2)
+        ac.evolve(gate=gate1, duration=1)
+        ac.evolve(gate=gate2, duration=1)
+
+        args = TaskArgsAnalog(
+            n_shots=500,
+            fock_cutoff=4,
+            metrics={
+                "Z^0": Expectation(operator= Z@A@C),
+                "Z^1": Expectation(operator= Z@A@A),
+            },
+            dt=1e-2,
+        )
+
+        task = Task(program = ac, args = args)
+
+        self.assertRaises(ValueError, lambda: test_function(node=task, visitor=self._visitor))
+
+
 
 if __name__ == '__main__':
     unittest.main()
