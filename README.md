@@ -1,18 +1,14 @@
-
-<div align="center">
-
 # ![Open Quantum Design](docs/img/oqd-logo-text.png)
+
 
 <h2 align="center">
     Program the world's first open-source, full-stack quantum computer.
 </h2>
 
-[//]: # ([![Documentation Status]&#40;https://readthedocs.org/projects/queso/badge/?version=latest&#41;]&#40;https://queso.readthedocs.io/en/latest/?badge=latest&#41;)
+
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 ![versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)
 [![CI](https://github.com/OpenQuantumDesign/midstack/actions/workflows/CI.yml/badge.svg)](https://github.com/OpenQuantumDesign/midstack/actions/workflows/CI.yml)
-
-</div>
 
 ## What's here
 - [Quick Start](#quickstart) <br/>

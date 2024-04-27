@@ -7,6 +7,11 @@ repo_url: https://github.com/OpenQuantumDesign/midstack
 
 copyright: Copyright &copy; 2024 Open Quantum Design
 docs_dir: .
+#site_dir: ../site
+#index_page: docs/index.md
+
+use_directory_urls: true
+#use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
 
 extra:
   social:
@@ -14,7 +19,8 @@ extra:
       link: https://github.com/OpenQuantumDesign
       name: Open Quantum Design GitHub
 
-nav:  
+
+nav:
 - Get Started:
     - The Stack: docs/index.md
     - Installation: docs/get-started/installation.md
@@ -44,9 +50,6 @@ nav:
     - Task: docs/technical/reference/task-backend.md
     - Qutip: docs/technical/reference/qutip-backend.md
   - Utilities: docs/technical/reference/utils.md
-
-
-use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
 
 
 theme:
