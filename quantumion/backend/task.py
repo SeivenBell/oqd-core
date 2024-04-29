@@ -10,7 +10,7 @@ from quantumion.interface.analog.operations import AnalogCircuit
 from quantumion.interface.digital.circuit import DigitalCircuit
 from quantumion.interface.atomic.program import AtomicProgram
 
-from quantumion.backend.metric import Metric
+from quantumion.backend.metric import Metric, EntanglementEntropyVN, EntanglementEntropyReyni, QutipExpectation
 
 ########################################################################################
 
@@ -78,6 +78,13 @@ class TaskArgsAnalog(VisitableBaseModel):
     fock_cutoff: int = 4
     dt: float = 0.1
     metrics: Dict[str, Metric] = {}
+
+class TaskQutip(VisitableBaseModel):
+    layer: Literal["analog"] = "analog"
+    n_shots: Union[int, None] = 10
+    fock_cutoff: int = 4
+    dt: float = 0.1
+    metrics: Dict[str, Union[EntanglementEntropyReyni, EntanglementEntropyVN, QutipExpectation]] = {}
 
 
 class TaskResultAnalog(VisitableBaseModel):

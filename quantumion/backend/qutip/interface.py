@@ -1,5 +1,5 @@
 from quantumion.interface.base import VisitableBaseModel
-from quantumion.backend.task import TaskArgsAnalog
+from quantumion.backend.task import TaskQutip
 from quantumion.backend.metric import *
 from typing import List, Tuple, Literal
 from pydantic import field_validator
@@ -31,4 +31,4 @@ class QutipExperiment(VisitableBaseModel):
     instructions: list[QutipOperation]
     n_qreg: NonNegativeInt
     n_qmode: NonNegativeInt
-    args: TaskArgsAnalog
+    args: TaskQutip
