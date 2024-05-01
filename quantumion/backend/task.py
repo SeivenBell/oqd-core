@@ -8,7 +8,7 @@ from pydantic import BaseModel, BeforeValidator
 from quantumion.interface.base import VisitableBaseModel
 from quantumion.interface.analog.operations import AnalogCircuit
 from quantumion.interface.digital.circuit import DigitalCircuit
-from quantumion.interface.atomic.program import AtomicProgram
+from quantumion.interface.atomic.circuit import AtomicCircuit
 
 from quantumion.backend.metric import Metric
 
@@ -124,7 +124,7 @@ class TaskResultAtomic(BaseModel):
 
 
 class Task(VisitableBaseModel):
-    program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
+    program: Union[AnalogCircuit, DigitalCircuit, AtomicCircuit]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
 
 

@@ -1,18 +1,21 @@
-from typing import List
+# External imports
+from typing import List, Union
 
 ########################################################################################
 
 from quantumion.interface.base import TypeReflectBaseModel
-from quantumion.interface.atomic import Ion
+from quantumion.interface.atomic.system import System
+from quantumion.interface.atomic.protocol import Protocol
 
 ########################################################################################
 
 __all__ = [
-    "Register",
+    "AtomicCircuit",
 ]
 
 ########################################################################################
 
 
-class Register(TypeReflectBaseModel):
-    configuration: List[Ion]
+class AtomicCircuit(TypeReflectBaseModel):
+    system: System
+    protocol: Protocol

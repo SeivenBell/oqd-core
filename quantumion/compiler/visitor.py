@@ -1,8 +1,18 @@
 from typing import Any
 
+from pydantic import BaseModel
+
 ########################################################################################
 
 from quantumion.interface.base import VisitableBaseModel
+
+########################################################################################
+
+__all__ = [
+    "Visitor",
+    "Transformer",
+    "PrettyPrint",
+]
 
 ########################################################################################
 
@@ -31,7 +41,7 @@ class Visitor:
             for key, value in model.items():
                 if isinstance(key, VisitableBaseModel):
                     self.visit(key)
-                
+
                 if isinstance(value, VisitableBaseModel):
                     self.visit(value)
 
@@ -63,10 +73,10 @@ class Transformer(Visitor):
             for key, value in model.items():
                 if isinstance(key, VisitableBaseModel):
                     key = self.visit(key)
-                
+
                 if isinstance(value, VisitableBaseModel):
                     value = self.visit(value)
-                    
+
                 new_model[key] = value
 
         if isinstance(model, VisitableBaseModel):
@@ -76,3 +86,34 @@ class Transformer(Visitor):
             new_model = model.__class__(**new_fields)
 
         return new_model
+
+
+class PrettyPrint(Transformer):
+    def _visit(self, model):
+        if isinstance(
+            model,
+            (list,),
+        ):
+            _s = ""
+            for i, element in enumerate(model):
+                _s += f"-> {i}: {self.visit(element)}\n"
+            _s = _s.split("\n")
+            _s = [f"  {s}\n" for s in _s]
+            _s = "".join(_s)
+            s = f"{model.__class__.__name__}\n{_s}"
+            s = s.rstrip(" \n")
+            return s
+        if isinstance(model, BaseModel):
+            _s = ""
+            for key in model.__fields__.keys():
+                _s += f"-> {key}: {self.visit(model.__dict__[key])}\n"
+            _s = _s.split("\n")
+            _s = [f"  {s}\n" for s in _s]
+            _s = "".join(_s)
+            s = f"{model.__class__.__name__}\n{_s}"
+            s = s.rstrip(" \n")
+            return s
+        return f"{model.__class__.__name__} = {model}"
+
+    def visit_str(self, model):
+        return f'{model.__class__.__name__} = "{model}"'

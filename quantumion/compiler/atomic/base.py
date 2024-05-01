@@ -4,24 +4,12 @@ from quantumion.interface.atomic.register import Register
 ########################################################################################
 
 
-class AtomicProgramVisitor(Visitor):
+class AtomicCircuitVisitor(Visitor):
     pass
 
 
-class AtomicProgramTransformer(Transformer):
+class AtomicCircuitTransformer(Transformer):
     pass
-
-
-class AtomicProgramIonsAnalysis(AtomicProgramVisitor):
-    def __init__(self):
-        self.ions = 0
-
-    def reset(self):
-        self.ions = 0
-
-    def visit_Register(self, model: Register) -> None:
-        assert isinstance(model, Register)
-        self.ions += len(model.configuration)
 
 
 ########################################################################################
