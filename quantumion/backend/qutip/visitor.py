@@ -27,25 +27,6 @@ __all__ = [
     "QutipExperimentEvolve",
 ]
 
-class QutipExperimentMeasure(AnalogInterfaceTransformer):
-    def __init__(self, state):
-        super().__init__()
-        self._state = state
-
-    def visit_QutipExperiment(self, model: QutipExperiment):
-        if model.args.n_shots is None:
-            return {}
-        probs = np.power(np.abs(self._state.full()), 2).squeeze()
-        n_shots = model.args.n_shots
-        inds = np.random.choice(len(probs), size=n_shots, p=probs)
-        opts = model.n_qreg * [[0, 1]] + model.n_qmode * [
-            list(range(model.args.fock_cutoff))
-        ]
-        bases = list(itertools.product(*opts))
-        shots = np.array([bases[ind] for ind in inds])
-        bitstrings = ["".join(map(str, shot)) for shot in shots]
-        return {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
-
 
 class QutipExperimentEvolve(AnalogInterfaceTransformer):
     def __init__(self):
@@ -103,15 +84,27 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
                 )
                 metrics.update({key: np.hstack([metrics[key], result_expect])})
 
+        if model.args.n_shots is None:
+            counts = {}
+        else:
+            probs = np.power(np.abs(results[-1].final_state.full()), 2).squeeze()
+            n_shots = model.args.n_shots
+            inds = np.random.choice(len(probs), size=n_shots, p=probs)
+            opts = model.n_qreg * [[0, 1]] + model.n_qmode * [
+                list(range(model.args.fock_cutoff))
+            ]
+            bases = list(itertools.product(*opts))
+            shots = np.array([bases[ind] for ind in inds])
+            bitstrings = ["".join(map(str, shot)) for shot in shots]
+            counts = {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
+
         return TaskResultAnalog(
             times=times,
             metrics=metrics,
             state=list(
                 results[-1].final_state.full().squeeze(),
             ),
-            counts=model.accept(
-                visitor=QutipExperimentMeasure(state=results[-1].final_state)
-            ),
+            counts = counts,
             runtime=time_taken,
         )
 
