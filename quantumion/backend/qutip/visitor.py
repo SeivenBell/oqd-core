@@ -113,9 +113,12 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
         tspan = np.linspace(
             0, duration, round(duration / self._dt)
         )  # create time vector
-
+        qutip_hamiltonian = []
+        for op, coeff in model.hamiltonian:
+            qutip_hamiltonian.append([op, coeff.accept(VerbosePrintMathExpr())]) ## this is the correct way to do it instead of extracting the coeff and giving .value
+        pprint("qutip ham is {}".format(qutip_hamiltonian))
         result_qobj = qt.sesolve(
-            model.hamiltonian,
+            qutip_hamiltonian,
             self._current_state,
             tspan,
             e_ops=self._qutip_metrics,
@@ -183,7 +186,7 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
         return [
             (
                 self.visit(model.op),
-                model.expr.accept(VerbosePrintMathExpr()),
+                model.expr
             )
         ]
 
