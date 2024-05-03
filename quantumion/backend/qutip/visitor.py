@@ -134,45 +134,6 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
         return result_qobj
 
 
-class QutipConvertTransformer(AnalogCircuitTransformer):
-    def __init__(self, fock_cutoff):
-        super().__init__()
-        self.fock_cutoff = fock_cutoff
-
-    def visit_PauliI(self, model: PauliI) -> qt.Qobj:
-        return qt.qeye(2)
-
-    def visit_PauliX(self, model: PauliX) -> qt.Qobj:
-        return qt.sigmax()
-
-    def visit_PauliY(self, model: PauliY) -> qt.Qobj:
-        return qt.sigmay()
-
-    def visit_PauliZ(self, model: PauliZ) -> qt.Qobj:
-        return qt.sigmaz()
-
-    def visit_Identity(self, model: Identity) -> qt.Qobj:
-        return qt.qeye(self.fock_cutoff)
-
-    def visit_Creation(self, model: Creation) -> qt.Qobj:
-        return qt.create(self.fock_cutoff)
-
-    def visit_Annihilation(self, model: Annihilation) -> qt.Qobj:
-        return qt.destroy(self.fock_cutoff)
-
-    def visit_OperatorMul(self, model: OperatorMul) -> qt.Qobj:
-        return self.visit(model.op1) * self.visit(model.op2)
-
-    def visit_OperatorKron(self, model: OperatorKron) -> qt.Qobj:
-        return qt.tensor(self.visit(model.op1), self.visit(model.op2))
-
-    def visit_OperatorAdd(self, model: OperatorAdd) -> qt.Qobj:
-        return self.visit(model.op1) + self.visit(model.op2)
-
-    def visit_OperatorScalarMul(self, model: OperatorScalarMul) -> qt.Qobj:
-        return model.expr.value * self.visit(model.op)
-
-
 def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
     rho = qt.ptrace(
         psi,
@@ -181,38 +142,6 @@ def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
     )
     return qt.entropy_vn(rho)
 
-
-class MetricsToQutipObjects(
-    AnalogInterfaceTransformer
-):  # task analog to taskqutipanalog
-    """
-    Transforms TaskArgsAnalog such that metrics converted to qutip  lambda objects
-    """
-
-    def __init__(self, n_qreg, n_qmode):
-        super().__init__()
-        self.n_qreg = n_qreg
-        self.n_qmode = n_qmode
-
-    def _visit(self, model: Any):
-        if isinstance(model, dict):
-            return {key: self.visit(metric) for (key, metric) in model.items()}
-        else:
-            return super(self.__class__, self)._visit(model)
-
-    def visit_TaskQutip(self, model: TaskQutip) -> dict:
-        self.fock_cutoff = model.fock_cutoff
-        return self.visit(model.metrics)
-
-    def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
-        return lambda t, psi: entanglement_entropy_vn(
-            t, psi, model.qreg, model.qmode, self.n_qreg, self.n_qmode
-        )
-
-    def visit_Expectation(self, model: QutipExpectation):
-        return lambda t, psi: qt.expect(
-            model.operator, psi
-        )
 
 class QutipBackendTransformer(AnalogInterfaceTransformer):
     """convert task to QutipObj without running (maybe use visitor?)
