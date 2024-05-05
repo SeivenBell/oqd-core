@@ -36,6 +36,7 @@ nav:
 - Explanation:
   - Visitor: docs/technical/explanation/visitor.md
   - Compilation Flow: docs/technical/explanation/compilation-flow.md
+  - Canonicalization Flow: docs/technical/explanation/canonicalization-flow.md
 - API Reference:
   - Interfaces:
     - Data Structures: docs/technical/reference/interface-base.md
