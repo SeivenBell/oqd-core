@@ -29,7 +29,6 @@ class SerializeMathExpr(Transformer):
     def visit_MathVar(self, model: MathVar):
         raise TypeError
 
-
     def visit_MathNum(self, model: MathNum):
         return model.value
 
@@ -40,8 +39,7 @@ class SerializeMathExpr(Transformer):
         return getattr(math, model.func)(self.visit(model.expr))
 
     def visit_MathAdd(self, model: MathAdd):
-        string = self.visit(model.expr1)+ self.visit(model.expr2)
-        return string
+        return self.visit(model.expr1)+ self.visit(model.expr2)
     
     def visit_MathSub(self, model: MathSub):
         return self.visit(model.expr1) - self.visit(model.expr2)

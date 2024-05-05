@@ -51,6 +51,13 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         self._term_indices = []
         self._current_term_index = None
 
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (Operator)):
+            pass
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+        super()._visit(model)
+
     def visit_OperatorAdd(self, model: OperatorAdd):
 
         try:
@@ -315,6 +322,11 @@ class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorAdd, OperatorSub)):
             self.visit_OperatorAddSub(model)
+        elif isinstance(model, Operator):
+             super(self.__class__, self)._visit(model)
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+            super(self.__class__, self)._visit(model)          
         else:
             super(self.__class__, self)._visit(model)
 
@@ -350,6 +362,13 @@ class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
 
     def reset(self):
         self.creation_tracker = False
+
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (Operator)):
+            pass
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+        super()._visit(model)
 
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul, OperatorKron)):
@@ -403,6 +422,13 @@ class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
     def reset(self):
         self._current_term_index = None
         self._term_indices = []
+
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (Operator)):
+            pass
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+        super()._visit(model)
 
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, self._allowed_nodes) and isinstance(model.op2, self._allowed_nodes):
