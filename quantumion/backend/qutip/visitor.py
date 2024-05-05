@@ -4,7 +4,7 @@ from quantumion.compiler.analog.base import (
 )
 from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
-from quantumion.compiler.math import VerbosePrintMathExpr
+from quantumion.compiler.math import VerbosePrintMathExpr, SerializeMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation
@@ -35,13 +35,10 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
 
     def visit_QutipExpectation(self, model: QutipExpectation):
         for idx, operator in enumerate(model.operator):
-            coefficient = eval(compile(ast.parse(operator[1], mode = 'eval'), '<string>', 'eval')) # coefficient has no time dependence
-            if idx == 0:
-                term = coefficient * operator[0]
-            else:
-                term = term + coefficient * operator[0]
+            coefficient = operator[1].accept(SerializeMathExpr())
+            op_exp = coefficient * operator[0] if idx == 0 else op_exp + coefficient * operator[0]
         return lambda t, psi: qt.expect(
-            model.operator[0][0], psi
+            op_exp, psi
         )
 
     def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
@@ -115,8 +112,7 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
         )  # create time vector
         qutip_hamiltonian = []
         for op, coeff in model.hamiltonian:
-            qutip_hamiltonian.append([op, coeff.accept(VerbosePrintMathExpr())]) ## this is the correct way to do it instead of extracting the coeff and giving .value
-        pprint("qutip ham is {}".format(qutip_hamiltonian))
+            qutip_hamiltonian.append([op, coeff.accept(VerbosePrintMathExpr())])
         result_qobj = qt.sesolve(
             qutip_hamiltonian,
             self._current_state,
