@@ -4,7 +4,7 @@ from quantumion.compiler.analog.base import (
 )
 from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
-from quantumion.compiler.math import VerbosePrintMathExpr, SerializeMathExpr
+from quantumion.compiler.math import VerbosePrintMathExpr, EvaluateMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation, TaskArgsQutip, QutipExpectation
@@ -33,7 +33,7 @@ class QutipExperimentInterpreter(AnalogInterfaceTransformer):
 
     def visit_QutipExpectation(self, model: QutipExpectation):
         for idx, operator in enumerate(model.operator):
-            coefficient = operator[1].accept(SerializeMathExpr())
+            coefficient = operator[1].accept(EvaluateMathExpr())
             op_exp = coefficient * operator[0] if idx == 0 else op_exp + coefficient * operator[0]
         return lambda t, psi: qt.expect(
             op_exp, psi

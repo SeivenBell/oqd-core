@@ -17,12 +17,12 @@ __all__ = [
     "DistributeMathExpr",
     "ProperOrderMathExpr",
     "MermaidMathExpr",
-    "SerializeMathExpr",
+    "EvaluateMathExpr",
 ]
 
 ########################################################################################
 
-class SerializeMathExpr(Transformer):
+class EvaluateMathExpr(Transformer):
     def _visit(self, model: Any):
         raise TypeError("Incompatible type for input model")
 
