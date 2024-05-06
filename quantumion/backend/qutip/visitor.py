@@ -22,11 +22,11 @@ import ast
 
 __all__ = [
     "QutipBackendTransformer",
-    "QutipExperimentEvolve",
+    "QutipExperimentInterpreter",
 ]
 
 
-class QutipExperimentEvolve(AnalogInterfaceTransformer):
+class QutipExperimentInterpreter(AnalogInterfaceTransformer):
     def __init__(self):
         super().__init__()
         self._current_state = None
@@ -176,7 +176,6 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
         return op
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
-        # pprint("scalar mul is {}".format(model))
         return [
             (
                 self.visit(model.op),

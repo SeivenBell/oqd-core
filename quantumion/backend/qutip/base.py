@@ -1,6 +1,6 @@
 from quantumion.backend.qutip.visitor import (
     QutipBackendTransformer,
-    QutipExperimentEvolve,
+    QutipExperimentInterpreter,
 )
 from quantumion.backend.base import BackendBase
 from quantumion.backend.qutip.interface import QutipExperiment
@@ -47,7 +47,7 @@ class QutipBackend(BackendBase):
     
     @property
     def evolve(self):
-        return TransformerFlowNode(visitor=QutipExperimentEvolve(),name="_")
+        return TransformerFlowNode(visitor=QutipExperimentInterpreter(),name="_")
 
     def compile(self, task: Task):
         return self.graph(task).model
