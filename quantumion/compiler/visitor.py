@@ -29,9 +29,7 @@ class Visitor:
 
         if isinstance(model, dict):
             for key, value in model.items():
-                if isinstance(key, VisitableBaseModel):
-                    self.visit(key)
-                
+
                 if isinstance(value, VisitableBaseModel):
                     self.visit(value)
 
@@ -61,8 +59,6 @@ class Transformer(Visitor):
         elif isinstance(model, dict):
             new_model = {}
             for key, value in model.items():
-                if isinstance(key, VisitableBaseModel):
-                    key = self.visit(key)
                 
                 if isinstance(value, VisitableBaseModel):
                     value = self.visit(value)
