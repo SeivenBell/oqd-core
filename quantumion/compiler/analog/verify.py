@@ -209,14 +209,6 @@ class VerifyHilbertSpace(AnalogCircuitVisitor):
             + f"\n\t{model.op2.accept(PrintOperator())}"
         )
 
-    def visit_AnalogCircuit(self, model: AnalogCircuit):
-        for idx, instruction in enumerate(model.sequence):
-            self.visit(instruction)
-            if idx == 0:
-                first_space_dim = self.space_temp 
-            elif self.space_temp != first_space_dim:
-                raise Exception("Incorrect dimensions between AnalogGates {} and {}".format(model.sequence[idx].gate.hamiltonian.accept(PrintOperator()), model.sequence[idx-1].gate.hamiltonian.accept(PrintOperator())))
-
 class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
     def __init__(self):
         super().__init__()
