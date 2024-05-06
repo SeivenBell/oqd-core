@@ -10,7 +10,7 @@ from pydantic.types import NonNegativeInt
 __all__ = [
     'QutipOperation',
     'QutipExperiment',
-    'TaskQutip',
+    'TaskArgsQutip',
     'QutipExpectation'
 ]
 
@@ -28,7 +28,7 @@ class QutipExpectation(VisitableBaseModel):
                 raise ValueError('Incorrect types in operator')
         return v
     
-class TaskQutip(VisitableBaseModel):
+class TaskArgsQutip(VisitableBaseModel):
     layer: Literal["analog"] = "analog"
     n_shots: Union[int, None] = 10
     fock_cutoff: int = 4
@@ -54,4 +54,4 @@ class QutipExperiment(VisitableBaseModel):
     instructions: list[QutipOperation]
     n_qreg: NonNegativeInt
     n_qmode: NonNegativeInt
-    args: TaskQutip
+    args: TaskArgsQutip

@@ -7,7 +7,7 @@ from quantumion.interface.base import VisitableBaseModel
 from quantumion.compiler.math import VerbosePrintMathExpr, SerializeMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
-from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation, TaskQutip, QutipExpectation
+from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation, TaskArgsQutip, QutipExpectation
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
 from typing import Any, Union, List, Tuple, Literal, Dict
@@ -151,7 +151,7 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
         )
     
     def visit_TaskArgsAnalog(self, model: TaskArgsAnalog):
-        return TaskQutip(
+        return TaskArgsQutip(
             layer=model.layer,
             n_shots=model.n_shots,
             fock_cutoff=model.fock_cutoff,
