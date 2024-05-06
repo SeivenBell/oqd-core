@@ -829,6 +829,6 @@ class TestCanonicalizationVerificationScaleTerms(CanonicalFormErrors, unittest.T
         """Complicated addition fail"""
         op = 2*(X@Z@Z@(C*A))  + Z + 2*(Y@Z) + 1*A + 1*(C*C) + 1*I + 1*Z
         self.assertCanonicalFormErrorRaised(operator=op, visitor=self._visitor)
-    
+
 if __name__ == '__main__':
     unittest.main()
