@@ -16,10 +16,7 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
         return self.visit(model.sequence)
     
     def visit_Evolve(self, model: Evolve):
-        return self.visit(model.gate)
-    
-    def visit_AnalogGate(self, model: AnalogGate):
-        omega  = self.visit(model.hamiltonian)
+        omega  = self.visit(model.gate.hamiltonian)
         omega_A = (omega*2*self.delta)**(1/2)
         omega_B = omega_A
         phi_A = self.phi
@@ -39,7 +36,28 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
             wavevector=[0,0,1],
             target=0
         )
-        return beam_A
+
+        beam_B = Beam(
+            transition=transition,
+            rabi=omega_B,
+            detuning=self.delta,
+            phase=phi_B,
+            polarization=[-1,1],
+            wavevector=[0,0,1],
+            target=0
+        )
+
+        pulse_A = Pulse(
+            beam = beam_A,
+            duration = model.duration
+        )
+        pulse_B = Pulse(
+            beam = beam_B,
+            duration = model.duration
+        )
+
+        protocol = SequentialProtocol(sequence = [pulse_A, pulse_B])
+        return protocol
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         if not isinstance(model.op, (PauliX, PauliY)):
