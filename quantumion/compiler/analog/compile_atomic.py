@@ -2,6 +2,7 @@ from quantumion.compiler.analog.base import AnalogInterfaceTransformer
 from quantumion.interface.analog.operations import *
 from quantumion.interface.analog.operator import *
 from quantumion.interface.atomic import *
+from quantumion.interface.math import MathFunc, MathNum
 import numpy as np
 from rich import print as pprint
 
@@ -16,11 +17,11 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
         return self.visit(model.sequence)
     
     def visit_Evolve(self, model: Evolve):
-        omega  = self.visit(model.gate.hamiltonian)
+        omega, phi  = self.visit(model.gate.hamiltonian)
         omega_A = (omega*2*self.delta)**(1/2)
         omega_B = omega_A
-        phi_A = self.phi
-        phi_B = -self.phi
+        phi_A = phi/2
+        phi_B = -phi/2
         level = Level(energy = 100)
         transition = Transition(
             level1 = level,
@@ -62,12 +63,16 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         if not isinstance(model.op, (PauliX, PauliY)):
             raise Exception("Unsupported operation")
-        return (model.expr**2)**(1/2)
+        if isinstance(model.op, PauliX):
+            phi = np.pi/2
+        else:
+            phi = 0
+        return (model.expr**2)**(1/2), MathNum(value=phi)
 
     def visit_OperatorAdd(self, model: OperatorAdd):
         if not isinstance(model.op1.op, (PauliX, PauliY)) or not isinstance(model.op2.op, (PauliX, PauliY)):
             raise Exception("Unsupported operation")
-        return (model.op1.expr**2 + model.op2.expr**2)**(1/2)
+        return (model.op1.expr**2 + model.op2.expr**2)**(1/2), MathFunc(func='atan', expr=model.op1.expr/model.op2.expr)
 
 if __name__ == '__main__':
     ac = AnalogCircuit()
