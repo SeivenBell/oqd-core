@@ -11,7 +11,6 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
     def __init__(self) -> None:
         super().__init__()
         self.delta = 2 * (6.626*(10**(-34))) * np.pi * (3*(10**8)) * ((1/(355*(10**(-9)))) - (1/(369*(10**(-9)))))
-        self.phi = 2
 
     def visit_AnalogCircuit(self, model: AnalogCircuit):
         return self.visit(model.sequence)
@@ -57,8 +56,25 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
             duration = model.duration
         )
 
-        protocol = SequentialProtocol(sequence = [pulse_A, pulse_B])
-        return protocol
+        protocol = ParallelProtocol(sequence = [pulse_A, pulse_B])
+        ion = Ion(
+            mass = 1,
+            charge = 1,
+            levels = [level],
+            transitions=[transition]
+        )
+        mode = Mode(
+            energy=1
+        )
+        system = System(
+            ions = [ion],
+            modes = [mode]
+        )
+        circuit = AtomicCircuit(
+            system=system,
+            protocol=protocol
+        )
+        return circuit
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         if not isinstance(model.op, (PauliX, PauliY)):
