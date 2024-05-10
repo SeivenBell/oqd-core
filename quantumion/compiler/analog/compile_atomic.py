@@ -3,6 +3,7 @@ from quantumion.interface.analog.operations import *
 from quantumion.interface.analog.operator import *
 from quantumion.interface.atomic import *
 from quantumion.interface.math import MathFunc, MathNum
+from quantumion.backend.task import Task, TaskArgsAnalog, TaskArgsAtomic
 import numpy as np
 from rich import print as pprint
 
@@ -12,8 +13,39 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
         super().__init__()
         self.delta = 2 * (6.626*(10**(-34))) * np.pi * (3*(10**8)) * ((1/(355*(10**(-9)))) - (1/(369*(10**(-9)))))
 
+    def visit_Task(self, model: Task):
+        return Task(program=self.visit(model.program), args=TaskArgsAnalog())
+
     def visit_AnalogCircuit(self, model: AnalogCircuit):
-        return self.visit(model.sequence)
+        level = Level(energy = 100)
+        transition = Transition(
+            level1 = level,
+            level2 = level,
+            einsteinA=1.0
+        )
+        ion = Ion(
+            mass = 1,
+            charge = 1,
+            levels = [level],
+            transitions=[transition]
+        )
+        mode = Mode(
+            energy=1
+        )
+        system = System(
+            ions = [ion],
+            modes = [mode]
+        )
+
+        protocol = SequentialProtocol(
+            sequence = self.visit(model.sequence)
+        )
+
+        circuit = AtomicCircuit(
+            system=system,
+            protocol=protocol
+        )
+        return circuit
     
     def visit_Evolve(self, model: Evolve):
         omega, phi  = self.visit(model.gate.hamiltonian)
@@ -57,24 +89,8 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
         )
 
         protocol = ParallelProtocol(sequence = [pulse_A, pulse_B])
-        ion = Ion(
-            mass = 1,
-            charge = 1,
-            levels = [level],
-            transitions=[transition]
-        )
-        mode = Mode(
-            energy=1
-        )
-        system = System(
-            ions = [ion],
-            modes = [mode]
-        )
-        circuit = AtomicCircuit(
-            system=system,
-            protocol=protocol
-        )
-        return circuit
+
+        return protocol
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         if not isinstance(model.op, (PauliX, PauliY)):
@@ -93,5 +109,14 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
 if __name__ == '__main__':
     ac = AnalogCircuit()
     gate = AnalogGate(hamiltonian=2*PauliX()+3*PauliY())
+    gate2 = AnalogGate(hamiltonian=55*PauliX())
+    args = TaskArgsAnalog(
+        n_shots=100,
+        fock_cutoff=4,
+        metrics={},
+        dt=1e-2,
+    )
+    task = Task(program=ac, args=args)
     ac.evolve(gate=gate, duration=1)
+    ac.evolve(gate=gate2, duration=3)
     pprint(ac.accept(AnalogIRtoAtomicIR()))
