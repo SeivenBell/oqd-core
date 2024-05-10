@@ -172,3 +172,6 @@ gen/
 .scratch/
 _scripts/
 .vscode/
+
+# ignore copied examples files when building docs
+docs/examples/

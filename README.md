@@ -129,6 +129,7 @@ pip install -e ".[docs]"
 ```
 To deploy the documentation server locally:
 ```
+cp -r examples/ docs/examples/
 mkdocs serve
 ```
 After deployment, the documentation can be accessed from http://127.0.0.1:8000

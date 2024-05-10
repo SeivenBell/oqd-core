@@ -6,7 +6,7 @@ repo_name: OpenQuantumDesign/midstack
 repo_url: https://github.com/OpenQuantumDesign/midstack
 
 copyright: Copyright &copy; 2024 Open Quantum Design
-docs_dir: .
+#docs_dir: .
 #site_dir: ../site
 #index_page: docs/index.md
 
@@ -22,11 +22,11 @@ extra:
 
 nav:
 - Get Started:
-    - The Stack: docs/index.md
-    - Installation: docs/get-started/installation.md
-    - More details: docs/get-started/stack.md
+    - The Stack: index.md
+    - Installation: get-started/installation.md
+    - More details: get-started/stack.md
 - Tutorials:
-  - Analog: docs/tutorials/analog.md
+  - Analog: tutorials/analog.md
 - Examples:
   - Analog:
     - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
@@ -34,29 +34,29 @@ nav:
     - GHZ state preparation: examples/ghz_state.ipynb
     - Ising model: examples/ising_model.ipynb
 - Explanation:
-  - Visitor: docs/technical/explanation/visitor.md
-  - Compilation Flow: docs/technical/explanation/compilation-flow.md
+  - Visitor: technical/explanation/visitor.md
+  - Compilation Flow: technical/explanation/compilation-flow.md
 - API Reference:
   - Interfaces:
-    - Data Structures: docs/technical/reference/interface-base.md
-    - Math Expression: docs/technical/reference/math-interface.md
-    - Digital: docs/technical/reference/digital-interface.md
+    - Data Structures: technical/reference/interface-base.md
+    - Math Expression: technical/reference/math-interface.md
+    - Digital: technical/reference/digital-interface.md
     - Analog:
-      - Dissipation: docs/technical/reference/dissipation-interface.md
-      - Operations: docs/technical/reference/operations-interface.md
-      - Operators: docs/technical/reference/operator-interface.md
-    - Atomic: docs/technical/reference/atomic-interface.md
+      - Dissipation: technical/reference/dissipation-interface.md
+      - Operations: technical/reference/operations-interface.md
+      - Operators: technical/reference/operator-interface.md
+    - Atomic: technical/reference/atomic-interface.md
   - Backends:
-    - Task: docs/technical/reference/task-backend.md
-    - Qutip: docs/technical/reference/qutip-backend.md
-  - Utilities: docs/technical/reference/utils.md
+    - Task: technical/reference/task-backend.md
+    - Qutip: technical/reference/qutip-backend.md
+  - Utilities: technical/reference/utils.md
 
 
 theme:
   name: material
 
-  logo: docs/img/oqd-logo.png
-  favicon: docs/img/oqd-logo.png
+  logo: img/oqd-logo.png
+  favicon: img/oqd-logo.png
 
   palette:
   - media: '(prefers-color-scheme: light)'
@@ -91,7 +91,6 @@ theme:
 
 plugins:
   - search:
-  - same-dir:
   - mknotebooks:
       execute: false
       timeout: 100
