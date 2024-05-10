@@ -3,7 +3,7 @@ from quantumion.interface.analog.operations import *
 from quantumion.interface.analog.operator import *
 from quantumion.interface.atomic import *
 from quantumion.interface.math import MathFunc, MathNum
-from quantumion.backend.task import Task, TaskArgsAnalog, TaskArgsAtomic
+from quantumion.backend.task import Task, TaskArgsAnalog
 import numpy as np
 from rich import print as pprint
 
@@ -37,9 +37,12 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
             modes = [mode]
         )
 
-        protocol = SequentialProtocol(
-            sequence = self.visit(model.sequence)
-        )
+        if len(model.sequence) == 1:
+            protocol = self.visit(model.sequence)[0]
+        else:
+            protocol = SequentialProtocol(
+                sequence = self.visit(model.sequence)
+            )
 
         circuit = AtomicCircuit(
             system=system,
@@ -118,5 +121,5 @@ if __name__ == '__main__':
     )
     task = Task(program=ac, args=args)
     ac.evolve(gate=gate, duration=1)
-    ac.evolve(gate=gate2, duration=3)
+    # ac.evolve(gate=gate2, duration=3)
     pprint(ac.accept(AnalogIRtoAtomicIR()))
