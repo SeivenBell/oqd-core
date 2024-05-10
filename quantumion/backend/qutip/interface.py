@@ -6,23 +6,23 @@ import qutip as qt
 from pydantic import ConfigDict
 from pydantic.types import NonNegativeInt
 
-__all__ = [
-    'QutipOperation',
-    'QutipExperiment',
-    'TaskArgsQutip',
-    'QutipExpectation'
-]
+__all__ = ["QutipOperation", "QutipExperiment", "TaskArgsQutip", "QutipExpectation"]
+
 
 class QutipExpectation(VisitableBaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     operator: List[Tuple[qt.Qobj, MathExpr]]
-    
+
+
 class TaskArgsQutip(VisitableBaseModel):
     layer: Literal["analog"] = "analog"
     n_shots: Union[int, None] = 10
     fock_cutoff: int = 4
     dt: float = 0.1
-    metrics: Dict[str, Union[EntanglementEntropyReyni, EntanglementEntropyVN, QutipExpectation]] = {}
+    metrics: Dict[
+        str, Union[EntanglementEntropyReyni, EntanglementEntropyVN, QutipExpectation]
+    ] = {}
+
 
 class QutipOperation(VisitableBaseModel):
     """
@@ -37,7 +37,7 @@ class QutipOperation(VisitableBaseModel):
     hamiltonian: List[Tuple[qt.Qobj, MathExpr]]
     duration: float
 
-    
+
 class QutipExperiment(VisitableBaseModel):
     """
     Class representing a quantum experiment in qutip

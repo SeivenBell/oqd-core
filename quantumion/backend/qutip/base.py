@@ -15,16 +15,18 @@ from quantumion.backend.task import Task
 
 from quantumion.compiler.flow import *
 from quantumion.compiler.analog.verification_flow import VerificationFlow
+
 ########################################################################################
 __all__ = [
     "QutipBackend",
 ]
 
+
 class QutipBackendFlow(FlowGraph):
     nodes = [
-        VerificationFlow(name = "verification_flow"),
-        TransformerFlowNode(visitor=RegisterInformation(), name = 'register_information'),
-        TransformerFlowNode(visitor=QutipBackendTransformer(), name = 'qutip_backend'),
+        VerificationFlow(name="verification_flow"),
+        TransformerFlowNode(visitor=RegisterInformation(), name="register_information"),
+        TransformerFlowNode(visitor=QutipBackendTransformer(), name="qutip_backend"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "verification_flow"
@@ -41,7 +43,7 @@ class QutipBackendFlow(FlowGraph):
     @forward_decorators.forward_once(done="terminal")
     def forward_qutip_backend(self, model):
         pass
-    
+
 
 class QutipBackend(BackendBase):
     """
@@ -51,10 +53,10 @@ class QutipBackend(BackendBase):
     @property
     def compiler(self):
         return QutipBackendFlow(name="_")
-    
+
     @property
     def interpreter(self):
-        return TransformerFlowNode(visitor=QutipExperimentInterpreter(),name="_")
+        return TransformerFlowNode(visitor=QutipExperimentInterpreter(), name="_")
 
     def compile(self, task: Task):
         """
@@ -78,4 +80,3 @@ class QutipBackend(BackendBase):
         if experiment is None:
             experiment = self.compile(task=task)
         return self.interpreter(experiment).model
-    

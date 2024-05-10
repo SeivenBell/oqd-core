@@ -33,12 +33,14 @@ class AnalogCircuitVisitor(Visitor):
 class AnalogCircuitTransformer(Transformer):
     pass
 
+
 class AnalogInterfaceVisitor(Visitor):
     pass
 
 
 class AnalogInterfaceTransformer(Transformer):
     pass
+
 
 ########################################################################################
 
@@ -122,7 +124,6 @@ class PrintOperator(AnalogCircuitTransformer):
 
 
 class VerbosePrintOperator(PrintOperator):
-
     def visit_MathExpr(self, model: MathExpr):
         return model.accept(VerbosePrintMathExpr())
 
@@ -174,7 +175,6 @@ class VerbosePrintOperator(PrintOperator):
 
 
 class MermaidOperator(Transformer):
-
     def emit(self, model):
         self.element = 0
 

@@ -99,11 +99,15 @@ def tfim(n: int):
         raise ValueError("Number of qubits, n, must be an integer greater than 2.")
 
     field = sum([tensor([X if i == j else I for i in range(n)]) for j in range(n)])
-    interaction = sum([tensor([Z if j in (i, (i + 1) % n) else I for j in range(n)]) for i in range(n)])
+    interaction = sum(
+        [
+            tensor([Z if j in (i, (i + 1) % n) else I for j in range(n)])
+            for i in range(n)
+        ]
+    )
 
     hamiltonian = AnalogGate(hamiltonian=field + interaction)
 
     circuit = AnalogCircuit()
     circuit.evolve(duration=1, gate=hamiltonian)
     return circuit
-

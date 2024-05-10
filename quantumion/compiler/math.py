@@ -8,8 +8,10 @@ from quantumion.compiler.visitor import Transformer
 
 from quantumion.utils.color import random_hexcolor
 import math
+
 ########################################################################################
 from rich import print as pprint
+
 __all__ = [
     "PrintMathExpr",
     "VerbosePrintMathExpr",
@@ -22,6 +24,7 @@ __all__ = [
 
 ########################################################################################
 
+
 class EvaluateMathExpr(Transformer):
     def _visit(self, model: Any):
         raise TypeError("Incompatible type for input model")
@@ -33,14 +36,14 @@ class EvaluateMathExpr(Transformer):
         return model.value
 
     def visit_MathImag(self, model: MathImag):
-        return complex('1j') #1j also works
+        return complex("1j")  # 1j also works
 
-    def visit_MathFunc(self, model: MathFunc): 
+    def visit_MathFunc(self, model: MathFunc):
         return getattr(math, model.func)(self.visit(model.expr))
 
     def visit_MathAdd(self, model: MathAdd):
-        return self.visit(model.expr1)+ self.visit(model.expr2)
-    
+        return self.visit(model.expr1) + self.visit(model.expr2)
+
     def visit_MathSub(self, model: MathSub):
         return self.visit(model.expr1) - self.visit(model.expr2)
 
@@ -48,10 +51,11 @@ class EvaluateMathExpr(Transformer):
         return self.visit(model.expr1) * self.visit(model.expr2)
 
     def visit_MathDiv(self, model: MathDiv):
-        return self.visit(model.expr1) / self.visit(model.expr2)     
-    
+        return self.visit(model.expr1) / self.visit(model.expr2)
+
     def visit_MathPow(self, model: MathPow):
-        return self.visit(model.expr1) ** self.visit(model.expr2)     
+        return self.visit(model.expr1) ** self.visit(model.expr2)
+
 
 class PrintMathExpr(Transformer):
     def _visit(self, model: Any):
@@ -173,7 +177,6 @@ class VerbosePrintMathExpr(PrintMathExpr):
 
 
 class MermaidMathExpr(Transformer):
-
     def emit(self, model):
         self.element = 0
 
