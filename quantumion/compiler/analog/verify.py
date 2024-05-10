@@ -3,6 +3,7 @@ from typing import Union, Any
 ########################################################################################
 
 from quantumion.interface.analog import *
+from quantumion.interface.base import VisitableBaseModel
 
 from quantumion.compiler.analog.base import *
 from quantumion.compiler.analog.error import *
@@ -49,6 +50,13 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         self.creation_tracker = False
         self._term_indices = []
         self._current_term_index = None
+
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (Operator)):
+            pass
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+        super()._visit(model)
 
     def visit_OperatorAdd(self, model: OperatorAdd):
 
@@ -143,40 +151,63 @@ class CanonicalizationVerificationOperator(AnalogCircuitVisitor):
         if isinstance(model, OperatorSub):
             raise CanonicalFormError("Subtraction of terms present")
 
-class VerifyHilbertSpace(AnalogCircuitTransformer):
+class VerifyHilbertSpace(AnalogCircuitVisitor):
+    """
+    We should not have:
+    def visit_AnalogGate(self, model: AnalogGate):
+        self.visit(model.hamiltonian)
+    This is because, then the default visitor will not be activated and thus, the global space dimension will
+    not be recorded. 
+    """
+    def __init__(self):
+        super().__init__()
+        self.global_space = None
+
+    def reset(self):
+        self.global_space = None
+
     def _visit(self, model):
         if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul)):
-            return self.visit_OperatorAddSubMul(model)
-        raise TypeError
+            self.visit_OperatorAddSubMul(model)
+        elif isinstance(model, VisitableBaseModel) and not isinstance(model, Operator):
+            for key in model.__dict__.keys():
+                self.visit(getattr(model, key))
+                if not isinstance(model, Operator) and isinstance(getattr(model, key), Operator):
+                    if self.global_space == None:
+                        self.global_space = self.space_temp
+                    elif self.global_space != self.space_temp:
+                        raise ValueError("Different Hilbert spaces encountered. Please check the dimensions of Args and gates.")
+        else:
+            super(self.__class__, self)._visit(model)
 
-    def visit_Pauli(self, model):
-        return (1, 0)
+    def visit_Pauli(self, model: Pauli):
+        self.space_temp = (1,0)
 
-    def visit_Ladder(self, model):
-        return (0, 1)
+    def visit_Ladder(self, model: Ladder):
+        self.space_temp = (0,1)
 
-    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
-        return self.visit(model.op)
+    def visit_OperatorKron(self, model: OperatorKron):
 
-    def visit_OperatorAddSubMul(
-        self, model: Union[OperatorAdd, OperatorSub, OperatorMul]
-    ):
-        space1 = self.visit(model.op1)
-        space2 = self.visit(model.op2)
+        self.visit(model.op1)
+        op1_space = self.space_temp
 
-        assert space1 == space2, (
+        self.visit(model.op2)
+        op2_space = self.space_temp
+
+        self.space_temp = tuple(map(sum, zip(op1_space, op2_space)))
+            
+    def visit_OperatorAddSubMul(self, model: Union[OperatorAdd, OperatorSub, OperatorMul]):
+        self.visit(model.op1)
+        left = self.space_temp
+
+        self.visit(model.op2)
+        right = self.space_temp
+
+        assert left == right, (
             "\nInconsistent Hilbert space between:"
             + f"\n\t{model.op1.accept(PrintOperator())}"
             + f"\n\t{model.op2.accept(PrintOperator())}"
         )
-        return space1
-
-    def visit_OperatorKron(self, model: OperatorKron):
-        space1 = self.visit(model.op1)
-        space2 = self.visit(model.op2)
-
-        space = (space1[0] + space2[0], space1[1] + space2[1])
-        return space
 
 class CanonicalizationVerificationOperatorDistribute(AnalogCircuitVisitor):
     def __init__(self):
@@ -283,6 +314,11 @@ class CanonicalizationVerificationGatherPauli(AnalogCircuitVisitor):
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorAdd, OperatorSub)):
             self.visit_OperatorAddSub(model)
+        elif isinstance(model, Operator):
+             super(self.__class__, self)._visit(model)
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+            super(self.__class__, self)._visit(model)          
         else:
             super(self.__class__, self)._visit(model)
 
@@ -318,6 +354,13 @@ class CanonicalizationVerificationNormalOrder(AnalogCircuitVisitor):
 
     def reset(self):
         self.creation_tracker = False
+
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (Operator)):
+            pass
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+        super()._visit(model)
 
     def _visit(self, model: Any) -> Any:
         if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul, OperatorKron)):
@@ -372,6 +415,13 @@ class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
         self._current_term_index = None
         self._term_indices = []
 
+    def _visit(self, model: Any) -> Any:
+        if isinstance(model, (Operator)):
+            pass
+        elif isinstance(model, VisitableBaseModel):
+            self.reset()
+        super()._visit(model)
+
     def visit_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, self._allowed_nodes) and isinstance(model.op2, self._allowed_nodes):
             if TermIndex().visit(model.op1) > TermIndex().visit(model.op2):
@@ -395,7 +445,7 @@ class CanonicalizationVerificationSortedOrder(AnalogCircuitVisitor):
 
 class CanonicalizationVerificationScaleTerms(AnalogCircuitVisitor):
     def _visit(self, model: Any):
-        if not isinstance(model, (OperatorAdd)):
+        if isinstance(model, Operator):
             return self.visit_OperatorNotOpAdd(model)
         return super(self.__class__, self)._visit(model)
     

@@ -4,9 +4,7 @@ from typing import Optional
 
 from quantumion.backend.qutip.visitor import (
     QutipBackendTransformer,
-    QutipExperimentEvolve,
-    QutipTaskArgsCanonicalization,
-    AnalogCircuitCanonicalization,
+    QutipExperimentInterpreter,
 )
 from quantumion.backend.base import BackendBase
 from quantumion.backend.qutip.interface import QutipExperiment
@@ -15,16 +13,48 @@ from quantumion.compiler.analog.analysis import (
 )
 from quantumion.backend.task import Task
 
+from quantumion.compiler.flow import *
+from quantumion.compiler.analog.verification_flow import VerificationFlow
 ########################################################################################
 __all__ = [
     "QutipBackend",
 ]
 
+class QutipBackendFlow(FlowGraph):
+    nodes = [
+        VerificationFlow(name = "verification_flow"),
+        TransformerFlowNode(visitor=RegisterInformation(), name = 'register_information'),
+        TransformerFlowNode(visitor=QutipBackendTransformer(), name = 'qutip_backend'),
+        FlowTerminal(name="terminal"),
+    ]
+    rootnode = "verification_flow"
+    forward_decorators = ForwardDecorators()
+
+    @forward_decorators.forward_once(done="register_information")
+    def forward_verification_flow(self, model):
+        pass
+
+    @forward_decorators.forward_once(done="qutip_backend")
+    def forward_register_information(self, model):
+        pass
+
+    @forward_decorators.forward_once(done="terminal")
+    def forward_qutip_backend(self, model):
+        pass
+    
 
 class QutipBackend(BackendBase):
     """
     Class representing the Qutip backend
     """
+
+    @property
+    def compiler(self):
+        return QutipBackendFlow(name="_")
+    
+    @property
+    def interpreter(self):
+        return TransformerFlowNode(visitor=QutipExperimentInterpreter(),name="_")
 
     def compile(self, task: Task):
         """
@@ -33,11 +63,7 @@ class QutipBackend(BackendBase):
         Args:
             task (Task): Quantum experiment to compile
         """
-        circuit = task.program.accept(AnalogCircuitCanonicalization())
-        args = task.args.accept(QutipTaskArgsCanonicalization())
-        return circuit.accept(RegisterInformation()).accept(
-            QutipBackendTransformer(args=args)
-        )
+        return self.compiler(task).model
 
     def run(self, *, task: Task = None, experiment: QutipExperiment = None):
         """
@@ -51,4 +77,5 @@ class QutipBackend(BackendBase):
             raise TypeError("Both task and experiment are given as inputs to run")
         if experiment is None:
             experiment = self.compile(task=task)
-        return experiment.accept(QutipExperimentEvolve())
+        return self.interpreter(experiment).model
+    

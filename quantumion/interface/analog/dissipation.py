@@ -1,3 +1,5 @@
+from typing import Optional
+
 from quantumion.interface.base import VisitableBaseModel
 
 ########################################################################################
@@ -14,4 +16,4 @@ class Dissipation(VisitableBaseModel):
     Class representing a dissipative term in the evolution of a quantum system
     """
 
-    jumps: int = None  # todo: discuss ir for dissipation
+    jumps: Optional[int] = None  # todo: discuss ir for dissipation

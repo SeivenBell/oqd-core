@@ -4,13 +4,12 @@ from quantumion.compiler.analog.base import (
 )
 from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
-from quantumion.compiler.math import VerbosePrintMathExpr
+from quantumion.compiler.math import VerbosePrintMathExpr, EvaluateMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
-from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation
-from quantumion.compiler.analog.verification_flow import VerificationFlow
-from quantumion.compiler.analog.verify import CanonicalizationVerificationOperator
+from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation, TaskArgsQutip, QutipExpectation
 from quantumion.backend.metric import *
+from quantumion.backend.task import Task, TaskArgsAnalog
 from typing import Any, Union, List, Tuple, Literal, Dict
 import qutip as qt
 from pydantic import BaseModel, ConfigDict
@@ -19,111 +18,39 @@ import numpy as np
 from pydantic.types import NonNegativeInt
 import itertools
 import time
+import ast
 
 __all__ = [
     "QutipBackendTransformer",
-    "QutipExperimentEvolve",
-    "QutipTaskArgsCanonicalization",
-    "AnalogCircuitCanonicalization",
+    "QutipExperimentInterpreter",
 ]
 
-class AnalogCircuitCanonicalization(AnalogInterfaceTransformer):
-    def __init__(self, flow_graph = VerificationFlow(name="_", max_steps=1000)):
-        super().__init__()
-        self.fg = flow_graph
 
-    def visit_AnalogCircuit(self, model: AnalogCircuit) -> AnalogCircuit:
-        return AnalogCircuit(
-            sequence = self.visit(model.sequence),
-            n_qreg = model.n_qreg,
-            n_qmode = model.n_qmode,
-            definitions = model.definitions,
-            qreg = model.qreg,
-            qmode = model.qmode
-        )
-    def visit_Evolve(self, model: Evolve) -> Evolve:
-        return Evolve(
-            key = model.key,
-            duration = model.duration,
-            gate = self.visit(model.gate)
-        )
-
-    def visit_AnalogGate(self, model: AnalogGate) -> AnalogGate:
-        canonical_model = self.fg(model.hamiltonian).model
-        canonical_model.accept(CanonicalizationVerificationOperator())
-        return AnalogGate(
-            hamiltonian = canonical_model,
-            dissipation = model.dissipation
-        )
-
-class QutipTaskArgsCanonicalization(AnalogInterfaceTransformer):
-    def __init__(self, flow_graph=VerificationFlow(name="_", max_steps=1000)):
-        super().__init__()
-        self.fg = flow_graph
-
-    def _visit(self, model: Any):
-        if isinstance(model, dict):
-            return {key: self.visit(metric) for (key, metric) in model.items()}
-        else:
-            super(self.__class__, self)._visit(model)
-
-    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog) -> TaskArgsAnalog:
-        return TaskArgsAnalog(
-            layer=model.layer,
-            n_shots=model.n_shots,
-            dt=model.dt,
-            metrics=self.visit(model.metrics),
-        )
-
-    def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
-        return EntanglementEntropyVN(qreg=model.qreg, qmode=model.qmode)
-
-    def visit_EntanglementEntropyReyni(self, model: EntanglementEntropyVN):
-        return EntanglementEntropyReyni(
-            alpha=model.alpha, qreg=model.qreg, qmode=model.qmode
-        )
-
-    def visit_Expectation(self, model: Expectation) -> Expectation:
-        canonical_model = self.fg(model.operator).model
-        canonical_model.accept(CanonicalizationVerificationOperator())
-        return Expectation(operator=canonical_model)
-
-
-class QutipExperimentMeasure(AnalogInterfaceTransformer):
-    def __init__(self, state):
-        super().__init__()
-        self._state = state
-
-    def visit_QutipExperiment(self, model: QutipExperiment):
-        if model.args.n_shots is None:
-            return {}
-        probs = np.power(np.abs(self._state.full()), 2).squeeze()
-        n_shots = model.args.n_shots
-        inds = np.random.choice(len(probs), size=n_shots, p=probs)
-        opts = model.n_qreg * [[0, 1]] + model.n_qmode * [
-            list(range(model.args.fock_cutoff))
-        ]
-        bases = list(itertools.product(*opts))
-        shots = np.array([bases[ind] for ind in inds])
-        bitstrings = ["".join(map(str, shot)) for shot in shots]
-        return {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
-
-
-class QutipExperimentEvolve(AnalogInterfaceTransformer):
+class QutipExperimentInterpreter(AnalogInterfaceTransformer):
     def __init__(self):
         super().__init__()
         self._current_state = None
 
+    def visit_QutipExpectation(self, model: QutipExpectation):
+        for idx, operator in enumerate(model.operator):
+            coefficient = operator[1].accept(EvaluateMathExpr())
+            op_exp = coefficient * operator[0] if idx == 0 else op_exp + coefficient * operator[0]
+        return lambda t, psi: qt.expect(
+            op_exp, psi
+        )
+
+    def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
+        return lambda t, psi: entanglement_entropy_vn(
+            t, psi, model.qreg, model.qmode, self.n_qreg, self.n_qmode
+        )
+
     def visit_QutipExperiment(self, model: QutipExperiment) -> TaskResultAnalog:
         dims = model.n_qreg * [2] + model.n_qmode * [model.args.fock_cutoff]
+        self.n_qreg = model.n_qreg
+        self.n_qmode = model.n_qmode
         initial_state = qt.tensor([qt.basis(d, 0) for d in dims])
 
-        self._qutip_metrics = model.args.accept(
-            MetricsToQutipObjects(
-                n_qreg=model.n_qreg,
-                n_qmode=model.n_qmode,
-            )
-        )
+        self._qutip_metrics = self.visit(model.args.metrics)
 
         self._current_state = initial_state
 
@@ -143,14 +70,28 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
                 else 0
             )
             times = np.hstack(
-                [times, result_times + duration_tracker if idx != 0 else result_times]
+                [times, [t + duration_tracker for t in result_times] if idx != 0 else result_times]
             )
 
-            for key in metrics.keys():
+            for i, key in enumerate(metrics.keys()):
                 result_expect = (
-                    result.expect[key][1:] if idx != 0 else result.expect[key]
+                    result.expect[i][1:] if idx != 0 else result.expect[i]
                 )
-                metrics.update({key: np.hstack([metrics[key], result_expect.real])})
+                metrics.update({key: np.hstack([metrics[key], result_expect])})
+
+        if model.args.n_shots is None:
+            counts = {}
+        else:
+            probs = np.power(np.abs(results[-1].final_state.full()), 2).squeeze()
+            n_shots = model.args.n_shots
+            inds = np.random.choice(len(probs), size=n_shots, p=probs)
+            opts = model.n_qreg * [[0, 1]] + model.n_qmode * [
+                list(range(model.args.fock_cutoff))
+            ]
+            bases = list(itertools.product(*opts))
+            shots = np.array([bases[ind] for ind in inds])
+            bitstrings = ["".join(map(str, shot)) for shot in shots]
+            counts = {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
 
         return TaskResultAnalog(
             times=times,
@@ -158,9 +99,7 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
             state=list(
                 results[-1].final_state.full().squeeze(),
             ),
-            counts=model.accept(
-                visitor=QutipExperimentMeasure(state=results[-1].final_state)
-            ),
+            counts = counts,
             runtime=time_taken,
         )
 
@@ -169,59 +108,20 @@ class QutipExperimentEvolve(AnalogInterfaceTransformer):
         tspan = np.linspace(
             0, duration, round(duration / self._dt)
         )  # create time vector
-
-        options = qt.solver.Options(store_final_state=True)
-
+        qutip_hamiltonian = []
+        for op, coeff in model.hamiltonian:
+            qutip_hamiltonian.append([op, coeff.accept(VerbosePrintMathExpr())])
         result_qobj = qt.sesolve(
-            model.hamiltonian,
+            qutip_hamiltonian,
             self._current_state,
             tspan,
             e_ops=self._qutip_metrics,
-            options=options,
+            options={"store_states": True},
         )
 
         self._current_state = result_qobj.final_state
 
         return result_qobj
-
-
-class QutipConvertTransformer(AnalogCircuitTransformer):
-    def __init__(self, fock_cutoff):
-        super().__init__()
-        self.fock_cutoff = fock_cutoff
-
-    def visit_PauliI(self, model: PauliI) -> qt.Qobj:
-        return qt.qeye(2)
-
-    def visit_PauliX(self, model: PauliX) -> qt.Qobj:
-        return qt.sigmax()
-
-    def visit_PauliY(self, model: PauliY) -> qt.Qobj:
-        return qt.sigmay()
-
-    def visit_PauliZ(self, model: PauliZ) -> qt.Qobj:
-        return qt.sigmaz()
-
-    def visit_Identity(self, model: Identity) -> qt.Qobj:
-        return qt.qeye(self.fock_cutoff)
-
-    def visit_Creation(self, model: Creation) -> qt.Qobj:
-        return qt.create(self.fock_cutoff)
-
-    def visit_Annihilation(self, model: Annihilation) -> qt.Qobj:
-        return qt.destroy(self.fock_cutoff)
-
-    def visit_OperatorMul(self, model: OperatorMul) -> qt.Qobj:
-        return self.visit(model.op1) * self.visit(model.op2)
-
-    def visit_OperatorKron(self, model: OperatorKron) -> qt.Qobj:
-        return qt.tensor(self.visit(model.op1), self.visit(model.op2))
-
-    def visit_OperatorAdd(self, model: OperatorAdd) -> qt.Qobj:
-        return self.visit(model.op1) + self.visit(model.op2)
-
-    def visit_OperatorScalarMul(self, model: OperatorScalarMul) -> qt.Qobj:
-        return model.expr.value * self.visit(model.op)
 
 
 def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
@@ -233,55 +133,34 @@ def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
     return qt.entropy_vn(rho)
 
 
-class MetricsToQutipObjects(
-    AnalogInterfaceTransformer
-):  # task analog to taskqutipanalog
-    """
-    Transforms TaskArgsAnalog such that metrics converted to qutip  lambda objects
-    """
-
-    def __init__(self, n_qreg, n_qmode):
-        super().__init__()
-        self.n_qreg = n_qreg
-        self.n_qmode = n_qmode
-
-    def _visit(self, model: Any):
-        if isinstance(model, dict):
-            return {key: self.visit(metric) for (key, metric) in model.items()}
-        else:
-            super(self.__class__, self)._visit(model)
-
-    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog) -> dict:
-        self.fock_cutoff = model.fock_cutoff
-        return self.visit(model.metrics)
-
-    def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
-        return lambda t, psi: entanglement_entropy_vn(
-            t, psi, model.qreg, model.qmode, self.n_qreg, self.n_qmode
-        )
-
-    def visit_Expectation(self, model: Expectation):
-        return lambda t, psi: qt.expect(
-            model.operator.accept(QutipConvertTransformer(self.fock_cutoff)), psi
-        )  # model.operator.accept(QutipBackendTransformer())
-
-
 class QutipBackendTransformer(AnalogInterfaceTransformer):
     """convert task to QutipObj without running (maybe use visitor?)
     Basically compiles down to qutip object using transformers.
     """
 
-    def __init__(self, args):
-        super().__init__()
-        self.args = args
+    def visit_Task(self, model: Task):
+        self.args = model.args # Without args we cannot define a QutipExperiment
+        return self.visit(model.program)
 
     def visit_AnalogCircuit(self, model: AnalogCircuit):
         return QutipExperiment(
             instructions=self.visit(model.sequence),
             n_qreg=model.n_qreg,
             n_qmode=model.n_qmode,
-            args=self.args,
+            args=self.visit(self.args),
         )
+    
+    def visit_TaskArgsAnalog(self, model: TaskArgsAnalog):
+        return TaskArgsQutip(
+            layer=model.layer,
+            n_shots=model.n_shots,
+            fock_cutoff=model.fock_cutoff,
+            dt = model.dt,
+            metrics=self.visit(model.metrics)
+        )
+    
+    def visit_Expectation(self, model: Expectation):
+        return QutipExpectation(operator=self.visit(model=model.operator))
 
     def visit_Evolve(self, model: Evolve):
         return QutipOperation(
@@ -299,9 +178,40 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         return [
             (
-                model.op.accept(
-                    QutipConvertTransformer(fock_cutoff=self.args.fock_cutoff)
-                ),
-                model.expr.accept(VerbosePrintMathExpr()),
+                self.visit(model.op),
+                model.expr
             )
         ]
+
+    def visit_PauliI(self, model: PauliI) -> qt.Qobj:
+        return qt.qeye(2)
+
+    def visit_PauliX(self, model: PauliX) -> qt.Qobj:
+        return qt.sigmax()
+
+    def visit_PauliY(self, model: PauliY) -> qt.Qobj:
+        return qt.sigmay()
+
+    def visit_PauliZ(self, model: PauliZ) -> qt.Qobj:
+        return qt.sigmaz()
+
+    def visit_Identity(self, model: Identity) -> qt.Qobj:
+        return qt.qeye(self.args.fock_cutoff)
+
+    def visit_Creation(self, model: Creation) -> qt.Qobj:
+        return qt.create(self.args.fock_cutoff)
+
+    def visit_Annihilation(self, model: Annihilation) -> qt.Qobj:
+        return qt.destroy(self.fock_cutoff)
+
+    def visit_OperatorMul(self, model: OperatorMul) -> qt.Qobj:
+        return self.visit(model.op1) * self.visit(model.op2)
+
+    def visit_OperatorKron(self, model: OperatorKron) -> qt.Qobj:
+        return qt.tensor(self.visit(model.op1), self.visit(model.op2))
+
+    # def visit_OperatorAdd(self, model: OperatorAdd) -> qt.Qobj:
+    #     return self.visit(model.op1) + self.visit(model.op2)
+
+    # def visit_OperatorScalarMul(self, model: OperatorScalarMul) -> qt.Qobj:
+    #     return model.expr.value * self.visit(model.op)

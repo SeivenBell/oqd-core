@@ -123,7 +123,7 @@ class TaskResultAtomic(BaseModel):
 ########################################################################################
 
 
-class Task(BaseModel):
+class Task(VisitableBaseModel):
     """
     Class representing a task to run a quantum experiment with some arguments
 
