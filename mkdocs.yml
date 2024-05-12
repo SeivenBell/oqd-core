@@ -37,6 +37,7 @@ nav:
   - Visitor: technical/explanation/visitor.md
   - Compilation Flow: technical/explanation/compilation-flow.md
   - Canonicalization Flow: technical/explanation/canonicalization-flow.md
+  - Analog to Atomic Compiler: technical/explanation/Analog-to-Atomic-compiler.md
 - API Reference:
   - Interfaces:
     - Data Structures: technical/reference/interface-base.md
