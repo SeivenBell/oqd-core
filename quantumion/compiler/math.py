@@ -21,7 +21,25 @@ __all__ = [
 
 ########################################################################################
 
+class SimplifyMathExpr(Transformer):
+    def visit_MathFunc(self, model: MathFunc): 
+        #return getattr(math, model.func)(self.visit(model.expr))
+        return MathFunc(func = model.func, expr = self.visit(model.expr))
 
+    def visit_MathAdd(self, model: MathAdd):
+        return self.visit(model.expr1) + self.visit(model.expr2)
+    
+    def visit_MathSub(self, model: MathSub):
+        return self.visit(model.expr1) - self.visit(model.expr2)
+
+    def visit_MathMul(self, model: MathMul):
+        return self.visit(model.expr1) * self.visit(model.expr2)
+
+    def visit_MathDiv(self, model: MathDiv):
+        return self.visit(model.expr1) / self.visit(model.expr2)     
+    
+    def visit_MathPow(self, model: MathPow):
+        return self.visit(model.expr1) ** self.visit(model.expr2) 
 class PrintMathExpr(Transformer):
     def _visit(self, model: Any):
         raise TypeError("Incompatible type for input model")
