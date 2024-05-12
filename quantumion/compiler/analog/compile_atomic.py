@@ -4,6 +4,7 @@ from quantumion.interface.analog.operator import *
 from quantumion.interface.atomic import *
 from quantumion.interface.math import MathFunc, MathNum
 from quantumion.backend.task import Task, TaskArgsAnalog
+from quantumion.compiler.analog.verification_flow import VerificationFlow
 import numpy as np
 from rich import print as pprint
 
@@ -111,15 +112,24 @@ class AnalogIRtoAtomicIR(AnalogInterfaceTransformer):
 
 if __name__ == '__main__':
     ac = AnalogCircuit()
-    gate = AnalogGate(hamiltonian=2*PauliX()+3*PauliY())
-    gate2 = AnalogGate(hamiltonian=55*PauliX())
+    fg = VerificationFlow(name = "_")
+    gate = AnalogGate(hamiltonian=2*PauliX()+3*PauliY()+3*PauliY())
+    # gate2 = AnalogGate(hamiltonian=55*PauliX())
     args = TaskArgsAnalog(
         n_shots=100,
         fock_cutoff=4,
         metrics={},
         dt=1e-2,
     )
-    task = Task(program=ac, args=args)
     ac.evolve(gate=gate, duration=1)
     # ac.evolve(gate=gate2, duration=3)
+    ac = fg(model=ac).model
+    task = Task(program=ac, args=args)
+    # task = fg(model=task).model
+    
+    pprint(task)
+
+    ac = task.program
+    
+    
     pprint(ac.accept(AnalogIRtoAtomicIR()))
