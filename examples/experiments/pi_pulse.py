@@ -51,5 +51,7 @@ def main():
         protocol=pi_protocol,
     )
 
+    pprint(pi_circuit.accept(AtomicToARTIQ()))
+
 if __name__ == "__main__":
     main()
