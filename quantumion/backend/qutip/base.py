@@ -1,6 +1,6 @@
 from quantumion.backend.qutip.visitor import (
     QutipBackendTransformer,
-    QutipExperimentEvolve,
+    QutipExperimentInterpreter,
 )
 from quantumion.backend.base import BackendBase
 from quantumion.backend.qutip.interface import QutipExperiment
@@ -42,20 +42,20 @@ class QutipBackendFlow(FlowGraph):
 class QutipBackend(BackendBase):
 
     @property
-    def graph(self):
+    def compiler(self):
         return QutipBackendFlow(name="_")
     
     @property
-    def evolve(self):
-        return TransformerFlowNode(visitor=QutipExperimentEvolve(),name="_")
+    def interpreter(self):
+        return TransformerFlowNode(visitor=QutipExperimentInterpreter(),name="_")
 
     def compile(self, task: Task):
-        return self.graph(task).model
+        return self.compiler(task).model
 
     def run(self, *, task: Task = None, experiment: QutipExperiment = None):
         if task is not None and experiment is not None:
             raise TypeError("Both task and experiment are given as inputs to run")
         if experiment is None:
             experiment = self.compile(task=task)
-        return self.evolve(experiment).model
+        return self.interpreter(experiment).model
     

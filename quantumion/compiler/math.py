@@ -7,9 +7,9 @@ from quantumion.interface.math import *
 from quantumion.compiler.visitor import Transformer
 
 from quantumion.utils.color import random_hexcolor
-
+import math
 ########################################################################################
-
+from rich import print as pprint
 __all__ = [
     "PrintMathExpr",
     "VerbosePrintMathExpr",
@@ -17,18 +17,30 @@ __all__ = [
     "DistributeMathExpr",
     "ProperOrderMathExpr",
     "MermaidMathExpr",
+    "EvaluateMathExpr",
 ]
 
 ########################################################################################
 
-class SimplifyMathExpr(Transformer):
-    def visit_MathFunc(self, model: MathFunc): 
-        #return getattr(math, model.func)(self.visit(model.expr))
-        return MathFunc(func = model.func, expr = self.visit(model.expr))
+class EvaluateMathExpr(Transformer):
+    def _visit(self, model: Any):
+        raise TypeError("Incompatible type for input model")
+
+    def visit_MathVar(self, model: MathVar):
+        raise TypeError
+
+    def visit_MathNum(self, model: MathNum):
+        return model.value
+
+    def visit_MathImag(self, model: MathImag):
+        return complex('1j') #1j also works
+
+    def visit_MathFunc(self, model: MathFunc):
+        return getattr(math, model.func)(self.visit(model.expr))
 
     def visit_MathAdd(self, model: MathAdd):
-        return self.visit(model.expr1) + self.visit(model.expr2)
-    
+        return self.visit(model.expr1)+ self.visit(model.expr2)
+
     def visit_MathSub(self, model: MathSub):
         return self.visit(model.expr1) - self.visit(model.expr2)
 
@@ -36,10 +48,25 @@ class SimplifyMathExpr(Transformer):
         return self.visit(model.expr1) * self.visit(model.expr2)
 
     def visit_MathDiv(self, model: MathDiv):
-        return self.visit(model.expr1) / self.visit(model.expr2)     
-    
+        return self.visit(model.expr1) / self.visit(model.expr2)
+
     def visit_MathPow(self, model: MathPow):
-        return self.visit(model.expr1) ** self.visit(model.expr2) 
+        return self.visit(model.expr1) ** self.visit(model.expr2)
+
+    def visit_MathAdd(self, model: MathAdd):
+        return self.visit(model.expr1) + self.visit(model.expr2)
+
+    def visit_MathSub(self, model: MathSub):
+        return self.visit(model.expr1) - self.visit(model.expr2)
+
+    def visit_MathMul(self, model: MathMul):
+        return self.visit(model.expr1) * self.visit(model.expr2)
+
+    def visit_MathDiv(self, model: MathDiv):
+        return self.visit(model.expr1) / self.visit(model.expr2)
+
+    def visit_MathPow(self, model: MathPow):
+        return self.visit(model.expr1) ** self.visit(model.expr2)
 class PrintMathExpr(Transformer):
     def _visit(self, model: Any):
         raise TypeError("Incompatible type for input model")
