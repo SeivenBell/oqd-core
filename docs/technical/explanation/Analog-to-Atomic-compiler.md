@@ -3,28 +3,24 @@
 We have a sample compiler for Analog to Atomic levels for the single qubit Rabi Flopping for hamiltonians of the form
 
 $$
-H = \sum_{i}A_{i}\sigma_{x} + \sum_{j}B_{j}\sigma_{y}
+H = A(t)\sigma_{x} + B(t)\sigma_{y}
 $$
 
-where the coefficients can be time dependent or time independent. 
-
-The first step is canonicalization where the hamiltonian is converted to the form:
-
-Now for simplicity define $A = \sum_{i}A_i$ and $B = \sum_{j}B_{j}$
+where coefficients $A$ and $B$ can be time dependent or time independent. 
 
 ## Mathematics
 Then we do the following calculations to find the Rabi Frequency and phase:
 
 $$
-\Omega = \sqrt{A^{2}+B^{2}}
+\Omega(t) = \sqrt{A^{2}(t)+B^{2}(t)}
 $$
 
 $$
-\frac{\Omega_{1}\Omega_{2}}{2\Delta} = \Omega, \Omega_{1} = \Omega_2
+\frac{\Omega_{1}(t)\Omega_{2}(t)}{2\Delta} = \Omega(t), \quad \Omega_{1}(t) = \Omega_2(t)
 $$
 Here, $\Delta = 2\pi\hbar c(\frac{1}{\lambda_1} - \frac{1}{\lambda_2})$ where $\lambda_{1} = 355nm$ and $\lambda_{2} = 369nm$.
 
-Now for phase calculation we do $\phi_{1} = \arctan{\frac{A}{B}}$ with $\phi_{1} = -\phi_{2}$
+Now for phase calculation we do $\phi_{1}(t) = 0.5 * \arctan \left( \frac{A(t)}{B(t)} \right)$ with $\phi_{1}(t) = -\phi_{2}(t)$
 ## Compilations levels
 The list below shows the corresponding Atomic Layer objects produced from different Analog Layer objects.
 ```
