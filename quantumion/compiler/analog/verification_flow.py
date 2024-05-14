@@ -25,17 +25,26 @@ __all__ = [
 
 ########################################################################################
 
+
 class VerificationPauliAlgebraFlow(FlowGraph):
     nodes = [
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationPauliAlgebra(),
-                                        transformer = PauliAlgebra())(name="paulialgebra"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherMathExpr(),
-                                        transformer = GatherMathExpr())(name="gathermathexpr"),
-        VisitorFlowNode(visitor = CanonicalizationVerificationPauliAlgebra(), name="paulialgebra_verifier"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationPauliAlgebra(),
+            transformer=PauliAlgebra(),
+        )(name="paulialgebra"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationGatherMathExpr(),
+            transformer=GatherMathExpr(),
+        )(name="gathermathexpr"),
+        VisitorFlowNode(
+            visitor=CanonicalizationVerificationPauliAlgebra(),
+            name="paulialgebra_verifier",
+        ),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "paulialgebra"
     forward_decorators = ForwardDecorators()
+
     #### pauli algebra and nornal order need to be done just once. so we should make subgraphs for them
     @forward_decorators.forward_once(done="gathermathexpr")
     def forward_paulialgebra(self, model):
@@ -50,20 +59,30 @@ class VerificationPauliAlgebraFlow(FlowGraph):
     def forward_paulialgebra_verifier(self, model):
         pass
 
+
 class VerificationNormalOrderFlow(FlowGraph):
     nodes = [
-        TransformerFlowNode(visitor = NormalOrder(),name="normalorder"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
-                                        transformer = OperatorDistribute())(name="distribute"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherMathExpr(),
-                                        transformer = GatherMathExpr())(name="gathermathexpr"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationProperOrder(),
-                                        transformer = ProperOrder())(name="properorder"),
-        VisitorFlowNode(visitor = CanonicalizationVerificationNormalOrder(), name = "normalorder_verifier"),
+        TransformerFlowNode(visitor=NormalOrder(), name="normalorder"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationOperatorDistribute(),
+            transformer=OperatorDistribute(),
+        )(name="distribute"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationGatherMathExpr(),
+            transformer=GatherMathExpr(),
+        )(name="gathermathexpr"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationProperOrder(), transformer=ProperOrder()
+        )(name="properorder"),
+        VisitorFlowNode(
+            visitor=CanonicalizationVerificationNormalOrder(),
+            name="normalorder_verifier",
+        ),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "normalorder"
     forward_decorators = ForwardDecorators()
+
     #### pauli algebra and nornal order need to be done just once. so we should make subgraphs for them
     @forward_decorators.forward_once(done="distribute")
     def forward_normalorder(self, model):
@@ -86,17 +105,26 @@ class VerificationNormalOrderFlow(FlowGraph):
     def forward_normalorder_verifier(self, model):
         pass
 
+
 class VerificationDistributionFlow(FlowGraph):
     nodes = [
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
-                                        transformer = OperatorDistribute())(name="distribute"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherMathExpr(),
-                                        transformer = GatherMathExpr())(name="gathermathexpr"),
-        VisitorFlowNode(visitor = CanonicalizationVerificationOperatorDistribute(), name="distribution_verifier"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationOperatorDistribute(),
+            transformer=OperatorDistribute(),
+        )(name="distribute"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationGatherMathExpr(),
+            transformer=GatherMathExpr(),
+        )(name="gathermathexpr"),
+        VisitorFlowNode(
+            visitor=CanonicalizationVerificationOperatorDistribute(),
+            name="distribution_verifier",
+        ),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "distribute"
     forward_decorators = ForwardDecorators()
+
     @forward_decorators.forward_once(done="gathermathexpr")
     def forward_distribute(self, model):
         pass
@@ -114,26 +142,38 @@ class VerificationDistributionFlow(FlowGraph):
 class VerificationFlow(FlowGraph):
     nodes = [
         VisitorFlowNode(visitor=VerifyHilbertSpace(), name="hspace"),
-        VerificationDistributionFlow(name = "DistributionFlow"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationProperOrder(),
-                                        transformer = ProperOrder())(name="properorder"),
-        VerificationPauliAlgebraFlow(name = "PauliAlgebraFlow"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationGatherPauli(),
-                                        transformer = GatherPauli())(name="gatherpauli"),
-        VisitorFlowNode(visitor=CanonicalizationVerificationNormalOrder(),name="NormalOrderVerifier"),
-        VerificationNormalOrderFlow(name = "NormalOrderFlow"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationPruneIdentity(),
-                                        transformer = PruneIdentity())(name="pruneidentity"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationOperatorDistribute(),
-                                        transformer = OperatorDistribute())(name="distribute_subtraction"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationSortedOrder(),
-                                        transformer = SortedOrder())(name="sortedorder"),
-        VerificationFlowGraphCreator(verify = CanonicalizationVerificationScaleTerms(),
-                                        transformer = ScaleTerms())(name="scaleterms"),
+        VerificationDistributionFlow(name="DistributionFlow"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationProperOrder(), transformer=ProperOrder()
+        )(name="properorder"),
+        VerificationPauliAlgebraFlow(name="PauliAlgebraFlow"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationGatherPauli(), transformer=GatherPauli()
+        )(name="gatherpauli"),
+        VisitorFlowNode(
+            visitor=CanonicalizationVerificationNormalOrder(),
+            name="NormalOrderVerifier",
+        ),
+        VerificationNormalOrderFlow(name="NormalOrderFlow"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationPruneIdentity(),
+            transformer=PruneIdentity(),
+        )(name="pruneidentity"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationOperatorDistribute(),
+            transformer=OperatorDistribute(),
+        )(name="distribute_subtraction"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationSortedOrder(), transformer=SortedOrder()
+        )(name="sortedorder"),
+        VerificationFlowGraphCreator(
+            verify=CanonicalizationVerificationScaleTerms(), transformer=ScaleTerms()
+        )(name="scaleterms"),
         FlowTerminal(name="terminal"),
     ]
     rootnode = "hspace"
     forward_decorators = ForwardDecorators()
+
     #### pauli algebra and nornal order need to be done just once. so we should make subgraphs for them
     @forward_decorators.forward_once(done="DistributionFlow")
     def forward_hspace(self, model):

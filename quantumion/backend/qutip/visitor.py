@@ -7,7 +7,12 @@ from quantumion.interface.base import VisitableBaseModel
 from quantumion.compiler.math import VerbosePrintMathExpr, EvaluateMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
-from quantumion.backend.qutip.interface import QutipExperiment, QutipOperation, TaskArgsQutip, QutipExpectation
+from quantumion.backend.qutip.interface import (
+    QutipExperiment,
+    QutipOperation,
+    TaskArgsQutip,
+    QutipExpectation,
+)
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
 from typing import Any, Union, List, Tuple, Literal, Dict
@@ -34,10 +39,12 @@ class QutipExperimentInterpreter(AnalogInterfaceTransformer):
     def visit_QutipExpectation(self, model: QutipExpectation):
         for idx, operator in enumerate(model.operator):
             coefficient = operator[1].accept(EvaluateMathExpr())
-            op_exp = coefficient * operator[0] if idx == 0 else op_exp + coefficient * operator[0]
-        return lambda t, psi: qt.expect(
-            op_exp, psi
-        )
+            op_exp = (
+                coefficient * operator[0]
+                if idx == 0
+                else op_exp + coefficient * operator[0]
+            )
+        return lambda t, psi: qt.expect(op_exp, psi)
 
     def visit_EntanglementEntropyVN(self, model: EntanglementEntropyVN):
         return lambda t, psi: entanglement_entropy_vn(
@@ -70,13 +77,18 @@ class QutipExperimentInterpreter(AnalogInterfaceTransformer):
                 else 0
             )
             times = np.hstack(
-                [times, [t + duration_tracker for t in result_times] if idx != 0 else result_times]
+                [
+                    times,
+                    (
+                        [t + duration_tracker for t in result_times]
+                        if idx != 0
+                        else result_times
+                    ),
+                ]
             )
 
             for i, key in enumerate(metrics.keys()):
-                result_expect = (
-                    result.expect[i][1:] if idx != 0 else result.expect[i]
-                )
+                result_expect = result.expect[i][1:] if idx != 0 else result.expect[i]
                 metrics.update({key: np.hstack([metrics[key], result_expect])})
 
         if model.args.n_shots is None:
@@ -91,7 +103,9 @@ class QutipExperimentInterpreter(AnalogInterfaceTransformer):
             bases = list(itertools.product(*opts))
             shots = np.array([bases[ind] for ind in inds])
             bitstrings = ["".join(map(str, shot)) for shot in shots]
-            counts = {bitstring: bitstrings.count(bitstring) for bitstring in bitstrings}
+            counts = {
+                bitstring: bitstrings.count(bitstring) for bitstring in bitstrings
+            }
 
         return TaskResultAnalog(
             times=times,
@@ -99,7 +113,7 @@ class QutipExperimentInterpreter(AnalogInterfaceTransformer):
             state=list(
                 results[-1].final_state.full().squeeze(),
             ),
-            counts = counts,
+            counts=counts,
             runtime=time_taken,
         )
 
@@ -139,7 +153,7 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
     """
 
     def visit_Task(self, model: Task):
-        self.args = model.args # Without args we cannot define a QutipExperiment
+        self.args = model.args  # Without args we cannot define a QutipExperiment
         return self.visit(model.program)
 
     def visit_AnalogCircuit(self, model: AnalogCircuit):
@@ -149,16 +163,16 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
             n_qmode=model.n_qmode,
             args=self.visit(self.args),
         )
-    
+
     def visit_TaskArgsAnalog(self, model: TaskArgsAnalog):
         return TaskArgsQutip(
             layer=model.layer,
             n_shots=model.n_shots,
             fock_cutoff=model.fock_cutoff,
-            dt = model.dt,
-            metrics=self.visit(model.metrics)
+            dt=model.dt,
+            metrics=self.visit(model.metrics),
         )
-    
+
     def visit_Expectation(self, model: Expectation):
         return QutipExpectation(operator=self.visit(model=model.operator))
 
@@ -176,12 +190,7 @@ class QutipBackendTransformer(AnalogInterfaceTransformer):
         return op
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
-        return [
-            (
-                self.visit(model.op),
-                model.expr
-            )
-        ]
+        return [(self.visit(model.op), model.expr)]
 
     def visit_PauliI(self, model: PauliI) -> qt.Qobj:
         return qt.qeye(2)

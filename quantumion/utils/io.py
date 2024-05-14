@@ -8,13 +8,22 @@ import string
 import random
 import yaml
 
+from numpy import ndarray
+
+from matplotlib.figure import Figure
+
+import pandas as pd
+from pandas import DataFrame
+
+from typing import Optional, Any
+
 
 def current_time():
     """
     Returns current date and time in a consistent format, used for monitoring long-running measurements
 
-    :return: current date and time
-    :rtype: str
+    Returns:
+        (str): current date and time
     """
     return datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 
@@ -24,7 +33,9 @@ class IO:
     The IO class encapsulates all saving/loading features of data, figures, etc.
     """
 
-    default_path = pathlib.Path(os.path.expanduser('~')).joinpath("data").joinpath("oqd")
+    default_path = (
+        pathlib.Path(os.path.expanduser("~")).joinpath("data").joinpath("oqd")
+    )
 
     def __init__(
         self,
@@ -36,21 +47,17 @@ class IO:
         verbose=True,
     ):
         """
+        Args:
+            path (Optional[str]): The parent folder.
+            folder (str): The main, descriptive folder name.
+            include_date (bool): If True, add the date to the front of the path. Otherwise, do not add the date
+            include_time (bool): If True, add the time to the front of the path. Otherwise, do not add the time
+            include_id (bool): If True, add a random string of characters to the end of the path. Otherwise, do not
+            verbose (bool): If True, will print out the path of each saved/loaded file.
 
-        :param path: The parent folder.
-        :type path: str (of pathlib.Path object)
-        :param folder: The main, descriptive folder name.
-        :type folder: str
-        :param include_date: If True, add the date to the front of the path. Otherwise, do not add the date
-        :type include_date: bool
-        :param include_time: If True, add the time to the front of the path. Otherwise, do not add the time
-        :type include_time: bool
-        :param include_id: If True, add a random string of characters to the end of the path. Otherwise, do not
-        :type include_id: bool
-        :param verbose: If True, will print out the path of each saved/loaded file.
-        :type verbose: bool
-        :return: A new IO class instance
-        :rtype: IO
+        Returns:
+            (IO): A new IO class instance
+
         """
         if path is None:
             path = self.default_path
@@ -91,14 +98,11 @@ class IO:
 
     def save_json(self, variable, filename):
         """
-        Save serialized python object into a json format, at filename
+        Save serialized python object into a json file at filename
 
-        :param variable: the object to save
-        :type variable: serialized object
-        :param filename: name of the file to which variable should be saved
-        :type filename: str
-        :return: the function returns nothing
-        :rtype: None
+        Args:
+            variable (object): the object to save
+            filename (str): name of the file to which variable should be saved
         """
         full_path = self.path.joinpath(filename)
         os.makedirs(full_path.parent, exist_ok=True)
@@ -110,10 +114,11 @@ class IO:
         """
         Load serialized python object from json
 
-        :param filename: name of the file from which we are loading the object
-        :type filename: str
-        :return: the loaded object data
-        :rtype: may vary
+        Args:
+            filename (str): name of the file from which we are loading the object
+
+        Returns:
+            (Any): the loaded object data
         """
         full_path = self.path.joinpath(filename)
         file = self._load_json(full_path)
@@ -123,14 +128,11 @@ class IO:
 
     def save_txt(self, variable, filename):
         """
-        Save serialized python object into a text format, at filename
+        Save serialized python object into a text file at filename
 
-        :param variable: the object to save
-        :type variable: serialized object
-        :param filename: name of the file to which variable should be saved
-        :type filename: str
-        :return: the function returns nothing
-        :rtype: None
+        Args:
+            variable (object): the object to save
+            filename (str): name of the file to which variable should be saved
         """
         full_path = self.path.joinpath(filename)
         os.makedirs(full_path.parent, exist_ok=True)
@@ -142,10 +144,11 @@ class IO:
         """
         Load serialized python object from text file
 
-        :param filename: name of the file from which we are loading the object
-        :type filename: str
-        :return: the loaded object data
-        :rtype: may vary
+        Args:
+            filename (str): name of the file from which we are loading the object
+
+        Returns:
+            (Any): the loaded object data
         """
         full_path = self.path.joinpath(filename)
         file = self._load_txt(full_path)
@@ -155,13 +158,11 @@ class IO:
 
     def save_dataframe(self, df, filename):
         """
-        Save a panda dataframe object to csv
+        Save a panda dataframe object to pkl
 
-        :param df: data contained in a dataframe
-        :type df: panda dataframe
-        :param filename: file to which data should be saved
-        :return: the function returns nothing
-        :rtype: None
+        Args:
+            df (DataFrame): data contained in a dataframe
+            filename (str): file to which data should be saved
         """
         ext = ".pkl"
         full_path = self.path.joinpath(filename + ext)
@@ -173,12 +174,13 @@ class IO:
 
     def load_dataframe(self, filename):
         """
-        Load panda dataframe object from CSV
+        Load panda dataframe object from pkl
 
-        :param filename: name of the file from which data should be loaded
-        :type filename: str
-        :return: dataframe data
-        :rtype: panda dataframe
+        Args:
+            filename (str): name of the file from which data should be loaded
+
+        Returns:
+            (DataFrame): dataframe data
         """
         import pandas as pd
 
@@ -194,12 +196,9 @@ class IO:
         """
         Save a figure (image datatype can be specified as part of filename)
 
-        :param fig: the figure containing the figure to save
-        :type fig: matplotlib.figure
-        :param filename: the filename to which we save a figure
-        :type filename: str
-        :return: the function returns nothing
-        :rtype: None
+        Args:
+            fig (Figure): the figure containing the figure to save
+            filename (str): the filename to which we save a figure
         """
         full_path = self.path.joinpath(filename)
         os.makedirs(full_path.parent, exist_ok=True)
@@ -211,12 +210,9 @@ class IO:
         """
         Save numpy array to a text document
 
-        :param np_arr: the array which we are saving
-        :type np_arr: numpy.array
-        :param filename: name of the text file to which we want to save the numpy array
-        :type filename: str
-        :return: the function returns nothing
-        :rtype: None
+        Args:
+            np_arr (ndarray): the array which we are saving
+            filename (str): name of the text file to which we want to save the numpy array
         """
         import numpy as np
 
@@ -230,12 +226,12 @@ class IO:
         """
         Loads numpy array from a text document
 
-        :param filename: name of the text file from which we want to load the numpy array
-        :type filename: str
-        :param complex_vals: True if we expect the numpy array to be complex, False otherwise
-        :type complex_vals: bool
-        :return: the function returns nothing
-        :rtype: None
+        Args:
+            filename (str): name of the text file from which we want to load the numpy array
+            complex_vals (bool): True if we expect the numpy array to be complex, False otherwise
+
+        Returns:
+            (ndarray): numpy array of data
         """
         import numpy as np
 
@@ -251,11 +247,9 @@ class IO:
         """
         Save a panda dataframe object to csv
 
-        :param df: data contained in a dataframe
-        :type df: panda dataframe
-        :param filename: file to which data should be saved
-        :return: the function returns nothing
-        :rtype: None
+        Args:
+            df (DataFrame): data contained in a dataframe
+            filename (str): file to which data should be saved
         """
         ext = ".csv"
         full_path = self.path.joinpath(filename + ext)
@@ -265,31 +259,20 @@ class IO:
             print(f"{current_time()} | Saved to {full_path} successfully.")
 
     def load_csv(self, filename):
-        import pandas as pd
-
         """
-        Load panda dataframe object from CSV
+        Load panda dataframe object from csv
 
-        :param filename: name of the file from which data should be loaded
-        :type filename: str
-        :return: dataframe data
-        :rtype: panda dataframe
+        Args:
+            filename (str): name of the file from which data should be loaded
+
+        Returns:
+            (DataFrame): dataframe data
         """
         full_path = self.path.joinpath(filename)
         df = pd.read_csv(str(full_path), sep=",", header=0)
         if self.verbose:
             print(f"{current_time()} | Loaded from {full_path} successfully.")
         return df
-
-    # def new_h5_file(self, filename):
-    #     """
-    #     :param filename: name of the text file to which we want to save the numpy array
-    #     """
-    #     full_path = self.path.joinpath(filename)
-    #     os.makedirs(full_path.parent, exist_ok=True)
-    #     hf = h5py.File("test.h5", 'w')
-    #     if self.verbose:
-    #         print(f"{current_time()} | New H5 file at {full_path}.")
 
     @staticmethod
     def _save_json(variable, path):

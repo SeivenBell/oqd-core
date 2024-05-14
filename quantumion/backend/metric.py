@@ -13,6 +13,7 @@ from quantumion.interface.analog.operator import Operator
 class Expectation(VisitableBaseModel):
     operator: Operator
 
+
 class EntanglementEntropyVN(VisitableBaseModel):
     qreg: List[NonNegativeInt] = []
     qmode: List[NonNegativeInt] = []

@@ -59,10 +59,10 @@ class Transformer(Visitor):
         elif isinstance(model, dict):
             new_model = {}
             for key, value in model.items():
-                
+
                 if isinstance(value, VisitableBaseModel):
                     value = self.visit(value)
-                    
+
                 new_model[key] = value
 
         if isinstance(model, VisitableBaseModel):

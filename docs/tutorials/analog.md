@@ -1,27 +1,4 @@
-!!! note
 
-    This part of the project documentation focuses on a
-    **learning-oriented** approach. You'll learn how to
-    get started with the code in this project.
-
-
-[//]: # (- Help newcomers with getting started)
-
-[//]: # (- Teach readers about your library by making them)
-
-[//]: # (    write code)
-
-[//]: # (- Inspire confidence through examples that work for)
-
-[//]: # (    everyone, repeatably)
-
-[//]: # (- Give readers an immediate sense of achievement)
-
-[//]: # (- Show concrete examples, no abstractions)
-
-[//]: # (- Provide the minimum necessary explanation)
-
-[//]: # (- Avoid any distractions)
 
 
 ## Analog mode
@@ -81,32 +58,12 @@ Operator objects `Operator` can (largely) be manipulated like normal Python obje
 
 We will go through concrete examples of how to get started with this in Analog Demos
 
-## Digital mode
-Digital quantum circuits, or the gate-based model.
-```py
-import numpy as np
-from quantumion.digital.circuit import DigitalCircuit
-from quantumion.digital.gate import Gate, H, CNOT
-
-circuit = DigitalCircuit()
-circuit.add(H)
-```
-
 
 ## Atomic mode
 
 ## Classical emulators
 Each mode has a suite of backend classical emulators for designing, 
 benchmarking, and studying programs run on quantum computers.
-
-```py
-from backends.analog import QutipBackend
-from backends.task import Task, TaskArgsAnalog
-
-backend = QutipBackend()
-backend.run(task)
-```
-
 
 
 

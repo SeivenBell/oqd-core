@@ -5,12 +5,20 @@ from pydantic import BaseModel, model_validator
 
 
 class VisitableBaseModel(BaseModel):
+    """
+    Class representing a visitable datastruct
+    """
+
     def accept(self, visitor):
         visitor.reset()
         return visitor.visit(self)
 
 
 class TypeReflectBaseModel(VisitableBaseModel):
+    """
+    Class representing a datastruct with type reflection
+    """
+
     class_: Optional[str]
 
     @model_validator(mode="before")

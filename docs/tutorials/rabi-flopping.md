@@ -23,7 +23,7 @@ from examples.emulation.utils import plot_metrics_counts
 ```
 ///
 
-Then we define the `AnalogGate` object
+Then we define the [`AnalogGate`][quantumion.interface.analog.operations.AnalogGate] object
 
 ``` py
 """For simplicity we initialize the X Operator"""
@@ -32,7 +32,7 @@ X = PauliX()
 H = AnalogGate(hamiltonian= -(np.pi / 4) * X)
 ```
 
-Then we define the `AnalogCircuit` object and evolve it according to the hamiltonian defined above
+Then we define the [`AnalogCircuit`][quantumion.interface.analog.operations.AnalogCircuit] object and evolve it according to the hamiltonian defined above
 
 ``` py
 ac = AnalogCircuit()
@@ -51,11 +51,12 @@ args = TaskArgsAnalog(
 )
 ```
 
-We can then wrap the `AnalogCircuit` and the args to a `Task` object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
+We can then wrap the [`AnalogCircuit`][quantumion.interface.analog.operations.AnalogCircuit] and the args to a [`Task`][quantumion.backend.task.Task] object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
 
 ## Running the simulation
+First initialize the [`QutipBackend`][quantumion.backend.qutip.base.QutipBackend] object.
 === "Compile & Simulate"
-    The `Task` can be compiled first to a `QuTipExperiment` object and then this `QuTipExperiment` object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
+    The [`Task`][quantumion.backend.task.Task] can be compiled first to a [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object and then this [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
 
     ``` py
     backend = QutipBackend()
@@ -64,7 +65,7 @@ We can then wrap the `AnalogCircuit` and the args to a `Task` object and run usi
     ```
 
 === "Directly Simulate"
-    The `Task` object can be directly simulated by the `run()` method. 
+    The [`Task`][quantumion.backend.task.Task] object can be directly simulated by the `run()` method. 
 
     ``` py
     backend = QutipBackend()
@@ -77,7 +78,10 @@ Finally we can plot the metrics and relevant statistics from the final quantum s
 
 
 ``` py
-plot_metrics_counts(results = results, experiment_name = 'one-qubit-rabi-flopping.png')
+plot_metrics_counts(
+    results = results,
+    experiment_name = "one-qubit-rabi-flopping.png",
+)
 ```
 
 The generated image is like:

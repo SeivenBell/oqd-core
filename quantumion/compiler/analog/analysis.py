@@ -5,10 +5,12 @@ from quantumion.compiler.analog.base import AnalogInterfaceTransformer
 from quantumion.compiler.analog.verify import VerifyHilbertSpace
 from typing import Union
 
+
 class RegisterInformation(AnalogInterfaceTransformer):
     """
     Assumes all hamiltonians in AnalogSystem are in canonical form
     """
+
     def _visit(self, model):
         if isinstance(model, (OperatorAdd, OperatorSub, OperatorMul)):
             return self.visit_OperatorAddSubMul(model)
@@ -18,7 +20,7 @@ class RegisterInformation(AnalogInterfaceTransformer):
     def visit_AnalogGate(self, model: AnalogGate):
         self.visit(model.hamiltonian)
         return model
-    
+
     def visit_AnalogCircuit(self, model: AnalogCircuit):
         """
         Note that we assume VerifyHilbertSpace has passed on model as without VerifyHilbertSpace passing,
@@ -28,40 +30,44 @@ class RegisterInformation(AnalogInterfaceTransformer):
         try:
             model.accept(VerifyHilbertSpace())
         except:
-            raise ValueError("Different Hilbert spaces encountered during Hilbert Space Verification")
+            raise ValueError(
+                "Different Hilbert spaces encountered during Hilbert Space Verification"
+            )
         for idx, instruction in enumerate(model.sequence):
             self.visit(instruction)
             if idx == 0:
-                first_space_dim = self.space_temp 
+                first_space_dim = self.space_temp
             elif self.space_temp != first_space_dim:
                 raise ValueError("Different Hilbert spaces encountered")
         n_qreg, n_qmode = self.space_temp
         return AnalogCircuit(
-            sequence = model.sequence,
-            n_qreg = n_qreg,
-            n_qmode = n_qmode,
-            definitions = model.definitions,
-            qreg = model.qreg,
-            qmode = model.qmode
+            sequence=model.sequence,
+            n_qreg=n_qreg,
+            n_qmode=n_qmode,
+            definitions=model.definitions,
+            qreg=model.qreg,
+            qmode=model.qmode,
         )
-    
+
     def visit_Evolve(self, model: Evolve):
         self.visit(model.gate)
         return model
-    
+
     def visit_Pauli(self, model):
-        self.space_temp = (1,0)
+        self.space_temp = (1, 0)
         return model
 
     def visit_Ladder(self, model):
-        self.space_temp = (0,1)
+        self.space_temp = (0, 1)
         return model
 
     def visit_OperatorScalarMul(self, model: OperatorScalarMul):
         self.visit(model.op)
         return model
 
-    def visit_OperatorAddSubMul(self, model: Union[OperatorAdd, OperatorSub, OperatorMul]):
+    def visit_OperatorAddSubMul(
+        self, model: Union[OperatorAdd, OperatorSub, OperatorMul]
+    ):
         self.visit(model.op2)
         return model
 
@@ -74,4 +80,3 @@ class RegisterInformation(AnalogInterfaceTransformer):
 
         self.space_temp = tuple(map(sum, zip(op1_space, op2_space)))
         return model
-

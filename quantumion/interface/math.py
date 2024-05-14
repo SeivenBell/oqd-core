@@ -34,6 +34,9 @@ __all__ = [
 
 
 class MathExpr(TypeReflectBaseModel):
+    """
+    Class representing the abstract syntax tree (AST) for a mathematical expression
+    """
 
     @classmethod
     def cast(cls, value: Any):
@@ -168,54 +171,126 @@ def MathStr(*, string):
 
 
 class MathTerminal(MathExpr):
+    """
+    Class representing a terminal in the [`MathExpr`][quantumion.interface.math.MathExpr] abstract syntax tree (AST)
+    """
+
     pass
 
 
 class MathVar(MathTerminal):
+    """
+    Class representing a variable in a [`MathExpr`][quantumion.interface.math.MathExpr]
+    """
+
     name: VarName
 
 
 class MathNum(MathTerminal):
+    """
+    Class representing a number in a [`MathExpr`][quantumion.interface.math.MathExpr]
+    """
+
     value: Union[int, float]
 
 
 class MathImag(MathTerminal):
+    """
+    Class representing the imaginary unit in a [`MathExpr`][quantumion.interface.math.MathExpr] abstract syntax tree (AST)
+    """
+
     pass
 
 
 class MathUnaryOp(MathExpr):
+    """
+    Class representing a unary operations on a [`MathExpr`][quantumion.interface.math.MathExpr] abstract syntax tree (AST)
+    """
+
     pass
 
 
 class MathFunc(MathUnaryOp):
+    """
+    Class representing a named function applied to a [`MathExpr`][quantumion.interface.math.MathExpr] abstract syntax tree (AST)
+
+    Attributes:
+        func (Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]): Named function to apply
+        expr (MathExpr): Argument of the named function
+    """
+
     func: Functions
     expr: CastMathExpr
 
 
 class MathBinaryOp(MathExpr):
+    """
+    Class representing binary operations on [`MathExprs`][quantumion.interface.math.MathExpr] abstract syntax tree (AST)
+    """
+
     pass
 
 
 class MathAdd(MathBinaryOp):
+    """
+    Class representing the addition of [`MathExprs`][quantumion.interface.analog.operator.Operator]
+
+    Attributes:
+        expr1 (MathExpr): Left hand side [`MathExpr`][quantumion.interface.analog.operator.Operator]
+        expr2 (MathExpr): Right hand side [`MathExpr`][quantumion.interface.analog.operator.Operator]
+    """
+
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
 class MathSub(MathBinaryOp):
+    """
+    Class representing the subtraction of [`MathExprs`][quantumion.interface.math.MathExpr]
+
+    Attributes:
+        expr1 (MathExpr): Left hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+    """
+
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
 class MathMul(MathBinaryOp):
+    """
+    Class representing the multiplication of [`MathExprs`][quantumion.interface.math.MathExpr]
+
+    Attributes:
+        expr1 (MathExpr): Left hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+    """
+
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
 class MathDiv(MathBinaryOp):
+    """
+    Class representing the division of [`MathExprs`][quantumion.interface.math.MathExpr]
+
+    Attributes:
+        expr1 (MathExpr): Left hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+    """
+
     expr1: CastMathExpr
     expr2: CastMathExpr
 
 
 class MathPow(MathBinaryOp):
+    """
+    Class representing the exponentiation of [`MathExprs`][quantumion.interface.math.MathExpr]
+
+    Attributes:
+        expr1 (MathExpr): Left hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][quantumion.interface.math.MathExpr]
+    """
+
     expr1: CastMathExpr
     expr2: CastMathExpr

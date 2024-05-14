@@ -20,6 +20,10 @@ __all__ = [
 
 ########################################################################################
 class AnalogOperation(VisitableBaseModel):
+    """
+    Class representing an analog operation applied to the quantum system
+    """
+
     pass
 
 

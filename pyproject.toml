@@ -26,6 +26,8 @@ docs = [
     "mkdocstrings",
     "mkdocs-material",
     "mkdocstrings-python",
+    "mkdocs-same-dir",
+    "mknotebooks",
 ]
 test = ["unittest_prettify"]
 server = [
