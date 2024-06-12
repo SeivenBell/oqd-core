@@ -1,7 +1,6 @@
 from typing import List, Union
 from quantumion.interface.base import VisitableBaseModel
 from pydantic.types import NonNegativeInt
-import qutip as qt
 
 ########################################################################################
 
