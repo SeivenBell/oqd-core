@@ -401,11 +401,3 @@ class ScaleTerms(AnalogCircuitTransformer):
         if isinstance(model, OperatorScalarMul):
             return model
         return OperatorScalarMul(expr=1, op=model)
-
-
-if __name__ == "__main__":
-    from rich import print as pprint
-    from quantumion.compiler.analog import *
-
-    X, Y, Z, I = PauliX(), PauliY(), PauliZ(), PauliI()
-    A, C, LI = Annihilation(), Creation(), Identity()
