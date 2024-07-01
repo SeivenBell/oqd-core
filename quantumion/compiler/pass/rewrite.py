@@ -7,7 +7,7 @@ from quantumion.compiler.visitor import Visitor
 ########################################################################################
 
 
-class Rewrite(ABC):
+class GenericRewriter(ABC):
     def __init__(self):
         super().__init__()
         pass
@@ -16,8 +16,8 @@ class Rewrite(ABC):
     def __call__(self, model):
         pass
 
-    def process(self, rule):
-        if isinstance(rule, Rewrite):
+    def map(self, rule):
+        if isinstance(rule, GenericRewriter):
             return rule
         elif isinstance(rule, Visitor):
             return lambda model: rule.visit(model)
@@ -25,7 +25,7 @@ class Rewrite(ABC):
     pass
 
 
-class Chain(Rewrite):
+class Chain(GenericRewriter):
     def __init__(self, *rules):
         super().__init__()
 
@@ -34,12 +34,12 @@ class Chain(Rewrite):
 
     def __call__(self, model):
         for rule in self.rules:
-            model = self.process(rule)(model)
+            model = self.map(rule)(model)
 
         return model
 
 
-class FixedPoint(Rewrite):
+class FixedPoint(GenericRewriter):
     def __init__(self, rule, *, max_iter=1000):
         super().__init__()
 
@@ -51,7 +51,7 @@ class FixedPoint(Rewrite):
 
         current_iter = 0
         while True:
-            _model = self.process(self.rule)(model)
+            _model = self.map(self.rule)(model)
 
             print(model, _model)
             if model == _model or current_iter > self.max_iter:
@@ -59,6 +59,19 @@ class FixedPoint(Rewrite):
                 break
 
             model = _model
+
+        return model
+
+
+class Single(GenericRewriter):
+    def __init__(self, rule):
+        super().__init__()
+
+        self.rule = rule
+        pass
+
+    def __call__(self, model):
+        model = self.map(self.rule)(model)
 
         return model
 
