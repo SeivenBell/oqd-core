@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 ########################################################################################
 
-from quantumion.compilerv2 import PassBase
+from quantumion.compilerv2.base import PassBase
 
 ########################################################################################
 

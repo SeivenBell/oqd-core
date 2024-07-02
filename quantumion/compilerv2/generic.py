@@ -1,16 +1,16 @@
 from abc import abstractmethod
-from quantumion.compilerv2 import PassBase
+from quantumion.compilerv2.base import PassBase
 
 ########################################################################################
 
 
 class GenericRewriter(PassBase):
     @abstractmethod
-    def compose(self):
+    def logic(self):
         pass
 
     def map(self, model):
-        return self.compose()(model)
+        return self.logic()(model)
 
 
 ########################################################################################
@@ -23,6 +23,16 @@ class Chain(GenericRewriter):
         self.rules = rules
         pass
 
+    def logic(self):
+        def map(model):
+            for rule in self.rules:
+                model = rule(model)
+            return model
+
+        return map
+
+        pass
+
 
 class FixedPoint(GenericRewriter):
     def __init__(self, rule, *, max_iter=1000):
@@ -32,6 +42,20 @@ class FixedPoint(GenericRewriter):
         self.max_iter = max_iter
         pass
 
+    def logic(self):
+        def map(model):
+            i = 0
+            while True:
+                _model = self.rule(model)
+
+                if _model == model or i > self.max_iter:
+                    return model
+
+                model = _model
+                i += 1
+
+        return map
+
 
 class Single(GenericRewriter):
     def __init__(self, rule):
@@ -39,3 +63,10 @@ class Single(GenericRewriter):
 
         self.rule = rule
         pass
+
+    def logic(self):
+        def map(model):
+            model = self.rule(model)
+            return model
+
+        return map
