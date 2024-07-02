@@ -1,22 +1,34 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
+########################################################################################
+
+from quantumion.compilerv2 import PassBase
 
 ########################################################################################
 
 
-class Walk(ABC):
+class Walk(PassBase):
+    def __init__(self, rule: PassBase):
+        self.rule = rule
+
     @abstractmethod
-    def walk(self, rule):
+    def walk(self):
         pass
+
+    def map(self, model):
+        return self.walk()(model)
+
+    pass
 
 
 ########################################################################################
 
 
 class Pre(Walk):
-    def map(self, rule):
+    def walk(self):
         pass
 
 
 class Post(Walk):
-    def map(self, rule):
+    def walk(self):
         pass

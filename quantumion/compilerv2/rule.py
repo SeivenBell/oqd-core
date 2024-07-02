@@ -2,11 +2,13 @@ from abc import ABC, abstractmethod
 
 ########################################################################################
 
+from quantumion.compilerv2 import PassBase
 
-class RewriteRule(ABC):
-    @abstractmethod
-    def map(self, node):
-        pass
+########################################################################################
+
+
+class RewriteRule(PassBase):
+    pass
 
 
 ########################################################################################

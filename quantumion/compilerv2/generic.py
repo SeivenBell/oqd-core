@@ -1,18 +1,16 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from quantumion.compilerv2 import PassBase
 
 ########################################################################################
 
 
-class GenericRewriter(ABC):
-    def __init__(self):
-        super().__init__()
-        pass
-
+class GenericRewriter(PassBase):
     @abstractmethod
-    def map(self):
+    def compose(self):
         pass
 
-    pass
+    def map(self, model):
+        return self.compose()(model)
 
 
 ########################################################################################
