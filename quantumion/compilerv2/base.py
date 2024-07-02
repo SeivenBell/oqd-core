@@ -26,5 +26,7 @@ class PassBase(ABC):
     def __repr__(self):
         return "{}({})".format(
             self.__class__.__name__,
-            ", ".join(f"{k}={v}" for k, v in self.__dict__.items() if k != "_model"),
+            ", ".join(
+                f"{k}={v}" for k, v in self.__dict__.items() if not k.startswith("_")
+            ),
         )

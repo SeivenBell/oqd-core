@@ -8,10 +8,11 @@ from quantumion.compilerv2.base import PassBase
 
 
 class Walk(PassBase):
-    def __init__(self, rule: PassBase):
+    def __init__(self, rule: PassBase, branches=(list, dict, tuple)):
         super().__init__()
 
         self.rule = rule
+        self._branches = tuple(branches)
         pass
 
     @abstractmethod
@@ -21,7 +22,11 @@ class Walk(PassBase):
     def map(self, model):
         return self.walk()(model)
 
-    pass
+    def is_branch(self, model):
+        if isinstance(model, (self._branches)):
+            return True
+        else:
+            return False
 
 
 ########################################################################################
@@ -30,10 +35,13 @@ class Walk(PassBase):
 class Pre(Walk):
     def walk(self):
         def map(model):
-            if isinstance(model, dict):
-                new_model = {k: self.rule(v) for k, v in model.items()}
-            elif isinstance(model, list):
-                new_model = [self.rule(e) for e in model]
+            if self.is_branch(model):
+                if isinstance(model, dict):
+                    new_model = {k: self(v) for k, v in model.items()}
+                elif isinstance(model, (list, tuple)):
+                    new_model = model.__class__([self(e) for e in model])
+                else:
+                    new_model = self(model)
             else:
                 new_model = self.rule(model)
 
