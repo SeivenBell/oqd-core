@@ -21,4 +21,4 @@ class AddOne(RewriteRule):
         if isinstance(model, Number):
             return model + 1
         else:
-            raise TypeError("Incompatible input type for AddOne")
+            return None
