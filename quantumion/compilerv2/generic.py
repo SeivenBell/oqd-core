@@ -48,7 +48,7 @@ class FixedPoint(GenericRewriter):
             while True:
                 _model = self.rule(model)
 
-                if _model == model or i > self.max_iter:
+                if _model == model or i >= self.max_iter:
                     return model
 
                 model = _model
