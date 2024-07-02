@@ -5,12 +5,9 @@ from quantumion.compilerv2.base import PassBase
 
 
 class GenericRewriter(PassBase):
-    @abstractmethod
-    def logic(self):
-        pass
 
     def map(self, model):
-        return self.logic()(model)
+        return self.rewriter(model)
 
 
 ########################################################################################
@@ -23,15 +20,10 @@ class Chain(GenericRewriter):
         self.rules = list(rules)
         pass
 
-    def logic(self):
-        def map(model):
-            for rule in self.rules:
-                model = rule(model)
-            return model
-
-        return map
-
-        pass
+    def map(self, model):
+        for rule in self.rules:
+            new_model = rule(model)
+        return new_model
 
 
 class FixedPoint(GenericRewriter):
@@ -42,19 +34,17 @@ class FixedPoint(GenericRewriter):
         self.max_iter = max_iter
         pass
 
-    def logic(self):
-        def map(model):
-            i = 0
-            while True:
-                _model = self.rule(model)
+    def map(self, model):
+        i = 0
+        new_model = model
+        while True:
+            _model = self.rule(new_model)
 
-                if _model == model or i >= self.max_iter:
-                    return model
+            if _model == new_model or i >= self.max_iter:
+                return new_model
 
-                model = _model
-                i += 1
-
-        return map
+            new_model = _model
+            i += 1
 
 
 class Single(GenericRewriter):
@@ -64,9 +54,6 @@ class Single(GenericRewriter):
         self.rule = rule
         pass
 
-    def logic(self):
-        def map(model):
-            model = self.rule(model)
-            return model
-
-        return map
+    def map(self, model):
+        new_model = self.rule(model)
+        return new_model
