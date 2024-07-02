@@ -4,7 +4,7 @@ from quantumion.compiler.analog.base import (
 )
 from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
-from quantumion.compiler.math import VerbosePrintMathExpr, EvaluateMathExpr
+from quantumion.compiler.math.base import VerbosePrintMathExpr, EvaluateMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from quantumion.backend.qutip.interface import (
