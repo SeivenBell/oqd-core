@@ -20,7 +20,7 @@ class Chain(GenericRewriter):
     def __init__(self, *rules):
         super().__init__()
 
-        self.rules = rules
+        self.rules = list(rules)
         pass
 
     def logic(self):

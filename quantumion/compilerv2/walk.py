@@ -9,7 +9,10 @@ from quantumion.compilerv2.base import PassBase
 
 class Walk(PassBase):
     def __init__(self, rule: PassBase):
+        super().__init__()
+
         self.rule = rule
+        pass
 
     @abstractmethod
     def walk(self):

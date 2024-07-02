@@ -9,12 +9,12 @@ class CompilerError(Exception):
 
 class PassBase(ABC):
     def __call__(self, model):
-        self.model = model
+        self._model = model
 
         try:
             model = self.map(model)
             if model is None:
-                model = self.model
+                model = self._model
             return model
         except Exception as e:
             raise CompilerError(f"{e}")
@@ -26,5 +26,5 @@ class PassBase(ABC):
     def __repr__(self):
         return "{}({})".format(
             self.__class__.__name__,
-            ", ".join(f"{k}={v}" for k, v in self.__dict__.items() if k != "model"),
+            ", ".join(f"{k}={v}" for k, v in self.__dict__.items() if k != "_model"),
         )
