@@ -14,6 +14,10 @@ class Walk(PassBase):
         self.rule = rule
         pass
 
+    @property
+    def children(self):
+        return [self.rule]
+
     def map(self, model):
         return self.walk(model)
 
@@ -30,7 +34,15 @@ class Walk(PassBase):
         return new_model
 
     def generic_walk(self, model):
-        return self.rule(model)
+        for cls in model.__class__.__mro__:
+            map_func = getattr(self.rule, "map_{}".format(cls.__name__), None)
+            if map_func:
+                break
+
+        if not map_func:
+            map_func = lambda model: model
+
+        return map_func(model)
 
     pass
 

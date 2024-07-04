@@ -8,6 +8,14 @@ class CompilerError(Exception):
 
 
 class PassBase(ABC):
+    def __init__(self):
+        pass
+
+    @property
+    @abstractmethod
+    def children(self):
+        pass
+
     def __call__(self, model):
         self._model = model
 

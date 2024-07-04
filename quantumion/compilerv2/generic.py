@@ -20,6 +20,10 @@ class Chain(GenericRewriter):
         self.rules = list(rules)
         pass
 
+    @property
+    def children(self):
+        return self.rules
+
     def map(self, model):
         for rule in self.rules:
             new_model = rule(model)
@@ -33,6 +37,10 @@ class FixedPoint(GenericRewriter):
         self.rule = rule
         self.max_iter = max_iter
         pass
+
+    @property
+    def children(self):
+        return [self.rule]
 
     def map(self, model):
         i = 0
@@ -53,6 +61,10 @@ class Single(GenericRewriter):
 
         self.rule = rule
         pass
+
+    @property
+    def children(self):
+        return [self.rule]
 
     def map(self, model):
         new_model = self.rule(model)
