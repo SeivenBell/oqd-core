@@ -56,6 +56,13 @@ class Pre(Walk):
     def walk_tuple(self, model):
         return tuple(self(e) for e in model)
 
+    def walk_VisitableBaseModel(self, model):
+        new_fields = {}
+        for key in model.model_fields.keys():
+            new_fields[key] = self(getattr(model, key))
+
+        return model.__class__(**new_fields)
+
 
 class Post(Walk):
     pass
