@@ -25,8 +25,9 @@ class Chain(GenericRewriter):
         return self.rules
 
     def map(self, model):
+        new_model = model
         for rule in self.rules:
-            new_model = rule(model)
+            new_model = rule(new_model)
         return new_model
 
 

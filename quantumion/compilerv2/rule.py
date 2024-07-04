@@ -47,5 +47,8 @@ class AddN(RewriteRule):
         self.N = N
         pass
 
+    def map_int(self, model):
+        return model + self.N
+
     def map_str(self, model):
         return str(int(model) + self.N)
