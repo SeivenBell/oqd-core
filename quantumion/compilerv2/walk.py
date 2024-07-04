@@ -40,7 +40,7 @@ class Walk(PassBase):
                 break
 
         if not map_func:
-            map_func = lambda model: model
+            map_func = lambda model: None
 
         return map_func(model)
 
