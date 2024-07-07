@@ -5,13 +5,17 @@ from abc import abstractmethod
 from quantumion.compilerv2.base import PassBase
 
 ########################################################################################
-
+from rich import print as pprint
 
 class Walk(PassBase):
     def __init__(self, rule: PassBase):
         super().__init__()
 
         self.rule = rule
+        pass
+
+    @abstractmethod
+    def walk_VisitableBaseModel(self, model):
         pass
 
     @property
@@ -25,7 +29,27 @@ class Walk(PassBase):
         for cls in model.__class__.__mro__:
             map_func = getattr(self.rule, "map_{}".format(cls.__name__), None)
             if map_func:
-                return map_func(model)
+                new_model = map_func(model)
+                if new_model is None:
+                    return self.walk_VisitableBaseModel(model=model) # or make it  a wrapper
+                else:
+                    return self.walk(new_model)
+                """
+                Notes:
+                - this seems to be something like map children in liang
+                - Understand class structure better now
+                - show why it needs to be walk_VisitableBaseModel and not something like checkVisitableBaseModel function
+                - This ensures graph traversal logic is handled by WALK and NOT rewrite rules
+
+                ## -----
+                
+                From CanVerPauliAlgebra
+                    There is pattern matching involved. when we go to visit_Op, we go to the pattern Op and then the 
+                    inner if statements try to do pattern matching
+                    if no pattern matched for the given Op model which has been visited, we just return None
+                ## -----
+                """
+
 
         for cls in model.__class__.__mro__:
             walk_func = getattr(self, "walk_{}".format(cls.__name__), None)
