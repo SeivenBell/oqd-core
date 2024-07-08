@@ -168,9 +168,7 @@ class GatherMathExpr(RewriteRule):
         # pprint(model)
         if isinstance(model.op, OperatorScalarMul):
             return model.expr * model.op.expr * model.op.op
-        # new_model = model.expr * model.op
-        # if model == new_model:
-        #     pprint("I told u man")
+
         return None
     
     def map_OperatorMul(self, model: OperatorMul):
@@ -200,6 +198,33 @@ class GatherMathExpr(RewriteRule):
 
     # def visit_OperatorAddSub(self, model: Union[OperatorAdd, OperatorSub]):
     #     return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
+
+class GatherPauli(RewriteRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    """
+
+    def map_OperatorKron(self, model: OperatorKron):
+        if isinstance(model.op2, Pauli):
+            if isinstance(model.op1, Ladder):
+                return OperatorKron(
+                    op1=model.op2,
+                    op2=model.op1,
+                )
+            if isinstance(model.op1, OperatorMul) and isinstance(model.op1.op2, Ladder):
+                return OperatorKron(
+                    op1=model.op2,
+                    op2=model.op1,
+                )
+            if isinstance(model.op1, OperatorKron) and isinstance(
+                model.op1.op2, Union[Ladder, OperatorMul]
+            ):
+                return OperatorKron(
+                    op1=OperatorKron(op1=model.op1.op1, op2=model.op2),
+                    op2=model.op1.op2,
+                )
+        return None
+    
 
 class CanVerGatherMathExpr(RewriteRule):
     """Assuming that OperatorDistribute has already been fully ran"""
