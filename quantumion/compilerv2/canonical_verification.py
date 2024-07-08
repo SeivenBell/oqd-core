@@ -200,6 +200,30 @@ class GatherMathExpr(RewriteRule):
 
     # def visit_OperatorAddSub(self, model: Union[OperatorAdd, OperatorSub]):
     #     return model.__class__(op1=self.visit(model.op1), op2=self.visit(model.op2))
+
+class CanVerGatherMathExpr(RewriteRule):
+    """Assuming that OperatorDistribute has already been fully ran"""
+
+    def map_OperatorMul(self, model: OperatorMul):
+        return self._mulkron(model)
+    
+    def map_OperatorKron(self, model: OperatorKron):
+        return self._mulkron(model)
+
+    def _mulkron(self, model: Union[OperatorMul, OperatorKron]):
+        if isinstance(model.op1, OperatorScalarMul) or isinstance(
+            model.op2, OperatorScalarMul
+        ):
+            raise CanonicalFormError("Incomplete Gather Math Expression")
+        return None
+
+    def map_OperatorScalarMul(self, model: OperatorScalarMul):
+        if isinstance(model.op, OperatorScalarMul):
+            raise CanonicalFormError(
+                "Incomplete scalar multiplications after GatherMathExpression"
+            )
+        return None
+
 if __name__ == '__main__':
     I, X, Z, Y = PauliI(), PauliX(), PauliZ(), PauliY()
     A, C, LI = Annihilation(), Creation(), Identity()
