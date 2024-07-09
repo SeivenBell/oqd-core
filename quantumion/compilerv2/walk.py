@@ -23,11 +23,6 @@ class Walk(PassBase):
 
     def walk(self, model):
         for cls in model.__class__.__mro__:
-            map_func = getattr(self.rule, "map_{}".format(cls.__name__), None)
-            if map_func:
-                return map_func(model)
-
-        for cls in model.__class__.__mro__:
             walk_func = getattr(self, "walk_{}".format(cls.__name__), None)
             if walk_func:
                 break
@@ -38,7 +33,7 @@ class Walk(PassBase):
         return walk_func(model)
 
     def generic_walk(self, model):
-        return model
+        return self.rule(model)
 
     pass
 
@@ -48,21 +43,64 @@ class Walk(PassBase):
 
 class Pre(Walk):
     def walk_dict(self, model):
-        return {k: self(v) for k, v in model.items()}
+        new_model = self.rule(model)
+
+        new_model = {k: self(v) for k, v in new_model.items()}
+
+        return new_model
 
     def walk_list(self, model):
-        return [self(e) for e in model]
+        new_model = self.rule(model)
+
+        new_model = [self(e) for e in new_model]
+
+        return new_model
 
     def walk_tuple(self, model):
-        return tuple(self(e) for e in model)
+        new_model = self.rule(model)
+
+        new_model = tuple([self(e) for e in new_model])
+
+        return new_model
+
+    def walk_VisitableBaseModel(self, model):
+        new_model = self.rule(model)
+
+        new_fields = {}
+        for key in new_model.model_fields.keys():
+            new_fields[key] = self(getattr(new_model, key))
+        new_model = new_model.__class__(**new_fields)
+
+        return new_model
+
+
+class Post(Walk):
+    def walk_dict(self, model):
+        new_model = {k: self(v) for k, v in model.items()}
+
+        new_model = self.rule(new_model)
+        return new_model
+
+    def walk_list(self, model):
+        new_model = [self(e) for e in model]
+
+        new_model = self.rule(new_model)
+
+        return new_model
+
+    def walk_tuple(self, model):
+        new_model = tuple([self(e) for e in model])
+
+        new_model = self.rule(new_model)
+
+        return new_model
 
     def walk_VisitableBaseModel(self, model):
         new_fields = {}
         for key in model.model_fields.keys():
             new_fields[key] = self(getattr(model, key))
+        new_model = model.__class__(**new_fields)
 
-        return model.__class__(**new_fields)
+        new_model = self.rule(new_model)
 
-
-class Post(Walk):
-    pass
+        return new_model

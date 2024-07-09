@@ -1,7 +1,3 @@
-import inspect
-
-########################################################################################
-
 from quantumion.compilerv2.base import PassBase
 
 ########################################################################################
@@ -19,17 +15,31 @@ class RewriteRule(PassBase):
                 break
 
         if not map_func:
-            raise TypeError(
-                f"Rule {self.__class__.__name__} does not apply to model of type {model.__class__.__name__}"
-            )
+            map_func = self.generic_map
 
-        new_model = map_func(model)
-        return new_model
+        return map_func(model)
+
+    def generic_map(self, model):
+        return model
 
     pass
 
 
 ########################################################################################
+
+
+class PrintCurrent(RewriteRule):
+    def __init__(self, *, print_fn=print):
+        super().__init__()
+
+        self.print_fn = print_fn
+        self.current = 0
+        pass
+
+    def generic_map(self, model):
+        self.print_fn(f"{self.current}: {model.__class__.__name__}({model})")
+        self.current += 1
+        pass
 
 
 class AddOne(RewriteRule):
