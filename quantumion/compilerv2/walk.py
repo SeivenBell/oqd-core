@@ -30,9 +30,12 @@ class Walk(PassBase):
             map_func = getattr(self.rule, "map_{}".format(cls.__name__), None)
             if map_func:
                 new_model = map_func(model)
-                if new_model is None:
-                    return self.walk_VisitableBaseModel(model=model) # or make it  a wrapper
-                else:
+                pprint("new model is {}\n-------------------\n".format(new_model))
+                # if new_model is None:
+                #     return self.walk_VisitableBaseModel(model=model) # or make it  a wrapper
+                # else:
+                #     return self.walk(new_model)
+                if new_model is not None:
                     return self.walk(new_model)
                 """
                 Notes:
