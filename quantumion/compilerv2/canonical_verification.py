@@ -6,7 +6,7 @@ from quantumion.interface.math import *
 from rich import print as pprint
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.interface.analog import *
-
+from typing import Union
 from quantumion.compiler.analog.base import *
 
 class CanVerPauliAlgebra(RewriteRule):
@@ -75,6 +75,8 @@ class OperatorDistribute(RewriteRule):
     """
     Assumptions: GatherMathExpr (sometimes)
     """
+    # def map_OperatorTerminal(self, model: OperatorTerminal):
+    #     return None # rule is do nothing
 
     def map_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (OperatorAdd, OperatorSub)):
@@ -302,15 +304,30 @@ if __name__ == '__main__':
     exp = (2*X)@Z + Y@Z # correct
     exp = X * ((2+3)*X) # correct
     exp = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*A*C*LI) # no change
-    exp = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*(1*A)*C*LI)
+    exp = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*(1*A)*C*LI) # correct
     exp = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A)) # fine after 1 gather, 2 dist
-    exp = (3 * 3 * 3) * ((X * Y) @ (A*C))
+    exp = (3 * 3 * 3) * ((X * Y) @ (A*C)) # no change
     exp = (3*(3*(3*(X*Y))))
+    # gather pauli
+    exp = X@X@Y@(A*C*LI)@A # no change
+    exp = X@X@Y@(A*C*LI)@A@I # correct
+    exp = X@X@Y@(A*C*LI)@A + I@I@I@I@C@C # no change
+    # exp = X@X@Y@(A*C*LI)@A@I + I@I@I@I@C@C #ccorrect
+    # exp = C@(A@(Z+I)) ## --> handles by repeatedly applying opdist (check with transformer)
+    # exp = [A@(Z+I@(Z+Y))] # Annihilation() @ PauliZ() + Annihilation() @ (PauliI() @ PauliZ() + PauliI() @ PauliY()) done after 1 app. This is done by just 1 app. Needed for nested cases
+    
+    exp = A*C
     pprint(exp)
     pprint("\n------\n")
-    out = Pre(OperatorDistribute())(exp)
+    out = Pre(ScaleTerms())(exp)
+    
     # out = Pre(CanVerPauliAlgebra())(exp)
  
     pprint(out)
+    pprint(out.accept(PrintOperator()))
+
     if out == exp:
-            print(True)
+        pprint("\n------")
+        pprint(True)
+        pprint("------")
+    

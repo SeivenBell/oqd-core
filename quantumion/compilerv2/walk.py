@@ -30,20 +30,29 @@ class Walk(PassBase):
             map_func = getattr(self.rule, "map_{}".format(cls.__name__), None)
             if map_func:
                 new_model = map_func(model)
-                pprint("new model is {}\n-------------------\n".format(new_model))
-                # if new_model is None:
-                #     return self.walk_VisitableBaseModel(model=model) # or make it  a wrapper
-                # else:
-                #     return self.walk(new_model)
                 if new_model is not None:
                     return self.walk(new_model)
                 """
                 Notes:
                 - this seems to be something like map children in liang
                 - Understand class structure better now
-                - show why it needs to be walk_VisitableBaseModel and not something like checkVisitableBaseModel function
+                - [High Priority] show why it needs to be walk_VisitableBaseModel and not something like checkVisitableBaseModel function
                 - This ensures graph traversal logic is handled by WALK and NOT rewrite rules
+                - Understand why we don't need any maps inside due to this modification
+                - how was is leaf case handled using previous method? i think we need another is leaf method to prevent unnecessary operations
+                - One thing I don't understand is the repetiotion
+                        walk model is class_='OperatorKron' op1=PauliI(class_='PauliI') op2=PauliY(class_='PauliY') and elems are (<class 
+                        'quantumion.interface.analog.operator.OperatorKron'>, <class 'quantumion.interface.analog.operator.OperatorBinaryOp'>, <class 
+                        'quantumion.interface.analog.operator.Operator'>, <class 'quantumion.interface.base.TypeReflectBaseModel'>, <class 
+                        'quantumion.interface.base.VisitableBaseModel'>, <class 'pydantic.main.BaseModel'>, <class 'object'>)
+                        walk map func is <bound method OperatorDistribute.map_OperatorKron of OperatorDistribute()>
+                        *********************
+                        new model is None
+                        -------------------
 
+                        walk model is OperatorKron and elems are (<class 'str'>, <class 'object'>)
+                - current logic is that when return is None only then go to children as otherwise we won't be able to do lowering or return diff objects
+                
                 ## -----
                 
                 From CanVerPauliAlgebra
