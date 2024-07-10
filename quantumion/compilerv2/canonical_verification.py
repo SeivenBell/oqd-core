@@ -249,6 +249,40 @@ class CanVerGatherMathExpr(RewriteRule):
             )
         return None
 
+class ScaleTerms(RewriteRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+                 PruneIdentity
+    (SortedOrder and ScaleTerms can be run in either order)
+    # """
+    def __init__(self):
+        super().__init__()
+        self.tree_top = True
+
+    def map_Operator(self, model: Operator):
+        pprint("tree top: {}".format(self.tree_top))
+        if self.tree_top:
+            if not isinstance(model, OperatorAdd):
+                self.tree_top = False
+                if not isinstance(model, OperatorScalarMul):
+                    return OperatorScalarMul(expr=1, op=model)
+        return None
+
+    def map_OperatorAdd(self, model: OperatorAdd):
+        self.tree_top = False
+        if isinstance(model, OperatorAdd):
+            if not isinstance(model.op1, OperatorScalarMul):
+                return OperatorAdd(
+                op1 = OperatorScalarMul(expr=1, op=model.op1),
+                op2 = model.op2
+            )
+            if not isinstance(model.op2, OperatorScalarMul):
+                return OperatorAdd(
+                    op1 = model.op1,
+                    op2 = OperatorScalarMul(expr=1, op=model.op2)
+                )
+        return None
+
 if __name__ == '__main__':
     I, X, Z, Y = PauliI(), PauliX(), PauliZ(), PauliY()
     A, C, LI = Annihilation(), Creation(), Identity()
