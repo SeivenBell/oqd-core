@@ -303,6 +303,7 @@ class ScaleTerms(RewriteRule):
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
                  PruneIdentity
     (SortedOrder and ScaleTerms can be run in either order)
+    Important: Requires GatherMathExpr right after application of ScaleTerms for Post walk
     # """
     def __init__(self):
         super().__init__()
