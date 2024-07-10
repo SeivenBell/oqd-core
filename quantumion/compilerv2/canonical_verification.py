@@ -306,31 +306,23 @@ class ScaleTerms(RewriteRule):
     # """
     def __init__(self):
         super().__init__()
-        self.tree_top = True
+        self.op_add_root = False
 
     def map_Operator(self, model: Operator):
-        pprint("tree top: {}".format(self.tree_top))
-        if self.tree_top:
-            if not isinstance(model, OperatorAdd):
-                if not isinstance(model, OperatorScalarMul):
-                    return OperatorScalarMul(expr=1, op=model)
-        self.tree_top = False
-        return None
+        if not self.op_add_root:
+            self.op_add_root = True
+            if not isinstance(model, Union[OperatorAdd, OperatorScalarMul]):
+                return OperatorScalarMul(expr=1, op=model)
+        return model
 
     def map_OperatorAdd(self, model: OperatorAdd):
-        self.tree_top = False
-        if isinstance(model, OperatorAdd):
-            if not isinstance(model.op1, Union[OperatorScalarMul, OperatorAdd]):
-                return OperatorAdd(
-                op1 = OperatorScalarMul(expr=1, op=model.op1),
-                op2 = model.op2
-            )
-            if not isinstance(model.op2, Union[OperatorScalarMul, OperatorAdd]):
-                return OperatorAdd(
-                    op1 = model.op1,
-                    op2 = OperatorScalarMul(expr=1, op=model.op2)
-                )
-        return None
+        self.op_add_root = True
+        op1, op2 = model.op1, model.op2
+        if not isinstance(model.op1, Union[OperatorScalarMul, OperatorAdd]):
+            op1 = OperatorScalarMul(expr=1, op=model.op1)
+        if not isinstance(model.op2, Union[OperatorScalarMul, OperatorAdd]):
+            op2 = OperatorScalarMul(expr=1, op=model.op2)
+        return OperatorAdd(op1=op1, op2=op2)
 
 if __name__ == '__main__':
     I, X, Z, Y = PauliI(), PauliX(), PauliZ(), PauliY()
