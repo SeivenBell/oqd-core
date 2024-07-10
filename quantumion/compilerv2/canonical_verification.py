@@ -251,6 +251,53 @@ class CanVerGatherMathExpr(RewriteRule):
             )
         return None
 
+class NormalOrder(RewriteRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    """
+
+    def map_OperatorMul(self, model: OperatorMul):
+        if isinstance(model.op2, Creation):
+            if isinstance(model.op1, Annihilation):
+                return OperatorAdd(
+                    op1=OperatorMul(op1=model.op2, op2=model.op1), op2=Identity()
+                )
+            if isinstance(model.op1, Identity):
+                return OperatorMul(op1=model.op2, op2=model.op1)
+            if isinstance(model.op1, OperatorMul) and isinstance(
+                model.op1.op2, (Annihilation, Identity)
+            ):
+                return OperatorMul(
+                    op1=model.op1.op1,
+                    op2=OperatorMul(op1=model.op1.op2, op2=model.op2),
+                )
+        return model
+
+class ProperOrder(RewriteRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute
+    """
+
+    def map_OperatorAdd(self, model: OperatorAdd):
+        return self._addmullkron(model=model)
+    
+    def map_OperatorMul(self, model: OperatorMul):
+        return self._addmullkron(model=model)
+    
+    def map_OperatorKron(self, model: OperatorKron):
+        return self._addmullkron(model=model)
+
+    def _addmullkron(
+        self, model: Union[OperatorAdd, OperatorMul, OperatorKron]
+    ):
+        if isinstance(model.op2, model.__class__):
+            return model.__class__(
+                op1=model.__class__(
+                    op1=model.op1, op2=model.op2.op1
+                ),
+                op2=model.op2.op2,
+            )
+        return model.__class__(op1=model.op1, op2=model.op2)
 class ScaleTerms(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
