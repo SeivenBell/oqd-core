@@ -263,20 +263,20 @@ class ScaleTerms(RewriteRule):
         pprint("tree top: {}".format(self.tree_top))
         if self.tree_top:
             if not isinstance(model, OperatorAdd):
-                self.tree_top = False
                 if not isinstance(model, OperatorScalarMul):
                     return OperatorScalarMul(expr=1, op=model)
+        self.tree_top = False
         return None
 
     def map_OperatorAdd(self, model: OperatorAdd):
         self.tree_top = False
         if isinstance(model, OperatorAdd):
-            if not isinstance(model.op1, OperatorScalarMul):
+            if not isinstance(model.op1, Union[OperatorScalarMul, OperatorAdd]):
                 return OperatorAdd(
                 op1 = OperatorScalarMul(expr=1, op=model.op1),
                 op2 = model.op2
             )
-            if not isinstance(model.op2, OperatorScalarMul):
+            if not isinstance(model.op2, Union[OperatorScalarMul, OperatorAdd]):
                 return OperatorAdd(
                     op1 = model.op1,
                     op2 = OperatorScalarMul(expr=1, op=model.op2)
