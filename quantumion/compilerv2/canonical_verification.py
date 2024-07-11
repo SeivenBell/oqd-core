@@ -447,7 +447,7 @@ class SortedOrder(RewriteRule):
                 return OperatorAdd(op1=model.op1, op2=model.op2)
             
     
-class TermIndex4(RewriteRule): # pre
+class TermIndex(RewriteRule): # pre
     def __init__(self):
         super().__init__()
 
@@ -473,6 +473,9 @@ class TermIndex4(RewriteRule): # pre
         return model
 
     def map_OperatorMul(self, model):
+        return self._mul(model)
+
+    def _mul(self, model):
         multerm = ()
         if not isinstance(model.op1, OperatorMul):
             return (self._get_index(model.op1)[0] + self._get_index(model.op2)[0],
@@ -487,8 +490,7 @@ class TermIndex4(RewriteRule): # pre
         multerm = (multerm[0] + self._get_index(new_model)[0],
                    multerm[1] + self._get_index(new_model)[1])
         return multerm
-
-    def map_OperatorKron(self, model):
+    def _kron(self, model):
         kron_elems = []
         if not isinstance(model.op1, OperatorKron):
             return [self._get_index(model.op1), self._get_index(model.op2)]
@@ -499,20 +501,31 @@ class TermIndex4(RewriteRule): # pre
                 kron_elems.insert(0, self._get_index(new_model.op2))
                 new_model = new_model.op1
             kron_elems.insert(0, self._get_index(new_model))
-        return kron_elems    
+        return kron_elems
+    
+    def map_OperatorKron(self, model):
+        return self._kron(model=model)    
+    
+    def map_OperatorScalarMul(self, model):
+        if isinstance(model.op, OperatorKron):
+            return self._kron(model.op)
+        elif isinstance(model.op, OperatorMul):
+            return self._mul(model.op)
+        else:
+            raise CanonicalFormError("Incorrect operator for TermIndex calculation")
 
     def map_OperatorAdd(self, model):
-        kron_elems = []
+        add_elems = []
         if not isinstance(model.op1, OperatorAdd):
             return [self._get_index(model.op1), self._get_index(model.op2)]
         else:
-            kron_elems.insert(len(kron_elems)-1, self._get_index(model.op2))
+            add_elems.insert(len(add_elems)-1, self._get_index(model.op2))
             new_model = model.op1
             while isinstance(new_model, OperatorAdd):
-                kron_elems.insert(0, self._get_index(new_model.op2))
+                add_elems.insert(0, self._get_index(new_model.op2))
                 new_model = new_model.op1
-            kron_elems.insert(0, self._get_index(new_model))
-        return kron_elems
+            add_elems.insert(0, self._get_index(new_model))
+        return add_elems
     
     def map_OperatorTerminal(self, model):
         return self._get_index(model)
