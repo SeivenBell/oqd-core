@@ -325,6 +325,152 @@ class ScaleTerms(RewriteRule):
             op2 = OperatorScalarMul(expr=1, op=model.op2)
         return OperatorAdd(op1=op1, op2=op2)
 
+class SortedOrder(RewriteRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+                 PruneIdentity
+    (SortedOrder and ScaleTerms can be run in either order)
+    """
+
+    def map_OperatorAdd(self, model: OperatorAdd):
+        if isinstance(model.op1, OperatorAdd):
+            term1 = TermIndex().visit(model.op1.op2)
+            term2 = TermIndex().visit(model.op2)
+
+            if term1 == term2:
+                expr1 = (
+                    model.op1.op2.expr
+                    if isinstance(model.op1.op2, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                expr2 = (
+                    model.op2.expr
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                op = (
+                    model.op2.op
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else model.op2
+                )
+                return OperatorAdd(
+                    op1=model.op1.op1,
+                    op2=OperatorScalarMul(
+                        op=op, expr=MathAdd(expr1=expr1, expr2=expr2)
+                    ),
+                )
+
+            elif term1 > term2:
+                return OperatorAdd(
+                    op1=OperatorAdd(op1=model.op1.op1, op2=model.op2),
+                    op2=model.op1.op2,
+                )
+
+            elif term1 < term2:
+                return OperatorAdd(op1=model.op1, op2=model.op2)
+
+        else:
+            term1 = TermIndex().visit(model.op1)
+            term2 = TermIndex().visit(model.op2)
+
+            if term1 == term2:
+                expr1 = (
+                    model.op1.expr
+                    if isinstance(model.op1, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                expr2 = (
+                    model.op2.expr
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else MathNum(value=1)
+                )
+                op = (
+                    model.op2.op
+                    if isinstance(model.op2, OperatorScalarMul)
+                    else model.op2
+                )
+                return OperatorScalarMul(op=op, expr=MathAdd(expr1=expr1, expr2=expr2))
+
+            elif term1 > term2:
+                return OperatorAdd(
+                    op1=model.op2,
+                    op2=model.op1,
+                )
+
+            elif term1 < term2:
+                return OperatorAdd(op1=model.op1, op2=model.op2)
+            
+    
+class TermIndex4(RewriteRule): # pre
+    def __init__(self):
+        super().__init__()
+
+        self.terms = []
+        self.single_term = True
+        pass
+
+    def _get_index(self, model):
+        if isinstance(model, PauliI):
+            return 0
+        if isinstance(model, PauliX):
+            return 1
+        if isinstance(model, PauliY):
+            return 2
+        if isinstance(model, PauliZ):
+            return 3
+        if isinstance(model, Annihilation):
+            return (1, 0)
+        if isinstance(model, Creation):
+            return (1, 1)
+        if isinstance(model, Identity):
+            return (0, 0)
+        return model
+
+    def map_OperatorMul(self, model):
+        multerm = ()
+        if not isinstance(model.op1, OperatorMul):
+            return (self._get_index(model.op1)[0] + self._get_index(model.op2)[0],
+                    self._get_index(model.op1)[1] + self._get_index(model.op2)[1])
+        multerm = self._get_index(model.op2)
+        new_model = model.op1
+        while isinstance(new_model, OperatorMul):
+
+            multerm = (multerm[0] + self._get_index(new_model.op2)[0],
+                       multerm[1] + self._get_index(new_model.op2)[1])
+            new_model = new_model.op1
+        multerm = (multerm[0] + self._get_index(new_model)[0],
+                   multerm[1] + self._get_index(new_model)[1])
+        return multerm
+
+    def map_OperatorKron(self, model):
+        kron_elems = []
+        if not isinstance(model.op1, OperatorKron):
+            return [self._get_index(model.op1), self._get_index(model.op2)]
+        else:
+            kron_elems.insert(len(kron_elems)-1, self._get_index(model.op2))
+            new_model = model.op1
+            while isinstance(new_model, OperatorKron):
+                kron_elems.insert(0, self._get_index(new_model.op2))
+                new_model = new_model.op1
+            kron_elems.insert(0, self._get_index(new_model))
+        return kron_elems    
+
+    def map_OperatorAdd(self, model):
+        kron_elems = []
+        if not isinstance(model.op1, OperatorAdd):
+            return [self._get_index(model.op1), self._get_index(model.op2)]
+        else:
+            kron_elems.insert(len(kron_elems)-1, self._get_index(model.op2))
+            new_model = model.op1
+            while isinstance(new_model, OperatorAdd):
+                kron_elems.insert(0, self._get_index(new_model.op2))
+                new_model = new_model.op1
+            kron_elems.insert(0, self._get_index(new_model))
+        return kron_elems
+    
+    def map_OperatorTerminal(self, model):
+        return self._get_index(model)
+        
 if __name__ == '__main__':
     I, X, Z, Y = PauliI(), PauliX(), PauliZ(), PauliY()
     A, C, LI = Annihilation(), Creation(), Identity()
