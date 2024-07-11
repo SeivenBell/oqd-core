@@ -448,12 +448,6 @@ class SortedOrder(RewriteRule):
             
     
 class TermIndex(RewriteRule): # pre
-    def __init__(self):
-        super().__init__()
-
-        self.terms = []
-        self.single_term = True
-        pass
 
     def _get_index(self, model):
         if isinstance(model, PauliI):
