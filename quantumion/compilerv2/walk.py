@@ -98,6 +98,8 @@ class Post(Walk):
     def walk_VisitableBaseModel(self, model):
         new_fields = {}
         for key in model.model_fields.keys():
+            if key == "class_":
+                continue
             new_fields[key] = self(getattr(model, key))
         new_model = model.__class__(**new_fields)
 
