@@ -16,11 +16,13 @@ class CanVerPauliAlgebra(RewriteRule):
     """
 
     def map_OperatorMul(self, model: OperatorMul):
-        pprint(model)
         if isinstance(model.op1, Pauli) and isinstance(model.op2, Pauli):
             raise CanonicalFormError("Incomplete Pauli Algebra")
-        else:
-            return None
+        elif isinstance(model.op1, Pauli) and isinstance(model.op2, Ladder):
+            raise CanonicalFormError("Incorrect Ladder and Pauli multiplication")
+        elif isinstance(model.op1, Ladder) and isinstance(model.op2, Pauli):
+            raise CanonicalFormError("Incorrect Ladder and Pauli multiplication")
+        pass
 
 class CanVerGatherMathExpr(RewriteRule):
     """Assuming that OperatorDistribute has already been fully ran"""
@@ -145,6 +147,20 @@ class CanVerGatherPauli(RewriteRule):
             if isinstance(model.op1, OperatorKron):
                 if isinstance(model.op1.op2, (Ladder, OperatorMul)):
                     raise CanonicalFormError("Incorrect GatherPauli")
+        pass
+
+class CanVerNormalOrder(RewriteRule):
+    """Assumptions:
+    >>> Distributed, Gathered and then proper ordered and PauliAlgebra, PruneIdentity
+    """
+
+    def map_OperatorMul(self, model: OperatorMul):
+        if isinstance(model.op2, Creation):
+            if isinstance(model.op1, Annihilation):
+                raise CanonicalFormError("Incorrect NormalOrder")
+            if isinstance(model.op1, OperatorMul):
+                if isinstance(model.op1.op2, Annihilation):
+                    raise CanonicalFormError("Incorrect NormalOrder")
         pass
 
 class PruneIdentity(RewriteRule):
