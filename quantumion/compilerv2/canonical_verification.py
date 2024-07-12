@@ -93,6 +93,35 @@ class CanVerOperatorDistribute(RewriteRule):
         if isinstance(model, OperatorSub):
             raise CanonicalFormError("Subtraction of terms present")
         pass
+
+class CanVerProperOrder(RewriteRule):
+    """Assumptions:
+    None
+    """
+
+    def map_OperatorAdd(self, model: OperatorAdd):
+        self._OperatorAddMulKron(model)
+        pass
+
+    def map_OperatorMul(self, model: OperatorMul):
+        self._OperatorAddMulKron(model)
+        pass
+
+    def map_OperatorKron(self, model: OperatorKron):
+        self._OperatorAddMulKron(model)
+        pass
+
+    def _OperatorAddMulKron(self, model: Union[OperatorAdd, OperatorMul, OperatorKron]):
+        if isinstance(model.op2, model.__class__):
+            raise CanonicalFormError("Incorrect Proper Ordering")
+        pass
+
+    def map_OperatorScalarMul(self, model: OperatorScalarMul):
+        if isinstance(model.op, model.__class__):
+            raise CanonicalFormError(
+                "Incorrect Proper Ordering (for scalar multiplication)"
+            )
+        pass
 class PruneIdentity(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
