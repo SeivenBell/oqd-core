@@ -122,6 +122,17 @@ class CanVerProperOrder(RewriteRule):
                 "Incorrect Proper Ordering (for scalar multiplication)"
             )
         pass
+
+class CanVerPruneIdentity(RewriteRule):
+    """Assumptions:
+    >>> Distributed
+    """
+
+    def map_OperatorMul(self, model: OperatorMul):
+        if isinstance(model.op1, Identity) or isinstance(model.op2, Identity):
+            raise CanonicalFormError("Prune Identity is not complete")
+        pass
+
 class PruneIdentity(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
