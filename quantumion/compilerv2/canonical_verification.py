@@ -133,6 +133,20 @@ class CanVerPruneIdentity(RewriteRule):
             raise CanonicalFormError("Prune Identity is not complete")
         pass
 
+class CanVerGatherPauli(RewriteRule):
+    """Assumptions:
+    >>> Distributed, Gathered and then proper ordered and PauliAlgebra
+    """
+
+    def map_OperatorKron(self, model: OperatorKron):
+        if isinstance(model.op2, Pauli):
+            if isinstance(model.op1, (Ladder, OperatorMul)):
+                raise CanonicalFormError("Incorrect GatherPauli")
+            if isinstance(model.op1, OperatorKron):
+                if isinstance(model.op1.op2, (Ladder, OperatorMul)):
+                    raise CanonicalFormError("Incorrect GatherPauli")
+        pass
+
 class PruneIdentity(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
