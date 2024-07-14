@@ -575,6 +575,8 @@ class TermIndex(RewriteRule): # pre
             return self._kron(model.op)
         elif isinstance(model.op, OperatorMul):
             return self._mul(model.op)
+        elif isinstance(model.op, OperatorTerminal):
+            return self._get_index(model.op)
         else:
             raise CanonicalFormError("Incorrect operator for TermIndex calculation")
 
