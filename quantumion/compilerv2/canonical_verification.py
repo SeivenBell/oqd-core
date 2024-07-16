@@ -163,6 +163,25 @@ class CanVerNormalOrder(RewriteRule):
                     raise CanonicalFormError("Incorrect NormalOrder")
         pass
 
+class CanVerSortedOrder(RewriteRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+                 PruneIdentity
+    """
+    def map_OperatorAdd(self, model: OperatorAdd):
+        term2 = Pre(TermIndex2())(model.op2)
+        if isinstance(model.op1, OperatorAdd):
+            term1 = Pre(TermIndex2())(model.op1.op2)
+        else:
+            term1 = Pre(TermIndex2())(model.op1)
+        if term_index_dim(term1) != term_index_dim(term2):
+            raise CanonicalFormError("Incorrect dimension of hilbert space")
+        if term1 > term2:
+            raise CanonicalFormError("Terms are not in sorted order")
+        elif term1 == term2:
+            raise CanonicalFormError("Duplicate terms present")
+        pass
+
 class PruneIdentity(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
@@ -176,8 +195,6 @@ class PruneIdentity(RewriteRule):
     def map_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (Identity)):
             return model.op2
-        pprint("model.op1 {}".format(model.op1))
-        pprint("self {}".format(self.map))
         if isinstance(model.op2, (Identity)):
             return model.op1 # problem is this is a rule and not a walk !!
         return None
@@ -430,7 +447,7 @@ class ScaleTerms(RewriteRule):
             self.op_add_root = True
             if not isinstance(model, Union[OperatorAdd, OperatorScalarMul]):
                 return OperatorScalarMul(expr=1, op=model)
-        return model
+        return model # check with no ret
 
     def map_OperatorAdd(self, model: OperatorAdd):
         self.op_add_root = True
@@ -439,7 +456,20 @@ class ScaleTerms(RewriteRule):
             op1 = OperatorScalarMul(expr=1, op=model.op1)
         if not isinstance(model.op2, Union[OperatorScalarMul, OperatorAdd]):
             op2 = OperatorScalarMul(expr=1, op=model.op2)
-        return OperatorAdd(op1=op1, op2=op2)
+        return OperatorAdd(op1=op1, op2=op2) # check with no ret
+
+def term_index_dim(lst):
+    if isinstance(lst, int):
+        return [1,0]
+    if isinstance(lst, tuple):
+        return [0,1]
+    dim = [0,0]
+    for elem in lst:
+        if isinstance(elem, tuple):
+            dim[1] = dim[1] + 1
+        else:
+            dim[0] = dim[0] + 1
+    return dim
 
 class SortedOrder(RewriteRule):
     """
@@ -450,8 +480,10 @@ class SortedOrder(RewriteRule):
 
     def map_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd):
-            term1 = TermIndex().visit(model.op1.op2)
-            term2 = TermIndex().visit(model.op2)
+            term1 = Pre(TermIndex2())(model.op1.op2)  #TermIndex().visit(model.op1.op2)
+            term2 = Pre(TermIndex2())(model.op2) # TermIndex().visit(model.op2)
+            if term_index_dim(term1) != term_index_dim(term2):
+                raise CanonicalFormError("Incorrect hilbert space dimensions")
 
             if term1 == term2:
                 expr1 = (
@@ -486,9 +518,10 @@ class SortedOrder(RewriteRule):
                 return OperatorAdd(op1=model.op1, op2=model.op2)
 
         else:
-            term1 = TermIndex().visit(model.op1)
-            term2 = TermIndex().visit(model.op2)
-
+            term1 = Pre(TermIndex2())(model.op1) #TermIndex().visit(model.op1)
+            term2 = Pre(TermIndex2())(model.op2) #TermIndex().visit(model.op2)
+            if term_index_dim(term1) != term_index_dim(term2):
+                raise CanonicalFormError("Incorrect hilbert space dimensions")
             if term1 == term2:
                 expr1 = (
                     model.op1.expr
@@ -515,9 +548,8 @@ class SortedOrder(RewriteRule):
 
             elif term1 < term2:
                 return OperatorAdd(op1=model.op1, op2=model.op2)
-            
-    
-class TermIndex(RewriteRule): # pre
+
+class TermIndex2(RewriteRule): # pre
 
     def _get_index(self, model):
         if isinstance(model, PauliI):
@@ -597,48 +629,49 @@ class TermIndex(RewriteRule): # pre
         return self._get_index(model)
         
 if __name__ == '__main__':
-    I, X, Z, Y = PauliI(), PauliX(), PauliZ(), PauliY()
-    A, C, LI = Annihilation(), Creation(), Identity()
-    exp = I@Z@(X*X)*C*LI
-    exp = I@I@X@(X-Z)@(A*A) + Z@(X@(X@(X+Z)))@(A*C*A*C*C)
-    # exp = I@I@X@(X-Z)@(A*A) + Z@(X@(X@((X*I)+Z)))@(A*C*A*C*C)
-    # exp = (C@A)*(X*Y)
-    exp = Creation() * Annihilation() * Identity()  * Identity()  * Identity()  * Identity()
-    exp = A*C + C*A*LI
-    # exp = A*A@C*A@(LI*A)
-    exp = X@(X@A)+ Y@LI
-    exp = X@((2*Y)+Z)
-    exp = 2*(X@(A+C)+Y)
-    exp = X*(X+Y)
-    # gather math expr
-    exp = 2*(X@Z) + Y@Z # no change
-    exp = (2*X)@Z + Y@Z # correct
-    exp = X * ((2+3)*X) # correct
-    exp = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*A*C*LI) # no change
-    exp = 2j*(X @ (A * A * C) @ (Y @ (A*C*A*A*C*LI))) + (-1)*(A*C*A*(1*A)*C*LI) # correct
-    exp = 2j*(5*(3* (X + Y)) + 3* (Z @ A*A*C*A)) # fine after 1 gather, 2 dist
-    exp = (3 * 3 * 3) * ((X * Y) @ (A*C)) # no change
-    exp = (3*(3*(3*(X*Y))))
-    # gather pauli
-    exp = X@X@Y@(A*C*LI)@A # no change
-    exp = X@X@Y@(A*C*LI)@A@I # correct
-    exp = X@X@Y@(A*C*LI)@A + I@I@I@I@C@C # no change
-    # exp = X@X@Y@(A*C*LI)@A@I + I@I@I@I@C@C #ccorrect
-    # exp = C@(A@(Z+I)) ## --> handles by repeatedly applying opdist (check with transformer)
-    # exp = [A@(Z+I@(Z+Y))] # Annihilation() @ PauliZ() + Annihilation() @ (PauliI() @ PauliZ() + PauliI() @ PauliY()) done after 1 app. This is done by just 1 app. Needed for nested cases
-    
-    exp = A*C
-    pprint(exp)
-    pprint("\n------\n")
-    out = Pre(ScaleTerms())(exp)
-    
-    # out = Pre(CanVerPauliAlgebra())(exp)
- 
-    pprint(out)
-    pprint(out.accept(PrintOperator()))
 
-    if out == exp:
-        pprint("\n------")
-        pprint(True)
-        pprint("------")
+    dist_chain = Chain(
+        FixedPoint(Post(OperatorDistribute())), 
+        FixedPoint(Post(GatherMathExpr())), 
+        FixedPoint(Post(OperatorDistribute())),
+        )
     
+    pauli_chain = Chain(
+        FixedPoint(Post(PauliAlgebra())),
+        FixedPoint(Post(GatherMathExpr())),
+        FixedPoint(Post(PauliAlgebra()))
+    )
+    
+    normal_order_chain = Chain(
+        FixedPoint(Post(NormalOrder())),
+        FixedPoint(Post(OperatorDistribute())),
+        FixedPoint(Post(GatherMathExpr())),
+        FixedPoint(Post(ProperOrder())),
+        FixedPoint(Post(NormalOrder())),
+    )
+
+    scale_terms_chain = Chain(
+        FixedPoint(Pre(ScaleTerms())),
+        FixedPoint(Post(GatherMathExpr()))
+    )
+
+    compiler = Chain(FixedPoint(dist_chain), 
+                FixedPoint(Post(ProperOrder())), 
+                FixedPoint(pauli_chain), 
+                FixedPoint(Post(GatherPauli())),
+                FixedPoint(normal_order_chain),
+                FixedPoint(Post(PruneIdentity())),
+                FixedPoint(scale_terms_chain),
+                FixedPoint(Post(SortedOrder()))
+                )
+
+    verifier = Chain(
+        Post(CanVerOperatorDistribute()),
+        Post(CanVerGatherMathExpr()),
+        Post(CanVerProperOrder()),
+        Post(CanVerPauliAlgebra()),
+        Post(CanVerGatherPauli()),
+        Post(CanVerNormalOrder()),
+        Post(CanVerPruneIdentity()),
+        Post(CanVerSortedOrder())
+    )
