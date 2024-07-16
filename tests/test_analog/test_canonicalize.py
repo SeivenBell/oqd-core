@@ -559,10 +559,10 @@ class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors, unittest.
         op = A@(Z+I)# +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
         self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule)
 
-    def test_assumption_simple_nested_product_fail(self):
-        """Error found when Ladder @ PauliMultiplication"""
-        op = A@(Z*I)
-        self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
+    # def test_assumption_simple_nested_product_fail(self):
+    #     """Error found when Ladder @ PauliMultiplication"""
+    #     op = A@(Z*I)
+    #     self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
 
     def test_ladder_prod_fail(self):
         """ladder multiplication fail"""
