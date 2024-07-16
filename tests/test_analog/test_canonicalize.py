@@ -15,7 +15,7 @@ from unittest_prettify.colorize import (
 )
 X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
 
-def test_function(operator: Operator, rule: RewriteRule, walk_method: Post):
+def test_function(operator: Operator, rule: RewriteRule, walk_method: Walk):
     walk_method(rule)(operator)
 
 class CanonicalFormErrors(unittest.TestCase):
@@ -793,43 +793,44 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors, unittest.
         op = (X@Y+(2*(3j)*(X@Y))) + (Y@I) + (Z@I)
         self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
 
-# @colorize(color=BLUE)
-# class TestCanonicalizationVerificationScaleTerms(CanonicalFormErrors, unittest.TestCase):
-#     maxDiff = None
+@colorize(color=BLUE)
+class TestCanonicalizationVerificationScaleTerms(CanonicalFormErrors, unittest.TestCase):
+    maxDiff = None
 
-#     def __init__(self, methodName: str = "runTest") -> None:
-#         self._rule = CanonicalizationVerificationScaleTerms()
-#         super().__init__(methodName)
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._rule = CanVerScaleTerm()
+        self._walk_method = Pre
+        super().__init__(methodName)
 
-#     def test_simple_addition_pass(self):
-#         """Addition pass"""
-#         op = 2*(X@Z) + 3*(Y@I) + 2*(Z@Z)
-#         self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule)
+    def test_simple_addition_pass(self):
+        """Addition pass"""
+        op = 2*(X@Z) + 3*(Y@I) + 2*(Z@Z)
+        self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule, walk_method=self._walk_method)
 
-#     def test_simple_addition_fail(self):
-#         """Addition fail"""
-#         op = 2*(X@Z) + (Y@I) + 2*(Z@Z)
-#         self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
+    def test_simple_addition_fail(self):
+        """Addition fail"""
+        op = 2*(X@Z) + (Y@I) + 2*(Z@Z)
+        self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule, walk_method=self._walk_method)
 
-#     def test_single_pass(self):
-#         """Single term pass"""
-#         op = 2*(X@Z)
-#         self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule)
+    def test_single_pass(self):
+        """Single term pass"""
+        op = 2*(X@Z)
+        self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule, walk_method=self._walk_method)
 
-#     def test_single_fail(self):
-#         """Single Term fail"""
-#         op = (X@Z)
-#         self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
+    def test_single_fail(self):
+        """Single Term fail"""
+        op = (X@Z)
+        self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule, walk_method=self._walk_method)
 
-#     def test_complicated_addition_pass(self):
-#         """Complicated addition pass"""
-#         op = 2*(X@Z@Z@(C*A))  + 3*Z + 2*(Y@Z) + 1*A + 1*(C*C) + 1*I + 1*Z
-#         self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule)
+    def test_complicated_addition_pass(self):
+        """Complicated addition pass"""
+        op = 2*(X@Z@Z@(C*A))  + 3*Z + 2*(Y@Z) + 1*A + 1*(C*C) + 1*I + 1*Z
+        self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule, walk_method=self._walk_method)
 
-#     def test_simple_addition_fail(self):
-#         """Complicated addition fail"""
-#         op = 2*(X@Z@Z@(C*A))  + Z + 2*(Y@Z) + 1*A + 1*(C*C) + 1*I + 1*Z
-#         self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
+    def test_simple_addition_fail(self):
+        """Complicated addition fail"""
+        op = 2*(X@Z@Z@(C*A))  + Z + 2*(Y@Z) + 1*A + 1*(C*C) + 1*I + 1*Z
+        self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule, walk_method=self._walk_method)
 
 if __name__ == '__main__':
     unittest.main()

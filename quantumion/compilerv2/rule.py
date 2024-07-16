@@ -2,7 +2,7 @@ from quantumion.compilerv2.base import PassBase
 
 ########################################################################################
 
-
+from rich import print as pprint
 class RewriteRule(PassBase):
     @property
     def children(self):
@@ -22,6 +22,12 @@ class RewriteRule(PassBase):
     def generic_map(self, model):
         return model
 
+    # def map(self, model):
+    #     for cls in model.__class__.__mro__:
+    #         map_func = getattr(self, "map_{}".format(cls.__name__), None)
+    #         if map_func:
+    #             map_func(model)
+    #             break
     pass
 
 
