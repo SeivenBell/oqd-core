@@ -84,14 +84,14 @@ class CanVerOperatorDistribute(RewriteRule):
         pass
        
 
-    def visit_OperatorScalarMul(self, model: OperatorScalarMul):
+    def map_OperatorScalarMul(self, model: OperatorScalarMul):
         if not (isinstance(model.op, self.allowed_ops)):
             raise CanonicalFormError(
                 "Scalar multiplication of operators not simplified fully"
             )
         pass
 
-    def visit_OperatorSub(self, model: OperatorSub):
+    def map_OperatorSub(self, model: OperatorSub):
         if isinstance(model, OperatorSub):
             raise CanonicalFormError("Subtraction of terms present")
         pass
