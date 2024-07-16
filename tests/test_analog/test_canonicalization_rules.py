@@ -15,7 +15,7 @@ from unittest_prettify.colorize import (
 )
 X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
 
-def test_function(operator: Operator, rule : RewriteRule, walk_method = Post):
+def test_function(operator: Operator, rule : RewriteRule, walk_method : Walk = Post):
     return FixedPoint(walk_method(rule))(operator)
 
 
@@ -31,6 +31,26 @@ class TestOperatorDistribute(unittest.TestCase):
         """Simple test"""
         op = X@(X+Y)
         expected = X@X + X@Y
+        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+
+@colorize(color=BLUE)
+class TestGatherMathExpr(unittest.TestCase):
+    maxDiff = None
+
+    def __init__(self, methodName: GREEN = "runTest") -> None:
+        super().__init__(methodName)
+        self.rule = GatherMathExpr()
+
+    def test_simple(self):
+        """Simple test"""
+        op = X@(3*Y) + (2*X)@Z
+        expected = 3*(X@Y) + 2*(X@Z)
+        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+
+    def test_complicated(self):
+        """Complicateds test"""
+        op = X@(3*Y*(3*Z))@(10*I) + (2*X)@Z@(5*Y)
+        expected = (MathStr(string='3*3*10'))*((X@(Y*Z))@I) + MathStr(string='2*5')*(X@Z@Y)
         self.assertEqual(test_function(operator = op, rule = self.rule), expected)
 
 
