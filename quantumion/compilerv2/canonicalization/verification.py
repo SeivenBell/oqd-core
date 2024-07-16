@@ -169,11 +169,11 @@ class CanVerSortedOrder(RewriteRule):
                  PruneIdentity
     """
     def map_OperatorAdd(self, model: OperatorAdd):
-        term2 = Pre(TermIndex())(model.op2)
+        term2 = PreWithNonVisitableOutput(TermIndex())(model.op2)
         if isinstance(model.op1, OperatorAdd):
-            term1 = Pre(TermIndex())(model.op1.op2)
+            term1 = PreWithNonVisitableOutput(TermIndex())(model.op1.op2)
         else:
-            term1 = Pre(TermIndex())(model.op1)
+            term1 = PreWithNonVisitableOutput(TermIndex())(model.op1)
         if term_index_dim(term1) != term_index_dim(term2):
             raise CanonicalFormError("Incorrect dimension of hilbert space")
         if term1 > term2:
