@@ -1,5 +1,5 @@
 from quantumion.interface.analog import *
-from quantumion.compilerv2.canonical_verification import *
+from quantumion.compilerv2.canonicalization.rules import *
 from quantumion.compiler.analog.verify import *
 from quantumion.compiler.analog.error import *
 from quantumion.compiler.analog.base import *
