@@ -2,6 +2,7 @@ from quantumion.compilerv2.rewriter import *
 from quantumion.compilerv2.walk import *
 from quantumion.compilerv2.canonicalization.rules import *
 from quantumion.compilerv2.canonicalization.verification import *
+from quantumion.compilerv2.math.rules import *
 
 dist_chain = Chain(
     FixedPoint(Post(OperatorDistribute())), 
@@ -28,6 +29,12 @@ scale_terms_chain = Chain(
     FixedPoint(Post(GatherMathExpr()))
 )
 
+math_chain = Chain(
+    FixedPoint(Post(DistributeMathExpr())),
+    FixedPoint(Post(ProperOrderMathExpr())),
+    FixedPoint(Post(PartitionMathExpr())),
+)
+
 compiler = Chain(FixedPoint(dist_chain), 
             FixedPoint(Post(ProperOrder())), 
             FixedPoint(pauli_chain), 
@@ -35,7 +42,8 @@ compiler = Chain(FixedPoint(dist_chain),
             FixedPoint(normal_order_chain),
             FixedPoint(Post(PruneIdentity())),
             FixedPoint(scale_terms_chain),
-            FixedPoint(Post(SortedOrder()))
+            FixedPoint(Post(SortedOrder())),
+            math_chain
             )
 
 verifier = Chain(
@@ -55,10 +63,17 @@ if __name__ == '__main__':
     X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
 
     op =  A@(Z*I) + A@I # gatherpauli does not give error (previously used to.) Now PauliAlgebra does give error
+    # op = X@(X+(3*(Y)))
+    op = 2*X + (3*Y) *((2*I) + (1*X))
 
     output = compiler(op)
-    output =  2*(X@Z)
 
     verifier(output)
 
-    pprint(output.accept(PrintOperator()))
+    pprint(output.accept(VerbosePrintOperator()))
+    """
+    partition does :
+    (((2) * PauliX()) + ((3 * 2) * PauliY())) + ((((3 * 1) * -1) * 1j) * PauliZ())
+    to
+    (((2) * PauliX()) + ((3 * 2) * PauliY())) + ((((1j * 3) * 1) * -1) * PauliZ())  
+    """
