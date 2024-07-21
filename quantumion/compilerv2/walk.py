@@ -4,6 +4,7 @@ from abc import abstractmethod
 
 from quantumion.compilerv2.base import PassBase
 
+from quantumion.interface.base import VisitableBaseModel
 ########################################################################################
 from rich import print as pprint
 
@@ -100,6 +101,11 @@ class Post(Walk):
         return new_model
 
     def walk_VisitableBaseModel(self, model):
+        """
+        POST walk does not work for term index...
+        That's because u r creating {'class_': 'OperatorKron', 'op1': 1, 'op2': 2} and trying tonput this in kron structure
+        so seems like post is only when self -> self. i.e. kron to kron
+        """
         new_fields = {}
         for key in model.model_fields.keys():
             new_fields[key] = self(getattr(model, key))
@@ -142,5 +148,38 @@ class PreWithNonVisitableOutput(Walk):
         for key in new_model.model_fields.keys():
             new_fields[key] = self(getattr(new_model, key))
         new_model = new_model.__class__(**new_fields)
+
+        return new_model
+
+class PostConversion(Walk):
+    """This is the walk method for conversions. All the logic is the same as Pre except in walk_VisitableBaseModel function. The walk_VisitableBaseModel
+    function goes through the attributes of VisitableBaseModels and then walks through the operands and then applies the rule on the model"""
+    def walk_dict(self, model):
+        new_model = {k: self(v) for k, v in model.items()}
+
+        new_model = self.rule(new_model)
+        return new_model
+
+    def walk_list(self, model):
+        new_model = [self(e) for e in model]
+
+        new_model = self.rule(new_model)
+
+        return new_model
+
+    def walk_tuple(self, model):
+        new_model = tuple([self(e) for e in model])
+
+        new_model = self.rule(new_model)
+
+        return new_model
+
+    def walk_VisitableBaseModel(self, model):
+
+        new_fields = {}
+        for key in model.model_fields.keys():
+            new_fields[key] = self(getattr(model, key))
+        self.rule.operands = new_fields
+        new_model = self.rule(model)
 
         return new_model
