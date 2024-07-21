@@ -248,8 +248,8 @@ class SortedOrder(RewriteRule):
 
     def map_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd):
-            term1 = PreWithNonVisitableOutput(TermIndex())(model.op1.op2)  #TermIndex().visit(model.op1.op2)
-            term2 = PreWithNonVisitableOutput(TermIndex())(model.op2) # TermIndex().visit(model.op2)
+            term1 = PostConversion(TermIndex())(model.op1.op2)  #TermIndex().visit(model.op1.op2)
+            term2 = PostConversion(TermIndex())(model.op2) # TermIndex().visit(model.op2)
             if term_index_dim(term1) != term_index_dim(term2):
                 raise CanonicalFormError("Incorrect hilbert space dimensions")
 
@@ -286,8 +286,8 @@ class SortedOrder(RewriteRule):
                 return OperatorAdd(op1=model.op1, op2=model.op2)
 
         else:
-            term1 = PreWithNonVisitableOutput(TermIndex())(model.op1) #TermIndex().visit(model.op1)
-            term2 = PreWithNonVisitableOutput(TermIndex())(model.op2) #TermIndex().visit(model.op2)
+            term1 = PostConversion(TermIndex())(model.op1) #TermIndex().visit(model.op1)
+            term2 = PostConversion(TermIndex())(model.op2) #TermIndex().visit(model.op2)
             if term_index_dim(term1) != term_index_dim(term2):
                 raise CanonicalFormError("Incorrect hilbert space dimensions")
             if term1 == term2:
@@ -317,81 +317,64 @@ class SortedOrder(RewriteRule):
             elif term1 < term2:
                 return OperatorAdd(op1=model.op1, op2=model.op2)
             
-class TermIndex(RewriteRule): # pre
+class TermIndex(ConversionRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+    (without NormalOrder, TermIndex is not useful. For example, TermIndex of A*C and C*A is the same (2,1).
+    Hence, NormalOrder is a requirement.
+    """
 
-    def _get_index(self, model):
-        if isinstance(model, PauliI):
-            return 0
-        if isinstance(model, PauliX):
-            return 1
-        if isinstance(model, PauliY):
-            return 2
-        if isinstance(model, PauliZ):
-            return 3
-        if isinstance(model, Annihilation):
-            return (1, 0)
-        if isinstance(model, Creation):
-            return (1, 1)
-        if isinstance(model, Identity):
-            return (0, 0)
-        return model
+    def map_PauliI(self, model: PauliI, operands):
+        return 0
 
-    def map_OperatorMul(self, model):
-        return self._mul(model)
+    def map_PauliX(self, model: PauliX, operands):
+        pprint("operands in X is {}\n".format(operands))
+        return 1
 
-    def _mul(self, model):
-        multerm = ()
-        if not isinstance(model.op1, OperatorMul):
-            return (self._get_index(model.op1)[0] + self._get_index(model.op2)[0],
-                    self._get_index(model.op1)[1] + self._get_index(model.op2)[1])
-        multerm = self._get_index(model.op2)
-        new_model = model.op1
-        while isinstance(new_model, OperatorMul):
+    def map_PauliY(self, model: PauliY, operands):
+        pprint("operands in model {} is {}\n".format(model, operands))
+        return 2
 
-            multerm = (multerm[0] + self._get_index(new_model.op2)[0],
-                       multerm[1] + self._get_index(new_model.op2)[1])
-            new_model = new_model.op1
-        multerm = (multerm[0] + self._get_index(new_model)[0],
-                   multerm[1] + self._get_index(new_model)[1])
-        return multerm
-    def _kron(self, model):
-        kron_elems = []
-        if not isinstance(model.op1, OperatorKron):
-            return [self._get_index(model.op1), self._get_index(model.op2)]
-        else:
-            kron_elems.insert(len(kron_elems)-1, self._get_index(model.op2))
-            new_model = model.op1
-            while isinstance(new_model, OperatorKron):
-                kron_elems.insert(0, self._get_index(new_model.op2))
-                new_model = new_model.op1
-            kron_elems.insert(0, self._get_index(new_model))
-        return kron_elems
-    
-    def map_OperatorKron(self, model):
-        return self._kron(model=model)    
-    
-    def map_OperatorScalarMul(self, model):
-        if isinstance(model.op, OperatorKron):
-            return self._kron(model.op)
-        elif isinstance(model.op, OperatorMul):
-            return self._mul(model.op)
-        elif isinstance(model.op, OperatorTerminal):
-            return self._get_index(model.op)
-        else:
-            raise CanonicalFormError("Incorrect operator for TermIndex calculation")
+    def map_PauliZ(self, model: PauliZ, operands):
+        return 3
 
-    def map_OperatorAdd(self, model):
-        add_elems = []
-        if not isinstance(model.op1, OperatorAdd):
-            return [self._get_index(model.op1), self._get_index(model.op2)]
-        else:
-            add_elems.insert(len(add_elems)-1, self._get_index(model.op2))
-            new_model = model.op1
-            while isinstance(new_model, OperatorAdd):
-                add_elems.insert(0, self._get_index(new_model.op2))
-                new_model = new_model.op1
-            add_elems.insert(0, self._get_index(new_model))
-        return add_elems
-    
-    def map_OperatorTerminal(self, model):
-        return self._get_index(model)
+    def map_Identity(self, model: Identity, operands):
+        return (0, 0)
+
+    def map_Annihilation(self, model: Annihilation, operands):
+        return (1, 0)
+
+    def map_Creation(self, model: Annihilation, operands):
+        return (1, 1)
+
+    def map_OperatorAdd(self, model: OperatorAdd, operands):
+        pprint("operands in model {} is {}\n".format(model, operands))
+        term1 = (
+            operands['op1']
+            if isinstance(model.op1, OperatorAdd)
+            else [operands['op1']]
+        )
+        term2 = operands['op2']
+        return term1 + [term2]
+
+    def map_OperatorScalarMul(self, model: OperatorScalarMul, operands):
+        pprint("in model {}, ops are {}".format(model, operands))
+        term = operands['op']
+        return term
+
+    def map_OperatorMul(self, model: OperatorMul, operands):
+        if not (
+            isinstance(model.op1, (Ladder, model.__class__))
+            and isinstance(model.op2, (Ladder, model.__class__))
+        ):
+            raise AssertionError("More simplification required for Term Index")
+        term1 = operands['op1']
+        term2 = operands['op2']
+        return (term1[0] + term2[0], term1[1] + term2[1])
+
+    def map_OperatorKron(self, model: OperatorKron, operands):
+        term1 = operands['op1']
+        term1 = term1 if isinstance(term1, list) else [term1]
+        term2 = operands['op2']
+        term2 = term2 if isinstance(term2, list) else [term2]
+        return term1 + term2
