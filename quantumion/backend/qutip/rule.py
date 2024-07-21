@@ -30,7 +30,7 @@ import ast
 class QutipBackendTransformer(ConversionRule):
 
     def map_AnalogCircuit(self, model: AnalogCircuit, operands):
-        pprint("operands in curciot is {}\n".format(operands))
+        # pprint("operands in curciot is {}\n".format(operands))
         return operands['sequence']
 
     def map_Task(self, model: Task, operands):
@@ -42,6 +42,7 @@ class QutipBackendTransformer(ConversionRule):
         )
 
     def map_TaskArgsAnalog(self, model: TaskArgsAnalog, operands):
+        pprint("mode metricsl: {} amd op is {}\n".format(model, operands))
         return TaskArgsQutip(
             layer=model.layer,
             n_shots=model.n_shots,
@@ -52,7 +53,7 @@ class QutipBackendTransformer(ConversionRule):
         )
 
     def map_Expectation(self, model: Expectation, operands):
-        return QutipExpectation(operator=model.operator)
+        return QutipExpectation(operator=operands['operator'])
         # return QutipExpectation(operator=self(model=model.operator))
 
 
@@ -68,7 +69,7 @@ class QutipBackendTransformer(ConversionRule):
         return operands['hamiltonian']
 
     def map_OperatorAdd(self, model: OperatorAdd, operands):
-        pprint("operands in adddd is {}\n".format(operands))
+        # pprint("operands in adddd is {}\n".format(operands))
         op = operands['op1']#self(model.op1)
         op.append(operands['op2'][0])
         return op
@@ -91,19 +92,22 @@ class QutipBackendTransformer(ConversionRule):
         return qt.sigmaz()
 
     def map_Identity(self, model: Identity, operands) -> qt.Qobj:
-        return qt.qeye(self.args.fock_cutoff)
+        raise NotImplementedError
+        #return qt.qeye(model.fock_cutoff)
 
     def map_Creation(self, model: Creation, operands) -> qt.Qobj:
-        return qt.create(self.args.fock_cutoff)
+        raise NotImplementedError
+        #return qt.create(model.fock_cutoff)
 
     def map_Annihilation(self, model: Annihilation, operands) -> qt.Qobj:
-        return qt.destroy(self.fock_cutoff)
+        raise NotImplementedError
+        #return qt.destroy(model.fock_cutoff)
 
     def map_OperatorMul(self, model: OperatorMul, operands) -> qt.Qobj:
-        return self(model.op1) * self(model.op2)
+        return operands['op1'] * operands['op2']
 
     def map_OperatorKron(self, model: OperatorKron, operands) -> qt.Qobj:
-        return qt.tensor(self(model.op1), self(model.op2))
+        return qt.tensor(operands['op1'], operands['op2'])
 
 
 if __name__ == '__main__':
@@ -113,10 +117,12 @@ if __name__ == '__main__':
     # out = PreWithNonVisitableOutput(TermIndex())(op)
     # pprint("lst out is {}".format(out))
     ac = AnalogCircuit()
-    ac.evolve(gate=AnalogGate(hamiltonian=1*(X)+ 1*(Y) + 1*(I) + 1*(Z)), duration=1)
+    ac.evolve(gate=AnalogGate(hamiltonian=1*(X@X)+ 1*(Y@Y) + 1*(I@I) + 3*(Z@I)), duration=1)
     ac.n_qreg = 100
     ac.n_qmode = 20
-    args = TaskArgsAnalog(n_shots=100)
+    args = TaskArgsAnalog(n_shots=100, metrics={
+        'exp' : Expectation(operator=2*(I@Y) + 3*(I@I)),
+    })
 
     task = Task(
         program=ac,
@@ -124,9 +130,4 @@ if __name__ == '__main__':
     )
     pprint(PostConversion(QutipBackendTransformer())(task)) # 'Qobj' object has no attribute 'keys' for post
         # pprint(Pre(QutipBackendTransformer())(ac)) # causes AttributeError: 'list' object has no attribute 'model_fields'
-
-    exp = X@Y@Z + Y@Z@C + 2*(X@X@Z) + 1*(Y@(C*A*A))
-    exp = 1*X + 2*Y + 3*Z
-    # exp = X+Y
-    pprint(PostConversion(TermIndex())(exp))
 
