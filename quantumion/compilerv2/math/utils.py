@@ -11,6 +11,34 @@ import math
 from rich import print as pprint
 
 
+class EvaluateMathExpr(ConversionRule):
+
+    def map_MathVar(self, model: MathVar, operands):
+        raise TypeError
+
+    def map_MathNum(self, model: MathNum, operands):
+        return model.value
+
+    def map_MathImag(self, model: MathImag, operands):
+        return complex("1j")  # 1j also works
+
+    def map_MathFunc(self, model: MathFunc, operands):
+        return getattr(math, model.func)(operands['expr'])
+
+    def map_MathAdd(self, model: MathAdd, operands):
+        return operands['expr1'] + operands['expr2']
+
+    def map_MathSub(self, model: MathSub, operands):
+        return operands['expr1'] - operands['expr2']
+
+    def map_MathMul(self, model: MathMul, operands):
+        return operands['expr1'] * operands['expr2']
+
+    def map_MathDiv(self, model: MathDiv, operands):
+        return operands['expr1'] / operands['expr2']
+
+    def map_MathPow(self, model: MathPow, operands):
+        return operands['expr1'] ** operands['expr2']
 
 class PrintMathExpr(ConversionRule):
 
@@ -89,5 +117,5 @@ class PrintMathExpr(ConversionRule):
         return string
     
 if __name__ == '__main__':
-    exp = MathStr(string='3+(5*3)')
-    pprint(PostConversion(PrintMathExpr())(exp))
+    exp = MathStr(string='2*(3+(5*3))')
+    pprint(PostConversion(EvaluateMathExpr())(exp))
