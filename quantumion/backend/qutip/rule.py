@@ -2,6 +2,7 @@ from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
+from quantumion.compiler.math.base import VerbosePrintMathExpr, EvaluateMathExpr
 from quantumion.backend.qutip.interface import (
     QutipExperiment,
     QutipOperation,
@@ -26,6 +27,130 @@ import ast
 - Source: Analog
 - Target: Qutip
 """
+
+def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
+    rho = qt.ptrace(
+        psi,
+        qreg
+        + [n_qreg + m for m in qmode],  # canonical index for each local Hilbert space
+    )
+    return qt.entropy_vn(rho)
+
+class QutipExperimentInterpreter(ConversionRule):
+
+    def map_QutipExpectation(self, model: QutipExpectation, operands):
+        for idx, operator in enumerate(model.operator):
+            coefficient = operator[1].accept(EvaluateMathExpr()) # using visitor
+            op_exp = (
+                coefficient * operator[0]
+                if idx == 0
+                else op_exp + coefficient * operator[0]
+            )
+        pprint("qutip exp is {}".format(op_exp))
+        return lambda t, psi: qt.expect(op_exp, psi)
+
+    def map_EntanglementEntropyVN(self, model: EntanglementEntropyVN, operands):
+        raise NotImplementedError
+        ## same problem as before
+        # return lambda t, psi: entanglement_entropy_vn(
+        #     t, psi, model.qreg, model.qmode, self.n_qreg, self.n_qmode
+        # )
+    
+    def map_TaskArgsQutip(self, model: TaskArgsQutip, operands):
+        return operands
+
+    def map_QutipExperiment(self, model: QutipExperiment, operands) -> TaskResultAnalog:
+        pprint("map_QutipExperiment operands are {}".format(operands))
+        dims = model.n_qreg * [2] + model.n_qmode * [model.args.fock_cutoff]
+        self.n_qreg = model.n_qreg
+        self.n_qmode = model.n_qmode
+        initial_state = qt.tensor([qt.basis(d, 0) for d in dims])
+
+        qutip_metrics = operands['args']['metrics']
+
+        current_state = initial_state
+
+        start_time = time.time()
+
+        results = []
+        for instruction in model.instructions:
+            results.append(self._QutipOperation(model=instruction, 
+                                           dt = model.args.dt, 
+                                           current_state=current_state, 
+                                           qutip_metrics=qutip_metrics))
+            current_state = results[-1].final_state
+
+        time_taken = time.time() - start_time
+
+        times = []
+        metrics = {key: np.empty(0) for key in qutip_metrics.keys()}
+        for idx, result in enumerate(results):
+            result_times = result.times[1:] if idx != 0 else result.times
+            duration_tracker = (
+                model.instructions[idx - 1].duration + duration_tracker
+                if idx != 0
+                else 0
+            )
+            times = np.hstack(
+                [
+                    times,
+                    (
+                        [t + duration_tracker for t in result_times]
+                        if idx != 0
+                        else result_times
+                    ),
+                ]
+            )
+
+            for i, key in enumerate(metrics.keys()):
+                result_expect = result.expect[i][1:] if idx != 0 else result.expect[i]
+                metrics.update({key: np.hstack([metrics[key], result_expect])})
+
+        if model.args.n_shots is None:
+            counts = {}
+        else:
+            probs = np.power(np.abs(results[-1].final_state.full()), 2).squeeze()
+            n_shots = model.args.n_shots
+            inds = np.random.choice(len(probs), size=n_shots, p=probs)
+            opts = model.n_qreg * [[0, 1]] + model.n_qmode * [
+                list(range(model.args.fock_cutoff))
+            ]
+            bases = list(itertools.product(*opts))
+            shots = np.array([bases[ind] for ind in inds])
+            bitstrings = ["".join(map(str, shot)) for shot in shots]
+            counts = {
+                bitstring: bitstrings.count(bitstring) for bitstring in bitstrings
+            }
+
+        return TaskResultAnalog(
+            times=times,
+            metrics=metrics,
+            state=list(
+                results[-1].final_state.full().squeeze(),
+            ),
+            counts=counts,
+            runtime=time_taken,
+        )
+
+    def _QutipOperation(self, model: QutipOperation, dt, current_state, qutip_metrics): # remove
+        duration = model.duration
+        tspan = np.linspace(
+            0, duration, round(duration / dt)
+        )  # create time vector
+        qutip_hamiltonian = []
+        for op, coeff in model.hamiltonian:
+            qutip_hamiltonian.append([op, coeff.accept(VerbosePrintMathExpr())]) # using visitor
+        result_qobj = qt.sesolve(
+            qutip_hamiltonian,
+            current_state,
+            tspan,
+            e_ops=qutip_metrics,
+            options={"store_states": True},
+        )
+
+        self._current_state = result_qobj.final_state
+
+        return result_qobj
 
 class QutipBackendTransformer(ConversionRule):
 
@@ -118,8 +243,8 @@ if __name__ == '__main__':
     # pprint("lst out is {}".format(out))
     ac = AnalogCircuit()
     ac.evolve(gate=AnalogGate(hamiltonian=1*(X@X)+ 1*(Y@Y) + 1*(I@I) + 3*(Z@I)), duration=1)
-    ac.n_qreg = 100
-    ac.n_qmode = 20
+    ac.n_qreg = 2
+    ac.n_qmode = 0
     args = TaskArgsAnalog(n_shots=100, metrics={
         'exp' : Expectation(operator=2*(I@Y) + 3*(I@I)),
     })
@@ -128,6 +253,7 @@ if __name__ == '__main__':
         program=ac,
         args = args
     )
-    pprint(PostConversion(QutipBackendTransformer())(task)) # 'Qobj' object has no attribute 'keys' for post
+    out = PostConversion(QutipBackendTransformer())(task) # 'Qobj' object has no attribute 'keys' for post
         # pprint(Pre(QutipBackendTransformer())(ac)) # causes AttributeError: 'list' object has no attribute 'model_fields'
+    pprint(PostConversion(QutipExperimentInterpreter())(out))
 
