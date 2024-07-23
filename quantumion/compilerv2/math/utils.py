@@ -116,6 +116,42 @@ class PrintMathExpr(ConversionRule):
         string = "{} ** {}".format(s1, s2)
         return string
     
+class VerbosePrintMathExpr(PrintMathExpr):
+    def _MathBinaryOp(self, model: MathBinaryOp, operands):
+        s1 = (
+            f"({operands['expr1']})"
+            if not isinstance(model.expr1, (MathTerminal, MathUnaryOp))
+            else operands['expr1']
+        )
+        s2 = (
+            f"({operands['expr2']})"
+            if not isinstance(model.expr2, (MathTerminal, MathUnaryOp))
+            else operands['expr2']
+        )
+        string = "{} {} {}".format(
+            s1,
+            dict(MathAdd="+", MathSub="-", MathMul="*", MathDiv="/", MathPow="**")[
+                model.__class__.__name__
+            ],
+            s2,
+        )
+        return string
+
+    def map_MathAdd(self, model: MathAdd, operands):
+        return self._MathBinaryOp(model, operands)
+
+    def map_MathSub(self, model: MathSub, operands):
+        return self._MathBinaryOp(model, operands)
+
+    def map_MathMul(self, model: MathMul, operands):
+        return self._MathBinaryOp(model, operands)
+
+    def map_MathDiv(self, model: MathDiv, operands):
+        return self._MathBinaryOp(model, operands)
+
+    def map_MathPow(self, model: MathPow, operands):
+        return self._MathBinaryOp(model, operands)
+
 if __name__ == '__main__':
     exp = MathStr(string='2*(3+(5*3))')
     pprint(PostConversion(EvaluateMathExpr())(exp))
