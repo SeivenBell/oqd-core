@@ -68,6 +68,8 @@ class Pre(Walk):
 
         new_fields = {}
         for key in new_model.model_fields.keys():
+            if key == "class_":
+                continue
             new_fields[key] = self(getattr(new_model, key))
         new_model = new_model.__class__(**new_fields)
 
