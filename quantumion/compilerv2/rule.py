@@ -1,4 +1,5 @@
 from quantumion.compilerv2.base import PassBase
+from quantumion.interface.base import VisitableBaseModel
 
 ########################################################################################
 
@@ -28,37 +29,30 @@ class RewriteRule(PassBase):
 ########################################################################################
 
 
-class PrintCurrent(RewriteRule):
-    def __init__(self, *, print_fn=print):
+class PrettyPrint(RewriteRule):
+    def __init__(self):
         super().__init__()
 
-        self.print_fn = print_fn
-        self.current = 0
-        pass
+        self.operands = []
 
     def generic_map(self, model):
-        self.print_fn(f"{self.current}: {model.__class__.__name__}({model})")
-        self.current += 1
-        pass
+        s = f"{model.__class__.__name__}"
 
+        _s = ""
+        if isinstance(model, list):
+            for i, _ in enumerate(model):
+                _s = (
+                    f"\n  {len(model) - i}: "
+                    + "\n  ".join(self.operands.pop().split("\n"))
+                    + _s
+                )
+        elif isinstance(model, VisitableBaseModel):
+            for k in reversed(model.model_fields.keys()):
+                if k == "class_":
+                    continue
+                _s = f"\n  {k}: " + "\n  ".join(self.operands.pop().split("\n")) + _s
+        else:
+            _s = f"({model})"
 
-class AddOne(RewriteRule):
-    def map_int(self, model):
-        return model + 1
-
-    def map_str(self, model):
-        return str(int(model) + 1)
-
-
-class AddN(RewriteRule):
-    def __init__(self, N):
-        super().__init__()
-
-        self.N = N
-        pass
-
-    def map_int(self, model):
-        return model + self.N
-
-    def map_str(self, model):
-        return str(int(model) + self.N)
+        self.operands.append(s + _s)
+        return model
