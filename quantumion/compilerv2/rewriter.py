@@ -4,9 +4,7 @@ from quantumion.compilerv2.base import PassBase
 
 
 class Rewriter(PassBase):
-
-    def map(self, model):
-        return self.rewriter(model)
+    pass
 
 
 ########################################################################################

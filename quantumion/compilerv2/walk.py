@@ -3,6 +3,7 @@ from abc import abstractmethod
 ########################################################################################
 
 from quantumion.compilerv2.base import PassBase
+from quantumion.compilerv2.rule import ConversionRule
 
 ########################################################################################
 
@@ -80,11 +81,17 @@ class Post(Walk):
     def walk_dict(self, model):
         new_model = {k: self(v) for k, v in model.items()}
 
+        if isinstance(self.rule, ConversionRule):
+            self.rule.operands = new_model
+
         new_model = self.rule(new_model)
         return new_model
 
     def walk_list(self, model):
         new_model = [self(e) for e in model]
+
+        if isinstance(self.rule, ConversionRule):
+            self.rule.operands = new_model
 
         new_model = self.rule(new_model)
 
@@ -92,6 +99,9 @@ class Post(Walk):
 
     def walk_tuple(self, model):
         new_model = tuple([self(e) for e in model])
+
+        if isinstance(self.rule, ConversionRule):
+            self.rule.operands = new_model
 
         new_model = self.rule(new_model)
 
@@ -103,8 +113,12 @@ class Post(Walk):
             if key == "class_":
                 continue
             new_fields[key] = self(getattr(model, key))
-        new_model = model.__class__(**new_fields)
 
-        new_model = self.rule(new_model)
+        if isinstance(self.rule, ConversionRule):
+            self.rule.operands = new_fields
+            new_model = self.rule(model)
+        else:
+            new_model = model.__class__(**new_fields)
+            new_model = self.rule(new_model)
 
         return new_model

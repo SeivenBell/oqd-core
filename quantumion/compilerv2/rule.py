@@ -26,33 +26,66 @@ class RewriteRule(PassBase):
     pass
 
 
-########################################################################################
-
-
-class PrettyPrint(RewriteRule):
+class ConversionRule(RewriteRule):
     def __init__(self):
         super().__init__()
 
-        self.operands = []
+        self.operands = None
+
+
+########################################################################################
+
+
+class PrettyPrint(ConversionRule):
+    def __init__(self, *, indent="  "):
+        super().__init__()
+
+        self.indent = indent
 
     def generic_map(self, model):
+        return f"{model.__class__.__name__}({model})"
+
+    def map_list(self, model):
+        s = f"{model.__class__.__name__}"
+
+        print(self.operands)
+        _s = ""
+        for n, o in enumerate(self.operands):
+            _s += f"\n{self.indent}- {n}: " + f"\n{self.indent}".join(o.split("\n"))
+
+        s = s + _s
+
+        return s
+
+    def map_tuple(self, model):
         s = f"{model.__class__.__name__}"
 
         _s = ""
-        if isinstance(model, list):
-            for i, _ in enumerate(model):
-                _s = (
-                    f"\n  {len(model) - i}: "
-                    + "\n  ".join(self.operands.pop().split("\n"))
-                    + _s
-                )
-        elif isinstance(model, VisitableBaseModel):
-            for k in reversed(model.model_fields.keys()):
-                if k == "class_":
-                    continue
-                _s = f"\n  {k}: " + "\n  ".join(self.operands.pop().split("\n")) + _s
-        else:
-            _s = f"({model})"
+        for n, o in enumerate(self.operands):
+            _s += f"\n{self.indent}- {n}: " + f"\n{self.indent}".join(o.split("\n"))
 
-        self.operands.append(s + _s)
-        return model
+        s = s + _s
+
+        return s
+
+    def map_dict(self, model):
+        s = f"{model.__class__.__name__}"
+
+        _s = ""
+        for k, v in self.operands.items():
+            _s += f"\n{self.indent}- {k}: " + f"\n{self.indent}".join(v.split("\n"))
+
+        s = s + _s
+
+        return s
+
+    def map_VisitableBaseModel(self, model):
+        s = f"{model.__class__.__name__}"
+
+        _s = ""
+        for k, v in self.operands.items():
+            _s += f"\n{self.indent}- {k}: " + f"\n{self.indent}".join(v.split("\n"))
+
+        s = s + _s
+
+        return s
