@@ -115,41 +115,6 @@ class Post(Walk):
 
         return new_model
 
-class PreWithNonVisitableOutput(Walk):
-    """For VisitableBaseMode, when self.rule(model) creates an object which is not a VisitableBaseMode, walk is applied again"""
-    def walk_dict(self, model):
-        new_model = self.rule(model)
-
-        new_model = {k: self(v) for k, v in new_model.items()}
-
-        return new_model
-
-    def walk_list(self, model):
-        new_model = self.rule(model)
-
-        new_model = [self(e) for e in new_model]
-
-        return new_model
-
-    def walk_tuple(self, model):
-        new_model = self.rule(model)
-
-        new_model = tuple([self(e) for e in new_model])
-
-        return new_model
-
-    def walk_VisitableBaseModel(self, model):
-        new_model = self.rule(model)
-
-        if not isinstance(new_model, VisitableBaseModel):
-            return self.walk(new_model)
-
-        new_fields = {}
-        for key in new_model.model_fields.keys():
-            new_fields[key] = self(getattr(new_model, key))
-        new_model = new_model.__class__(**new_fields)
-
-        return new_model
 
 class PostConversion(Walk):
     """This is the walk method for conversions. All the logic is the same as Pre except in walk_VisitableBaseModel function. The walk_VisitableBaseModel
