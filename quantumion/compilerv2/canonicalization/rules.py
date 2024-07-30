@@ -223,6 +223,12 @@ class ScaleTerms(RewriteRule):
         super().__init__()
         self.op_add_root = False
 
+    def map_AnalogGate(self, model):
+        self.op_add_root = False
+
+    def map_Expectation(self, model):
+        self.op_add_root = False
+
     def map_Operator(self, model: Operator):
         if not self.op_add_root:
             self.op_add_root = True

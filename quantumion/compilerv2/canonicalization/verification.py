@@ -192,6 +192,12 @@ class CanVerScaleTerm(RewriteRule):
         super().__init__()
         self._single_term_scaling_needed = False
 
+    def map_AnalogGate(self, model):
+        self._single_term_scaling_needed = False
+
+    def map_Expectation(self, model):
+        self._single_term_scaling_needed = False
+
     def map_OperatorScalarMul(self, model: OperatorScalarMul):
         self._single_term_scaling_needed = True
         pass
