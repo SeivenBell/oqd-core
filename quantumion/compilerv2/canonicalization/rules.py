@@ -348,7 +348,7 @@ class TermIndex(ConversionRule):
         return (1, 1)
 
     def map_OperatorAdd(self, model: OperatorAdd, operands):
-        pprint("operands in model {} is {}\n".format(model, operands))
+
         term1 = (
             operands['op1']
             if isinstance(model.op1, OperatorAdd)
