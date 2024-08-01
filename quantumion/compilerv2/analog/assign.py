@@ -7,16 +7,15 @@ from quantumion.interface.math import MathExpr
 from quantumion.compilerv2.rule import RewriteRule
 from quantumion.compilerv2.walk import Post, Pre
 from quantumion.compilerv2.analog.utils import get_canonical_hamiltonian_dim
+from quantumion.backend.metric import Expectation
 from rich import print as pprint
 
-
-## write an analysis to get the info and then assign
 
 
 class AssignAnalogIRDim(RewriteRule):
     def __init__(self):
         super().__init__()
-        self.dim = None
+        self.dim: Union[tuple, None] = None
                 
 
     
@@ -28,8 +27,18 @@ class AssignAnalogIRDim(RewriteRule):
         if self.dim is None:
             self.dim = get_canonical_hamiltonian_dim(model.hamiltonian)       
         elif self.dim != get_canonical_hamiltonian_dim(model.hamiltonian):
-            raise Exception 
+            raise Exception
+        
+class VerifyAnalogIRDim(RewriteRule):
+    def __init__(self, n_qreg, n_qmode):
+        super().__init__()
+        self._dim: tuple = (n_qreg, n_qmode)
 
+    def map_AnalogGate(self, model: AnalogGate):
+        assert self._dim == get_canonical_hamiltonian_dim(model.hamiltonian)
+
+    def map_Expectation(self, model: Expectation):
+        assert self._dim == get_canonical_hamiltonian_dim(model.operator)
 
 
 if __name__ == '__main__':
