@@ -2,15 +2,13 @@ from typing import Optional
 
 ########################################################################################
 
-from quantumion.backend.qutip.visitor import (
+from quantumion.backend.qutip.rule import (
     QutipBackendTransformer,
     QutipExperimentInterpreter,
 )
 from quantumion.backend.base import BackendBase
 from quantumion.backend.qutip.interface import QutipExperiment
-from quantumion.compiler.analog.analysis import (
-    RegisterInformation,
-)
+
 from quantumion.backend.task import Task
 
 from quantumion.compiler.flow import *
@@ -21,42 +19,16 @@ __all__ = [
     "QutipBackend",
 ]
 
-
-class QutipBackendFlow(FlowGraph):
-    nodes = [
-        VerificationFlow(name="verification_flow"),
-        TransformerFlowNode(visitor=RegisterInformation(), name="register_information"),
-        TransformerFlowNode(visitor=QutipBackendTransformer(), name="qutip_backend"),
-        FlowTerminal(name="terminal"),
-    ]
-    rootnode = "verification_flow"
-    forward_decorators = ForwardDecorators()
-
-    @forward_decorators.forward_once(done="register_information")
-    def forward_verification_flow(self, model):
-        pass
-
-    @forward_decorators.forward_once(done="qutip_backend")
-    def forward_register_information(self, model):
-        pass
-
-    @forward_decorators.forward_once(done="terminal")
-    def forward_qutip_backend(self, model):
-        pass
-
+    
+from quantumion.compilerv2.analog.assign import AssignAnalogIRDim
+from quantumion.compilerv2.walk import Post, PostConversion
+from quantumion.compilerv2.canonicalization.canonicalize import canonicalize, verifier
 
 class QutipBackend(BackendBase):
     """
     Class representing the Qutip backend
+    insprired from https://github.com/QuEraComputing/bloqade-python/blob/main/src/bloqade/ir/routine/braket.py#L183
     """
-
-    @property
-    def compiler(self):
-        return QutipBackendFlow(name="_")
-
-    @property
-    def interpreter(self):
-        return TransformerFlowNode(visitor=QutipExperimentInterpreter(), name="_")
 
     def compile(self, task: Task):
         """
@@ -65,7 +37,35 @@ class QutipBackend(BackendBase):
         Args:
             task (Task): Quantum experiment to compile
         """
-        return self.compiler(task).model
+        from quantumion.compilerv2.analog.assign import VerifyAnalogIRDim
+        canonicalized_task = canonicalize(task)
+        verifier(canonicalized_task)
+        # add verifier which checks hilbert space dim
+
+        canonicalized_circuit = canonicalized_task.program
+
+        # pprint(canonicalized_circuit)
+        
+        assigned_circuit = Post(AssignAnalogIRDim())(canonicalized_circuit)
+
+        canonicalized_args = canonicalized_task.args
+        Post(VerifyAnalogIRDim(n_qreg=assigned_circuit.n_qreg, n_qmode=assigned_circuit.n_qmode))(assigned_circuit)
+        Post(VerifyAnalogIRDim(n_qreg=assigned_circuit.n_qreg, n_qmode=assigned_circuit.n_qmode))(canonicalized_args)
+
+        # here fock_cutoff is a compiler parameter
+
+        converted_circuit = PostConversion(QutipBackendTransformer(fock_cutoff=task.args.fock_cutoff))(assigned_circuit)
+        converted_args = PostConversion(QutipBackendTransformer(fock_cutoff=task.args.fock_cutoff))(canonicalized_args)
+        # circuit_args = PostConversion(QutipBackendTransformer())(canonicalized_args)
+        # pprint(converted_circuit)
+        
+
+        return QutipExperiment(
+            instructions=converted_circuit,
+            n_qreg=assigned_circuit.n_qreg,
+            n_qmode = assigned_circuit.n_qmode,
+            args = converted_args
+        )
 
     def run(self, *, task: Task = None, experiment: QutipExperiment = None):
         """
@@ -79,4 +79,30 @@ class QutipBackend(BackendBase):
             raise TypeError("Both task and experiment are given as inputs to run")
         if experiment is None:
             experiment = self.compile(task=task)
-        return self.interpreter(experiment).model
+        return PostConversion(QutipExperimentInterpreter())(experiment)
+
+
+if __name__ == '__main__':
+    from quantumion.compiler.analog.base import *
+    from quantumion.interface.analog.operator import *
+    from quantumion.interface.analog.operations import *
+    from quantumion.backend.metric import *
+    from rich import print as pprint
+    from quantumion.backend.task import Task, TaskArgsAnalog
+    X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
+
+    ac = AnalogCircuit()
+    ac.evolve(gate=AnalogGate(hamiltonian=1*(X@A)), duration=1)
+    ac.evolve(gate=AnalogGate(hamiltonian=X@A + (X*I)@A), duration=1)
+    # ac.n_qreg = 1
+    # ac.n_qmode = 0
+    args = TaskArgsAnalog(n_shots=100, metrics={
+        'exp' : Expectation(operator=X@(A*LI)),
+    })
+
+    task = Task(
+        program=ac,
+        args = args
+    )
+    backend = QutipBackend()
+    pprint(backend.run(task=task))
