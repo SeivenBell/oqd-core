@@ -153,6 +153,9 @@ class QutipExperimentInterpreter(ConversionRule):
         return result_qobj
 
 class QutipBackendTransformer(ConversionRule):
+    def __init__(self, operands=None, fock_cutoff = None):
+        super().__init__(operands)
+        self._fock_cutoff = fock_cutoff
 
     def map_AnalogCircuit(self, model: AnalogCircuit, operands):
         # pprint("operands in curciot is {}\n".format(operands))
@@ -167,7 +170,6 @@ class QutipBackendTransformer(ConversionRule):
         )
 
     def map_TaskArgsAnalog(self, model: TaskArgsAnalog, operands):
-        pprint("mode metricsl: {} amd op is {}\n".format(model, operands))
         return TaskArgsQutip(
             layer=model.layer,
             n_shots=model.n_shots,
@@ -217,16 +219,16 @@ class QutipBackendTransformer(ConversionRule):
         return qt.sigmaz()
 
     def map_Identity(self, model: Identity, operands) -> qt.Qobj:
-        raise NotImplementedError
-        #return qt.qeye(model.fock_cutoff)
+        # raise NotImplementedError
+        return qt.qeye(self._fock_cutoff)
 
     def map_Creation(self, model: Creation, operands) -> qt.Qobj:
-        raise NotImplementedError
-        #return qt.create(model.fock_cutoff)
+        #raise NotImplementedError
+        return qt.create(self._fock_cutoff)
 
     def map_Annihilation(self, model: Annihilation, operands) -> qt.Qobj:
-        raise NotImplementedError
-        #return qt.destroy(model.fock_cutoff)
+        #raise NotImplementedError
+        return qt.destroy(self._fock_cutoff)
 
     def map_OperatorMul(self, model: OperatorMul, operands) -> qt.Qobj:
         return operands['op1'] * operands['op2']
@@ -237,23 +239,37 @@ class QutipBackendTransformer(ConversionRule):
 
 if __name__ == '__main__':
     from quantumion.compiler.analog.base import *
+    from quantumion.compilerv2.analog.assign import AssignAnalogIRDim
+    from quantumion.compilerv2.canonicalization.canonicalize import canonicalize, verifier
     X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
     # op = X@Y@(A*C*A) + X@Z + Z + Z@I@C
     # out = PreWithNonVisitableOutput(TermIndex())(op)
     # pprint("lst out is {}".format(out))
     ac = AnalogCircuit()
-    ac.evolve(gate=AnalogGate(hamiltonian=1*(X@X)+ 1*(Y@Y) + 1*(I@I) + 3*(Z@I)), duration=1)
-    ac.n_qreg = 2
-    ac.n_qmode = 0
+    ac.evolve(gate=AnalogGate(hamiltonian=1*(X@Z)), duration=1)
+    ac.evolve(gate=AnalogGate(hamiltonian=X@Y), duration=1)
+    # ac.n_qreg = 1
+    # ac.n_qmode = 0
     args = TaskArgsAnalog(n_shots=100, metrics={
-        'exp' : Expectation(operator=2*(I@Y) + 3*(I@I)),
+        'exp' : Expectation(operator=X@Z),
     })
 
     task = Task(
         program=ac,
         args = args
     )
-    out = PostConversion(QutipBackendTransformer())(task) # 'Qobj' object has no attribute 'keys' for post
-        # pprint(Pre(QutipBackendTransformer())(ac)) # causes AttributeError: 'list' object has no attribute 'model_fields'
-    pprint(PostConversion(QutipExperimentInterpreter())(out))
-
+    # canonicalization
+    # pprint("Task before conversion: {}\n".format(task))
+    # task = compiler(task)
+    # pprint("\nTask after canonicalization conversion: {}\n".format(task.program.sequence))
+    # task = Post(AssignAnalogIRDim())(task)
+    # pprint("Task after conversion: {}\n".format(task))
+    # out = PostConversion(QutipBackendTransformer())(task) # 'Qobj' object has no attribute 'keys' for post
+    #     # pprint(Pre(QutipBackendTransformer())(ac)) # causes AttributeError: 'list' object has no attribute 'model_fields'
+    # pprint(PostConversion(QutipExperimentInterpreter())(out))
+    # pprint(verifier(ac))
+    pprint(canonicalize(ac))
+    """
+    Question is should we apply canonicalization on the wholeAC or on the operator. if we apply on the op, this prob
+    is no longer there, but if we apply on ac, this problem is indeed there
+    """

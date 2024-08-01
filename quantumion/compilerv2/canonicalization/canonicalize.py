@@ -35,7 +35,7 @@ math_chain = Chain(
     FixedPoint(Post(PartitionMathExpr())),
 )
 
-compiler = Chain(FixedPoint(dist_chain), 
+canonicalize = Chain(FixedPoint(dist_chain), 
             FixedPoint(Post(ProperOrder())), 
             FixedPoint(pauli_chain), 
             FixedPoint(Post(GatherPauli())),
