@@ -20,13 +20,19 @@ class AssignAnalogIRDim(RewriteRule):
         elif self.dim != get_canonical_hamiltonian_dim(model.hamiltonian):
             raise Exception
         
-class VerifyAnalogIRDim(RewriteRule):
+class VerifyAnalogCircuitDim(RewriteRule):
     def __init__(self, n_qreg, n_qmode):
         super().__init__()
         self._dim: tuple = (n_qreg, n_qmode)
 
     def map_AnalogGate(self, model: AnalogGate):
         assert self._dim == get_canonical_hamiltonian_dim(model.hamiltonian)
+
+
+class VerifyAnalogArgsDim(RewriteRule):
+    def __init__(self, n_qreg, n_qmode):
+        super().__init__()
+        self._dim: tuple = (n_qreg, n_qmode)
 
     def map_Expectation(self, model: Expectation):
         assert self._dim == get_canonical_hamiltonian_dim(model.operator)
