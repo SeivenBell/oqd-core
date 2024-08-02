@@ -4,8 +4,8 @@ from typing import Any, Union
 
 from quantumion.interface.analog import *
 from quantumion.interface.math import MathExpr
-from quantumion.compilerv2.rule import *
-from quantumion.compilerv2.walk import *
+from quantumion.compilerv2.rule import ConversionRule
+from quantumion.compilerv2.walk import PostConversion
 from quantumion.compilerv2.math.utils import PrintMathExpr, VerbosePrintMathExpr
 
 
@@ -154,9 +154,74 @@ def get_canonical_hamiltonian_dim(model):
     dim = _get_index(model.op)
     return dim
 
-if __name__ == '__main__':
-    from quantumion.compiler.analog.base import PauliX, PauliY, PauliZ, PauliI, Annihilation, Creation, Identity
-    X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
-    exp = X@Y + (3*(Y)*4)*(Y@Z@Y@Y)
-    # exp = AnalogGate(hamiltonian=(X+Y+Z)) # applying VPO on this doesnn't make sense as we can't have str in hamiltonian field
-    pprint(PostConversion(VerbosePrintOperator())(exp))
+def term_index_dim(lst):
+    if isinstance(lst, int):
+        return [1,0]
+    if isinstance(lst, tuple):
+        return [0,1]
+    dim = [0,0]
+    for elem in lst:
+        if isinstance(elem, tuple):
+            dim[1] = dim[1] + 1
+        else:
+            dim[0] = dim[0] + 1
+    return dim
+
+class TermIndex(ConversionRule):
+    """
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+    (without NormalOrder, TermIndex is not useful. For example, TermIndex of A*C and C*A is the same (2,1).
+    Hence, NormalOrder is a requirement.
+    """
+
+    def map_PauliI(self, model: PauliI, operands):
+        return 0
+
+    def map_PauliX(self, model: PauliX, operands):
+        return 1
+
+    def map_PauliY(self, model: PauliY, operands):
+        return 2
+
+    def map_PauliZ(self, model: PauliZ, operands):
+        return 3
+
+    def map_Identity(self, model: Identity, operands):
+        return (0, 0)
+
+    def map_Annihilation(self, model: Annihilation, operands):
+        return (1, 0)
+
+    def map_Creation(self, model: Annihilation, operands):
+        return (1, 1)
+
+    def map_OperatorAdd(self, model: OperatorAdd, operands):
+
+        term1 = (
+            operands['op1']
+            if isinstance(model.op1, OperatorAdd)
+            else [operands['op1']]
+        )
+        term2 = operands['op2']
+        return term1 + [term2]
+
+    def map_OperatorScalarMul(self, model: OperatorScalarMul, operands):
+        term = operands['op']
+        return term
+
+    def map_OperatorMul(self, model: OperatorMul, operands):
+        if not (
+            isinstance(model.op1, (Ladder, model.__class__))
+            and isinstance(model.op2, (Ladder, model.__class__))
+        ):
+            raise AssertionError("More simplification required for Term Index")
+        term1 = operands['op1']
+        term2 = operands['op2']
+        return (term1[0] + term2[0], term1[1] + term2[1])
+
+    def map_OperatorKron(self, model: OperatorKron, operands):
+        term1 = operands['op1']
+        term1 = term1 if isinstance(term1, list) else [term1]
+        term2 = operands['op2']
+        term2 = term2 if isinstance(term2, list) else [term2]
+        return term1 + term2
