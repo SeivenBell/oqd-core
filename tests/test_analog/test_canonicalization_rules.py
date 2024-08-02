@@ -1,14 +1,12 @@
 from quantumion.interface.analog import *
-from quantumion.compilerv2.canonicalization.rules import *
-from quantumion.compiler.analog.verify import *
-from quantumion.compiler.analog.error import *
-from quantumion.compiler.analog.base import *
-from rich import print as pprint
+from quantumion.compilerv2.analog.rewrite.canonicalize import *
+from quantumion.compilerv2.rule import RewriteRule
+from quantumion.compilerv2.walk import Walk, Post, Pre
+from quantumion.compilerv2.rewriter import FixedPoint
 import unittest
 from quantumion.interface.math import *
 from unittest_prettify.colorize import (
     colorize,
-    GREEN,
     BLUE,
     RED,
     MAGENTA,
@@ -23,7 +21,7 @@ def test_function(operator: Operator, rule : RewriteRule, walk_method : Walk = P
 class TestOperatorDistribute(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = OperatorDistribute()
 
@@ -43,7 +41,7 @@ class TestOperatorDistribute(unittest.TestCase):
 class TestGatherMathExpr(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = GatherMathExpr()
 
@@ -69,7 +67,7 @@ class TestGatherMathExpr(unittest.TestCase):
 class TestProperOrder(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = ProperOrder()
 
@@ -90,7 +88,7 @@ class TestProperOrder(unittest.TestCase):
 class TestPauliAlgebra(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = PauliAlgebra()
 
@@ -118,7 +116,7 @@ class TestPauliAlgebra(unittest.TestCase):
 class TestGatherPauli(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = GatherPauli()
 
@@ -138,7 +136,7 @@ class TestGatherPauli(unittest.TestCase):
 class TestNormalOrder(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = NormalOrder()
 
@@ -165,7 +163,7 @@ class TestNormalOrder(unittest.TestCase):
 class TestPruneIdentity(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = PruneIdentity()
 
@@ -185,7 +183,7 @@ class TestPruneIdentity(unittest.TestCase):
 class TestSortedOrder(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = SortedOrder()
 
@@ -211,7 +209,7 @@ class TestSortedOrder(unittest.TestCase):
 class TestScaleTerms(unittest.TestCase):
     maxDiff = None
 
-    def __init__(self, methodName: GREEN = "runTest") -> None:
+    def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.rule = ScaleTerms()
 

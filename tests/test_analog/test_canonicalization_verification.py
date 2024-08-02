@@ -1,9 +1,8 @@
 from quantumion.interface.analog import *
-from quantumion.compilerv2.canonicalization.verification import *
-from quantumion.compiler.analog.verify import *
-from quantumion.compiler.analog.error import *
-from quantumion.compiler.analog.base import *
-from rich import print as pprint
+from quantumion.compilerv2.analog.verify.canonicalization import *
+from quantumion.compiler.analog.error import CanonicalFormError
+from quantumion.compilerv2.rule import RewriteRule
+from quantumion.compilerv2.walk import Walk, Post, Pre
 import unittest
 from quantumion.interface.math import *
 from unittest_prettify.colorize import (
