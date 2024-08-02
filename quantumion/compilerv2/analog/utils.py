@@ -5,7 +5,7 @@ from typing import Any, Union
 from quantumion.interface.analog import *
 from quantumion.interface.math import MathExpr
 from quantumion.compilerv2.rule import ConversionRule
-from quantumion.compilerv2.walk import PostConversion
+from quantumion.compilerv2.walk import Post
 from quantumion.compilerv2.math.utils import PrintMathExpr, VerbosePrintMathExpr
 
 
@@ -15,7 +15,7 @@ class PrintOperator(ConversionRule):
         return model.class_ + "()"
 
     def map_MathExpr(self, model: MathExpr, operands):
-        return PostConversion(PrintMathExpr())(model)
+        return Post(PrintMathExpr())(model)
 
     def map_OperatorAdd(self, model: OperatorAdd, operands):
         string = "{} + {}".format(operands['op1'], operands['op2'])
@@ -82,7 +82,7 @@ class PrintOperator(ConversionRule):
     
 class VerbosePrintOperator(PrintOperator):
     def map_MathExpr(self, model: MathExpr, operands):
-        return PostConversion(VerbosePrintMathExpr())(model)
+        return Post(VerbosePrintMathExpr())(model)
 
     def _OperatorBinaryOp(self, model: OperatorBinaryOp, operands):
         s1 = (

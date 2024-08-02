@@ -1,5 +1,5 @@
 from quantumion.compilerv2.math.utils import EvaluateMathExpr
-from quantumion.compilerv2.walk import PostConversion, Walk
+from quantumion.compilerv2.walk import Post, Walk
 from quantumion.compilerv2.rule import ConversionRule, RewriteRule
 from quantumion.interface.math import *
 from typing import Union
@@ -17,7 +17,7 @@ from unittest_prettify.colorize import (
 # def test_function(math_str: str, visitor=EvaluateMathExpr()):
 #     return MathStr(string=math_str).accept(visitor=visitor)
 
-def test_function(math_str: str, rule: Union[ConversionRule, RewriteRule] = EvaluateMathExpr(), walk_method: Walk = PostConversion):
+def test_function(math_str: str, rule: Union[ConversionRule, RewriteRule] = EvaluateMathExpr(), walk_method: Walk = Post):
     return walk_method(rule)(MathStr(string=math_str))
 
 

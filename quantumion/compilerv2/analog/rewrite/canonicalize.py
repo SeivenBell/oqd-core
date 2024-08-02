@@ -1,5 +1,5 @@
 from quantumion.compilerv2.rule import RewriteRule
-from quantumion.compilerv2.walk import PostConversion
+from quantumion.compilerv2.walk import Post
 from quantumion.compilerv2.analog.utils import term_index_dim, TermIndex
 from quantumion.interface.math import MathNum, MathImag, MathAdd
 from quantumion.compiler.analog.error import CanonicalFormError
@@ -252,8 +252,8 @@ class SortedOrder(RewriteRule):
 
     def map_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd):
-            term1 = PostConversion(TermIndex())(model.op1.op2)  #TermIndex().visit(model.op1.op2)
-            term2 = PostConversion(TermIndex())(model.op2) # TermIndex().visit(model.op2)
+            term1 = Post(TermIndex())(model.op1.op2)  #TermIndex().visit(model.op1.op2)
+            term2 = Post(TermIndex())(model.op2) # TermIndex().visit(model.op2)
             if term_index_dim(term1) != term_index_dim(term2):
                 raise CanonicalFormError("Incorrect hilbert space dimensions")
 
@@ -290,8 +290,8 @@ class SortedOrder(RewriteRule):
                 return OperatorAdd(op1=model.op1, op2=model.op2)
 
         else:
-            term1 = PostConversion(TermIndex())(model.op1) #TermIndex().visit(model.op1)
-            term2 = PostConversion(TermIndex())(model.op2) #TermIndex().visit(model.op2)
+            term1 = Post(TermIndex())(model.op1) #TermIndex().visit(model.op1)
+            term2 = Post(TermIndex())(model.op2) #TermIndex().visit(model.op2)
             if term_index_dim(term1) != term_index_dim(term2):
                 raise CanonicalFormError("Incorrect hilbert space dimensions")
             if term1 == term2:

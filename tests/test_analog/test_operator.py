@@ -1,6 +1,6 @@
 from quantumion.interface.analog import *
 from quantumion.compilerv2.analog.utils import PrintOperator, VerbosePrintOperator
-from quantumion.compilerv2.walk import PostConversion, Walk
+from quantumion.compilerv2.walk import Post, Walk
 from quantumion.compilerv2.rule import ConversionRule, RewriteRule
 from typing import Union
 from rich import print as pprint
@@ -15,7 +15,7 @@ from unittest_prettify.colorize import (
 )
 
 
-def test_function(inp: Operator, rule: Union[ConversionRule, RewriteRule] = PrintOperator(), walk_method: Walk = PostConversion):
+def test_function(inp: Operator, rule: Union[ConversionRule, RewriteRule] = PrintOperator(), walk_method: Walk = Post):
     return walk_method(rule)(inp)
 #######################################################
 @colorize(color=BLUE)

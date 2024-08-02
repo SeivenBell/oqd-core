@@ -1,5 +1,5 @@
 from quantumion.compilerv2.rule import RewriteRule
-from quantumion.compilerv2.walk import PostConversion
+from quantumion.compilerv2.walk import Post
 from quantumion.compilerv2.analog.utils import term_index_dim, TermIndex
 from quantumion.interface.math import *
 from quantumion.compiler.analog.error import CanonicalFormError
@@ -167,11 +167,11 @@ class CanVerSortedOrder(RewriteRule):
                  PruneIdentity
     """
     def map_OperatorAdd(self, model: OperatorAdd):
-        term2 = PostConversion(TermIndex())(model.op2)
+        term2 = Post(TermIndex())(model.op2)
         if isinstance(model.op1, OperatorAdd):
-            term1 = PostConversion(TermIndex())(model.op1.op2)
+            term1 = Post(TermIndex())(model.op1.op2)
         else:
-            term1 = PostConversion(TermIndex())(model.op1)
+            term1 = Post(TermIndex())(model.op1)
         if term_index_dim(term1) != term_index_dim(term2):
             raise CanonicalFormError("Incorrect dimension of hilbert space")
         if term1 > term2:

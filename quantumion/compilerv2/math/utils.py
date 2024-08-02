@@ -151,7 +151,3 @@ class VerbosePrintMathExpr(PrintMathExpr):
 
     def map_MathPow(self, model: MathPow, operands):
         return self._MathBinaryOp(model, operands)
-
-if __name__ == '__main__':
-    exp = MathStr(string='2*(3+(5*3))')
-    pprint(PostConversion(EvaluateMathExpr())(exp))
