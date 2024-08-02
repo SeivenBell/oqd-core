@@ -152,7 +152,7 @@ class QutipExperimentInterpreter(ConversionRule):
 
         return result_qobj
 
-class QutipBackendTransformer(ConversionRule):
+class QutipBackendCompiler(ConversionRule):
     def __init__(self, operands=None, fock_cutoff = None):
         super().__init__(operands)
         self._fock_cutoff = fock_cutoff
@@ -160,14 +160,6 @@ class QutipBackendTransformer(ConversionRule):
     def map_AnalogCircuit(self, model: AnalogCircuit, operands):
         # pprint("operands in curciot is {}\n".format(operands))
         return operands['sequence']
-
-    def map_Task(self, model: Task, operands):
-        return QutipExperiment(
-            instructions=operands['program'],
-            n_qreg=model.program.n_qreg,
-            n_qmode=model.program.n_qmode, ## maybe put them inside operands and output this in AC instrad of accessing the program object here. seems more rigorous
-            args=operands['args'],
-        )
 
     def map_TaskArgsAnalog(self, model: TaskArgsAnalog, operands):
         return TaskArgsQutip(
@@ -235,41 +227,3 @@ class QutipBackendTransformer(ConversionRule):
 
     def map_OperatorKron(self, model: OperatorKron, operands) -> qt.Qobj:
         return qt.tensor(operands['op1'], operands['op2'])
-
-
-if __name__ == '__main__':
-    from quantumion.compiler.analog.base import *
-    from quantumion.compilerv2.analog.assign import AssignAnalogIRDim
-    from quantumion.compilerv2.canonicalization.canonicalize import canonicalize, verifier
-    X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
-    # op = X@Y@(A*C*A) + X@Z + Z + Z@I@C
-    # out = PreWithNonVisitableOutput(TermIndex())(op)
-    # pprint("lst out is {}".format(out))
-    ac = AnalogCircuit()
-    ac.evolve(gate=AnalogGate(hamiltonian=1*(X@Z)), duration=1)
-    ac.evolve(gate=AnalogGate(hamiltonian=X@Y), duration=1)
-    # ac.n_qreg = 1
-    # ac.n_qmode = 0
-    args = TaskArgsAnalog(n_shots=100, metrics={
-        'exp' : Expectation(operator=X@Z),
-    })
-
-    task = Task(
-        program=ac,
-        args = args
-    )
-    # canonicalization
-    # pprint("Task before conversion: {}\n".format(task))
-    # task = compiler(task)
-    # pprint("\nTask after canonicalization conversion: {}\n".format(task.program.sequence))
-    # task = Post(AssignAnalogIRDim())(task)
-    # pprint("Task after conversion: {}\n".format(task))
-    # out = PostConversion(QutipBackendTransformer())(task) # 'Qobj' object has no attribute 'keys' for post
-    #     # pprint(Pre(QutipBackendTransformer())(ac)) # causes AttributeError: 'list' object has no attribute 'model_fields'
-    # pprint(PostConversion(QutipExperimentInterpreter())(out))
-    # pprint(verifier(ac))
-    pprint(canonicalize(ac))
-    """
-    Question is should we apply canonicalization on the wholeAC or on the operator. if we apply on the op, this prob
-    is no longer there, but if we apply on ac, this problem is indeed there
-    """
