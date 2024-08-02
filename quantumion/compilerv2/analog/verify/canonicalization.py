@@ -1,8 +1,6 @@
-from quantumion.compilerv2.rewriter import *
-from quantumion.compilerv2.rule import *
-from quantumion.compilerv2.walk import *
-from quantumion.compilerv2.canonicalization.utils import term_index_dim
-from quantumion.compilerv2.canonicalization.rules import TermIndex
+from quantumion.compilerv2.rule import RewriteRule
+from quantumion.compilerv2.walk import PostConversion
+from quantumion.compilerv2.analog.utils import term_index_dim, TermIndex
 from quantumion.interface.math import *
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.interface.analog import *
@@ -66,7 +64,7 @@ class CanVerOperatorDistribute(RewriteRule):
         return self._OperatorMulKron(model)
 
 
-    def _OperatorMulKron(self, model: (OperatorMul, OperatorKron)):
+    def _OperatorMulKron(self, model: Union[OperatorMul, OperatorKron]):
         if (
             isinstance(model, OperatorMul)
             and isinstance(model.op1, OperatorKron)

@@ -1,8 +1,9 @@
-from quantumion.compilerv2.rewriter import *
-from quantumion.compilerv2.walk import *
-from quantumion.compilerv2.canonicalization.rules import *
-from quantumion.compilerv2.canonicalization.verification import *
-from quantumion.compilerv2.math.rules import *
+from quantumion.compilerv2.rewriter import Chain, FixedPoint
+from quantumion.compilerv2.walk import Post, Pre
+from quantumion.compilerv2.analog.rewrite.canonicalize import *
+from quantumion.compilerv2.analog.verify.canonicalization import *
+from quantumion.compilerv2.math.rules import DistributeMathExpr, ProperOrderMathExpr, PartitionMathExpr
+
 
 dist_chain = Chain(
     FixedPoint(Post(OperatorDistribute())), 
@@ -46,7 +47,7 @@ canonicalize = Chain(FixedPoint(dist_chain),
             math_chain
             )
 
-verifier = Chain(
+verify_canonicalization = Chain(
     Post(CanVerOperatorDistribute()),
     Post(CanVerGatherMathExpr()),
     Post(CanVerProperOrder()),
@@ -58,22 +59,7 @@ verifier = Chain(
     Pre(CanVerScaleTerm())
 )
 
-if __name__ == '__main__':
-    from quantumion.compiler.analog.base import *
-    X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
-
-    op =  A@(Z*I) + A@I # gatherpauli does not give error (previously used to.) Now PauliAlgebra does give error
-    # op = X@(X+(3*(Y)))
-    op = 2*X + (3*Y) *((2*I) + (1*X))
-
-    output = compiler(op)
-
-    verifier(output)
-
-    pprint(output.accept(VerbosePrintOperator()))
-    """
-    partition does :
-    (((2) * PauliX()) + ((3 * 2) * PauliY())) + ((((3 * 1) * -1) * 1j) * PauliZ())
-    to
-    (((2) * PauliX()) + ((3 * 2) * PauliY())) + ((((1j * 3) * 1) * -1) * PauliZ())  
-    """
+def analog_operator_canonicalization(model):
+    new_model = canonicalize(model)
+    verify_canonicalization(new_model)
+    return new_model
