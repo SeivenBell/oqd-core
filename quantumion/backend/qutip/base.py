@@ -1,28 +1,14 @@
-from typing import Optional
-
-########################################################################################
-
-from quantumion.backend.qutip.rule import (
-    QutipBackendTransformer,
-    QutipExperimentInterpreter,
-)
 from quantumion.backend.base import BackendBase
 from quantumion.backend.qutip.interface import QutipExperiment
 
 from quantumion.backend.task import Task
-
-from quantumion.compiler.flow import *
-from quantumion.compiler.analog.verification_flow import VerificationFlow
 
 ########################################################################################
 __all__ = [
     "QutipBackend",
 ]
 
-    
-from quantumion.compilerv2.analog.assign import AssignAnalogIRDim
-from quantumion.compilerv2.walk import Post, PostConversion
-from quantumion.compilerv2.canonicalization.canonicalize import canonicalize, verifier
+
 
 class QutipBackend(BackendBase):
     """
@@ -37,27 +23,21 @@ class QutipBackend(BackendBase):
         Args:
             task (Task): Quantum experiment to compile
         """
-        from quantumion.compilerv2.analog.assign import VerifyAnalogIRDim
-        canonicalized_task = canonicalize(task)
-        verifier(canonicalized_task)
-        # add verifier which checks hilbert space dim
-
-        canonicalized_circuit = canonicalized_task.program
-
-        # pprint(canonicalized_circuit)
+        from quantumion.compilerv2.analog.passes.canonicalize import analog_operator_canonicalization
+        from quantumion.compilerv2.analog.passes.assign import assign_analog_circuit_dim, verify_analog_args_dim
+        from quantumion.backend.qutip.passes import (
+            compiler_analog_args_to_qutipIR,
+            compiler_analog_circuit_to_qutipIR
+        )
+        canonicalized_circuit = analog_operator_canonicalization(task.program)
+        canonicalized_args = analog_operator_canonicalization(task.args)
         
-        assigned_circuit = Post(AssignAnalogIRDim())(canonicalized_circuit)
-
-        canonicalized_args = canonicalized_task.args
-        Post(VerifyAnalogIRDim(n_qreg=assigned_circuit.n_qreg, n_qmode=assigned_circuit.n_qmode))(assigned_circuit)
-        Post(VerifyAnalogIRDim(n_qreg=assigned_circuit.n_qreg, n_qmode=assigned_circuit.n_qmode))(canonicalized_args)
-
+        assigned_circuit = assign_analog_circuit_dim(canonicalized_circuit)
+        verify_analog_args_dim(canonicalized_args, n_qreg=assigned_circuit.n_qreg, n_qmode=assigned_circuit.n_qmode)
         # here fock_cutoff is a compiler parameter
+        converted_circuit = compiler_analog_circuit_to_qutipIR(assigned_circuit, fock_cutoff=task.args.fock_cutoff)
+        converted_args = compiler_analog_args_to_qutipIR(canonicalized_args, fock_cutoff=task.args.fock_cutoff)
 
-        converted_circuit = PostConversion(QutipBackendTransformer(fock_cutoff=task.args.fock_cutoff))(assigned_circuit)
-        converted_args = PostConversion(QutipBackendTransformer(fock_cutoff=task.args.fock_cutoff))(canonicalized_args)
-        # circuit_args = PostConversion(QutipBackendTransformer())(canonicalized_args)
-        # pprint(converted_circuit)
         
 
         return QutipExperiment(
@@ -75,11 +55,14 @@ class QutipBackend(BackendBase):
             task (Optional[Task]): Quantum experiment to run as a [`Task`][quantumion.backend.task.Task] object
             experiment (Optional[QutipExperiment]): Quantum experiment to run as a [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object
         """
+        from quantumion.backend.qutip.passes import (
+            run_qutip_experiment
+        )
         if task is not None and experiment is not None:
             raise TypeError("Both task and experiment are given as inputs to run")
         if experiment is None:
             experiment = self.compile(task=task)
-        return PostConversion(QutipExperimentInterpreter())(experiment)
+        return run_qutip_experiment(experiment)
 
 
 if __name__ == '__main__':
