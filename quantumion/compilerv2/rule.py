@@ -37,6 +37,7 @@ class ConversionRule(RewriteRule):
         super().__init__()
         self.operands = None
 
+
     def map(self, model): # prolly need some operand here which will be first evaluated
         operands = self.operands if isinstance(model, VisitableBaseModel) else None
         # operands = self.operands
@@ -64,40 +65,66 @@ class ConversionRule(RewriteRule):
 
     def generic_map(self, model, operands):
         return model
+
+# class ConversionRule(RewriteRule):
+#     def __init__(self):
+#         super().__init__()
+
+#         self.operands = None
+
 ########################################################################################
 
 
-class PrintCurrent(RewriteRule):
-    def __init__(self, *, print_fn=print):
+class PrettyPrint(ConversionRule):
+    def __init__(self, *, indent="  "):
         super().__init__()
 
-        self.print_fn = print_fn
-        self.current = 0
-        pass
+        self.indent = indent
 
     def generic_map(self, model):
-        self.print_fn(f"{self.current}: {model.__class__.__name__}({model})")
-        self.current += 1
-        pass
+        return f"{model.__class__.__name__}({model})"
 
+    def map_list(self, model):
+        s = f"{model.__class__.__name__}"
 
-class AddOne(RewriteRule):
-    def map_int(self, model):
-        return model + 1
+        print(self.operands)
+        _s = ""
+        for n, o in enumerate(self.operands):
+            _s += f"\n{self.indent}- {n}: " + f"\n{self.indent}".join(o.split("\n"))
 
-    def map_str(self, model):
-        return str(int(model) + 1)
+        s = s + _s
 
+        return s
 
-class AddN(RewriteRule):
-    def __init__(self, N):
-        super().__init__()
+    def map_tuple(self, model):
+        s = f"{model.__class__.__name__}"
 
-        self.N = N
-        pass
+        _s = ""
+        for n, o in enumerate(self.operands):
+            _s += f"\n{self.indent}- {n}: " + f"\n{self.indent}".join(o.split("\n"))
 
-    def map_int(self, model):
-        return model + self.N
+        s = s + _s
 
-    def map_str(self, model):
-        return str(int(model) + self.N)
+        return s
+
+    def map_dict(self, model):
+        s = f"{model.__class__.__name__}"
+
+        _s = ""
+        for k, v in self.operands.items():
+            _s += f"\n{self.indent}- {k}: " + f"\n{self.indent}".join(v.split("\n"))
+
+        s = s + _s
+
+        return s
+
+    def map_VisitableBaseModel(self, model):
+        s = f"{model.__class__.__name__}"
+
+        _s = ""
+        for k, v in self.operands.items():
+            _s += f"\n{self.indent}- {k}: " + f"\n{self.indent}".join(v.split("\n"))
+
+        s = s + _s
+
+        return s
