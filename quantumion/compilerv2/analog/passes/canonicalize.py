@@ -36,17 +36,6 @@ math_chain = Chain(
     FixedPoint(Post(PartitionMathExpr())),
 )
 
-canonicalize = Chain(FixedPoint(dist_chain), 
-            FixedPoint(Post(ProperOrder())), 
-            FixedPoint(pauli_chain), 
-            FixedPoint(Post(GatherPauli())),
-            FixedPoint(normal_order_chain),
-            FixedPoint(Post(PruneIdentity())),
-            FixedPoint(scale_terms_chain),
-            FixedPoint(Post(SortedOrder())),
-            math_chain
-            )
-
 verify_canonicalization = Chain(
     Post(CanVerOperatorDistribute()),
     Post(CanVerGatherMathExpr()),
@@ -60,6 +49,14 @@ verify_canonicalization = Chain(
 )
 
 def analog_operator_canonicalization(model):
-    new_model = canonicalize(model)
-    verify_canonicalization(new_model)
-    return new_model
+    return Chain(FixedPoint(dist_chain), 
+            FixedPoint(Post(ProperOrder())), 
+            FixedPoint(pauli_chain), 
+            FixedPoint(Post(GatherPauli())),
+            FixedPoint(normal_order_chain),
+            FixedPoint(Post(PruneIdentity())),
+            FixedPoint(scale_terms_chain),
+            FixedPoint(Post(SortedOrder())),
+            math_chain,
+            verify_canonicalization # running verifier
+            )(model=model)
