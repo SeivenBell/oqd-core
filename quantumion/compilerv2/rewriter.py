@@ -4,6 +4,11 @@ from quantumion.compilerv2.base import PassBase
 
 
 class Rewriter(PassBase):
+    """
+    This class represents a wrapper for passes to compose and modify their logic without
+    affecting the internals of a pass.
+    """
+
     pass
 
 
@@ -11,6 +16,10 @@ class Rewriter(PassBase):
 
 
 class Chain(Rewriter):
+    """
+    This class represents a composite pass where the passes are applied sequentially.
+    """
+
     def __init__(self, *rules):
         super().__init__()
 
@@ -29,6 +38,11 @@ class Chain(Rewriter):
 
 
 class FixedPoint(Rewriter):
+    """
+    This class represents a wrapped pass that is applied until the object/IR converges to a fixed point
+    or reaches a maximum iteration count.
+    """
+
     def __init__(self, rule, *, max_iter=1000):
         super().__init__()
 

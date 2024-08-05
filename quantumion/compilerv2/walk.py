@@ -43,6 +43,11 @@ class Walk(PassBase):
 
 
 class Pre(Walk):
+    """
+    This class represents a the pre order tree traversal algorithm that walks through an AST
+    and applies the rule from top to bottom.
+    """
+
     def walk_dict(self, model):
         new_model = self.rule(model)
 
@@ -78,6 +83,11 @@ class Pre(Walk):
 
 
 class Post(Walk):
+    """
+    This class represents a the post order tree traversal algorithm that walks through an AST
+    and applies the rule from bottom to top.
+    """
+
     def walk_dict(self, model):
         new_model = {k: self(v) for k, v in model.items()}
 

@@ -52,6 +52,7 @@ nav:
       - Operations: technical/reference/operations-interface.md
       - Operators: technical/reference/operator-interface.md
     - Atomic: technical/reference/atomic-interface.md
+  - Compiler: technical/reference/compiler.md
   - Backends:
     - Task: technical/reference/task-backend.md
     - Qutip: technical/reference/qutip-backend.md
