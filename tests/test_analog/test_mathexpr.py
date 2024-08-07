@@ -14,10 +14,11 @@ from unittest_prettify.colorize import (
 )
 
 
-# def test_function(math_str: str, visitor=EvaluateMathExpr()):
-#     return MathStr(string=math_str).accept(visitor=visitor)
-
-def test_function(math_str: str, rule: Union[ConversionRule, RewriteRule] = EvaluateMathExpr(), walk_method: Walk = Post):
+def test_function(
+    math_str: str,
+    rule: Union[ConversionRule, RewriteRule] = EvaluateMathExpr(),
+    walk_method: Walk = Post,
+):
     return walk_method(rule)(MathStr(string=math_str))
 
 
