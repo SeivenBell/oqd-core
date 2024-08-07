@@ -4,6 +4,8 @@ from quantumion.interface.base import VisitableBaseModel
 ########################################################################################
 
 from rich import print as pprint
+
+
 class RewriteRule(PassBase):
     @property
     def children(self):
@@ -23,35 +25,16 @@ class RewriteRule(PassBase):
     def generic_map(self, model):
         return model
 
-    # For verfications this is enough
-    # def map(self, model):
-    #     for cls in model.__class__.__mro__:
-    #         map_func = getattr(self, "map_{}".format(cls.__name__), None)
-    #         if map_func:
-    #             map_func(model)
-    #             break
     pass
 
+
 class ConversionRule(RewriteRule):
-    def __init__(self, operands = None):
+    def __init__(self):
         super().__init__()
         self.operands = None
 
-
-    def map(self, model): # prolly need some operand here which will be first evaluated
+    def map(self, model):  # prolly need some operand here which will be first evaluated
         operands = self.operands if isinstance(model, VisitableBaseModel) else None
-        # operands = self.operands
-        # pprint("in map the operands is {} and model is {}".format(operands, model))
-        """
-        Commented out logic is now part of ConversionWalk
-        """
-        # if isinstance(model, VisitableBaseModel):
-        #     # pprint("map model is here:: {}\n".format(model))
-        #     operands_dict = {}
-        #     for key in model.model_fields.keys():
-        #         operands_dict[key] = getattr(model, key)
-        #     pprint("\n exp is {}\n model is {}\n ".format(operands_dict, model))
-        #     operands = self.operands(operands_dict)
 
         for cls in model.__class__.__mro__:
             map_func = getattr(self, "map_{}".format(cls.__name__), None)
@@ -61,16 +44,11 @@ class ConversionRule(RewriteRule):
         if not map_func:
             map_func = self.generic_map
 
-        return map_func(model, operands = operands)
+        return map_func(model, operands=operands)
 
     def generic_map(self, model, operands):
         return model
 
-# class ConversionRule(RewriteRule):
-#     def __init__(self):
-#         super().__init__()
-
-#         self.operands = None
 
 ########################################################################################
 

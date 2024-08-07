@@ -1,10 +1,29 @@
+from typing import Union
+
+########################################################################################
+
 from quantumion.compilerv2.rule import RewriteRule
 from quantumion.compilerv2.walk import Post
 from quantumion.compilerv2.analog.utils import term_index_dim, TermIndex
 from quantumion.interface.math import MathNum, MathImag, MathAdd
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.interface.analog import *
-from typing import Union
+
+########################################################################################
+
+__all__ = [
+    "OperatorDistribute",
+    "GatherMathExpr",
+    "GatherPauli",
+    "PruneIdentity",
+    "PauliAlgebra",
+    "NormalOrder",
+    "ProperOrder",
+    "ScaleTerms",
+    "SortedOrder",
+]
+
+########################################################################################
 
 
 class OperatorDistribute(RewriteRule):
@@ -59,7 +78,8 @@ class OperatorDistribute(RewriteRule):
             op1=model.op1,
             op2=OperatorScalarMul(op=model.op2, expr=MathNum(value=-1)),
         )
-    
+
+
 class GatherMathExpr(RewriteRule):
     """
     Assumptions: OperatorDistribute (sometimes)
@@ -71,10 +91,10 @@ class GatherMathExpr(RewriteRule):
             return model.expr * model.op.expr * model.op.op
 
         return None
-    
+
     def map_OperatorMul(self, model: OperatorMul):
         return self._mulkron(model)
-    
+
     def map_OperatorKron(self, model: OperatorKron):
         return self._mulkron(model)
 
@@ -89,11 +109,12 @@ class GatherMathExpr(RewriteRule):
             )
         if isinstance(model.op1, OperatorScalarMul):
             return model.op1.expr * model.__class__(op1=model.op1.op, op2=model.op2)
-            
+
         if isinstance(model.op2, OperatorScalarMul):
             return model.op2.expr * model.__class__(op1=model.op1, op2=model.op2.op)
         return None
-    
+
+
 class GatherPauli(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
@@ -119,7 +140,8 @@ class GatherPauli(RewriteRule):
                     op2=model.op1.op2,
                 )
         return None
-    
+
+
 class PruneIdentity(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
@@ -130,13 +152,15 @@ class PruneIdentity(RewriteRule):
     inner if statements try to do pattern matching
     if no pattern matched for the given Op model which has been visited, we just return None
     """
+
     def map_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (Identity)):
             return model.op2
         if isinstance(model.op2, (Identity)):
-            return model.op1 # problem is this is a rule and not a walk !!
+            return model.op1  # problem is this is a rule and not a walk !!
         return None
-    
+
+
 class PauliAlgebra(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder
@@ -161,7 +185,8 @@ class PauliAlgebra(RewriteRule):
                 expr=MathNum(value=-1),
             )
         return None
-    
+
+
 class NormalOrder(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
@@ -183,7 +208,8 @@ class NormalOrder(RewriteRule):
                     op2=OperatorMul(op1=model.op1.op2, op2=model.op2),
                 )
         return model
-    
+
+
 class ProperOrder(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute
@@ -191,32 +217,30 @@ class ProperOrder(RewriteRule):
 
     def map_OperatorAdd(self, model: OperatorAdd):
         return self._addmullkron(model=model)
-    
+
     def map_OperatorMul(self, model: OperatorMul):
         return self._addmullkron(model=model)
-    
+
     def map_OperatorKron(self, model: OperatorKron):
         return self._addmullkron(model=model)
 
-    def _addmullkron(
-        self, model: Union[OperatorAdd, OperatorMul, OperatorKron]
-    ):
+    def _addmullkron(self, model: Union[OperatorAdd, OperatorMul, OperatorKron]):
         if isinstance(model.op2, model.__class__):
             return model.__class__(
-                op1=model.__class__(
-                    op1=model.op1, op2=model.op2.op1
-                ),
+                op1=model.__class__(op1=model.op1, op2=model.op2.op1),
                 op2=model.op2.op2,
             )
         return model.__class__(op1=model.op1, op2=model.op2)
-    
+
+
 class ScaleTerms(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
                  PruneIdentity
     (SortedOrder and ScaleTerms can be run in either order)
     Important: Requires GatherMathExpr right after application of ScaleTerms for Post walk
-    # """
+    #"""
+
     def __init__(self):
         super().__init__()
         self.op_add_root = False
@@ -232,7 +256,7 @@ class ScaleTerms(RewriteRule):
             self.op_add_root = True
             if not isinstance(model, Union[OperatorAdd, OperatorScalarMul]):
                 return OperatorScalarMul(expr=1, op=model)
-        return model # check with no ret
+        return model  # check with no ret
 
     def map_OperatorAdd(self, model: OperatorAdd):
         self.op_add_root = True
@@ -241,8 +265,9 @@ class ScaleTerms(RewriteRule):
             op1 = OperatorScalarMul(expr=1, op=model.op1)
         if not isinstance(model.op2, Union[OperatorScalarMul, OperatorAdd]):
             op2 = OperatorScalarMul(expr=1, op=model.op2)
-        return OperatorAdd(op1=op1, op2=op2) # check with no ret
-    
+        return OperatorAdd(op1=op1, op2=op2)  # check with no ret
+
+
 class SortedOrder(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
@@ -252,8 +277,8 @@ class SortedOrder(RewriteRule):
 
     def map_OperatorAdd(self, model: OperatorAdd):
         if isinstance(model.op1, OperatorAdd):
-            term1 = Post(TermIndex())(model.op1.op2)  #TermIndex().visit(model.op1.op2)
-            term2 = Post(TermIndex())(model.op2) # TermIndex().visit(model.op2)
+            term1 = Post(TermIndex())(model.op1.op2)  # TermIndex().visit(model.op1.op2)
+            term2 = Post(TermIndex())(model.op2)  # TermIndex().visit(model.op2)
             if term_index_dim(term1) != term_index_dim(term2):
                 raise CanonicalFormError("Incorrect hilbert space dimensions")
 
@@ -290,8 +315,8 @@ class SortedOrder(RewriteRule):
                 return OperatorAdd(op1=model.op1, op2=model.op2)
 
         else:
-            term1 = Post(TermIndex())(model.op1) #TermIndex().visit(model.op1)
-            term2 = Post(TermIndex())(model.op2) #TermIndex().visit(model.op2)
+            term1 = Post(TermIndex())(model.op1)  # TermIndex().visit(model.op1)
+            term2 = Post(TermIndex())(model.op2)  # TermIndex().visit(model.op2)
             if term_index_dim(term1) != term_index_dim(term2):
                 raise CanonicalFormError("Incorrect hilbert space dimensions")
             if term1 == term2:
@@ -320,4 +345,3 @@ class SortedOrder(RewriteRule):
 
             elif term1 < term2:
                 return OperatorAdd(op1=model.op1, op2=model.op2)
-            

@@ -1,5 +1,4 @@
 from quantumion.interface.analog.operator import *
-from quantumion.interface.base import VisitableBaseModel
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from quantumion.compilerv2.math.passes import evaluate_math_expr
@@ -11,22 +10,20 @@ from quantumion.backend.qutip.interface import (
 )
 from quantumion.backend.metric import *
 from quantumion.backend.task import Task, TaskArgsAnalog
-from typing import Any, Union, List, Tuple, Literal, Dict
 import qutip as qt
-from pydantic import BaseModel, ConfigDict
 from quantumion.compilerv2.walk import *
 from quantumion.compilerv2.rule import *
 from rich import print as pprint
 import numpy as np
-from pydantic.types import NonNegativeInt
 import itertools
 import time
-import ast
+
 # define the target and then build a new model based on the target
 """
 - Source: Analog
 - Target: Qutip
 """
+
 
 def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
     rho = qt.ptrace(
@@ -36,11 +33,14 @@ def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
     )
     return qt.entropy_vn(rho)
 
+
 class QutipExperimentInterpreter(ConversionRule):
 
     def map_QutipExpectation(self, model: QutipExpectation, operands):
         for idx, operator in enumerate(model.operator):
-            coefficient = evaluate_math_expr(operator[1]) #operator[1].accept(EvaluateMathExpr()) # using visitor
+            coefficient = evaluate_math_expr(
+                operator[1]
+            )  # operator[1].accept(EvaluateMathExpr()) # using visitor
             op_exp = (
                 coefficient * operator[0]
                 if idx == 0
@@ -55,7 +55,7 @@ class QutipExperimentInterpreter(ConversionRule):
         # return lambda t, psi: entanglement_entropy_vn(
         #     t, psi, model.qreg, model.qmode, self.n_qreg, self.n_qmode
         # )
-    
+
     def map_TaskArgsQutip(self, model: TaskArgsQutip, operands):
         return operands
 
@@ -66,7 +66,7 @@ class QutipExperimentInterpreter(ConversionRule):
         self.n_qmode = model.n_qmode
         initial_state = qt.tensor([qt.basis(d, 0) for d in dims])
 
-        qutip_metrics = operands['args']['metrics']
+        qutip_metrics = operands["args"]["metrics"]
 
         current_state = initial_state
 
@@ -74,10 +74,14 @@ class QutipExperimentInterpreter(ConversionRule):
 
         results = []
         for instruction in model.instructions:
-            results.append(self._QutipOperation(model=instruction, 
-                                           dt = model.args.dt, 
-                                           current_state=current_state, 
-                                           qutip_metrics=qutip_metrics))
+            results.append(
+                self._QutipOperation(
+                    model=instruction,
+                    dt=model.args.dt,
+                    current_state=current_state,
+                    qutip_metrics=qutip_metrics,
+                )
+            )
             current_state = results[-1].final_state
 
         time_taken = time.time() - start_time
@@ -132,14 +136,16 @@ class QutipExperimentInterpreter(ConversionRule):
             runtime=time_taken,
         )
 
-    def _QutipOperation(self, model: QutipOperation, dt, current_state, qutip_metrics): # remove
+    def _QutipOperation(
+        self, model: QutipOperation, dt, current_state, qutip_metrics
+    ):  # remove
         duration = model.duration
-        tspan = np.linspace(
-            0, duration, round(duration / dt)
-        )  # create time vector
+        tspan = np.linspace(0, duration, round(duration / dt))  # create time vector
         qutip_hamiltonian = []
         for op, coeff in model.hamiltonian:
-            qutip_hamiltonian.append([op, evaluate_math_expr(coeff, output_mode='str')]) # using visitor
+            qutip_hamiltonian.append(
+                [op, evaluate_math_expr(coeff, output_mode="str")]
+            )  # using visitor
         result_qobj = qt.sesolve(
             qutip_hamiltonian,
             current_state,
@@ -152,14 +158,15 @@ class QutipExperimentInterpreter(ConversionRule):
 
         return result_qobj
 
+
 class QutipBackendCompiler(ConversionRule):
-    def __init__(self, operands=None, fock_cutoff = None):
+    def __init__(self, operands=None, fock_cutoff=None):
         super().__init__(operands)
         self._fock_cutoff = fock_cutoff
 
     def map_AnalogCircuit(self, model: AnalogCircuit, operands):
         # pprint("operands in curciot is {}\n".format(operands))
-        return operands['sequence']
+        return operands["sequence"]
 
     def map_TaskArgsAnalog(self, model: TaskArgsAnalog, operands):
         return TaskArgsQutip(
@@ -167,35 +174,35 @@ class QutipBackendCompiler(ConversionRule):
             n_shots=model.n_shots,
             fock_cutoff=model.fock_cutoff,
             dt=model.dt,
-            metrics = operands['metrics'],
+            metrics=operands["metrics"],
             # metrics=self(model.metrics),
         )
 
     def map_Expectation(self, model: Expectation, operands):
-        return QutipExpectation(operator=operands['operator'])
+        return QutipExpectation(operator=operands["operator"])
         # return QutipExpectation(operator=self(model=model.operator))
-
 
     def map_Evolve(self, model: Evolve, operands):
         return QutipOperation(
             # hamiltonian=self(model.gate), duration=model.duration
-            hamiltonian=operands['gate'], duration=model.duration
+            hamiltonian=operands["gate"],
+            duration=model.duration,
         )
 
     def map_AnalogGate(self, model: AnalogGate, operands):
         # pprint("operands in analog gate is {}\n".format(operands))
         # return self(model.hamiltonian)
-        return operands['hamiltonian']
+        return operands["hamiltonian"]
 
     def map_OperatorAdd(self, model: OperatorAdd, operands):
         # pprint("operands in adddd is {}\n".format(operands))
-        op = operands['op1']#self(model.op1)
-        op.append(operands['op2'][0])
+        op = operands["op1"]  # self(model.op1)
+        op.append(operands["op2"][0])
         return op
 
     def map_OperatorScalarMul(self, model: OperatorScalarMul, operands):
         # return [(self(model.op), model.expr)]
-        return [(operands['op'], model.expr)]
+        return [(operands["op"], model.expr)]
 
     def map_PauliI(self, model: PauliI, operands) -> qt.Qobj:
         return qt.qeye(2)
@@ -215,15 +222,15 @@ class QutipBackendCompiler(ConversionRule):
         return qt.qeye(self._fock_cutoff)
 
     def map_Creation(self, model: Creation, operands) -> qt.Qobj:
-        #raise NotImplementedError
+        # raise NotImplementedError
         return qt.create(self._fock_cutoff)
 
     def map_Annihilation(self, model: Annihilation, operands) -> qt.Qobj:
-        #raise NotImplementedError
+        # raise NotImplementedError
         return qt.destroy(self._fock_cutoff)
 
     def map_OperatorMul(self, model: OperatorMul, operands) -> qt.Qobj:
-        return operands['op1'] * operands['op2']
+        return operands["op1"] * operands["op2"]
 
     def map_OperatorKron(self, model: OperatorKron, operands) -> qt.Qobj:
-        return qt.tensor(operands['op1'], operands['op2'])
+        return qt.tensor(operands["op1"], operands["op2"])

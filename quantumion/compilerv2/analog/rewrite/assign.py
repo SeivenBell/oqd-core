@@ -1,8 +1,21 @@
 from typing import Any, Union
+
+########################################################################################
+
 from quantumion.interface.analog import AnalogCircuit, AnalogGate
 from quantumion.compilerv2.rule import RewriteRule
 from quantumion.compilerv2.analog.utils import get_canonical_hamiltonian_dim
 from quantumion.backend.metric import Expectation
+
+########################################################################################
+
+__all__ = [
+    "AssignAnalogIRDim",
+    "VerifyAnalogCircuitDim",
+    "VerifyAnalogArgsDim",
+]
+
+########################################################################################
 
 
 class AssignAnalogIRDim(RewriteRule):
@@ -14,12 +27,14 @@ class AssignAnalogIRDim(RewriteRule):
         model.n_qreg = self.dim[0]
         model.n_qmode = self.dim[1]
         return model
+
     def map_AnalogGate(self, model):
         if self.dim is None:
-            self.dim = get_canonical_hamiltonian_dim(model.hamiltonian)       
+            self.dim = get_canonical_hamiltonian_dim(model.hamiltonian)
         elif self.dim != get_canonical_hamiltonian_dim(model.hamiltonian):
             raise Exception
-        
+
+
 class VerifyAnalogCircuitDim(RewriteRule):
     def __init__(self, n_qreg, n_qmode):
         super().__init__()

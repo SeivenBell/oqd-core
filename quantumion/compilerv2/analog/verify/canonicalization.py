@@ -1,11 +1,31 @@
+from typing import Union
+
+########################################################################################
+
 from quantumion.compilerv2.rule import RewriteRule
 from quantumion.compilerv2.walk import Post
 from quantumion.compilerv2.analog.utils import term_index_dim, TermIndex
 from quantumion.interface.math import *
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.interface.analog import *
-from typing import Union
 from quantumion.compiler.analog.base import *
+
+########################################################################################
+
+__all__ = [
+    "CanVerPauliAlgebra",
+    "CanVerGatherMathExpr",
+    "CanVerOperatorDistribute",
+    "CanVerProperOrder",
+    "CanVerPruneIdentity",
+    "CanVerGatherPauli",
+    "CanVerNormalOrder",
+    "CanVerSortedOrder",
+    "CanVerScaleTerm",
+]
+
+########################################################################################
+
 
 class CanVerPauliAlgebra(RewriteRule):
     """
@@ -22,12 +42,13 @@ class CanVerPauliAlgebra(RewriteRule):
             raise CanonicalFormError("Incorrect Ladder and Pauli multiplication")
         pass
 
+
 class CanVerGatherMathExpr(RewriteRule):
     """Assuming that OperatorDistribute has already been fully ran"""
 
     def map_OperatorMul(self, model: OperatorMul):
         return self._mulkron(model)
-    
+
     def map_OperatorKron(self, model: OperatorKron):
         return self._mulkron(model)
 
@@ -44,7 +65,8 @@ class CanVerGatherMathExpr(RewriteRule):
                 "Incomplete scalar multiplications after GatherMathExpression"
             )
         return None
-    
+
+
 class CanVerOperatorDistribute(RewriteRule):
     def __init__(self):
         super().__init__()
@@ -58,11 +80,9 @@ class CanVerOperatorDistribute(RewriteRule):
 
     def map_OperatorMul(self, model):
         return self._OperatorMulKron(model)
-    
 
     def map_OperatorKron(self, model):
         return self._OperatorMulKron(model)
-
 
     def _OperatorMulKron(self, model: Union[OperatorMul, OperatorKron]):
         if (
@@ -78,9 +98,8 @@ class CanVerOperatorDistribute(RewriteRule):
             and isinstance(model.op2, self.allowed_ops)
         ):
             raise CanonicalFormError("Incomplete Operator Distribution")
-        
+
         pass
-       
 
     def map_OperatorScalarMul(self, model: OperatorScalarMul):
         if not (isinstance(model.op, self.allowed_ops)):
@@ -93,6 +112,7 @@ class CanVerOperatorDistribute(RewriteRule):
         if isinstance(model, OperatorSub):
             raise CanonicalFormError("Subtraction of terms present")
         pass
+
 
 class CanVerProperOrder(RewriteRule):
     """Assumptions:
@@ -123,6 +143,7 @@ class CanVerProperOrder(RewriteRule):
             )
         pass
 
+
 class CanVerPruneIdentity(RewriteRule):
     """Assumptions:
     >>> Distributed
@@ -132,6 +153,7 @@ class CanVerPruneIdentity(RewriteRule):
         if isinstance(model.op1, Identity) or isinstance(model.op2, Identity):
             raise CanonicalFormError("Prune Identity is not complete")
         pass
+
 
 class CanVerGatherPauli(RewriteRule):
     """Assumptions:
@@ -147,6 +169,7 @@ class CanVerGatherPauli(RewriteRule):
                     raise CanonicalFormError("Incorrect GatherPauli")
         pass
 
+
 class CanVerNormalOrder(RewriteRule):
     """Assumptions:
     >>> Distributed, Gathered and then proper ordered and PauliAlgebra, PruneIdentity
@@ -161,11 +184,13 @@ class CanVerNormalOrder(RewriteRule):
                     raise CanonicalFormError("Incorrect NormalOrder")
         pass
 
+
 class CanVerSortedOrder(RewriteRule):
     """
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
                  PruneIdentity
     """
+
     def map_OperatorAdd(self, model: OperatorAdd):
         term2 = Post(TermIndex())(model.op2)
         if isinstance(model.op1, OperatorAdd):
@@ -180,12 +205,14 @@ class CanVerSortedOrder(RewriteRule):
             raise CanonicalFormError("Duplicate terms present")
         pass
 
+
 class CanVerScaleTerm(RewriteRule):
     """
-    Assumptions: 
+    Assumptions:
     >>> GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder, PruneIdentity
     Note that this only works for Pre
     """
+
     def __init__(self):
         super().__init__()
         self._single_term_scaling_needed = False
@@ -214,7 +241,11 @@ class CanVerScaleTerm(RewriteRule):
 
     def map_OperatorAdd(self, model: OperatorAdd):
         self._single_term_scaling_needed = True
-        if isinstance(model.op2, OperatorScalarMul) and isinstance(model.op1, Union[OperatorScalarMul, OperatorAdd]):
+        if isinstance(model.op2, OperatorScalarMul) and isinstance(
+            model.op1, Union[OperatorScalarMul, OperatorAdd]
+        ):
             pass
         else:
-            raise CanonicalFormError("some operators between addition are not scaled properly")
+            raise CanonicalFormError(
+                "some operators between addition are not scaled properly"
+            )

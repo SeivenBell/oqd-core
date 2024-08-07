@@ -4,7 +4,7 @@ from quantumion.compiler.analog.base import (
 )
 from quantumion.interface.analog.operator import *
 from quantumion.interface.base import VisitableBaseModel
-from quantumion.compiler.math.base import VerbosePrintMathExpr, EvaluateMathExpr
+from quantumion.compiler.math.base import PrintMathExpr, EvaluateMathExpr
 from quantumion.interface.analog.operations import *
 from quantumion.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from quantumion.backend.qutip.interface import (
@@ -124,7 +124,7 @@ class QutipExperimentInterpreter(AnalogInterfaceTransformer):
         )  # create time vector
         qutip_hamiltonian = []
         for op, coeff in model.hamiltonian:
-            qutip_hamiltonian.append([op, coeff.accept(VerbosePrintMathExpr())])
+            qutip_hamiltonian.append([op, coeff.accept(PrintMathExpr(verbose=True))])
         result_qobj = qt.sesolve(
             qutip_hamiltonian,
             self._current_state,
