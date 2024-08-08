@@ -3,7 +3,6 @@ from quantumion.interface.base import VisitableBaseModel
 
 ########################################################################################
 
-from rich import print as pprint
 
 
 class RewriteRule(PassBase):
@@ -33,7 +32,7 @@ class ConversionRule(RewriteRule):
         super().__init__()
         self.operands = None
 
-    def map(self, model):  # prolly need some operand here which will be first evaluated
+    def map(self, model):
         operands = self.operands if isinstance(model, VisitableBaseModel) else None
 
         for cls in model.__class__.__mro__:

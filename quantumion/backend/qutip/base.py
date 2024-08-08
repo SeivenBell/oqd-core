@@ -63,29 +63,3 @@ class QutipBackend(BackendBase):
         if experiment is None:
             experiment = self.compile(task=task)
         return run_qutip_experiment(experiment)
-
-
-if __name__ == '__main__':
-    from quantumion.compiler.analog.base import *
-    from quantumion.interface.analog.operator import *
-    from quantumion.interface.analog.operations import *
-    from quantumion.backend.metric import *
-    from rich import print as pprint
-    from quantumion.backend.task import Task, TaskArgsAnalog
-    X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
-
-    ac = AnalogCircuit()
-    ac.evolve(gate=AnalogGate(hamiltonian=1*(X@A)), duration=1)
-    ac.evolve(gate=AnalogGate(hamiltonian=X@A + (X*I)@A), duration=1)
-    # ac.n_qreg = 1
-    # ac.n_qmode = 0
-    args = TaskArgsAnalog(n_shots=100, metrics={
-        'exp' : Expectation(operator=X@(A*LI)),
-    })
-
-    task = Task(
-        program=ac,
-        args = args
-    )
-    backend = QutipBackend()
-    pprint(backend.run(task=task))

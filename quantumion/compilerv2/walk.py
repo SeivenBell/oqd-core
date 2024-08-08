@@ -5,19 +5,12 @@ from abc import abstractmethod
 from quantumion.compilerv2.base import PassBase
 from quantumion.compilerv2.rule import ConversionRule
 
-from quantumion.interface.base import VisitableBaseModel
-########################################################################################
-from rich import print as pprint
 
 class Walk(PassBase):
     def __init__(self, rule: PassBase):
         super().__init__()
 
         self.rule = rule
-        pass
-
-    @abstractmethod
-    def walk_VisitableBaseModel(self, model):
         pass
 
     @property
