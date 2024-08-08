@@ -160,8 +160,8 @@ class QutipExperimentInterpreter(ConversionRule):
 
 
 class QutipBackendCompiler(ConversionRule):
-    def __init__(self, operands=None, fock_cutoff=None):
-        super().__init__(operands)
+    def __init__(self, fock_cutoff = None):
+        super().__init__()
         self._fock_cutoff = fock_cutoff
 
     def map_AnalogCircuit(self, model: AnalogCircuit, operands):
