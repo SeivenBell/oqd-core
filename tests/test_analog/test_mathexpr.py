@@ -1,4 +1,4 @@
-from quantumion.compilerv2.math.utils import EvaluateMathExpr
+from quantumion.compilerv2.math.rules import EvaluateMathExpr
 from quantumion.compilerv2.walk import Post, Walk
 from quantumion.compilerv2.rule import ConversionRule, RewriteRule
 from quantumion.interface.math import *
