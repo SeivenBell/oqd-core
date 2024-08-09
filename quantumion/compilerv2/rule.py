@@ -4,7 +4,6 @@ from quantumion.interface.base import VisitableBaseModel
 ########################################################################################
 
 
-
 class RewriteRule(PassBase):
     @property
     def children(self):
@@ -33,7 +32,7 @@ class ConversionRule(RewriteRule):
         self.operands = None
 
     def map(self, model):
-        operands = self.operands if isinstance(model, VisitableBaseModel) else None
+        operands = self.operands
 
         for cls in model.__class__.__mro__:
             map_func = getattr(self, "map_{}".format(cls.__name__), None)
@@ -58,48 +57,47 @@ class PrettyPrint(ConversionRule):
 
         self.indent = indent
 
-    def generic_map(self, model):
+    def generic_map(self, model, operands):
         return f"{model.__class__.__name__}({model})"
 
-    def map_list(self, model):
+    def map_list(self, model, operands):
         s = f"{model.__class__.__name__}"
 
-        print(self.operands)
         _s = ""
-        for n, o in enumerate(self.operands):
+        for n, o in enumerate(operands):
             _s += f"\n{self.indent}- {n}: " + f"\n{self.indent}".join(o.split("\n"))
 
         s = s + _s
 
         return s
 
-    def map_tuple(self, model):
+    def map_tuple(self, model, operands):
         s = f"{model.__class__.__name__}"
 
         _s = ""
-        for n, o in enumerate(self.operands):
+        for n, o in enumerate(operands):
             _s += f"\n{self.indent}- {n}: " + f"\n{self.indent}".join(o.split("\n"))
 
         s = s + _s
 
         return s
 
-    def map_dict(self, model):
+    def map_dict(self, model, operands):
         s = f"{model.__class__.__name__}"
 
         _s = ""
-        for k, v in self.operands.items():
+        for k, v in operands.items():
             _s += f"\n{self.indent}- {k}: " + f"\n{self.indent}".join(v.split("\n"))
 
         s = s + _s
 
         return s
 
-    def map_VisitableBaseModel(self, model):
+    def map_VisitableBaseModel(self, model, operands):
         s = f"{model.__class__.__name__}"
 
         _s = ""
-        for k, v in self.operands.items():
+        for k, v in operands.items():
             _s += f"\n{self.indent}- {k}: " + f"\n{self.indent}".join(v.split("\n"))
 
         s = s + _s
