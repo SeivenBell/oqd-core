@@ -4,6 +4,11 @@ from quantumion.compiler.base import PassBase
 
 
 class RewriteRule(PassBase):
+    """
+    This class represents a rule used to rewrite a type or IR. The result of the same type
+    or IR.
+    """
+
     @property
     def children(self):
         return []
@@ -26,6 +31,10 @@ class RewriteRule(PassBase):
 
 
 class ConversionRule(RewriteRule):
+    """
+    This class represents a rule used to convert between different types and IRs.
+    """
+
     def __init__(self):
         super().__init__()
         self.operands = None
@@ -51,6 +60,10 @@ class ConversionRule(RewriteRule):
 
 
 class PrettyPrint(ConversionRule):
+    """
+    This class represents a rewrite rule that constructs a string to represent an AST.
+    """
+
     def __init__(self, *, indent="  "):
         super().__init__()
 

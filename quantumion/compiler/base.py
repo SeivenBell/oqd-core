@@ -4,10 +4,18 @@ from abc import ABC, abstractmethod
 
 
 class CompilerError(Exception):
+    """
+    Class for Compiler Errors.
+    """
+
     pass
 
 
 class PassBase(ABC):
+    """
+    Abstract base class for passes.
+    """
+
     def __init__(self):
         pass
 
