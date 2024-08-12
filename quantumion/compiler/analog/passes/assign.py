@@ -1,5 +1,5 @@
-from quantumion.compilerv2.walk import Post
-from quantumion.compilerv2.analog.rewrite.assign import (
+from quantumion.compiler.walk import Post
+from quantumion.compiler.analog.rewrite.assign import (
     AssignAnalogIRDim,
     VerifyAnalogCircuitDim,
     VerifyAnalogArgsDim,

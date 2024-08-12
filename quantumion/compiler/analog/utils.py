@@ -4,9 +4,9 @@ from typing import Any, Union
 
 from quantumion.interface.analog import *
 from quantumion.interface.math import MathExpr
-from quantumion.compilerv2.rule import ConversionRule
-from quantumion.compilerv2.walk import Post
-from quantumion.compilerv2.math.utils import PrintMathExpr
+from quantumion.compiler.rule import ConversionRule
+from quantumion.compiler.walk import Post
+from quantumion.compiler.math.rules import PrintMathExpr
 
 ########################################################################################
 

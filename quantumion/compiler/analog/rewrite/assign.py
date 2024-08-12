@@ -3,8 +3,8 @@ from typing import Any, Union
 ########################################################################################
 
 from quantumion.interface.analog import AnalogCircuit, AnalogGate
-from quantumion.compilerv2.rule import RewriteRule
-from quantumion.compilerv2.analog.utils import get_canonical_hamiltonian_dim
+from quantumion.compiler.rule import RewriteRule
+from quantumion.compiler.analog.utils import get_canonical_hamiltonian_dim
 from quantumion.backend.metric import Expectation
 
 ########################################################################################

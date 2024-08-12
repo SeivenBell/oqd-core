@@ -1,9 +1,12 @@
 from abc import abstractmethod
+import inspect
 
 ########################################################################################
 
-from quantumion.compilerv2.base import PassBase
-from quantumion.compilerv2.rule import ConversionRule
+from quantumion.compiler.base import PassBase
+from quantumion.compiler.rule import ConversionRule
+
+########################################################################################
 
 
 class Walk(PassBase):

@@ -1,8 +1,8 @@
-from quantumion.compilerv2.rewriter import Chain, FixedPoint
-from quantumion.compilerv2.walk import Post, Pre
-from quantumion.compilerv2.analog.rewrite.canonicalize import *
-from quantumion.compilerv2.analog.verify.canonicalization import *
-from quantumion.compilerv2.math.rules import (
+from quantumion.compiler.rewriter import Chain, FixedPoint
+from quantumion.compiler.walk import Post, Pre
+from quantumion.compiler.analog.rewrite.canonicalize import *
+from quantumion.compiler.analog.verify.canonicalization import *
+from quantumion.compiler.math.rules import (
     DistributeMathExpr,
     ProperOrderMathExpr,
     PartitionMathExpr,

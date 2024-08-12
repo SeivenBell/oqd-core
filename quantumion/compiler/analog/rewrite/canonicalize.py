@@ -2,9 +2,9 @@ from typing import Union
 
 ########################################################################################
 
-from quantumion.compilerv2.rule import RewriteRule
-from quantumion.compilerv2.walk import Post
-from quantumion.compilerv2.analog.utils import term_index_dim, TermIndex
+from quantumion.compiler.rule import RewriteRule
+from quantumion.compiler.walk import Post
+from quantumion.compiler.analog.utils import term_index_dim, TermIndex
 from quantumion.interface.math import MathNum, MathImag, MathAdd
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.interface.analog import *

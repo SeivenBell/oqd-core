@@ -87,17 +87,10 @@ class AnalogCircuit(AnalogOperation):
     Class representing a quantum information experiment represented in terms of analog operations.
 
     Attributes:
-        qreg (List[NonNegativeInt]): Indices of the qubit registers
-        qmode (List[NonNegativeInt]): Indices of the bosonic mode registers
-        definitions (List[Tuple[str, AnalogGate]]): Definitions of gates to unique string identifiers
         sequence (List[Union[Measure, Evolve, Initialize]]): Sequence of statements, including initialize, evolve, measure
 
     """
 
-    qreg: List[NonNegativeInt] = []
-    qmode: List[NonNegativeInt] = []
-
-    definitions: List[Tuple[str, AnalogGate]] = []
     sequence: List[Statement] = []
 
     n_qreg: Union[NonNegativeInt, None] = None

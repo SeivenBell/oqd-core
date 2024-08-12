@@ -1,3 +1,4 @@
-from .base import *
-from .canonicalize import *
+from .passes import *
+from .rewrite import *
 from .verify import *
+from .utils import *

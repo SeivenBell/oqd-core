@@ -1,5 +1,5 @@
-from quantumion.compilerv2.walk import Post
-from quantumion.compilerv2.math.rules import EvaluateMathExpr
+from quantumion.compiler.walk import Post
+from quantumion.compiler.math.rules import EvaluateMathExpr
 
 ########################################################################################
 

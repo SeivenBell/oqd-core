@@ -1,4 +1,4 @@
-from quantumion.compilerv2.base import PassBase
+from quantumion.compiler.base import PassBase
 
 ########################################################################################
 

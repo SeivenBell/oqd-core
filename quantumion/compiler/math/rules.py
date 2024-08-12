@@ -5,7 +5,7 @@ import math
 ########################################################################################
 
 from quantumion.interface.math import *
-from quantumion.compilerv2.rule import *
+from quantumion.compiler.rule import *
 
 ########################################################################################
 

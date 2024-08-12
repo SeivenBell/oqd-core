@@ -1,6 +1,6 @@
-from quantumion.compilerv2.math.rules import EvaluateMathExpr
-from quantumion.compilerv2.walk import Post, Walk
-from quantumion.compilerv2.rule import ConversionRule, RewriteRule
+from quantumion.compiler.math.rules import EvaluateMathExpr
+from quantumion.compiler.walk import Post, Walk
+from quantumion.compiler.rule import ConversionRule, RewriteRule
 from quantumion.interface.math import *
 from typing import Union
 from rich import print as pprint

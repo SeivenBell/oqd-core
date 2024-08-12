@@ -1,8 +1,8 @@
 from quantumion.interface.analog import *
-from quantumion.compilerv2.analog.rewrite.canonicalize import *
-from quantumion.compilerv2.rule import RewriteRule
-from quantumion.compilerv2.walk import Walk, Post, Pre
-from quantumion.compilerv2.rewriter import FixedPoint
+from quantumion.compiler.analog.rewrite.canonicalize import *
+from quantumion.compiler.rule import RewriteRule
+from quantumion.compiler.walk import Walk, Post, Pre
+from quantumion.compiler.rewriter import FixedPoint
 import unittest
 from quantumion.interface.math import *
 from unittest_prettify.colorize import (
@@ -11,9 +11,19 @@ from unittest_prettify.colorize import (
     RED,
     MAGENTA,
 )
-X, Y, Z, I, A, C, LI = PauliX(), PauliY(), PauliZ(), PauliI(), Annihilation(), Creation(), Identity()
 
-def test_function(operator: Operator, rule : RewriteRule, walk_method : Walk = Post):
+X, Y, Z, I, A, C, LI = (
+    PauliX(),
+    PauliY(),
+    PauliZ(),
+    PauliI(),
+    Annihilation(),
+    Creation(),
+    Identity(),
+)
+
+
+def test_function(operator: Operator, rule: RewriteRule, walk_method: Walk = Post):
     return FixedPoint(walk_method(rule))(operator)
 
 
@@ -27,16 +37,17 @@ class TestOperatorDistribute(unittest.TestCase):
 
     def test_simple(self):
         """Simple test"""
-        op = X@(X+Y)
-        expected = X@X + X@Y
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        op = X @ (X + Y)
+        expected = X @ X + X @ Y
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_no_effect(self):
         """Distribution does not do anything as GatherMathExpr required"""
-        op = (2*(X@Y)*(3*(I@I)))
-        expected =  (2*(X@Y)*(3*(I@I)))
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
-    
+        op = 2 * (X @ Y) * (3 * (I @ I))
+        expected = 2 * (X @ Y) * (3 * (I @ I))
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
+
+
 @colorize(color=BLUE)
 class TestGatherMathExpr(unittest.TestCase):
     maxDiff = None
@@ -47,21 +58,24 @@ class TestGatherMathExpr(unittest.TestCase):
 
     def test_simple(self):
         """Simple test"""
-        op = X@(3*Y) + (2*X)@Z
-        expected = 3*(X@Y) + 2*(X@Z)
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        op = X @ (3 * Y) + (2 * X) @ Z
+        expected = 3 * (X @ Y) + 2 * (X @ Z)
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_complicated(self):
         """Complicated test"""
-        op = X@(3*Y*(3*Z))@(10*I) + (2*X)@Z@(5*Y)
-        expected = (MathStr(string='3*3*10'))*((X@(Y*Z))@I) + MathStr(string='2*5')*(X@Z@Y)
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        op = X @ (3 * Y * (3 * Z)) @ (10 * I) + (2 * X) @ Z @ (5 * Y)
+        expected = (MathStr(string="3*3*10")) * ((X @ (Y * Z)) @ I) + MathStr(
+            string="2*5"
+        ) * (X @ Z @ Y)
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_no_effect(self):
         """GatherMathExpr does not do anything as Distribution required"""
-        op = X@((2*X + 3*Y))
-        expected = X@((2*X + 3*Y))
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        op = X @ ((2 * X + 3 * Y))
+        expected = X @ ((2 * X + 3 * Y))
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
+
 
 @colorize(color=BLUE)
 class TestProperOrder(unittest.TestCase):
@@ -73,15 +87,15 @@ class TestProperOrder(unittest.TestCase):
 
     def test_simple(self):
         """Simple test"""
-        op = X@(Y@(I@Z))
-        expected = (((X@Y)@I)@Z)
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        op = X @ (Y @ (I @ Z))
+        expected = ((X @ Y) @ I) @ Z
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_complicated(self):
         """Complicated test with addition and scalar multiplication"""
-        op = X@(Y@Z) + 3*(Z@(Y@I))
-        expected = (X@Y)@Z + 3*((Z@Y)@I)
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        op = X @ (Y @ Z) + 3 * (Z @ (Y @ I))
+        expected = (X @ Y) @ Z + 3 * ((Z @ Y) @ I)
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
 
 @colorize(color=BLUE)
@@ -94,22 +108,21 @@ class TestPauliAlgebra(unittest.TestCase):
 
     def test_simple(self):
         """Simple test"""
-        op = X*X + Y*Y + Z*I
+        op = X * X + Y * Y + Z * I
         expected = I + I + Z
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
-
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_nested_multiplications(self):
         """Nested Multiplication test"""
-        op = X*X + Y*Y * Z*I
+        op = X * X + Y * Y * Z * I
         expected = I + Z
-        self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_nested_multiplications_complicated(self):
         """Complicated Nested Multiplication test fails as we need GatherMathExpr after PauliAlgebra"""
-        op = Z*X*X * Y*Y * Z*I
+        op = Z * X * X * Y * Y * Z * I
         expected = I + Z
-        self.assertNotEqual(test_function(operator = op, rule = self.rule), expected)
+        self.assertNotEqual(test_function(operator=op, rule=self.rule), expected)
 
 
 @colorize(color=BLUE)
@@ -121,16 +134,17 @@ class TestGatherPauli(unittest.TestCase):
         self.rule = GatherPauli()
 
     def test_simple(self):
-            """Simple test"""
-            op = X@A@Y
-            expected = X@Y@A
-            self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple test"""
+        op = X @ A @ Y
+        expected = X @ Y @ A
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_complicated(self):
-            """Complicated test"""
-            op = X@A@Y + (A*A*C)@Y@Z + X@Y@Z
-            expected = X@Y@A + Y@Z@(A*A*C) + X@Y@Z
-            self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Complicated test"""
+        op = X @ A @ Y + (A * A * C) @ Y @ Z + X @ Y @ Z
+        expected = X @ Y @ A + Y @ Z @ (A * A * C) + X @ Y @ Z
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
+
 
 @colorize(color=BLUE)
 class TestNormalOrder(unittest.TestCase):
@@ -141,22 +155,22 @@ class TestNormalOrder(unittest.TestCase):
         self.rule = NormalOrder()
 
     def test_simple(self):
-            """Simple test"""
-            op = (A*C)@(A*C)
-            expected = (C*A + LI) @ (C*A + LI)
-            self.assertEqual(test_function(operator = op, rule = self.rule), expected)
-    
+        """Simple test"""
+        op = (A * C) @ (A * C)
+        expected = (C * A + LI) @ (C * A + LI)
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
+
     def test_simple_fail(self):
-            """Simple test fail as distribution required"""
-            op = 1*(A*A*C)
-            expected = 1*(C*A*A + LI*A + A*LI)
-            self.assertNotEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple test fail as distribution required"""
+        op = 1 * (A * A * C)
+        expected = 1 * (C * A * A + LI * A + A * LI)
+        self.assertNotEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_inside_pauli(self):
-            """Simple test with Pauli"""
-            op = X@(A*C)@Y
-            expected = X@(C*A + LI)@Y
-            self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple test with Pauli"""
+        op = X @ (A * C) @ Y
+        expected = X @ (C * A + LI) @ Y
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
 
 @colorize(color=BLUE)
@@ -168,16 +182,17 @@ class TestPruneIdentity(unittest.TestCase):
         self.rule = PruneIdentity()
 
     def test_simple(self):
-         """Simple Test"""
-         op = A*LI*C*LI*LI
-         expected = A*C
-         self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple Test"""
+        op = A * LI * C * LI * LI
+        expected = A * C
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_simple_nested(self):
-            """Simple nested"""
-            op = (A*LI*C*A*LI*C)@LI@(A*LI)
-            expected = (A*C*A*C)@LI@(A)
-            self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple nested"""
+        op = (A * LI * C * A * LI * C) @ LI @ (A * LI)
+        expected = (A * C * A * C) @ LI @ (A)
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
+
 
 @colorize(color=BLUE)
 class TestSortedOrder(unittest.TestCase):
@@ -188,22 +203,23 @@ class TestSortedOrder(unittest.TestCase):
         self.rule = SortedOrder()
 
     def test_simple(self):
-         """Simple Test"""
-         op = X@Y + X@Z + I@Z
-         expected = I@Z + X@Y + X@Z 
-         self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple Test"""
+        op = X @ Y + X @ Z + I @ Z
+        expected = I @ Z + X @ Y + X @ Z
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_terminals(self):
-         """Simple Test with terminals"""
-         op = X + Z + Y + I
-         expected = I + X + Y + Z
-         self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple Test with terminals"""
+        op = X + Z + Y + I
+        expected = I + X + Y + Z
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
 
     def test_ladder(self):
-         """Simple Test with ladder"""
-         op = X@(C*A*A) + X@(C*A)
-         expected = X@(C*A) + X@(C*A*A)
-         self.assertEqual(test_function(operator = op, rule = self.rule), expected)
+        """Simple Test with ladder"""
+        op = X @ (C * A * A) + X @ (C * A)
+        expected = X @ (C * A) + X @ (C * A * A)
+        self.assertEqual(test_function(operator=op, rule=self.rule), expected)
+
 
 @colorize(color=BLUE)
 class TestScaleTerms(unittest.TestCase):
@@ -215,20 +231,35 @@ class TestScaleTerms(unittest.TestCase):
 
     def test_simple(self):
         """Simple test"""
-        op = X@(Y@Z) + (Z@(Y@I))
-        expected = MathStr(string='1')*(X@(Y@Z)) + MathStr(string='1')*(Z@(Y@I))
-        self.assertEqual(test_function(operator = op, rule = self.rule, walk_method = Pre), expected)
+        op = X @ (Y @ Z) + (Z @ (Y @ I))
+        expected = MathStr(string="1") * (X @ (Y @ Z)) + MathStr(string="1") * (
+            Z @ (Y @ I)
+        )
+        self.assertEqual(
+            test_function(operator=op, rule=self.rule, walk_method=Pre), expected
+        )
 
     def test_single_term(self):
         """Single term sorted order"""
-        op = X@(Y@Z)
-        expected = MathStr(string='1')*(X@(Y@Z))
-        self.assertEqual(test_function(operator = op, rule = self.rule, walk_method = Pre), expected)
+        op = X @ (Y @ Z)
+        expected = MathStr(string="1") * (X @ (Y @ Z))
+        self.assertEqual(
+            test_function(operator=op, rule=self.rule, walk_method=Pre), expected
+        )
 
     def test_terminals(self):
         """Terminal term sorted order"""
         op = X + Y + Z + I
-        expected = MathStr(string='1')*X + MathStr(string='1')*Y + MathStr(string='1')*Z + MathStr(string='1')*I
-        self.assertEqual(test_function(operator = op, rule = self.rule, walk_method = Pre), expected)
-if __name__ == '__main__':
+        expected = (
+            MathStr(string="1") * X
+            + MathStr(string="1") * Y
+            + MathStr(string="1") * Z
+            + MathStr(string="1") * I
+        )
+        self.assertEqual(
+            test_function(operator=op, rule=self.rule, walk_method=Pre), expected
+        )
+
+
+if __name__ == "__main__":
     unittest.main()

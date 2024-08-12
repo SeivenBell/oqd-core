@@ -1,7 +1,7 @@
 from quantumion.interface.analog import *
-from quantumion.compilerv2.analog.utils import PrintOperator
-from quantumion.compilerv2.walk import Post, Walk
-from quantumion.compilerv2.rule import ConversionRule, RewriteRule
+from quantumion.compiler.analog.utils import PrintOperator
+from quantumion.compiler.walk import Post, Walk
+from quantumion.compiler.rule import ConversionRule, RewriteRule
 from typing import Union
 from rich import print as pprint
 import unittest

@@ -9,7 +9,7 @@ import ast
 ########################################################################################
 
 from quantumion.interface.base import TypeReflectBaseModel
-from quantumion.compiler.visitor import Transformer
+from quantumion.compiler import ConversionRule, Post
 
 ########################################################################################
 
@@ -119,52 +119,52 @@ Functions = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
 ########################################################################################
 
 
-class AST_to_MathExpr(Transformer):
-    def _visit(self, model: Any):
+class AST_to_MathExpr(ConversionRule):
+    def generic_map(self, model: Any, operands):
         raise TypeError
 
-    def visit_Module(self, model: ast.Module):
+    def map_Module(self, model: ast.Module, operands):
         if len(model.body) == 1:
-            return self.visit(model.body[0])
+            return self(model.body[0])
         raise TypeError
 
-    def visit_Expr(self, model: ast.Expr):
-        return self.visit(model.value)
+    def map_Expr(self, model: ast.Expr, operands):
+        return self(model.value)
 
-    def visit_Constant(self, model: ast.Constant):
+    def map_Constant(self, model: ast.Constant, operands):
         return MathExpr.cast(model.value)
 
-    def visit_Name(self, model: ast.Name):
+    def map_Name(self, model: ast.Name, operands):
         return MathVar(name=model.id)
 
-    def visit_BinOp(self, model: ast.BinOp):
+    def map_BinOp(self, model: ast.BinOp, operands):
         if isinstance(model.op, ast.Add):
-            return MathAdd(expr1=self.visit(model.left), expr2=self.visit(model.right))
+            return MathAdd(expr1=self(model.left), expr2=self(model.right))
         if isinstance(model.op, ast.Sub):
-            return MathSub(expr1=self.visit(model.left), expr2=self.visit(model.right))
+            return MathSub(expr1=self(model.left), expr2=self(model.right))
         if isinstance(model.op, ast.Mult):
-            return MathMul(expr1=self.visit(model.left), expr2=self.visit(model.right))
+            return MathMul(expr1=self(model.left), expr2=self(model.right))
         if isinstance(model.op, ast.Div):
-            return MathDiv(expr1=self.visit(model.left), expr2=self.visit(model.right))
+            return MathDiv(expr1=self(model.left), expr2=self(model.right))
         if isinstance(model.op, ast.Pow):
-            return MathPow(expr1=self.visit(model.left), expr2=self.visit(model.right))
+            return MathPow(expr1=self(model.left), expr2=self(model.right))
         raise TypeError
 
-    def visit_UnaryOp(self, model: ast.UnaryOp):
+    def map_UnaryOp(self, model: ast.UnaryOp, operands):
         if isinstance(model.op, ast.USub):
-            return -self.visit(model.operand)
+            return -self(model.operand)
         if isinstance(model.op, ast.UAdd):
-            return self.visit(model.operand)
+            return self(model.operand)
         raise TypeError
 
-    def visit_Call(self, model: ast.Call):
+    def map_Call(self, model: ast.Call, operands):
         if len(model.args) == 1:
-            return MathFunc(func=model.func.id, expr=self.visit(model.args[0]))
+            return MathFunc(func=model.func.id, expr=self(model.args[0]))
         raise TypeError
 
 
 def MathStr(*, string):
-    return AST_to_MathExpr().visit(ast.parse(string))
+    return AST_to_MathExpr()(ast.parse(string))
 
 
 ########################################################################################
