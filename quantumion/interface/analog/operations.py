@@ -19,6 +19,8 @@ __all__ = [
 
 
 ########################################################################################
+
+
 class AnalogOperation(VisitableBaseModel):
     """
     Class representing an analog operation applied to the quantum system
@@ -33,11 +35,9 @@ class AnalogGate(AnalogOperation):
 
     Attributes:
         hamiltonian (Operator): Hamiltonian terms of the gate
-        dissipation (Dissipation): Dissipative terms of the gate
     """
 
     hamiltonian: Operator
-    dissipation: Dissipation = Dissipation()
 
 
 class Evolve(AnalogOperation):
@@ -64,8 +64,6 @@ class Measure(AnalogOperation):
     """
 
     key: Literal["measure"] = "measure"
-    qreg: Union[List[NonNegativeInt], None] = None
-    qmode: Union[List[NonNegativeInt], None] = None
 
 
 class Initialize(AnalogOperation):
@@ -96,16 +94,11 @@ class AnalogCircuit(AnalogOperation):
     n_qreg: Union[NonNegativeInt, None] = None
     n_qmode: Union[NonNegativeInt, None] = None
 
-    class Config:
-        extra = "forbid"
-
-    def define(self, id: str, gate: AnalogGate):
-        self.definitions.append((id, gate))
-
     def evolve(self, gate: AnalogGate, duration: float):
-        if not isinstance(gate, AnalogGate):
-            raise ValidationError
         self.sequence.append(Evolve(duration=duration, gate=gate))
 
-    def measure(self, qreg: List[NonNegativeInt], qmode: List[NonNegativeInt]):
-        self.sequence.append(Measure(qreg=qreg, qmode=qmode))
+    def initialize(self):
+        self.sequence.append(Initialize())
+
+    def measure(self):
+        self.sequence.append(Measure())
