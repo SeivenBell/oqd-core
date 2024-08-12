@@ -19,13 +19,10 @@ class PassBase(ABC):
     def __call__(self, model):
         self._model = model
 
-        # try:
         model = self.map(model)
         if model is None:
             model = self._model
         return model
-        # except Exception as e:
-        #     raise CompilerError(f"{e}")
 
     @abstractmethod
     def map(self, model):
