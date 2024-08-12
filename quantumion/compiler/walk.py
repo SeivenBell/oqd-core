@@ -123,3 +123,71 @@ class Post(Walk):
             new_model = self.rule(new_model)
 
         return new_model
+
+
+class Level(Walk):
+    def __init__(self, rule):
+        super().__init__(rule)
+
+        self.stack = []
+        self.initial = True
+
+    def generic_walk(self, model):
+        if self.initial:
+            self.stack.append(model)
+            self.initial = False
+
+        self.rule(self.stack.pop(0))
+        if self.stack:
+            self(self.stack[0])
+        pass
+
+    def walk_list(self, model):
+        if self.initial:
+            self.stack.append(model)
+            self.initial = False
+
+        self.stack.extend(model)
+
+        self.rule(self.stack.pop(0))
+        if self.stack:
+            self(self.stack[0])
+        pass
+
+    def walk_tuple(self, model):
+        if self.initial:
+            self.stack.append(model)
+            self.initial = False
+
+        self.stack.extend(model)
+
+        self.rule(self.stack.pop(0))
+        if self.stack:
+            self(self.stack[0])
+        pass
+
+    def walk_dict(self, model):
+        if self.initial:
+            self.stack.append(model)
+            self.initial = False
+
+        self.stack.extend(model.values())
+
+        self.rule(self.stack.pop(0))
+        if self.stack:
+            self(self.stack[0])
+        pass
+
+    def walk_VisitableBaseModel(self, model):
+        if self.initial:
+            self.stack.append(model)
+            self.initial = False
+
+        self.stack.extend(
+            [getattr(model, k) for k in model.model_fields.keys() if k != "class_"]
+        )
+
+        self.rule(self.stack.pop(0))
+        if self.stack:
+            self(self.stack[0])
+        pass
