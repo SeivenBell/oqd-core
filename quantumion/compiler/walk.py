@@ -1,8 +1,3 @@
-from abc import abstractmethod
-import inspect
-
-########################################################################################
-
 from quantumion.compiler.base import PassBase
 from quantumion.compiler.rule import ConversionRule
 

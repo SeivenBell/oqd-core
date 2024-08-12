@@ -1,5 +1,4 @@
 from quantumion.compiler.base import PassBase
-from quantumion.interface.base import VisitableBaseModel
 
 ########################################################################################
 
