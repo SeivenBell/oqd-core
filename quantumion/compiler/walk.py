@@ -196,3 +196,41 @@ class Level(Walk):
         if self.stack:
             self(self.stack[0])
         pass
+
+
+class In(Walk):
+    def generic_walk(self, model):
+        self.rule(model)
+        pass
+
+    def walk_list(self, model):
+        for e in model[:-1]:
+            self(e)
+
+        self.rule(model)
+        self(model[-1])
+        pass
+
+    def walk_tuple(self, model):
+        for e in model[:-1]:
+            self(e)
+
+        self.rule(model)
+        self(model[-1])
+        pass
+
+    def walk_dict(self, model):
+        for v in list(model.values())[:-1]:
+            self(v)
+
+        self.rule(model)
+        self(list(model.values())[-1])
+        pass
+
+    def walk_VisitableBaseModel(self, model):
+        for k in list(model.model_fields.keys())[:-1]:
+            self(getattr(model, k))
+
+        self.rule(model)
+        self(getattr(model, list(model.model_fields.keys())[-1]))
+        pass
