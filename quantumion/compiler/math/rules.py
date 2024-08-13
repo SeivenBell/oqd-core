@@ -14,6 +14,7 @@ __all__ = [
     "DistributeMathExpr",
     "PartitionMathExpr",
     "ProperOrderMathExpr",
+    "PruneMathExpr",
     "SimplifyMathExpr",
     "EvaluateMathExpr",
 ]
@@ -161,6 +162,19 @@ class DistributeMathExpr(RewriteRule):
 
 
 class PartitionMathExpr(RewriteRule):
+    def map_MathAdd(self, model):
+        if not (
+            (
+                isinstance(model.expr2, MathImag)
+                or (
+                    isinstance(model.expr2, MathMul)
+                    and isinstance(model.expr2.expr1, MathImag)
+                )
+                or isinstance(model.expr2, MathAdd)
+            )
+        ):
+            return MathAdd(expr1=model.expr2, expr2=model.expr1)
+
     def map_MathMul(self, model: MathMul):
         priority = dict(MathImag=4, MathNum=3, MathVar=2, MathFunc=1, MathPow=0)
 
@@ -202,36 +216,35 @@ class ProperOrderMathExpr(RewriteRule):
         pass
 
 
+class PruneMathExpr(RewriteRule):
+    def map_MathAdd(self, model):
+        if model.expr1 == MathNum(value=0):
+            return model.expr2
+        if model.expr2 == MathNum(value=0):
+            return model.expr1
+
+    def map_MathMul(self, model):
+        if model.expr1 == MathNum(value=1):
+            return model.expr2
+        if model.expr2 == MathNum(value=1):
+            return model.expr1
+
+        if model.expr1 == MathNum(value=0) or model.expr2 == MathNum(value=0):
+            return MathNum(value=0)
+
+    def map_MathPow(self, model):
+        if model.expr1 == MathNum(value=1) or model.expr2 == MathNum(value=1):
+            return model.expr1
+
+
 class SimplifyMathExpr(RewriteRule):
     def map_MathAdd(self, model):
         if isinstance(model.expr1, MathNum) and isinstance(model.expr2, MathNum):
             return MathNum(value=model.expr1.value + model.expr2.value)
-        if isinstance(model.expr1, model.__class__):
-            if isinstance(model.expr1.expr1, MathNum):
-                return model.expr1.__class__(
-                    expr1=MathNum(value=model.expr1.expr1.value + model.expr2.value),
-                    expr2=model.expr1.expr2,
-                )
-            if isinstance(model.expr1.expr2, MathNum):
-                model.expr1.__class__(
-                    expr1=MathNum(value=model.expr1.expr2.value + model.expr2.value),
-                    expr2=model.expr1.expr1,
-                )
 
     def map_MathMul(self, model):
         if isinstance(model.expr1, MathNum) and isinstance(model.expr2, MathNum):
             return MathNum(value=model.expr1.value * model.expr2.value)
-        if isinstance(model.expr1, model.__class__):
-            if isinstance(model.expr1.expr1, MathNum):
-                return model.expr1.__class__(
-                    expr1=MathNum(value=model.expr1.expr1.value + model.expr2.value),
-                    expr2=model.expr1.expr2,
-                )
-            if isinstance(model.expr1.expr2, MathNum):
-                model.expr1.__class__(
-                    expr1=MathNum(value=model.expr1.expr2.value + model.expr2.value),
-                    expr2=model.expr1.expr1,
-                )
 
     def map_MathPow(self, model):
         if isinstance(model.expr1, MathNum) and isinstance(model.expr2, MathNum):

@@ -84,6 +84,59 @@ class TestPreWalk(unittest.TestCase):
         )
 
 
+@colorize(color=GREEN)
+class TestReversedPreWalk(unittest.TestCase):
+    def __init__(self, methodName: str = "runTest") -> None:
+        super().__init__(methodName)
+
+    def test_reversed_pre_list(self):
+        "Test of Reversed Pre Walk on a list"
+        inp = ["a", "b"]
+
+        printer = Pre(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(printer.children[0].string, "\n0: ['a', 'b']\n1: b\n2: a")
+
+    def test_reversed_pre_dict(self):
+        "Test of Reversed Pre Walk on a dict"
+        inp = {"a": "a", "b": "b"}
+
+        printer = Pre(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: {'a': 'a', 'b': 'b'}\n1: b\n2: a"
+        )
+
+    def test_reversed_pre_VisitableBaseModel(self):
+        "Test of Reversed Pre Walk on a VisitableBaseModel"
+        inp = {"a": "a", "b": "b"}
+
+        class M(VisitableBaseModel):
+            a: str
+            b: str
+
+        inp = M(a="a", b="b")
+
+        printer = Pre(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(printer.children[0].string, "\n0: a='a' b='b'\n1: b\n2: a")
+
+    def test_reversed_pre_nested_list(self):
+        "Test of Reversed Pre Walk on a nested list"
+        inp = ["a", ["b", "c"]]
+
+        printer = Pre(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string,
+            "\n0: ['a', ['b', 'c']]\n1: ['b', 'c']\n2: c\n3: b\n4: a",
+        )
+
+
 ########################################################################################
 
 
@@ -137,6 +190,59 @@ class TestPostWalk(unittest.TestCase):
         self.assertEqual(
             printer.children[0].string,
             "\n0: a\n1: b\n2: c\n3: ['b', 'c']\n4: ['a', ['b', 'c']]",
+        )
+
+
+@colorize(color=RED)
+class TestReversedPostWalk(unittest.TestCase):
+    def __init__(self, methodName: str = "runTest") -> None:
+        super().__init__(methodName)
+
+    def test_reversed_post_list(self):
+        "Test of Reversed Post Walk on a list"
+        inp = ["a", "b"]
+
+        printer = Post(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(printer.children[0].string, "\n0: b\n1: a\n2: ['a', 'b']")
+
+    def test_reversed_post_dict(self):
+        "Test of Reversed Post Walk on a dict"
+        inp = {"a": "a", "b": "b"}
+
+        printer = Post(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: b\n1: a\n2: {'a': 'a', 'b': 'b'}"
+        )
+
+    def test_reversed_post_VisitableBaseModel(self):
+        "Test of Reversed Post Walk on a VisitableBaseModel"
+        inp = {"a": "a", "b": "b"}
+
+        class M(VisitableBaseModel):
+            a: str
+            b: str
+
+        inp = M(a="a", b="b")
+
+        printer = Post(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(printer.children[0].string, "\n0: b\n1: a\n2: a='a' b='b'")
+
+    def test_reversed_post_nested_list(self):
+        "Test of Reversed Post Walk on a nested list"
+        inp = ["a", ["b", "c"]]
+
+        printer = Post(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string,
+            "\n0: c\n1: b\n2: ['b', 'c']\n3: a\n4: ['a', ['b', 'c']]",
         )
 
 

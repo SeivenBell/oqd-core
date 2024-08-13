@@ -44,32 +44,49 @@ class Pre(Walk):
     and applies the rule from top to bottom.
     """
 
+    def __init__(self, rule, *, reverse=False):
+        super().__init__(rule)
+        self.reverse = reverse
+
     def walk_dict(self, model):
         new_model = self.rule(model)
 
-        new_model = {k: self(v) for k, v in new_model.items()}
+        items = reversed(new_model.items()) if self.reverse else new_model.items()
+        new_model = {k: self(v) for k, v in items}
 
-        return new_model
+        return (
+            {new_model[k] for k in reversed(new_model.keys())}
+            if self.reverse
+            else new_model
+        )
 
     def walk_list(self, model):
         new_model = self.rule(model)
 
-        new_model = [self(e) for e in new_model]
+        elements = reversed(new_model) if self.reverse else new_model
+        new_model = [self(e) for e in elements]
 
-        return new_model
+        return list(reversed(new_model)) if self.reverse else new_model
 
     def walk_tuple(self, model):
         new_model = self.rule(model)
 
-        new_model = tuple([self(e) for e in new_model])
+        elements = reversed(new_model) if self.reverse else new_model
+        new_model = tuple([self(e) for e in elements])
 
-        return new_model
+        return tuple(reversed(new_model)) if self.reverse else new_model
 
     def walk_VisitableBaseModel(self, model):
         new_model = self.rule(model)
 
         new_fields = {}
-        for key in new_model.model_fields.keys():
+
+        keys = (
+            reversed(new_model.model_fields.keys())
+            if self.reverse
+            else new_model.model_fields.keys()
+        )
+        for key in keys:
             if key == "class_":
                 continue
             new_fields[key] = self(getattr(new_model, key))
@@ -84,38 +101,57 @@ class Post(Walk):
     and applies the rule from bottom to top.
     """
 
+    def __init__(self, rule, *, reverse=False):
+        super().__init__(rule)
+        self.reverse = reverse
+
     def walk_dict(self, model):
-        new_model = {k: self(v) for k, v in model.items()}
+        items = reversed(model.items()) if self.reverse else model.items()
+        new_model = {k: self(v) for k, v in items}
 
         if isinstance(self.rule, ConversionRule):
             self.rule.operands = new_model
 
+        new_model = (
+            {k: new_model[k] for k in reversed(new_model.keys())}
+            if self.reverse
+            else new_model
+        )
         new_model = self.rule(new_model)
+
         return new_model
 
     def walk_list(self, model):
-        new_model = [self(e) for e in model]
+        elements = reversed(model) if self.reverse else model
+        new_model = [self(e) for e in elements]
 
         if isinstance(self.rule, ConversionRule):
             self.rule.operands = new_model
 
+        new_model = list(reversed(new_model)) if self.reverse else new_model
         new_model = self.rule(new_model)
-
         return new_model
 
     def walk_tuple(self, model):
-        new_model = tuple([self(e) for e in model])
+        elements = reversed(model) if self.reverse else model
+        new_model = tuple([self(e) for e in elements])
 
         if isinstance(self.rule, ConversionRule):
             self.rule.operands = new_model
 
+        new_model = tuple(reversed(new_model)) if self.reverse else new_model
         new_model = self.rule(new_model)
-
         return new_model
 
     def walk_VisitableBaseModel(self, model):
         new_fields = {}
-        for key in model.model_fields.keys():
+
+        keys = (
+            reversed(model.model_fields.keys())
+            if self.reverse
+            else model.model_fields.keys()
+        )
+        for key in keys:
             if key == "class_":
                 continue
             new_fields[key] = self(getattr(model, key))
