@@ -6,7 +6,6 @@ from pydantic.types import NonNegativeInt
 
 from quantumion.interface.base import VisitableBaseModel
 from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.dissipation import Dissipation
 
 ########################################################################################
 
