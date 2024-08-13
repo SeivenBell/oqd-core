@@ -149,7 +149,7 @@ class Level(Walk):
         self.rule(self.stack.pop(0))
         if self.stack:
             self(self.stack[0])
-        pass
+        return model
 
     def walk_list(self, model):
         if self.initial:
@@ -161,7 +161,7 @@ class Level(Walk):
         self.rule(self.stack.pop(0))
         if self.stack:
             self(self.stack[0])
-        pass
+        return model
 
     def walk_tuple(self, model):
         if self.initial:
@@ -173,7 +173,7 @@ class Level(Walk):
         self.rule(self.stack.pop(0))
         if self.stack:
             self(self.stack[0])
-        pass
+        return model
 
     def walk_dict(self, model):
         if self.initial:
@@ -185,7 +185,7 @@ class Level(Walk):
         self.rule(self.stack.pop(0))
         if self.stack:
             self(self.stack[0])
-        pass
+        return model
 
     def walk_VisitableBaseModel(self, model):
         if self.initial:
@@ -199,7 +199,7 @@ class Level(Walk):
         self.rule(self.stack.pop(0))
         if self.stack:
             self(self.stack[0])
-        pass
+        return model
 
 
 class In(Walk):
@@ -209,7 +209,7 @@ class In(Walk):
 
     def generic_walk(self, model):
         self.rule(model)
-        pass
+        return model
 
     def walk_list(self, model):
         for e in model[:-1]:
@@ -217,7 +217,7 @@ class In(Walk):
 
         self.rule(model)
         self(model[-1])
-        pass
+        return model
 
     def walk_tuple(self, model):
         for e in model[:-1]:
@@ -225,7 +225,7 @@ class In(Walk):
 
         self.rule(model)
         self(model[-1])
-        pass
+        return model
 
     def walk_dict(self, model):
         for v in list(model.values())[:-1]:
@@ -233,7 +233,7 @@ class In(Walk):
 
         self.rule(model)
         self(list(model.values())[-1])
-        pass
+        return model
 
     def walk_VisitableBaseModel(self, model):
         for k in list(model.model_fields.keys())[:-1]:
@@ -241,4 +241,4 @@ class In(Walk):
 
         self.rule(model)
         self(getattr(model, list(model.model_fields.keys())[-1]))
-        pass
+        return model
