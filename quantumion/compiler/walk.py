@@ -42,7 +42,7 @@ class Walk(PassBase):
 
 class Pre(Walk):
     """
-    This class represents a the pre order tree traversal algorithm that walks through an AST
+    This class represents the pre order tree traversal algorithm that walks through an AST
     and applies the rule from top to bottom.
     """
 
@@ -86,7 +86,7 @@ class Pre(Walk):
 
 class Post(Walk):
     """
-    This class represents a the post order tree traversal algorithm that walks through an AST
+    This class represents the post order tree traversal algorithm that walks through an AST
     and applies the rule from bottom to top.
     """
 
@@ -144,7 +144,7 @@ class Post(Walk):
 
 class Level(Walk):
     """
-    This class represents a the level/breadth first order tree traversal algorithm that walks through an AST.
+    This class represents the level/breadth first order tree traversal algorithm that walks through an AST.
     """
 
     def __init__(self, rule, *, reverse=False):
@@ -219,7 +219,7 @@ class Level(Walk):
 
 class In(Walk):
     """
-    This class represents a the in order tree traversal algorithm that walks through an AST.
+    This class represents the in order tree traversal algorithm that walks through an AST.
     """
 
     def generic_walk(self, model):
