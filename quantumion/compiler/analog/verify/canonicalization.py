@@ -3,12 +3,11 @@ from typing import Union
 ########################################################################################
 
 from quantumion.compiler.rule import RewriteRule
-from quantumion.compiler.walk import Post
-from quantumion.compiler.analog.utils import term_index_dim, TermIndex
+from quantumion.compiler.analog.utils import term_index_dim
 from quantumion.interface.math import *
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.interface.analog import *
-
+from quantumion.compiler.analog.passes.analysis import analysis_term_index
 ########################################################################################
 
 __all__ = [
@@ -191,11 +190,11 @@ class CanVerSortedOrder(RewriteRule):
     """
 
     def map_OperatorAdd(self, model: OperatorAdd):
-        term2 = Post(TermIndex())(model.op2)
+        term2 = analysis_term_index(model.op2)
         if isinstance(model.op1, OperatorAdd):
-            term1 = Post(TermIndex())(model.op1.op2)
+            term1 = analysis_term_index(model.op1.op2)
         else:
-            term1 = Post(TermIndex())(model.op1)
+            term1 = analysis_term_index(model.op1)
         if term_index_dim(term1) != term_index_dim(term2):
             raise CanonicalFormError("Incorrect dimension of hilbert space")
         if term1 > term2:
