@@ -6,10 +6,11 @@ from quantumion.compiler.utils import controlled_reverse
 
 
 class Walk(PassBase):
-    def __init__(self, rule: PassBase):
+    def __init__(self, rule: PassBase, *, reverse: bool = False):
         super().__init__()
 
         self.rule = rule
+        self.reverse = reverse
         pass
 
     @property
@@ -44,10 +45,6 @@ class Pre(Walk):
     This class represents a the pre order tree traversal algorithm that walks through an AST
     and applies the rule from top to bottom.
     """
-
-    def __init__(self, rule, *, reverse=False):
-        super().__init__(rule)
-        self.reverse = reverse
 
     def walk_dict(self, model):
         new_model = self.rule(model)
@@ -92,10 +89,6 @@ class Post(Walk):
     This class represents a the post order tree traversal algorithm that walks through an AST
     and applies the rule from bottom to top.
     """
-
-    def __init__(self, rule, *, reverse=False):
-        super().__init__(rule)
-        self.reverse = reverse
 
     def walk_dict(self, model):
         new_model = {
@@ -155,11 +148,10 @@ class Level(Walk):
     """
 
     def __init__(self, rule, *, reverse=False):
-        super().__init__(rule)
+        super().__init__(rule, reverse=reverse)
 
         self.stack = []
         self.initial = True
-        self.reverse = reverse
 
     def generic_walk(self, model):
         if self.initial:
@@ -229,10 +221,6 @@ class In(Walk):
     """
     This class represents a the in order tree traversal algorithm that walks through an AST.
     """
-
-    def __init__(self, rule, *, reverse=False):
-        super().__init__(rule)
-        self.reverse = reverse
 
     def generic_walk(self, model):
         self.rule(model)
