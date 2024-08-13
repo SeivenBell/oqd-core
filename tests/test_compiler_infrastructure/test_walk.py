@@ -241,12 +241,12 @@ class TestInWalk(unittest.TestCase):
 
     def test_in_nested_list(self):
         "Test of In Walk on a nested list"
-        inp = [["a", ["b", "c"]], ["d", "e"]]
+        inp = [["a", ["b", "c"]], ["d", "e", "f"]]
 
         printer = In(PrintWalkOrder())
 
         printer(inp)
         self.assertEqual(
             printer.children[0].string,
-            "\n0: a\n1: ['a', ['b', 'c']]\n2: b\n3: ['b', 'c']\n4: c\n5: [['a', ['b', 'c']], ['d', 'e']]\n6: d\n7: ['d', 'e']\n8: e",
+            "\n0: a\n1: ['a', ['b', 'c']]\n2: b\n3: ['b', 'c']\n4: c\n5: [['a', ['b', 'c']], ['d', 'e', 'f']]\n6: d\n7: e\n8: ['d', 'e', 'f']\n9: f",
         )
