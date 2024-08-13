@@ -43,7 +43,7 @@ class TestPreWalk(unittest.TestCase):
         printer = Pre(PrintWalkOrder())
 
         printer(inp)
-        assert printer.children[0].string == "\n0: ['a', 'b']\n1: a\n2: b"
+        self.assertEqual(printer.children[0].string, "\n0: ['a', 'b']\n1: a\n2: b")
 
     def test_pre_dict(self):
         "Test of Pre Walk on a dict"
@@ -52,7 +52,9 @@ class TestPreWalk(unittest.TestCase):
         printer = Pre(PrintWalkOrder())
 
         printer(inp)
-        assert printer.children[0].string == "\n0: {'a': 'a', 'b': 'b'}\n1: a\n2: b"
+        self.assertEqual(
+            printer.children[0].string, "\n0: {'a': 'a', 'b': 'b'}\n1: a\n2: b"
+        )
 
     def test_pre_VisitableBaseModel(self):
         "Test of Pre Walk on a VisitableBaseModel"
@@ -67,7 +69,7 @@ class TestPreWalk(unittest.TestCase):
         printer = Pre(PrintWalkOrder())
 
         printer(inp)
-        assert printer.children[0].string == "\n0: M(a='a', b='b')\n1: a\n2: b"
+        self.assertEqual(printer.children[0].string, "\n0: a='a' b='b'\n1: a\n2: b")
 
     def test_pre_nested_list(self):
         "Test of Pre Walk on a nested list"
@@ -76,9 +78,9 @@ class TestPreWalk(unittest.TestCase):
         printer = Pre(PrintWalkOrder())
 
         printer(inp)
-        assert (
-            printer.children[0].string
-            == "\n0: ['a', ['b', 'c']]\n1: a\n2: ['b', 'c']\n3: b\n4: c"
+        self.assertEqual(
+            printer.children[0].string,
+            "\n0: ['a', ['b', 'c']]\n1: a\n2: ['b', 'c']\n3: b\n4: c",
         )
 
 
@@ -97,7 +99,7 @@ class TestPostWalk(unittest.TestCase):
         printer = Post(PrintWalkOrder())
 
         printer(inp)
-        assert printer.children[0].string == "\n0: a\n1: b\n2: ['a', 'b']"
+        self.assertEqual(printer.children[0].string, "\n0: a\n1: b\n2: ['a', 'b']")
 
     def test_post_dict(self):
         "Test of Post Walk on a dict"
@@ -106,7 +108,9 @@ class TestPostWalk(unittest.TestCase):
         printer = Post(PrintWalkOrder())
 
         printer(inp)
-        assert printer.children[0].string == "\n0: a\n1: b\n2: {'a': 'a', 'b': 'b'}"
+        self.assertEqual(
+            printer.children[0].string, "\n0: a\n1: b\n2: {'a': 'a', 'b': 'b'}"
+        )
 
     def test_post_VisitableBaseModel(self):
         "Test of Post Walk on a VisitableBaseModel"
@@ -121,7 +125,7 @@ class TestPostWalk(unittest.TestCase):
         printer = Post(PrintWalkOrder())
 
         printer(inp)
-        assert printer.children[0].string == "\n0: a\n1: b\n2: M(a='a', b='b')"
+        self.assertEqual(printer.children[0].string, "\n0: a\n1: b\n2: a='a' b='b'")
 
     def test_post_nested_list(self):
         "Test of Post Walk on a nested list"
@@ -130,7 +134,63 @@ class TestPostWalk(unittest.TestCase):
         printer = Post(PrintWalkOrder())
 
         printer(inp)
-        assert (
-            printer.children[0].string
-            == "\n0: a\n1: b\n2: c\n3: ['b', 'c']\n4: ['a', ['b', 'c']]"
+        self.assertEqual(
+            printer.children[0].string,
+            "\n0: a\n1: b\n2: c\n3: ['b', 'c']\n4: ['a', ['b', 'c']]",
+        )
+
+
+########################################################################################
+
+
+@colorize(color=BLUE)
+class TestLevelWalk(unittest.TestCase):
+    def __init__(self, methodName: str = "runTest") -> None:
+        super().__init__(methodName)
+
+    def test_level_list(self):
+        "Test of Level Walk on a list"
+        inp = ["a", "b"]
+
+        printer = Level(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(printer.children[0].string, "\n0: ['a', 'b']\n1: a\n2: b")
+
+    def test_level_dict(self):
+        "Test of Level Walk on a dict"
+        inp = {"a": "a", "b": "b"}
+
+        printer = Level(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: {'a': 'a', 'b': 'b'}\n1: a\n2: b"
+        )
+
+    def test_level_VisitableBaseModel(self):
+        "Test of Level Walk on a VisitableBaseModel"
+        inp = {"a": "a", "b": "b"}
+
+        class M(VisitableBaseModel):
+            a: str
+            b: str
+
+        inp = M(a="a", b="b")
+
+        printer = Level(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(printer.children[0].string, "\n0: a='a' b='b'\n1: a\n2: b")
+
+    def test_level_nested_list(self):
+        "Test of Level Walk on a nested list"
+        inp = [["a", ["b", "c"]], ["d", "e"]]
+
+        printer = Level(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string,
+            "\n0: [['a', ['b', 'c']], ['d', 'e']]\n1: ['a', ['b', 'c']]\n2: ['d', 'e']\n3: a\n4: ['b', 'c']\n5: d\n6: e\n7: b\n8: c",
         )
