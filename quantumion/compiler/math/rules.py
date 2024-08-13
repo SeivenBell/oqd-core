@@ -14,6 +14,7 @@ __all__ = [
     "DistributeMathExpr",
     "PartitionMathExpr",
     "ProperOrderMathExpr",
+    "SimplifyMathExpr",
     "EvaluateMathExpr",
 ]
 
@@ -186,7 +187,6 @@ class PartitionMathExpr(RewriteRule):
 
 
 class ProperOrderMathExpr(RewriteRule):
-
     def map_MathAdd(self, model: MathAdd):
         return self._MathAddMul(model)
 
@@ -200,6 +200,46 @@ class ProperOrderMathExpr(RewriteRule):
                 expr2=model.expr2.expr2,
             )
         pass
+
+
+class SimplifyMathExpr(RewriteRule):
+    def map_MathAdd(self, model):
+        if isinstance(model.expr1, MathNum) and isinstance(model.expr2, MathNum):
+            return MathNum(value=model.expr1.value + model.expr2.value)
+        if isinstance(model.expr1, model.__class__):
+            if isinstance(model.expr1.expr1, MathNum):
+                return model.expr1.__class__(
+                    expr1=MathNum(value=model.expr1.expr1.value + model.expr2.value),
+                    expr2=model.expr1.expr2,
+                )
+            if isinstance(model.expr1.expr2, MathNum):
+                model.expr1.__class__(
+                    expr1=MathNum(value=model.expr1.expr2.value + model.expr2.value),
+                    expr2=model.expr1.expr1,
+                )
+
+    def map_MathMul(self, model):
+        if isinstance(model.expr1, MathNum) and isinstance(model.expr2, MathNum):
+            return MathNum(value=model.expr1.value * model.expr2.value)
+        if isinstance(model.expr1, model.__class__):
+            if isinstance(model.expr1.expr1, MathNum):
+                return model.expr1.__class__(
+                    expr1=MathNum(value=model.expr1.expr1.value + model.expr2.value),
+                    expr2=model.expr1.expr2,
+                )
+            if isinstance(model.expr1.expr2, MathNum):
+                model.expr1.__class__(
+                    expr1=MathNum(value=model.expr1.expr2.value + model.expr2.value),
+                    expr2=model.expr1.expr1,
+                )
+
+    def map_MathPow(self, model):
+        if isinstance(model.expr1, MathNum) and isinstance(model.expr2, MathNum):
+            return MathNum(value=model.expr1.value**model.expr2.value)
+
+    def map_MathFunc(self, model):
+        if isinstance(model.expr, MathNum):
+            return MathNum(value=getattr(math, model.func)(model.expr.value))
 
 
 ########################################################################################
