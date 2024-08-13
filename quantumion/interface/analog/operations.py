@@ -57,10 +57,6 @@ class Evolve(AnalogOperation):
 class Measure(AnalogOperation):
     """
     Class representing a measurement in the analog circuit
-
-    Attributes:
-        qreg (Optional[List[NonNegativeInt]]): Indices of the qubit quantum register to measure. Default: `None`
-        qmode (Optional[List[NonNegativeInt]]): Indices of the modal quantum register to measure. Default: `None`
     """
 
     key: Literal["measure"] = "measure"

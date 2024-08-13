@@ -48,7 +48,6 @@ nav:
     - Math Expression: technical/reference/math-interface.md
     - Digital: technical/reference/digital-interface.md
     - Analog:
-      - Dissipation: technical/reference/dissipation-interface.md
       - Operations: technical/reference/operations-interface.md
       - Operators: technical/reference/operator-interface.md
     - Atomic: technical/reference/atomic-interface.md

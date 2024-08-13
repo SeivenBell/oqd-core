@@ -131,6 +131,10 @@ class Post(Walk):
 
 
 class Level(Walk):
+    """
+    This class represents a the level/breadth first order tree traversal algorithm that walks through an AST.
+    """
+
     def __init__(self, rule):
         super().__init__(rule)
 
@@ -199,6 +203,10 @@ class Level(Walk):
 
 
 class In(Walk):
+    """
+    This class represents a the in order tree traversal algorithm that walks through an AST.
+    """
+
     def generic_walk(self, model):
         self.rule(model)
         pass
