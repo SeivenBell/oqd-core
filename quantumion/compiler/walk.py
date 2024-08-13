@@ -1,6 +1,5 @@
 from quantumion.compiler.base import PassBase
 from quantumion.compiler.rule import ConversionRule
-from quantumion.compiler.utils import controlled_reverse
 
 ########################################################################################
 
@@ -12,6 +11,14 @@ class Walk(PassBase):
         self.rule = rule
         self.reverse = reverse
         pass
+
+    @staticmethod
+    def controlled_reverse(iterable, reverse, *, restore_type=False):
+        new_iterable = reversed(iterable) if reverse else iterable
+        new_iterable = (
+            iterable.__class__(new_iterable) if restore_type else new_iterable
+        )
+        return new_iterable
 
     @property
     def children(self):
@@ -50,32 +57,35 @@ class Pre(Walk):
         new_model = self.rule(model)
 
         new_model = {
-            k: self(v) for k, v in controlled_reverse(new_model.items(), self.reverse)
+            k: self(v)
+            for k, v in self.controlled_reverse(new_model.items(), self.reverse)
         }
 
-        return {k: v for k, v in controlled_reverse(new_model.items(), self.reverse)}
+        return {
+            k: v for k, v in self.controlled_reverse(new_model.items(), self.reverse)
+        }
 
     def walk_list(self, model):
         new_model = self.rule(model)
 
-        new_model = [self(e) for e in controlled_reverse(new_model, self.reverse)]
+        new_model = [self(e) for e in self.controlled_reverse(new_model, self.reverse)]
 
-        return controlled_reverse(new_model, self.reverse, restore_type=True)
+        return self.controlled_reverse(new_model, self.reverse, restore_type=True)
 
     def walk_tuple(self, model):
         new_model = self.rule(model)
 
         new_model = tuple(
-            [self(e) for e in controlled_reverse(new_model, self.reverse)]
+            [self(e) for e in self.controlled_reverse(new_model, self.reverse)]
         )
 
-        return controlled_reverse(new_model, self.reverse, restore_type=True)
+        return self.controlled_reverse(new_model, self.reverse, restore_type=True)
 
     def walk_VisitableBaseModel(self, model):
         new_model = self.rule(model)
 
         new_fields = {}
-        for key in controlled_reverse(new_model.model_fields.keys(), self.reverse):
+        for key in self.controlled_reverse(new_model.model_fields.keys(), self.reverse):
             if key == "class_":
                 continue
             new_fields[key] = self(getattr(new_model, key))
@@ -92,10 +102,10 @@ class Post(Walk):
 
     def walk_dict(self, model):
         new_model = {
-            k: self(v) for k, v in controlled_reverse(model.items(), self.reverse)
+            k: self(v) for k, v in self.controlled_reverse(model.items(), self.reverse)
         }
         new_model = {
-            k: v for k, v in controlled_reverse(new_model.items(), self.reverse)
+            k: v for k, v in self.controlled_reverse(new_model.items(), self.reverse)
         }
 
         if isinstance(self.rule, ConversionRule):
@@ -106,8 +116,8 @@ class Post(Walk):
         return new_model
 
     def walk_list(self, model):
-        new_model = [self(e) for e in controlled_reverse(model, self.reverse)]
-        new_model = controlled_reverse(new_model, self.reverse, restore_type=True)
+        new_model = [self(e) for e in self.controlled_reverse(model, self.reverse)]
+        new_model = self.controlled_reverse(new_model, self.reverse, restore_type=True)
 
         if isinstance(self.rule, ConversionRule):
             self.rule.operands = new_model
@@ -116,8 +126,10 @@ class Post(Walk):
         return new_model
 
     def walk_tuple(self, model):
-        new_model = tuple([self(e) for e in controlled_reverse(model, self.reverse)])
-        new_model = controlled_reverse(new_model, self.reverse, restore_type=True)
+        new_model = tuple(
+            [self(e) for e in self.controlled_reverse(model, self.reverse)]
+        )
+        new_model = self.controlled_reverse(new_model, self.reverse, restore_type=True)
 
         if isinstance(self.rule, ConversionRule):
             self.rule.operands = new_model
@@ -127,7 +139,7 @@ class Post(Walk):
 
     def walk_VisitableBaseModel(self, model):
         new_fields = {}
-        for key in controlled_reverse(model.model_fields.keys(), self.reverse):
+        for key in self.controlled_reverse(model.model_fields.keys(), self.reverse):
             if key == "class_":
                 continue
             new_fields[key] = self(getattr(model, key))
@@ -168,7 +180,7 @@ class Level(Walk):
             self.stack.append(model)
             self.initial = False
 
-        self.stack.extend(controlled_reverse(model, self.reverse))
+        self.stack.extend(self.controlled_reverse(model, self.reverse))
 
         self.rule(self.stack.pop(0))
         if self.stack:
@@ -180,7 +192,7 @@ class Level(Walk):
             self.stack.append(model)
             self.initial = False
 
-        self.stack.extend(controlled_reverse(model, self.reverse))
+        self.stack.extend(self.controlled_reverse(model, self.reverse))
 
         self.rule(self.stack.pop(0))
         if self.stack:
@@ -192,7 +204,7 @@ class Level(Walk):
             self.stack.append(model)
             self.initial = False
 
-        self.stack.extend(controlled_reverse(model.values(), self.reverse))
+        self.stack.extend(self.controlled_reverse(model.values(), self.reverse))
 
         self.rule(self.stack.pop(0))
         if self.stack:
@@ -205,7 +217,7 @@ class Level(Walk):
             self.initial = False
 
         self.stack.extend(
-            controlled_reverse(
+            self.controlled_reverse(
                 [getattr(model, k) for k in model.model_fields.keys() if k != "class_"],
                 self.reverse,
             )
@@ -227,38 +239,42 @@ class In(Walk):
         return model
 
     def walk_list(self, model):
-        for e in controlled_reverse(model, self.reverse, restore_type=True)[:-1]:
+        for e in self.controlled_reverse(model, self.reverse, restore_type=True)[:-1]:
             self(e)
 
         self.rule(model)
-        self(controlled_reverse(model, self.reverse, restore_type=True)[-1])
+        self(self.controlled_reverse(model, self.reverse, restore_type=True)[-1])
         return model
 
     def walk_tuple(self, model):
-        for e in controlled_reverse(model, self.reverse, restore_type=True)[:-1]:
+        for e in self.controlled_reverse(model, self.reverse, restore_type=True)[:-1]:
             self(e)
 
         self.rule(model)
-        self(controlled_reverse(model, self.reverse, restore_type=True)[-1])
+        self(self.controlled_reverse(model, self.reverse, restore_type=True)[-1])
         return model
 
     def walk_dict(self, model):
-        for v in list(controlled_reverse(model.values(), self.reverse))[:-1]:
+        for v in list(self.controlled_reverse(model.values(), self.reverse))[:-1]:
             self(v)
 
         self.rule(model)
-        self(list(controlled_reverse(model.values(), self.reverse))[-1])
+        self(list(self.controlled_reverse(model.values(), self.reverse))[-1])
         return model
 
     def walk_VisitableBaseModel(self, model):
-        for k in list(controlled_reverse(model.model_fields.keys(), self.reverse))[:-1]:
+        for k in list(self.controlled_reverse(model.model_fields.keys(), self.reverse))[
+            :-1
+        ]:
             self(getattr(model, k))
 
         self.rule(model)
         self(
             getattr(
                 model,
-                list(controlled_reverse(model.model_fields.keys(), self.reverse))[-1],
+                list(self.controlled_reverse(model.model_fields.keys(), self.reverse))[
+                    -1
+                ],
             )
         )
         return model
