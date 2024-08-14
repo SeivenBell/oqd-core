@@ -2,6 +2,7 @@ from quantumion.compiler.rewriter import Chain, FixedPoint
 from quantumion.compiler.walk import Post, Pre, In
 from quantumion.compiler.analog.rewrite.canonicalize import *
 from quantumion.compiler.analog.verify.canonicalization import *
+from quantumion.compiler.analog.verify.operator import VerifyHilberSpaceDim
 from quantumion.compiler.math.rules import (
     DistributeMathExpr,
     ProperOrderMathExpr,
@@ -71,7 +72,7 @@ def analog_operator_canonicalization(model):
         FixedPoint(Post(ProperOrder())),
         FixedPoint(pauli_chain),
         FixedPoint(Post(GatherPauli())),
-        In(CanVerHilberSpace(), reverse=True),
+        In(VerifyHilberSpaceDim(), reverse=True),
         FixedPoint(normal_order_chain),
         FixedPoint(Post(PruneIdentity())),
         FixedPoint(scale_terms_chain),
