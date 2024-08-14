@@ -2,7 +2,7 @@ from quantumion.interface.analog import *
 from quantumion.compiler.analog.verify.canonicalization import *
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.compiler.rule import RewriteRule
-from quantumion.compiler.walk import Walk, Post, Pre
+from quantumion.compiler.walk import Walk, Post, Pre, In
 import unittest
 from quantumion.interface.math import *
 from unittest_prettify.colorize import (
@@ -24,25 +24,25 @@ X, Y, Z, I, A, C, LI = (
 )
 
 
-def test_function(operator: Operator, rule: RewriteRule, walk_method: Walk):
-    walk_method(rule)(operator)
+def test_function(operator: Operator, rule: RewriteRule, walk_method: Walk, reverse: bool):
+    walk_method(rule, reverse = reverse)(operator)
 
 
 class CanonicalFormErrors(unittest.TestCase):
 
     def assertCanonicalFormErrorRaised(
-        self, operator: Operator, rule: RewriteRule, walk_method: Walk = Post
+        self, operator: Operator, rule: RewriteRule, walk_method: Walk = Post, reverse: bool = False
     ):
         with self.assertRaises(CanonicalFormError) as context:
-            test_function(operator=operator, rule=rule, walk_method=walk_method)
+            test_function(operator=operator, rule=rule, walk_method=walk_method, reverse=reverse)
         print(context.exception)
 
     def assertCanonicalFormErrorNotRaised(
-        self, operator, rule: RewriteRule, walk_method: Walk = Post
+        self, operator, rule: RewriteRule, walk_method: Walk = Post, reverse: bool = False
     ):
         with self.assertRaises(AssertionError) as context:
             self.assertCanonicalFormErrorRaised(
-                operator=operator, rule=rule, walk_method=walk_method
+                operator=operator, rule=rule, walk_method=walk_method, reverse=reverse
             )
         print(context.exception)
 
@@ -713,6 +713,49 @@ class TestCanonicalizationVerificationScaleTerms(
             operator=op, rule=self._rule, walk_method=self._walk_method
         )
 
+@colorize(color=BLUE)
+class TestCanonicalizationVerificationHilbertSpace(
+    CanonicalFormErrors, unittest.TestCase
+):
+    maxDiff = None
+
+    def __init__(self, methodName: str = "runTest") -> None:
+        self._rule = CanVerHilberSpace()
+        self._walk_method = In
+        self._reverse = True
+        super().__init__(methodName)
+
+    def test_simple_addition_fail(self):
+        """Addition fail"""
+        op = 2 * (X @ Z @ Z) + 3 * (Y @ I) + 2 * (Z @ Z)
+        self.assertRaises(AssertionError, lambda: test_function(
+            operator=op, rule=self._rule, walk_method=self._walk_method, reverse=self._reverse
+        ))
+
+    def test_simple_addition_pass_single(self):
+        """Addition pass single"""
+        op = 2 * X + 3 * Y + Z + Y #+ 2 * (Z @ Z)
+        test_function(operator=op, rule=self._rule, walk_method=self._walk_method, reverse=self._reverse)
+
+
+    def test_simple_addition_fail_single_with_ladder(self):
+        """Addition fail single term with ladder"""
+        op = 2 * X + Y + A + Z + Y #+ 2 * (Z @ Z)
+        self.assertRaises(AssertionError, lambda: test_function(
+            operator=op, rule=self._rule, walk_method=self._walk_method, reverse=self._reverse
+        ))
+
+    def test_simple_addition_fail_ladder(self):
+        """Addition fail with ladder"""
+        op = 2 * (X @ Z @ A) + 3 * (Y @ I @ C) + 2 * (Z @ Z @ (C*C*I) @ A)
+        self.assertRaises(AssertionError, lambda: test_function(
+            operator=op, rule=self._rule, walk_method=self._walk_method, reverse=self._reverse
+        ))
+
+    def test_simple_addition_pass_ladder(self):
+        """Addition pass with ladder"""
+        op = 2 * (X @ Z @ A) + (Y @ I @ C) + 2 * (Z @ Z @ (C*C*I)) + (Y @ I @ (C*A*A*C*LI))
+        test_function(operator=op, rule=self._rule, walk_method=self._walk_method, reverse=self._reverse)
 
 if __name__ == "__main__":
     unittest.main()
