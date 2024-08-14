@@ -12,7 +12,6 @@ __all__ = [
 class QutipBackend(BackendBase):
     """
     Class representing the Qutip backend
-    insprired from https://github.com/QuEraComputing/bloqade-python/blob/main/src/bloqade/ir/routine/braket.py#L183
     """
 
     def compile(self, task: Task):
