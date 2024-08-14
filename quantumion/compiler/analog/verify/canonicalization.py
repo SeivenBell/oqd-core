@@ -3,7 +3,6 @@ from typing import Union
 ########################################################################################
 
 from quantumion.compiler.rule import RewriteRule
-from quantumion.compiler.analog.utils import term_index_dim
 from quantumion.interface.math import *
 from quantumion.compiler.analog.error import CanonicalFormError
 from quantumion.interface.analog import *
@@ -190,6 +189,17 @@ class CanVerHilberSpace(RewriteRule):
         self._term_dim = None
         self._final_add_term = False
 
+    def _reset(self):
+        self._dim = (0,0)
+        self._term_dim = None
+        self._final_add_term = False
+
+    def map_AnalogGate(self, model):
+        self._reset()
+
+    def map_Expectation(self, model):
+        self._reset()
+
     def _get_dim(self, model):
         if isinstance(model, Pauli):
             return (1,0)
@@ -248,8 +258,6 @@ class CanVerSortedOrder(RewriteRule):
             term1 = analysis_term_index(model.op1.op2)
         else:
             term1 = analysis_term_index(model.op1)
-        if term_index_dim(term1) != term_index_dim(term2):
-            raise CanonicalFormError("Incorrect dimension of hilbert space")
         if term1 > term2:
             raise CanonicalFormError("Terms are not in sorted order")
         elif term1 == term2:

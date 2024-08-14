@@ -4,7 +4,6 @@ from typing import Union
 
 from quantumion.compiler.rule import RewriteRule
 from quantumion.compiler.walk import Post
-from quantumion.compiler.analog.utils import term_index_dim
 from quantumion.compiler.analog.passes.analysis import analysis_term_index
 from quantumion.interface.math import MathNum, MathImag, MathAdd
 from quantumion.compiler.analog.error import CanonicalFormError
@@ -281,9 +280,6 @@ class SortedOrder(RewriteRule):
             term1 = analysis_term_index(model.op1.op2)
             term2 = analysis_term_index(model.op2)
 
-            if term_index_dim(term1) != term_index_dim(term2):
-                raise CanonicalFormError("Incorrect hilbert space dimensions")
-
             if term1 == term2:
                 expr1 = (
                     model.op1.op2.expr
@@ -319,8 +315,7 @@ class SortedOrder(RewriteRule):
         else:
             term1 = analysis_term_index(model.op1)
             term2 = analysis_term_index(model.op2)
-            if term_index_dim(term1) != term_index_dim(term2):
-                raise CanonicalFormError("Incorrect hilbert space dimensions")
+
             if term1 == term2:
                 expr1 = (
                     model.op1.expr
