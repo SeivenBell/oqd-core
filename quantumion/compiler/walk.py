@@ -243,7 +243,8 @@ class In(Walk):
             self(e)
 
         self.rule(model)
-        self(self.controlled_reverse(model, self.reverse, restore_type=True)[-1])
+        if model:
+            self(self.controlled_reverse(model, self.reverse, restore_type=True)[-1])
         return model
 
     def walk_tuple(self, model):
@@ -251,7 +252,8 @@ class In(Walk):
             self(e)
 
         self.rule(model)
-        self(self.controlled_reverse(model, self.reverse, restore_type=True)[-1])
+        if model:
+            self(self.controlled_reverse(model, self.reverse, restore_type=True)[-1])
         return model
 
     def walk_dict(self, model):
@@ -259,7 +261,8 @@ class In(Walk):
             self(v)
 
         self.rule(model)
-        self(list(self.controlled_reverse(model.values(), self.reverse))[-1])
+        if model:
+            self(list(self.controlled_reverse(model.values(), self.reverse))[-1])
         return model
 
     def walk_VisitableBaseModel(self, model):
