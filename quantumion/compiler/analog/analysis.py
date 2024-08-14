@@ -35,10 +35,9 @@ class TermIndex(RewriteRule):
                 self.term_idx[-1] = []
 
         if isinstance(model.op1, Union[OperatorTerminal]):
-
             self.term_idx[-1].insert(0, self._get_index(model.op1))
-            self.term_idx[-1].insert(1, self._get_index(model.op2))
-        elif not isinstance(model.op2, OperatorMul):
+
+        if isinstance(model.op2, OperatorTerminal):
             self.term_idx[-1].insert(len(self.term_idx[-1]), self._get_index(model.op2))
 
     def map_OperatorTerminal(self, model):
