@@ -37,6 +37,12 @@ class Y(TypeReflectBaseModel):
     a: str
     b: str
 
+class N(TypeReflectBaseModel):
+    pass
+
+class A(VisitableBaseModel):
+    n: N
+    x: X
 
 ########################################################################################
 
@@ -487,4 +493,16 @@ class TestInWalk(unittest.TestCase):
         printer(inp)
         self.assertEqual(
             printer.children[0].string, "\n0: b\n1: class_='Y' a='a' b='b'\n2: a"
+        )
+
+    def test_reversed_in_TypeReflectBaseModel_no_attribute(self):
+        "Test of reversed In Walk on a TypeReflectBaseModel with no attribute for N"
+        x = X(a="x1", b="x2")
+        n = N()
+        inp = A(n=n,x=x)
+        printer = In(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: x2\n1: a='x1' b='x2'\n2: x1\n3: n=N(class_='N') x=X(a='x1', b='x2')\n4: class_='N'"
         )
