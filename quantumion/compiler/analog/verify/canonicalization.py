@@ -183,6 +183,10 @@ class CanVerNormalOrder(RewriteRule):
         pass
 
 class CanVerHilberSpace(RewriteRule):
+    """Assumptions:
+    >>> Distributed, Gathered and then proper ordered and PauliAlgebra
+    """
+
     def __init__(self):
         super().__init__()
         self._dim = (0,0)
