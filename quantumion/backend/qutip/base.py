@@ -47,7 +47,7 @@ class QutipBackend(BackendBase):
             assigned_circuit, fock_cutoff=task.args.fock_cutoff
         )
         converted_args = compiler_analog_args_to_qutipIR(
-            canonicalized_args, fock_cutoff=task.args.fock_cutoff
+            canonicalized_args
         )
 
         return QutipExperiment(
