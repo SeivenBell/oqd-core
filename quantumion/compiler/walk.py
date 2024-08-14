@@ -269,5 +269,6 @@ class In(Walk):
             self(getattr(model, k))
 
         self.rule(model)
-        self(getattr(model, keys[-1]))
+        if keys:
+            self(getattr(model, keys[-1]))
         return model
