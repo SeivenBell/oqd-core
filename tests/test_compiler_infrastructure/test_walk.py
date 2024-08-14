@@ -140,7 +140,7 @@ class TestPreWalk(unittest.TestCase):
         )
 
     def test_reversed_pre_TypeReflectBaseModel(self):
-        "Test of Pre Walk on a TypeReflectBaseModel"
+        "Test of reversed Pre Walk on a TypeReflectBaseModel"
         inp = Y(a="a", b="b")
 
         printer = Pre(PrintWalkOrder(), reverse=True)
@@ -253,7 +253,7 @@ class TestPostWalk(unittest.TestCase):
         )
 
     def test_reversed_post_TypeReflectBaseModel(self):
-        "Test of Post Walk on a TypeReflectBaseModel"
+        "Test of reversed Post Walk on a TypeReflectBaseModel"
         inp = Y(a="a", b="b")
 
         printer = Post(PrintWalkOrder(), reverse=True)
@@ -366,7 +366,7 @@ class TestLevelWalk(unittest.TestCase):
         )
 
     def test_reversed_level_TypeReflectBaseModel(self):
-        "Test of Level Walk on a TypeReflectBaseModel"
+        "Test of reversed Level Walk on a TypeReflectBaseModel"
         inp = Y(a="a", b="b")
 
         printer = Level(PrintWalkOrder(), reverse=True)
@@ -479,7 +479,7 @@ class TestInWalk(unittest.TestCase):
         )
 
     def test_reversed_in_TypeReflectBaseModel(self):
-        "Test of In Walk on a TypeReflectBaseModel"
+        "Test of reversed In Walk on a TypeReflectBaseModel"
         inp = Y(a="a", b="b")
 
         printer = In(PrintWalkOrder(), reverse=True)
