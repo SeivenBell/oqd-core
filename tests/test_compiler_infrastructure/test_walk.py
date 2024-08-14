@@ -12,7 +12,7 @@ from rich.console import Console
 ########################################################################################
 
 from quantumion.compiler import *
-from quantumion.interface.base import VisitableBaseModel
+from quantumion.interface.base import VisitableBaseModel, TypeReflectBaseModel
 
 ########################################################################################
 
@@ -26,6 +26,16 @@ class PrintWalkOrder(RewriteRule):
         self.string += f"\n{self.current_index}: {model}"
         self.current_index += 1
         pass
+
+
+class X(VisitableBaseModel):
+    a: str
+    b: str
+
+
+class Y(TypeReflectBaseModel):
+    a: str
+    b: str
 
 
 ########################################################################################
@@ -58,13 +68,7 @@ class TestPreWalk(unittest.TestCase):
 
     def test_pre_VisitableBaseModel(self):
         "Test of Pre Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = Pre(PrintWalkOrder())
 
@@ -105,13 +109,7 @@ class TestPreWalk(unittest.TestCase):
 
     def test_reversed_pre_VisitableBaseModel(self):
         "Test of reversed Pre Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = Pre(PrintWalkOrder(), reverse=True)
 
@@ -128,6 +126,28 @@ class TestPreWalk(unittest.TestCase):
         self.assertEqual(
             printer.children[0].string,
             "\n0: ['a', ['b', 'c']]\n1: ['b', 'c']\n2: c\n3: b\n4: a",
+        )
+
+    def test_pre_TypeReflectBaseModel(self):
+        "Test of Pre Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = Pre(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: class_='Y' a='a' b='b'\n1: a\n2: b"
+        )
+
+    def test_reversed_pre_TypeReflectBaseModel(self):
+        "Test of Pre Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = Pre(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: class_='Y' a='a' b='b'\n1: b\n2: a"
         )
 
 
@@ -161,13 +181,7 @@ class TestPostWalk(unittest.TestCase):
 
     def test_post_VisitableBaseModel(self):
         "Test of Post Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = Post(PrintWalkOrder())
 
@@ -208,13 +222,7 @@ class TestPostWalk(unittest.TestCase):
 
     def test_reversed_post_VisitableBaseModel(self):
         "Test of reversed Post Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = Post(PrintWalkOrder(), reverse=True)
 
@@ -231,6 +239,28 @@ class TestPostWalk(unittest.TestCase):
         self.assertEqual(
             printer.children[0].string,
             "\n0: c\n1: b\n2: ['b', 'c']\n3: a\n4: ['a', ['b', 'c']]",
+        )
+
+    def test_post_TypeReflectBaseModel(self):
+        "Test of Post Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = Post(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: a\n1: b\n2: class_='Y' a='a' b='b'"
+        )
+
+    def test_reversed_post_TypeReflectBaseModel(self):
+        "Test of Post Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = Post(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: b\n1: a\n2: class_='Y' a='a' b='b'"
         )
 
 
@@ -264,13 +294,7 @@ class TestLevelWalk(unittest.TestCase):
 
     def test_level_VisitableBaseModel(self):
         "Test of Level Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = Level(PrintWalkOrder())
 
@@ -311,13 +335,7 @@ class TestLevelWalk(unittest.TestCase):
 
     def test_reversed_level_VisitableBaseModel(self):
         "Test of reversed Level Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = Level(PrintWalkOrder(), reverse=True)
 
@@ -334,6 +352,28 @@ class TestLevelWalk(unittest.TestCase):
         self.assertEqual(
             printer.children[0].string,
             "\n0: [['a', ['b', 'c']], ['d', 'e']]\n1: ['d', 'e']\n2: ['a', ['b', 'c']]\n3: e\n4: d\n5: ['b', 'c']\n6: a\n7: c\n8: b",
+        )
+
+    def test_level_TypeReflectBaseModel(self):
+        "Test of Level Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = Level(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: class_='Y' a='a' b='b'\n1: a\n2: b"
+        )
+
+    def test_reversed_level_TypeReflectBaseModel(self):
+        "Test of Level Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = Level(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: class_='Y' a='a' b='b'\n1: b\n2: a"
         )
 
 
@@ -367,13 +407,7 @@ class TestInWalk(unittest.TestCase):
 
     def test_in_VisitableBaseModel(self):
         "Test of In Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = In(PrintWalkOrder())
 
@@ -414,13 +448,7 @@ class TestInWalk(unittest.TestCase):
 
     def test_reversed_in_VisitableBaseModel(self):
         "Test of reversed In Walk on a VisitableBaseModel"
-        inp = {"a": "a", "b": "b"}
-
-        class M(VisitableBaseModel):
-            a: str
-            b: str
-
-        inp = M(a="a", b="b")
+        inp = X(a="a", b="b")
 
         printer = In(PrintWalkOrder(), reverse=True)
 
@@ -437,4 +465,26 @@ class TestInWalk(unittest.TestCase):
         self.assertEqual(
             printer.children[0].string,
             "\n0: f\n1: e\n2: ['d', 'e', 'f']\n3: d\n4: [['a', ['b', 'c']], ['d', 'e', 'f']]\n5: c\n6: ['b', 'c']\n7: b\n8: ['a', ['b', 'c']]\n9: a",
+        )
+
+    def test_in_TypeReflectBaseModel(self):
+        "Test of In Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = In(PrintWalkOrder())
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: a\n1: class_='Y' a='a' b='b'\n2: b"
+        )
+
+    def test_reversed_in_TypeReflectBaseModel(self):
+        "Test of In Walk on a TypeReflectBaseModel"
+        inp = Y(a="a", b="b")
+
+        printer = In(PrintWalkOrder(), reverse=True)
+
+        printer(inp)
+        self.assertEqual(
+            printer.children[0].string, "\n0: b\n1: class_='Y' a='a' b='b'\n2: a"
         )
