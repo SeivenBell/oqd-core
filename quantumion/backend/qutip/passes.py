@@ -16,4 +16,7 @@ def compiler_analog_args_to_qutipIR(model, fock_cutoff):
 
 
 def run_qutip_experiment(model):
-    return Post(QutipExperimentInterpreter())(model=model)
+    n_qreg = model.n_qreg
+    n_qmode = model.n_qmode
+    return Post(QutipExperimentInterpreter(n_qreg=n_qreg,
+                                           n_qmode=n_qmode))(model=model)

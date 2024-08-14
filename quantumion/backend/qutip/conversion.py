@@ -35,6 +35,10 @@ def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
 
 
 class QutipExperimentInterpreter(ConversionRule):
+    def __init__(self, n_qreg, n_qmode):
+        super().__init__()
+        self._n_qreg = n_qreg
+        self._n_qmode = n_qmode
 
     def map_QutipExpectation(self, model: QutipExpectation, operands):
         for idx, operator in enumerate(model.operator):
@@ -50,17 +54,15 @@ class QutipExperimentInterpreter(ConversionRule):
         return lambda t, psi: qt.expect(op_exp, psi)
 
     def map_EntanglementEntropyVN(self, model: EntanglementEntropyVN, operands):
-        raise NotImplementedError
-        ## same problem as before
-        # return lambda t, psi: entanglement_entropy_vn(
-        #     t, psi, model.qreg, model.qmode, self.n_qreg, self.n_qmode
-        # )
+        return lambda t, psi: entanglement_entropy_vn(
+            t, psi, model.qreg, model.qmode, self._n_qreg, self._n_qmode
+        )
 
     def map_TaskArgsQutip(self, model: TaskArgsQutip, operands):
         return operands
 
     def map_QutipExperiment(self, model: QutipExperiment, operands) -> TaskResultAnalog:
-        # pprint("map_QutipExperiment operands are {}".format(operands))
+
         dims = model.n_qreg * [2] + model.n_qmode * [model.args.fock_cutoff]
         self.n_qreg = model.n_qreg
         self.n_qmode = model.n_qmode
