@@ -263,18 +263,18 @@ class In(Walk):
         return model
 
     def walk_VisitableBaseModel(self, model):
-        for k in list(self.controlled_reverse(model.model_fields.keys(), self.reverse))[
-            :-1
-        ]:
+        fields = {key: value for key, value in model.model_fields.items() if key != 'class_'}
+        keys = list(self.controlled_reverse(list(fields.keys()), self.reverse))
+        for k in keys[:-1]:
             self(getattr(model, k))
 
         self.rule(model)
-        self(
-            getattr(
-                model,
-                list(self.controlled_reverse(model.model_fields.keys(), self.reverse))[
-                    -1
-                ],
+        if keys != []:
+            self(
+                getattr(
+                    model,
+                    keys[-1]
+                    ,
+                )
             )
-        )
         return model
