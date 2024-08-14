@@ -1,10 +1,6 @@
 from quantumion.compiler.walk import Post
-from quantumion.compiler.analog.rewrite.assign import (
-    AssignAnalogIRDim,
-    VerifyAnalogCircuitDim,
-    VerifyAnalogArgsDim,
-)
-
+from quantumion.compiler.analog.rewrite.assign import AssignAnalogIRDim
+from quantumion.compiler.analog.verify.task import VerifyAnalogArgsDim, VerifyAnalogCircuitDim
 ########################################################################################
 
 __all__ = [
@@ -19,13 +15,13 @@ def assign_analog_circuit_dim(model):
     """can't have a chain here as verifier need info which is obtained from assignanalogIRDim.
     Here we should probably use some sort of analysis pass to first get n_qreg and n_qmode, which can
     then be assigned by AssignAnalogIRDim"""
-    assignmed_model = Post(AssignAnalogIRDim())(model)
+    assigned_model = Post(AssignAnalogIRDim())(model)
     Post(
         VerifyAnalogCircuitDim(
-            n_qreg=assignmed_model.n_qreg, n_qmode=assignmed_model.n_qmode
+            n_qreg=assigned_model.n_qreg, n_qmode=assigned_model.n_qmode
         )
-    )(assignmed_model)
-    return assignmed_model
+    )(assigned_model)
+    return assigned_model
 
 
 def verify_analog_args_dim(model, n_qreg, n_qmode):
