@@ -11,8 +11,8 @@ from rich.console import Console
 
 ########################################################################################
 
-from quantumion.compiler import *
-from quantumion.interface.base import VisitableBaseModel, TypeReflectBaseModel
+from midstack.compiler import *
+from midstack.interface.base import VisitableBaseModel, TypeReflectBaseModel
 
 ########################################################################################
 
@@ -37,12 +37,15 @@ class Y(TypeReflectBaseModel):
     a: str
     b: str
 
+
 class N(TypeReflectBaseModel):
     pass
+
 
 class A(VisitableBaseModel):
     n: N
     x: X
+
 
 ########################################################################################
 
@@ -499,10 +502,11 @@ class TestInWalk(unittest.TestCase):
         "Test of reversed In Walk on a TypeReflectBaseModel with no attribute for N"
         x = X(a="x1", b="x2")
         n = N()
-        inp = A(n=n,x=x)
+        inp = A(n=n, x=x)
         printer = In(PrintWalkOrder(), reverse=True)
 
         printer(inp)
         self.assertEqual(
-            printer.children[0].string, "\n0: x2\n1: a='x1' b='x2'\n2: x1\n3: n=N(class_='N') x=X(a='x1', b='x2')\n4: class_='N'"
+            printer.children[0].string,
+            "\n0: x2\n1: a='x1' b='x2'\n2: x1\n3: n=N(class_='N') x=X(a='x1', b='x2')\n4: class_='N'",
         )

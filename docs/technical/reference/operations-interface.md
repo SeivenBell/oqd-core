@@ -50,4 +50,4 @@ classDiagram
   }
 ```
 
-::: quantumion.interface.analog.operations
+::: midstack.interface.analog.operations

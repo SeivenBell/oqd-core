@@ -41,11 +41,11 @@ To get started you can run one of the example scripts provided. For example, to 
 ```python
 import matplotlib.pyplot as plt
 
-from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.operations import *
-from quantumion.backend.metric import *
-from quantumion.backend.task import Task, TaskArgsAnalog
-from quantumion.backend import QutipBackend
+from midstack.interface.analog.operator import *
+from midstack.interface.analog.operations import *
+from midstack.backend.metric import *
+from midstack.backend.task import Task, TaskArgsAnalog
+from midstack.backend import QutipBackend
 
 X = PauliX()
 Z = PauliZ()
@@ -121,7 +121,7 @@ Planned supported hardware backends include:
 
 ## Documentation <a name="documentation"></a>
 
-Documentation is implemented with [MkDocs](https://www.mkdocs.org/) and can be read from the [docs](https://github.com/OpenQuantumDesign/quantumion/tree/main/docs) folder.
+Documentation is implemented with [MkDocs](https://www.mkdocs.org/) and can be read from the [docs](https://github.com/OpenQuantumDesign/midstack/tree/main/docs) folder.
 
 To install the dependencies for documentation, run:
 ```

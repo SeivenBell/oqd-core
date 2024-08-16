@@ -1,10 +1,10 @@
-from quantumion.interface.analog import *
-from quantumion.compiler.analog.rewrite.canonicalize import *
-from quantumion.compiler.rule import RewriteRule
-from quantumion.compiler.walk import Walk, Post, Pre
-from quantumion.compiler.rewriter import FixedPoint
+from midstack.interface.analog import *
+from midstack.compiler.analog.rewrite.canonicalize import *
+from midstack.compiler.rule import RewriteRule
+from midstack.compiler.walk import Walk, Post, Pre
+from midstack.compiler.rewriter import FixedPoint
 import unittest
-from quantumion.interface.math import *
+from midstack.interface.math import *
 from unittest_prettify.colorize import (
     colorize,
     BLUE,

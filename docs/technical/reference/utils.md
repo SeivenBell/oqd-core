@@ -1,3 +1,3 @@
 # Utilities
 
-::: quantumion.utils
+::: midstack.utils

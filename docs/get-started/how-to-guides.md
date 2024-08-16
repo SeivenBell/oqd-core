@@ -20,7 +20,7 @@ $$
 
 Our analog circuit will have one gate, which describes this Hamiltonian.
 ``` py
-from quantumion.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
+from midstack.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
 
 circuit = AnalogCircuit()
 circuit.evolve(
@@ -33,8 +33,8 @@ circuit.evolve(
 
 Let's now generalize this to a quantum system with `n` qubits.
 ``` py
-from quantumion.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
-from quantumion.analog.math import tensor
+from midstack.analog import AnalogCircuit, AnalogGate, PauliX, PauliZ, PauliI
+from midstack.analog.math import tensor
 
 n = 10
 circuit = AnalogCircuit()

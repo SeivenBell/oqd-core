@@ -1,7 +1,7 @@
-from quantumion.compiler.math.rules import EvaluateMathExpr
-from quantumion.compiler.walk import Post, Walk
-from quantumion.compiler.rule import ConversionRule, RewriteRule
-from quantumion.interface.math import *
+from midstack.compiler.math.rules import EvaluateMathExpr
+from midstack.compiler.walk import Post, Walk
+from midstack.compiler.rule import ConversionRule, RewriteRule
+from midstack.interface.math import *
 from typing import Union
 from rich import print as pprint
 import unittest

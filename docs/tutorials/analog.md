@@ -14,13 +14,13 @@ U = e^{i t H}
 $$
 
 ### Creating an analog quantum circuit
-In `quantumion`, time evolution is specified as an **analog gate** (`AnalogGate`).
+In `midstack`, time evolution is specified as an **analog gate** (`AnalogGate`).
 For example, to implement the one-qubit Rabi flopping from above,
 ```py
 import numpy as np
-from quantumion.interface.analog.operator import PauliX
-from quantumion.interface.analog.dissipation import Dissipation
-from quantumion.interface.analog.operations import AnalogGate, AnalogCircuit
+from midstack.interface.analog.operator import PauliX
+from midstack.interface.analog.dissipation import Dissipation
+from midstack.interface.analog.operations import AnalogGate, AnalogCircuit
 
 circuit = AnalogCircuit()
 gate = AnalogGate(hamiltonian= -(np.pi / 4) * PauliX())
@@ -38,7 +38,7 @@ Hamiltonians are represented using Pauli and ladder operators, which act on the 
 Let's start by creating a more complex Hamiltonian, composed of Pauli operators on the qubit registers.
 
 ```py
-from quantumion.interface.analog.operator import PauliX
+from midstack.interface.analog.operator import PauliX
 interaction = PauliX() @ PauliX()
 ``` 
 Here, an interaction operator, $\sigma_x \otimes \sigma_x$, 

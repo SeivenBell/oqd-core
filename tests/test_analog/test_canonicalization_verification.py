@@ -1,10 +1,10 @@
-from quantumion.interface.analog import *
-from quantumion.compiler.analog.verify.canonicalization import *
-from quantumion.compiler.analog.error import CanonicalFormError
-from quantumion.compiler.rule import RewriteRule
-from quantumion.compiler.walk import Walk, Post, Pre
+from midstack.interface.analog import *
+from midstack.compiler.analog.verify.canonicalization import *
+from midstack.compiler.analog.error import CanonicalFormError
+from midstack.compiler.rule import RewriteRule
+from midstack.compiler.walk import Walk, Post, Pre
 import unittest
-from quantumion.interface.math import *
+from midstack.interface.math import *
 from unittest_prettify.colorize import (
     colorize,
     GREEN,
@@ -24,21 +24,33 @@ X, Y, Z, I, A, C, LI = (
 )
 
 
-def test_function(operator: Operator, rule: RewriteRule, walk_method: Walk, reverse: bool):
-    walk_method(rule, reverse = reverse)(operator)
+def test_function(
+    operator: Operator, rule: RewriteRule, walk_method: Walk, reverse: bool
+):
+    walk_method(rule, reverse=reverse)(operator)
 
 
 class CanonicalFormErrors(unittest.TestCase):
 
     def assertCanonicalFormErrorRaised(
-        self, operator: Operator, rule: RewriteRule, walk_method: Walk = Post, reverse: bool = False
+        self,
+        operator: Operator,
+        rule: RewriteRule,
+        walk_method: Walk = Post,
+        reverse: bool = False,
     ):
         with self.assertRaises(CanonicalFormError) as context:
-            test_function(operator=operator, rule=rule, walk_method=walk_method, reverse=reverse)
+            test_function(
+                operator=operator, rule=rule, walk_method=walk_method, reverse=reverse
+            )
         print(context.exception)
 
     def assertCanonicalFormErrorNotRaised(
-        self, operator, rule: RewriteRule, walk_method: Walk = Post, reverse: bool = False
+        self,
+        operator,
+        rule: RewriteRule,
+        walk_method: Walk = Post,
+        reverse: bool = False,
     ):
         with self.assertRaises(AssertionError) as context:
             self.assertCanonicalFormErrorRaised(
@@ -712,6 +724,7 @@ class TestCanonicalizationVerificationScaleTerms(
         self.assertCanonicalFormErrorRaised(
             operator=op, rule=self._rule, walk_method=self._walk_method
         )
+
 
 if __name__ == "__main__":
     unittest.main()

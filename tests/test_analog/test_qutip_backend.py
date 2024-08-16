@@ -1,9 +1,9 @@
-from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.operations import *
-from quantumion.interface.math import MathStr
-from quantumion.backend.metric import *
-from quantumion.backend.task import Task, TaskArgsAnalog
-from quantumion.backend import QutipBackend
+from midstack.interface.analog.operator import *
+from midstack.interface.analog.operations import *
+from midstack.interface.math import MathStr
+from midstack.backend.metric import *
+from midstack.backend.task import Task, TaskArgsAnalog
+from midstack.backend import QutipBackend
 import numpy as np
 from rich import print as pprint
 import unittest

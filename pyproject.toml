@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "quantumion"
+name = "midstack"
 version = "0.0.0"
 requires-python = ">=3.10"
 dependencies = [
@@ -56,4 +56,4 @@ all = [
 ]
 
 [tool.setuptools]
-packages = ["quantumion"]
+packages = ["midstack"]

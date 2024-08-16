@@ -1,3 +1,3 @@
 # Qutip backend
 
-::: quantumion.backend.qutip
+::: midstack.backend.qutip
