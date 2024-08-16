@@ -12,9 +12,9 @@ __all__ = [
 
 
 def assign_analog_circuit_dim(model):
-    """can't have a chain here as verifier need info which is obtained from assignanalogIRDim.
-    Here we should probably use some sort of analysis pass to first get n_qreg and n_qmode, which can
-    then be assigned by AssignAnalogIRDim"""
+    """
+    This pass assigns n_qreg and n_qmode in the analog circuit and then verifies the assignment
+    """
     assigned_model = Post(AssignAnalogIRDim())(model)
     Post(
         VerifyAnalogCircuitDim(
@@ -25,4 +25,8 @@ def assign_analog_circuit_dim(model):
 
 
 def verify_analog_args_dim(model, n_qreg, n_qmode):
+    """
+    This pass checks whether the assigned n_qreg and n_qmode in AnalogCircuit match the n_qreg and n_qmode
+    in any Operators (like the Operator inside Expectation) in TaskArgsAnalog
+    """
     Post(VerifyAnalogArgsDim(n_qreg=n_qreg, n_qmode=n_qmode))(model)

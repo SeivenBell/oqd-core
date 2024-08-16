@@ -6,6 +6,9 @@ from typing import Union
 
 class TermIndex(RewriteRule):
     """
+    This computes TermIndex. Example:
+    - For X@X + Y@Z the TermIndex is [[1,1],[2,3]]
+    - For X@A the TermIndex is [[1,(1,0)]]
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
     (without NormalOrder, TermIndex is not useful. For example, TermIndex of A*C and C*A is the same (2,1).
     Hence, NormalOrder is a requirement.

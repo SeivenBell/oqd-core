@@ -9,8 +9,11 @@ __all__ = [
     "VerifyHilberSpaceDim",
 ]
 class VerifyHilberSpaceDim(RewriteRule):
-    """Assumptions:
-    >>> Distributed, Gathered and then proper ordered and PauliAlgebra
+    """
+    This checks whether the hilbert spaces are correct between additions. Example:
+    - X@Y + Y@Z will pass this verification
+    - X@A + Y@Z will fail this verification
+    Assumptions: Distributed, Gathered and then proper ordered and PauliAlgebra
     """
 
     def __init__(self):
@@ -49,7 +52,6 @@ class VerifyHilberSpaceDim(RewriteRule):
                 self._dim[1] + new[1]
             )
             if self._final_add_term:
-                print(self._term_dim)
                 assert self._term_dim == self._dim, "Incorrect Hilbert space dimension"
 
     def map_OperatorAdd(self, model):

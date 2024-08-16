@@ -23,6 +23,9 @@ __all__ = [
 
 
 class PrintMathExpr(ConversionRule):
+    """
+    This prints MathExpr objects. Verbosity level can be given as an attribute.
+    """
     def __init__(self, *, verbose=False):
         super().__init__()
 
@@ -61,7 +64,6 @@ class PrintMathExpr(ConversionRule):
         string = "{} - {}".format(operands["expr1"], s2)
         return string
 
-    ##
     def map_MathMul(self, model: MathMul, operands):
         if self.verbose:
             return self._map_MathBinaryOp(model, operands)
@@ -135,6 +137,10 @@ class PrintMathExpr(ConversionRule):
 
 
 class DistributeMathExpr(RewriteRule):
+    """
+    This distributes MathExpr. example:
+    - 2*(3+5) = 2*3 + 2*5
+    """
     def map_MathMul(self, model: MathMul):
         if isinstance(model.expr1, (MathAdd, MathSub)):
             return model.expr1.__class__(
@@ -162,6 +168,11 @@ class DistributeMathExpr(RewriteRule):
 
 
 class PartitionMathExpr(RewriteRule):
+    """
+    This partitions MathExpr objects. Example:
+    1 + 1j + 2 => 1 + 2 + 1j
+    1 * 1j * 2 => 1j * 1 * 2
+    """
     def map_MathAdd(self, model):
         if not (
             (
@@ -201,6 +212,10 @@ class PartitionMathExpr(RewriteRule):
 
 
 class ProperOrderMathExpr(RewriteRule):
+    """
+    This arranges MathExpr in proper order. Example:
+    - 2*(3*5) will be converted to (2*3)*5
+    """
     def map_MathAdd(self, model: MathAdd):
         return self._MathAddMul(model)
 
@@ -217,6 +232,9 @@ class ProperOrderMathExpr(RewriteRule):
 
 
 class PruneMathExpr(RewriteRule):
+    """
+    This is constant fold operation where scalar addition, multiplication and power are simplified
+    """
     def map_MathAdd(self, model):
         if model.expr1 == MathNum(value=0):
             return model.expr2
@@ -238,6 +256,9 @@ class PruneMathExpr(RewriteRule):
 
 
 class SimplifyMathExpr(RewriteRule):
+    """
+    This simplified MathExpr objects
+    """
     def map_MathAdd(self, model):
         if isinstance(model.expr1, MathNum) and isinstance(model.expr2, MathNum):
             return MathNum(value=model.expr1.value + model.expr2.value)
@@ -259,6 +280,9 @@ class SimplifyMathExpr(RewriteRule):
 
 
 class EvaluateMathExpr(ConversionRule):
+    """
+    This evalaluates MathExpr objects
+    """
     def map_MathVar(self, model: MathVar, operands):
         raise TypeError
 

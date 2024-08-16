@@ -67,6 +67,9 @@ verify_canonicalization = Chain(
 
 
 def analog_operator_canonicalization(model):
+    """
+    This pass runs canonicalization chain for Operators with a verifies for canonicalization.
+    """
     return Chain(
         FixedPoint(dist_chain),
         FixedPoint(Post(ProperOrder())),
@@ -78,5 +81,5 @@ def analog_operator_canonicalization(model):
         FixedPoint(scale_terms_chain),
         FixedPoint(Post(SortedOrder())),
         math_chain,
-        verify_canonicalization,  # running verifier
+        verify_canonicalization,
     )(model=model)

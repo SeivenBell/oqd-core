@@ -16,6 +16,9 @@ __all__ = [
 
 
 class AssignAnalogIRDim(RewriteRule):
+    """
+    This gets the dimensions from analysis pass analysis_canonical_hamiltonian_dim and then inserts the dimension in the Analog IR
+    """
     def __init__(self):
         super().__init__()
         self.dim: Union[tuple, None] = None
@@ -28,5 +31,3 @@ class AssignAnalogIRDim(RewriteRule):
     def map_AnalogGate(self, model):
         if self.dim is None:
             self.dim = analysis_canonical_hamiltonian_dim(model.hamiltonian)
-        elif self.dim != analysis_canonical_hamiltonian_dim(model.hamiltonian):
-            raise Exception

@@ -26,8 +26,9 @@ __all__ = [
 
 class CanVerPauliAlgebra(RewriteRule):
     """
+    This checks whether there is no incomplete Pauli Algebra computation
     Assumptions:
-    Distributed, Gathered and then proper ordered. Then MatMul is done on the set of operators.
+    Distributed, Gathered and then proper ordered
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -41,7 +42,10 @@ class CanVerPauliAlgebra(RewriteRule):
 
 
 class CanVerGatherMathExpr(RewriteRule):
-    """Assuming that OperatorDistribute has already been fully ran"""
+    """
+    This checks whether all MathExpr have been gathered
+    Assumptions: OperatorDistribute
+    """
 
     def map_OperatorMul(self, model: OperatorMul):
         return self._mulkron(model)
@@ -65,6 +69,10 @@ class CanVerGatherMathExpr(RewriteRule):
 
 
 class CanVerOperatorDistribute(RewriteRule):
+    """
+    This checks for incomplete distribution of Operators
+    Assumptions: None
+    """
     def __init__(self):
         super().__init__()
         self.allowed_ops = Union[
@@ -112,8 +120,10 @@ class CanVerOperatorDistribute(RewriteRule):
 
 
 class CanVerProperOrder(RewriteRule):
-    """Assumptions:
-    None
+    """
+    This ensures that Operarors follow ProperOrder
+    Example: X @ (Y @ Z) is not ProperOrder, but (X @ Y) @ Z is
+    Assumptions: None
     """
 
     def map_OperatorAdd(self, model: OperatorAdd):
@@ -142,8 +152,9 @@ class CanVerProperOrder(RewriteRule):
 
 
 class CanVerPruneIdentity(RewriteRule):
-    """Assumptions:
-    >>> Distributed
+    """
+    This checks if there is any ladder Identity present in ladder multiplication
+    Assumptions: OperatorDistribute
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -153,8 +164,11 @@ class CanVerPruneIdentity(RewriteRule):
 
 
 class CanVerGatherPauli(RewriteRule):
-    """Assumptions:
-    >>> Distributed, Gathered and then proper ordered and PauliAlgebra
+    """
+    This checks whether pauli and ladder have been separated. Example:
+    - X @ A @ Y will fail this check
+    - X @ Y @ A will pass this check
+    Assumptions: Distributed, Gathered and then proper ordered and PauliAlgebra
     """
 
     def map_OperatorKron(self, model: OperatorKron):
@@ -168,8 +182,9 @@ class CanVerGatherPauli(RewriteRule):
 
 
 class CanVerNormalOrder(RewriteRule):
-    """Assumptions:
-    >>> Distributed, Gathered and then proper ordered and PauliAlgebra, PruneIdentity
+    """
+    This checks whether the ladder operations are in normal order
+    Assumptions: Distributed, Gathered and then proper ordered and PauliAlgebra, PruneIdentity
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -183,6 +198,9 @@ class CanVerNormalOrder(RewriteRule):
 
 class CanVerSortedOrder(RewriteRule):
     """
+    This checks whether operators are in sorted order. Example:
+    - X + I will fail this check
+    - I + X will pass
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
                  PruneIdentity
     """
@@ -202,8 +220,10 @@ class CanVerSortedOrder(RewriteRule):
 
 class CanVerScaleTerm(RewriteRule):
     """
-    Assumptions:
-    >>> GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder, PruneIdentity
+    This cheks whether all terms have a scalar multiplication. Example:
+    - X + 2*Y will fail this check
+    - 1*X + 2*Y will pass this
+    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder, PruneIdentity
     Note that this only works for Pre
     """
 

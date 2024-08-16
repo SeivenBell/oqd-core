@@ -18,11 +18,6 @@ import numpy as np
 import itertools
 import time
 
-# define the target and then build a new model based on the target
-"""
-- Source: Analog
-- Target: Qutip
-"""
 
 
 def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
@@ -35,6 +30,9 @@ def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
 
 
 class QutipExperimentInterpreter(ConversionRule):
+    """
+    This takes in a QutipExperiment object, simulates the experiment and then produces the results
+    """
     def __init__(self, n_qreg, n_qmode):
         super().__init__()
         self._n_qreg = n_qreg
@@ -50,7 +48,6 @@ class QutipExperimentInterpreter(ConversionRule):
                 if idx == 0
                 else op_exp + coefficient * operator[0]
             )
-        # pprint("qutip exp is {}".format(op_exp))
         return lambda t, psi: qt.expect(op_exp, psi)
 
     def map_EntanglementEntropyVN(self, model: EntanglementEntropyVN, operands):
@@ -140,14 +137,14 @@ class QutipExperimentInterpreter(ConversionRule):
 
     def _QutipOperation(
         self, model: QutipOperation, dt, current_state, qutip_metrics
-    ):  # remove
+    ):
         duration = model.duration
         tspan = np.linspace(0, duration, round(duration / dt))  # create time vector
         qutip_hamiltonian = []
         for op, coeff in model.hamiltonian:
             qutip_hamiltonian.append(
                 [op, evaluate_math_expr(coeff, output_mode="str")]
-            )  # using visitor
+            )
         result_qobj = qt.sesolve(
             qutip_hamiltonian,
             current_state,
@@ -162,12 +159,14 @@ class QutipExperimentInterpreter(ConversionRule):
 
 
 class QutipBackendCompiler(ConversionRule):
+    """
+    This is a ConversionRule which which compiles analog layer objects to QutipExperiment objects
+    """
     def __init__(self, fock_cutoff=None):
         super().__init__()
         self._fock_cutoff = fock_cutoff
 
     def map_AnalogCircuit(self, model: AnalogCircuit, operands):
-        # pprint("operands in curciot is {}\n".format(operands))
         return operands["sequence"]
 
     def map_TaskArgsAnalog(self, model: TaskArgsAnalog, operands):
@@ -177,40 +176,32 @@ class QutipBackendCompiler(ConversionRule):
             fock_cutoff=model.fock_cutoff,
             dt=model.dt,
             metrics=operands["metrics"],
-            # metrics=self(model.metrics),
         )
 
     def map_Expectation(self, model: Expectation, operands):
         return QutipExpectation(operator=operands["operator"])
-        # return QutipExpectation(operator=self(model=model.operator))
 
     def map_Evolve(self, model: Evolve, operands):
         return QutipOperation(
-            # hamiltonian=self(model.gate), duration=model.duration
             hamiltonian=operands["gate"],
             duration=model.duration,
         )
 
     def map_AnalogGate(self, model: AnalogGate, operands):
-        # pprint("operands in analog gate is {}\n".format(operands))
-        # return self(model.hamiltonian)
         return operands["hamiltonian"]
 
     def map_OperatorAdd(self, model: OperatorAdd, operands):
-        # pprint("operands in adddd is {}\n".format(operands))
-        op = operands["op1"]  # self(model.op1)
+        op = operands["op1"]
         op.append(operands["op2"][0])
         return op
 
     def map_OperatorScalarMul(self, model: OperatorScalarMul, operands):
-        # return [(self(model.op), model.expr)]
         return [(operands["op"], model.expr)]
 
     def map_PauliI(self, model: PauliI, operands) -> qt.Qobj:
         return qt.qeye(2)
 
     def map_PauliX(self, model: PauliX, operands) -> qt.Qobj:
-        # pprint("operands in model {} is {}\n".format(model, operands))
         return qt.sigmax()
 
     def map_PauliY(self, model: PauliY, operands) -> qt.Qobj:
@@ -220,15 +211,12 @@ class QutipBackendCompiler(ConversionRule):
         return qt.sigmaz()
 
     def map_Identity(self, model: Identity, operands) -> qt.Qobj:
-        # raise NotImplementedError
         return qt.qeye(self._fock_cutoff)
 
     def map_Creation(self, model: Creation, operands) -> qt.Qobj:
-        # raise NotImplementedError
         return qt.create(self._fock_cutoff)
 
     def map_Annihilation(self, model: Annihilation, operands) -> qt.Qobj:
-        # raise NotImplementedError
         return qt.destroy(self._fock_cutoff)
 
     def map_OperatorMul(self, model: OperatorMul, operands) -> qt.Qobj:

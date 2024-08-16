@@ -18,6 +18,9 @@ __all__ = [
 
 
 class PrintOperator(ConversionRule):
+    """
+    This Conversion rule prints operators. verbosity can be set through the verbose attribute
+    """
     def __init__(self, *, verbose=False):
         super().__init__()
         self.verbose = verbose

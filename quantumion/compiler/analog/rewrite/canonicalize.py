@@ -28,6 +28,7 @@ __all__ = [
 
 class OperatorDistribute(RewriteRule):
     """
+    This distributes operators of hamiltonians
     Assumptions: GatherMathExpr (sometimes)
     """
 
@@ -82,11 +83,12 @@ class OperatorDistribute(RewriteRule):
 
 class GatherMathExpr(RewriteRule):
     """
+    This gathers the math expressions of operators so that we have math_expr * (operators without scalar multiplication)
     Assumptions: OperatorDistribute (sometimes)
     """
 
     def map_OperatorScalarMul(self, model: OperatorScalarMul):
-        # pprint(model)
+
         if isinstance(model.op, OperatorScalarMul):
             return model.expr * model.op.expr * model.op.op
 
@@ -117,6 +119,7 @@ class GatherMathExpr(RewriteRule):
 
 class GatherPauli(RewriteRule):
     """
+    This gathers ladders and paulis so that we have paulis and then ladders
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
     """
 
@@ -144,25 +147,21 @@ class GatherPauli(RewriteRule):
 
 class PruneIdentity(RewriteRule):
     """
+    This removes unnecessary ladder Identities from operators
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
-    """
-
-    """
-    There is pattern matching involved. when we go to visit_Op, we go to the pattern Op and then the 
-    inner if statements try to do pattern matching
-    if no pattern matched for the given Op model which has been visited, we just return None
     """
 
     def map_OperatorMul(self, model: OperatorMul):
         if isinstance(model.op1, (Identity)):
             return model.op2
         if isinstance(model.op2, (Identity)):
-            return model.op1  # problem is this is a rule and not a walk !!
+            return model.op1
         return None
 
 
 class PauliAlgebra(RewriteRule):
     """
+    This does Pauli algebra operations
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder
     """
 
@@ -189,6 +188,7 @@ class PauliAlgebra(RewriteRule):
 
 class NormalOrder(RewriteRule):
     """
+    This arranges Ladder oeprators in normal order form
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
     """
 
@@ -212,6 +212,8 @@ class NormalOrder(RewriteRule):
 
 class ProperOrder(RewriteRule):
     """
+    This converts expressions to proper order. Example X @ (Y @ Z)
+    will be converted to (X @ Y) @ Z
     Assumptions: GatherMathExpr, OperatorDistribute
     """
 
@@ -235,11 +237,13 @@ class ProperOrder(RewriteRule):
 
 class ScaleTerms(RewriteRule):
     """
+    This dcales operators. Like X + Y + 2*Z will be converted to
+    1*X + 1*Y + 2*Z
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
                  PruneIdentity
     (SortedOrder and ScaleTerms can be run in either order)
     Important: Requires GatherMathExpr right after application of ScaleTerms for Post walk
-    #"""
+    """
 
     def __init__(self):
         super().__init__()
@@ -265,11 +269,13 @@ class ScaleTerms(RewriteRule):
             op1 = OperatorScalarMul(expr=1, op=model.op1)
         if not isinstance(model.op2, Union[OperatorScalarMul, OperatorAdd]):
             op2 = OperatorScalarMul(expr=1, op=model.op2)
-        return OperatorAdd(op1=op1, op2=op2)  # check with no ret
+        return OperatorAdd(op1=op1, op2=op2)
 
 
 class SortedOrder(RewriteRule):
     """
+    This sorts operators. Example (X@Y) + (X@I) will be sorted to 
+    (X@I) + (X@Y)
     Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
                  PruneIdentity
     (SortedOrder and ScaleTerms can be run in either order)
