@@ -17,7 +17,18 @@ __all__ = [
 
 class AssignAnalogIRDim(RewriteRule):
     """
-    This gets the dimensions from analysis pass analysis_canonical_hamiltonian_dim and then inserts the dimension in the Analog IR
+    RewriteRule which gets the dimensions from analysis pass
+    analysis_canonical_hamiltonian_dim and then inserts the dimension in the Analog IR
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only modifies [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] in Analog level
+
+    Returns:
+        model  (VisitableBaseModel):
+
+    Assumptions:
+        - All [`Operator`][midstack.interface.analog.operator.Operator] inside  [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] must be in canonical form
     """
 
     def __init__(self):

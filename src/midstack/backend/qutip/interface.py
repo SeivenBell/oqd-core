@@ -46,7 +46,7 @@ class QutipExperiment(VisitableBaseModel):
         instructions (List[QutipOperation]): List of quantum operations to apply
         n_qreg (NonNegativeInt): Number of qubit quantum registers
         n_qmode (NonNegativeInt): Number of modal quantum registers
-        args (TaskArgsAnalog): Arguments for the experiment
+        args (TaskArgsQutip): Arguments for the experiment
     """
 
     instructions: list[QutipOperation]

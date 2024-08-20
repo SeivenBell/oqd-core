@@ -27,9 +27,23 @@ __all__ = [
 
 class CanVerPauliAlgebra(RewriteRule):
     """
-    This checks whether there is no incomplete Pauli Algebra computation
+    Checks whether there is any incomplete Pauli Algebra computation
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
     Assumptions:
-    Distributed, Gathered and then proper ordered
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder]
+
+    Example:
+        - X@(Y*Z) => fail
+        - X@Y => pass
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -44,8 +58,23 @@ class CanVerPauliAlgebra(RewriteRule):
 
 class CanVerGatherMathExpr(RewriteRule):
     """
-    This checks whether all MathExpr have been gathered
-    Assumptions: OperatorDistribute
+    Checks whether all MathExpr have been gathered (i.e. basically checks whether
+    there is any scalar multiplication within a term)
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        OperatorDistribute
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute]
+
+    Example:
+        - X@(1*Z) => fail
+        - 1*(X@Z) => pass
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -71,8 +100,21 @@ class CanVerGatherMathExpr(RewriteRule):
 
 class CanVerOperatorDistribute(RewriteRule):
     """
-    This checks for incomplete distribution of Operators
-    Assumptions: None
+    Checks for incomplete distribution of Operators
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        None
+
+    Example:
+        - X@(Y+Z) => fail
+        - X@Y + X@Z => pass
     """
 
     def __init__(self):
@@ -123,9 +165,22 @@ class CanVerOperatorDistribute(RewriteRule):
 
 class CanVerProperOrder(RewriteRule):
     """
-    This ensures that Operarors follow ProperOrder
-    Example: X @ (Y @ Z) is not ProperOrder, but (X @ Y) @ Z is
-    Assumptions: None
+    Checks whether all Operators are ProperOrdered according to how they are bracketed
+    Please see example for clarification
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        None
+
+    Example:
+        - X@(Y@Z) => fail
+        - (X@Y)@Z => pass
     """
 
     def map_OperatorAdd(self, model: OperatorAdd):
@@ -155,8 +210,22 @@ class CanVerProperOrder(RewriteRule):
 
 class CanVerPruneIdentity(RewriteRule):
     """
-    This checks if there is any ladder Identity present in ladder multiplication
-    Assumptions: OperatorDistribute
+    Checks if there is any ladder Identity present in ladder multiplication
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        OperatorDistribute
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute]
+
+    Example:
+        - A*J*C => fail
+        - A*C => pass
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -167,10 +236,24 @@ class CanVerPruneIdentity(RewriteRule):
 
 class CanVerGatherPauli(RewriteRule):
     """
-    This checks whether pauli and ladder have been separated. Example:
-    - X @ A @ Y will fail this check
-    - X @ Y @ A will pass this check
-    Assumptions: Distributed, Gathered and then proper ordered and PauliAlgebra
+    Checks whether pauli and ladder have been separated.
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra]
+
+    Example:
+        - X@A@Y => fail
+        - X@Y@A => pass
     """
 
     def map_OperatorKron(self, model: OperatorKron):
@@ -185,8 +268,27 @@ class CanVerGatherPauli(RewriteRule):
 
 class CanVerNormalOrder(RewriteRule):
     """
-    This checks whether the ladder operations are in normal order
-    Assumptions: Distributed, Gathered and then proper ordered and PauliAlgebra, PruneIdentity
+    Checks whether the ladder operations are in normal order
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        OperatorDistribute, GatherMathExpr, ProperOrder, PauliAlgebra, PruneIdentity
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra],
+        [`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity]
+
+
+    Example:
+        - A*C => fail
+        - C*A => pass
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -201,11 +303,27 @@ class CanVerNormalOrder(RewriteRule):
 
 class CanVerSortedOrder(RewriteRule):
     """
-    This checks whether operators are in sorted order. Example:
-    - X + I will fail this check
-    - I + X will pass
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
-                 PruneIdentity
+    Checks whether operators are in sorted order according to TermIndex.
+    Please see example for further clarification
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder],
+        [`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity]
+
+    Example:
+        - X + I => fail
+        - I + X => pass
     """
 
     def map_OperatorAdd(self, model: OperatorAdd):
@@ -223,11 +341,24 @@ class CanVerSortedOrder(RewriteRule):
 
 class CanVerScaleTerm(RewriteRule):
     """
-    This cheks whether all terms have a scalar multiplication. Example:
-    - X + 2*Y will fail this check
-    - 1*X + 2*Y will pass this
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder, PruneIdentity
-    Note that this only works for Pre
+    Checks whether all terms have a scalar multiplication.
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseMode): unchanged
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli]
+
+    Example:
+        - X + 2*Y => fail
+        - 1*X + 2*Y => pass
     """
 
     def __init__(self):

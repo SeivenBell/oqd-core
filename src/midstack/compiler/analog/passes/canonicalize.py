@@ -12,12 +12,6 @@ from midstack.compiler.math.rules import (
 ########################################################################################
 
 __all__ = [
-    "dist_chain",
-    "pauli_chain",
-    "normal_order_chain",
-    "scale_terms_chain",
-    "math_chain",
-    "verify_canonicalization",
     "analog_operator_canonicalization",
 ]
 
@@ -69,6 +63,22 @@ verify_canonicalization = Chain(
 def analog_operator_canonicalization(model):
     """
     This pass runs canonicalization chain for Operators with a verifies for canonicalization.
+
+    Args:
+        model (VisitableBaseModel):
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseModel):  [`Operator`][midstack.interface.analog.operator.Operator] of Analog level are in canonical form
+
+    Assumtions:
+        None
+
+    Example:
+        - for model = X@(Y + Z), output is 1*(X@Y) + 1 * (X@Z)
+        - for model = [`AnalogGate`][midstack.interface.analog.operations.AnalogGate](hamiltonian = (A * J)@X), output is
+            [`AnalogGate`][midstack.interface.analog.operations.AnalogGate](hamiltonian = 1 * (X@A))
+            (where A = Annhiliation(), J = Identity() [Ladder])
     """
     return Chain(
         FixedPoint(dist_chain),

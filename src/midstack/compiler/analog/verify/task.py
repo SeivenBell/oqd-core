@@ -11,8 +11,18 @@ __all__ = [
 
 class VerifyAnalogCircuitDim(RewriteRule):
     """
-    This checks whether hilbert space dimensions are consistent between AnalogGates
-    and whether they match the n_qreg and n_qmode given as input
+    Checks  whether hilbert space dimensions are consistent between  [`AnalogGate`][midstack.interface.analog.operations.AnalogGate] objects.
+    and whether they match the n_qreg and n_qmode given as input.
+
+    Args:
+        model (VisitableBaseModel):
+            The rule only verifies [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] in Analog level
+
+    Returns:
+        model (VisitableBaseModel): unchanged
+
+    Assumptions:
+        All [`Operator`][midstack.interface.analog.operator.Operator] inside  [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] are canonicalized
     """
 
     def __init__(self, n_qreg, n_qmode):
@@ -27,8 +37,18 @@ class VerifyAnalogCircuitDim(RewriteRule):
 
 class VerifyAnalogArgsDim(RewriteRule):
     """
-    This checks whether hilbert space dimensions are consistent between Expectation in args
-    and whether they match the n_qreg and n_qmode given as input
+    Checks whether hilbert space dimensions are consistent between Expectation in args
+    and whether they match the n_qreg and n_qmode given as input.
+
+    Args:
+        model (VisitableBaseModel):
+            The rule only verfies Expectation inside TaskArgsAnalog in Analog layer
+
+    Returns:
+        model (VisitableBaseModel): unchanged
+
+    Assumptions:
+        All [`Operator`][midstack.interface.analog.operator.Operator] inside  [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] are canonicalized
     """
 
     def __init__(self, n_qreg, n_qmode):

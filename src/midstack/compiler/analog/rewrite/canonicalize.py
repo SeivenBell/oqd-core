@@ -3,10 +3,8 @@ from typing import Union
 ########################################################################################
 
 from midstack.compiler.rule import RewriteRule
-from midstack.compiler.walk import Post
 from midstack.compiler.analog.passes.analysis import analysis_term_index
 from midstack.interface.math import MathNum, MathImag, MathAdd
-from midstack.compiler.analog.error import CanonicalFormError
 from midstack.interface.analog import *
 
 ########################################################################################
@@ -28,8 +26,20 @@ __all__ = [
 
 class OperatorDistribute(RewriteRule):
     """
-    This distributes operators of hamiltonians
-    Assumptions: GatherMathExpr (sometimes)
+    RewriteRule which distributes operators of hamiltonians
+
+    Args:
+        model ( VisitableBaseModel ):
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr] (sometimes)
+
+    Example:
+        X@(Y+Z) => X@Y + X@Z
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -83,8 +93,20 @@ class OperatorDistribute(RewriteRule):
 
 class GatherMathExpr(RewriteRule):
     """
-    This gathers the math expressions of operators so that we have math_expr * (operators without scalar multiplication)
-    Assumptions: OperatorDistribute (sometimes)
+    Gathers the math expressions of  [`Operator`][midstack.interface.analog.operator.Operator] so that we have math_expr * ( [`Operator`][midstack.interface.analog.operator.Operator] without scalar multiplication)
+
+    Args:
+        model (VisitableBaseModel):
+            The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+         [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute] (sometimes)
+
+    Example:
+        (1 * X) @ (2 * Y) => (1 * 2) => (1 * 2) * (X @ Y)
     """
 
     def map_OperatorScalarMul(self, model: OperatorScalarMul):
@@ -119,8 +141,23 @@ class GatherMathExpr(RewriteRule):
 
 class GatherPauli(RewriteRule):
     """
-    This gathers ladders and paulis so that we have paulis and then ladders
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    Gathers ladders and paulis so that we have paulis and then ladders
+
+    Args:
+        model ( VisitableBaseModel ):
+            The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder]
+        [`Operator`][midstack.interface.analog.operator.Operator]
+
+    Example:
+        X@A@Y => X@Y@A
     """
 
     def map_OperatorKron(self, model: OperatorKron):
@@ -147,8 +184,24 @@ class GatherPauli(RewriteRule):
 
 class PruneIdentity(RewriteRule):
     """
-    This removes unnecessary ladder Identities from operators
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
+    Removes unnecessary ladder Identities from operators
+
+    Args:
+        model ( VisitableBaseModel ):
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder]
+
+    Example:
+        A*J => A
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -161,8 +214,22 @@ class PruneIdentity(RewriteRule):
 
 class PauliAlgebra(RewriteRule):
     """
-    This does Pauli algebra operations
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder
+    RewriteRule for Pauli algebra operations
+
+    Args:
+        model ( VisitableBaseModel ):
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder]
+
+    Example:
+        X*Y => iZ
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -188,8 +255,23 @@ class PauliAlgebra(RewriteRule):
 
 class NormalOrder(RewriteRule):
     """
-    This arranges Ladder oeprators in normal order form
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli
+    Arranges Ladder oeprators in normal order form
+
+    Args:
+        model ( VisitableBaseModel ):
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli]
+
+    Example:
+        A*C => C*A + J
     """
 
     def map_OperatorMul(self, model: OperatorMul):
@@ -212,9 +294,21 @@ class NormalOrder(RewriteRule):
 
 class ProperOrder(RewriteRule):
     """
-    This converts expressions to proper order. Example X @ (Y @ Z)
-    will be converted to (X @ Y) @ Z
-    Assumptions: GatherMathExpr, OperatorDistribute
+    Converts expressions to proper order bracketing. Please see example for clarification.
+
+    Args:
+        model ( VisitableBaseModel )
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute]
+
+    Example:
+        X @ (Y @ Z) =>  (X @ Y) @ Z
     """
 
     def map_OperatorAdd(self, model: OperatorAdd):
@@ -237,12 +331,30 @@ class ProperOrder(RewriteRule):
 
 class ScaleTerms(RewriteRule):
     """
-    This dcales operators. Like X + Y + 2*Z will be converted to
-    1*X + 1*Y + 2*Z
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
-                 PruneIdentity
-    (SortedOrder and ScaleTerms can be run in either order)
-    Important: Requires GatherMathExpr right after application of ScaleTerms for Post walk
+    Scales operators to ensure consistency
+
+    Args:
+        model ( VisitableBaseModel )
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+
+    Returns:
+        model ( VisitableBaseModel ):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder],
+        [`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity]
+
+    Note:
+        - Requires [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr] right after application of [`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms]  for Post walk
+        - [`SortedOrder`][midstack.compiler.analog.rewrite.canonicalize.SortedOrder] and  [`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms] can be run in either order
+
+    Example:
+        X + Y + 2*Z => 1*X + 1*Y + 2*Z
+        X@Y => 1*(X@Y)
     """
 
     def __init__(self):
@@ -260,7 +372,6 @@ class ScaleTerms(RewriteRule):
             self.op_add_root = True
             if not isinstance(model, Union[OperatorAdd, OperatorScalarMul]):
                 return OperatorScalarMul(expr=1, op=model)
-        return model  # check with no ret
 
     def map_OperatorAdd(self, model: OperatorAdd):
         self.op_add_root = True
@@ -274,11 +385,30 @@ class ScaleTerms(RewriteRule):
 
 class SortedOrder(RewriteRule):
     """
-    This sorts operators. Example (X@Y) + (X@I) will be sorted to
-    (X@I) + (X@Y)
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
-                 PruneIdentity
-    (SortedOrder and ScaleTerms can be run in either order)
+    Sorts operators based on TermIndex and collects duplicate terms.
+    Please see example for clarification
+
+    Args:
+        model ( VisitableBaseModel ):
+               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model ( VisitableBaseModel )
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder],
+        [`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity]
+
+    Note:
+        - [`SortedOrder`][midstack.compiler.analog.rewrite.canonicalize.SortedOrder] and  [`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms] can be run in either order
+
+    Example:
+        (X@Y) + (X@I) => (X@I) + (X@Y)
+        X + I + Z + Y => I + X + Y + Z
     """
 
     def map_OperatorAdd(self, model: OperatorAdd):

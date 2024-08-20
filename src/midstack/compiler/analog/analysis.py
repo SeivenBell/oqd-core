@@ -6,12 +6,27 @@ from typing import Union
 
 class TermIndex(RewriteRule):
     """
-    This computes TermIndex. Example:
-    - For X@X + Y@Z the TermIndex is [[1,1],[2,3]]
-    - For X@A the TermIndex is [[1,(1,0)]]
-    Assumptions: GatherMathExpr, OperatorDistribute, ProperOrder, GatherPauli, NormalOrder
-    (without NormalOrder, TermIndex is not useful. For example, TermIndex of A*C and C*A is the same (2,1).
-    Hence, NormalOrder is a requirement.
+    This computes TermIndex and then stores the result in the TermIndex attribute. Please
+    see the example for further clarification.
+
+    Args:
+        model (VisitableBaseModel):
+            The rule only analyses [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseModel):
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder],
+
+    Example:
+        - X@Y@Z => TermIndex is [[1,2,3]]
+        - X@X + Y@Z => TermIndex is [[1,1],[2,3]]
+        - X@A => TermIndex is [[1,(1,0)]]
     """
 
     def __init__(self):

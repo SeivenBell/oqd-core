@@ -19,7 +19,20 @@ __all__ = [
 
 class PrintOperator(ConversionRule):
     """
-    This Conversion rule prints operators. verbosity can be set through the verbose attribute
+    ConversionRule which prints operators. Level of
+    verbosity can be set through the verbose attribute
+
+    Args:
+        model (Operator): [`Operator`][midstack.interface.analog.operator.Operator] of Analog level
+
+    Returns:
+        string (str):
+
+    Assumptions:
+        None
+
+    Example:
+        X@Y => str(X@Y)
     """
 
     def __init__(self, *, verbose=False):

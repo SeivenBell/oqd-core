@@ -12,10 +12,24 @@ __all__ = [
 
 class VerifyHilberSpaceDim(RewriteRule):
     """
-    This checks whether the hilbert spaces are correct between additions. Example:
-    - X@Y + Y@Z will pass this verification
-    - X@A + Y@Z will fail this verification
-    Assumptions: Distributed, Gathered and then proper ordered and PauliAlgebra
+    Checks whether the hilbert spaces are correct between additions.
+
+    Args:
+        model (VisitableBaseModel):
+            The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+
+    Returns:
+        model (VisitableBaseModel): unchanged
+
+    Assumptions:
+        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra]
+
+    Example:
+        - X@A + Y@Z => fail
+        - X@Y + Y@Z => pass
     """
 
     def __init__(self):
@@ -73,7 +87,6 @@ class VerifyHilberSpaceDim(RewriteRule):
                     model.op1.op
                 ), "Incorrect Hilbert space dimension"
 
-        #     self._final_add_term = True
         if not isinstance(model.op1, OperatorAdd):
             self._final_add_term = True
         self._dim = (0, 0)

@@ -20,6 +20,9 @@ class QutipBackend(BackendBase):
 
         Args:
             task (Task): Quantum experiment to compile
+
+        Returns:
+            QutipExperiment containing the compiled experiment for Qutip
         """
         from midstack.compiler.analog.passes.canonicalize import (
             analog_operator_canonicalization,
@@ -57,11 +60,17 @@ class QutipBackend(BackendBase):
 
     def run(self, *, task: Task = None, experiment: QutipExperiment = None):
         """
-        Method to run a
+        Method to simulate an experiment using theQuTip backend
 
         Args:
-            task (Optional[Task]): Quantum experiment to run as a [`Task`][midstack.backend.task.Task] object
-            experiment (Optional[QutipExperiment]): Quantum experiment to run as a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] object
+            task (Optional[Task]): Run experiment from a [`Task`][midstack.backend.task.Task] object
+            experiment (Optional[QutipExperiment]): Run experiment from a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] object
+
+        Returns:
+            TaskResultAnalog object containing the simulation results.
+
+        Note:
+            only one of task or experiment must provided
         """
         from midstack.backend.qutip.passes import run_qutip_experiment
 

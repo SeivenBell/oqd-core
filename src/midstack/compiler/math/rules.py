@@ -24,7 +24,19 @@ __all__ = [
 
 class PrintMathExpr(ConversionRule):
     """
-    This prints MathExpr objects. Verbosity level can be given as an attribute.
+    This prints [`MathExpr`][midstack.interface.math.MathExpr] objects. Verbosity level can be given as an attribute.
+
+    Args:
+        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+
+    Returns:
+        string (str):
+
+    Assumptions:
+        None
+
+    Example:
+        MathAdd(expr1 = 2, expr2 = 3) => str(2 + 3)
     """
 
     def __init__(self, *, verbose=False):
@@ -139,8 +151,19 @@ class PrintMathExpr(ConversionRule):
 
 class DistributeMathExpr(RewriteRule):
     """
-    This distributes MathExpr. example:
-    - 2*(3+5) = 2*3 + 2*5
+    This distributes [`MathExpr`][midstack.interface.math.MathExpr] objects.
+
+    Args:
+        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+
+    Returns:
+        model (MathExpr):
+
+    Assumptions:
+        None
+
+    Example:
+        MathStr(string = '3 * (2 + 1)') => MathStr(string = '3 * 2 + 3 * 1')
     """
 
     def map_MathMul(self, model: MathMul):
@@ -171,9 +194,21 @@ class DistributeMathExpr(RewriteRule):
 
 class PartitionMathExpr(RewriteRule):
     """
-    This partitions MathExpr objects. Example:
-    1 + 1j + 2 => 1 + 2 + 1j
-    1 * 1j * 2 => 1j * 1 * 2
+    This separates real and complex portions of [`MathExpr`][midstack.interface.math.MathExpr] objects.
+
+    Args:
+        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+
+    Returns:
+        model (MathExpr):
+
+    Assumptions:
+        [`DistributeMathExpr`][midstack.compiler.math.rules.DistributeMathExpr],
+        [`ProperOrderMathExpr`][midstack.compiler.math.rules.ProperOrderMathExpr]
+
+    Example:
+        - MathStr(string = '1 + 1j + 2') => MathStr(string = '1 + 2 + 1j')
+        - MathStr(string = '1 * 1j * 2') => MathStr(string = '1j * 1 * 2')
     """
 
     def map_MathAdd(self, model):
@@ -216,8 +251,19 @@ class PartitionMathExpr(RewriteRule):
 
 class ProperOrderMathExpr(RewriteRule):
     """
-    This arranges MathExpr in proper order. Example:
-    - 2*(3*5) will be converted to (2*3)*5
+    This rearranges bracketing of [`MathExpr`][midstack.interface.math.MathExpr] objects.
+
+    Args:
+        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+
+    Returns:
+        model (MathExpr):
+
+    Assumptions:
+        [`DistributeMathExpr`][midstack.compiler.math.rules.DistributeMathExpr]
+
+    Example:
+        - MathStr(string = '2 * (3 * 5)') => MathStr(string = '(2 * 3) * 5')
     """
 
     def map_MathAdd(self, model: MathAdd):
