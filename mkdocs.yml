@@ -118,6 +118,8 @@ plugins:
             show_signature_annotations: true
             signature_crossrefs: true
             separate_signature: false
+            group_by_category: false
+            members_order: "source"
           import:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
