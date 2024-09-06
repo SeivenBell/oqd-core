@@ -16,13 +16,16 @@ class QutipBackend(BackendBase):
 
     def compile(self, task: Task):
         """
-        Method for compiling a task to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment]
+        Method for compiling program of task to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] and converting
+        args of rask to ([`TaskArgsQutip`][midstack.backend.qutip.interface.TaskArgsQutip].
 
         Args:
             task (Task): Quantum experiment to compile
 
         Returns:
-            QutipExperiment containing the compiled experiment for Qutip
+            converted_circuit (QutipExperiment): QutipExperiment containing the compiled experiment for Qutip
+            converted_args (TaskArgsQutip): args of analog layer are converted to args for QuTip.
+
         """
         from midstack.compiler.analog.passes.canonicalize import (
             analog_operator_canonicalization,

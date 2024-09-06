@@ -15,6 +15,17 @@ class QutipExpectation(VisitableBaseModel):
 
 
 class TaskArgsQutip(VisitableBaseModel):
+    """
+    Class representing args for QuTip
+
+    Attributes:
+        layer (str): the layer of the experiment (analog, atomic)
+        n_shots (Union[int, None]): number of shots requested
+        fock_cutof (int): fock_cutoff for QuTip simulation
+        dt (float): timesteps for discrete time
+        metrics (dict): metrics which should be computed for the experiment. This does not require any Measure instruction in the analog layer.
+    """
+
     layer: Literal["analog"] = "analog"
     n_shots: Union[int, None] = 10
     fock_cutoff: int = 4
@@ -26,7 +37,7 @@ class TaskArgsQutip(VisitableBaseModel):
 
 class QutipOperation(VisitableBaseModel):
     """
-    Class representing a quantum operation in qutip
+    Class representing a quantum operation in QuTip
 
     Attributes:
         hamiltonian (List[qt.Qobj, str]): Hamiltonian to evolve by

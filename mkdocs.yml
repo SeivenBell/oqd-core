@@ -43,6 +43,7 @@ nav:
   - Canonicalization Flow: technical/explanation/canonicalization-flow.md
   - Infrastructure: technical/explanation/infrastructure.md
   - Analog to Atomic Compiler: technical/explanation/Analog-to-Atomic-compiler.md
+  - QuTip Simulation: technical/explanation/qutip-simulation.md
 - API Reference:
   - Interfaces:
     - Data Structures: technical/reference/interface-base.md

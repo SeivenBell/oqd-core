@@ -81,6 +81,18 @@ class TaskArgsAnalog(VisitableBaseModel):
 
 
 class TaskResultAnalog(VisitableBaseModel):
+    """
+    Contains the results of a simulation/actual experiment.
+
+    Attributes:
+        layer (str): the layer of the experiment (analog, atomic)
+        times (list[float]): number of discrete times
+        state List[CastComplexFloat]: Final quantum state after evolution
+        metrics (dict): metrics which have been computed for the experiment. This does not require any Measure instruction in the analog layer.
+        counts dict[str, int]: counts of different states after the experiment. This requires Measure instruction in the analog layer.
+        runtime (float): time taken for the simulation/experiment.
+    """
+
     layer: Literal["analog"] = "analog"
     times: List[float] = []
     state: List[CastComplexFloat] = []
