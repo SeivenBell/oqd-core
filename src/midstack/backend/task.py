@@ -6,7 +6,7 @@ from pydantic import BaseModel, BeforeValidator
 ########################################################################################
 
 from midstack.interface.base import VisitableBaseModel
-from midstack.interface.analog.operations import AnalogCircuit
+from midstack.interface.analog.operation import AnalogCircuit
 from midstack.interface.digital.circuit import DigitalCircuit
 from midstack.interface.atomic.program import AtomicProgram
 

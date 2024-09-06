@@ -1,5 +1,5 @@
 from midstack.interface.analog.operator import *
-from midstack.interface.analog.operations import *
+from midstack.interface.analog.operation import *
 from midstack.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
 from midstack.compiler.math.passes import evaluate_math_expr
 from midstack.backend.qutip.interface import (

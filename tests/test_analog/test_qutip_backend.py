@@ -1,5 +1,5 @@
 from midstack.interface.analog.operator import *
-from midstack.interface.analog.operations import *
+from midstack.interface.analog.operation import *
 from midstack.interface.math import MathStr
 from midstack.backend.metric import *
 from midstack.backend.task import Task, TaskArgsAnalog

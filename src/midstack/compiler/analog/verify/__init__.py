@@ -1,2 +1,2 @@
-from .canonicalization import *
+from .canonicalize import *
 from .task import *

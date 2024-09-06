@@ -50,4 +50,4 @@ classDiagram
   }
 ```
 
-::: midstack.interface.analog.operations
+::: midstack.interface.analog.operation

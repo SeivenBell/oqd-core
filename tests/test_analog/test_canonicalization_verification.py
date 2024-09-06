@@ -1,5 +1,5 @@
 from midstack.interface.analog import *
-from midstack.compiler.analog.verify.canonicalization import *
+from midstack.compiler.analog.verify.canonicalize import *
 from midstack.compiler.analog.error import CanonicalFormError
 from midstack.compiler.rule import RewriteRule
 from midstack.compiler.walk import Walk, Post, Pre
