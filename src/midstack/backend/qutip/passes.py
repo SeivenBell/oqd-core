@@ -1,8 +1,9 @@
 from midstack.backend.qutip.conversion import (
     QutipBackendCompiler,
-    QutipExperimentInterpreter,
+    QutipExperimentVM,
+    QutipMetricConversion,
 )
-from midstack.compiler.walk import Post
+from midstack.compiler.walk import Post, Pre
 
 
 def compiler_analog_circuit_to_qutipIR(model, fock_cutoff):
@@ -35,7 +36,7 @@ def compiler_analog_args_to_qutipIR(model):
     return Post(QutipBackendCompiler(fock_cutoff=model.fock_cutoff))(model=model)
 
 
-def run_qutip_experiment(model):
+def run_qutip_experiment(model, args):
     """
     This takes in a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] and produces a TaskResultAnalog object
 
@@ -48,4 +49,15 @@ def run_qutip_experiment(model):
     """
     n_qreg = model.n_qreg
     n_qmode = model.n_qmode
-    return Post(QutipExperimentInterpreter(n_qreg=n_qreg, n_qmode=n_qmode))(model=model)
+    metrics = Post(QutipMetricConversion(n_qreg=n_qreg, n_qmode=n_qmode))(args.metrics)
+    interpreter = Pre(
+        QutipExperimentVM(
+            qt_metrics=metrics,
+            n_shots=args.n_shots,
+            fock_cutoff=args.fock_cutoff,
+            dt=args.dt,
+        )
+    )
+    interpreter(model=model)
+
+    return interpreter.children[0].results

@@ -38,6 +38,10 @@ class QutipOperation(VisitableBaseModel):
     duration: float
 
 
+class QutipMeasurement(VisitableBaseModel):
+    pass
+
+
 class QutipExperiment(VisitableBaseModel):
     """
     Class representing a quantum experiment in qutip
@@ -49,7 +53,6 @@ class QutipExperiment(VisitableBaseModel):
         args (TaskArgsQutip): Arguments for the experiment
     """
 
-    instructions: list[QutipOperation]
+    instructions: list[Union[QutipOperation, QutipMeasurement]]
     n_qreg: NonNegativeInt
     n_qmode: NonNegativeInt
-    args: TaskArgsQutip

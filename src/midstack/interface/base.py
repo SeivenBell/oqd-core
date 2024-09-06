@@ -13,6 +13,9 @@ class VisitableBaseModel(BaseModel):
         visitor.reset()
         return visitor.visit(self)
 
+    class Config:
+        validate_assignment = True
+
 
 class TypeReflectBaseModel(VisitableBaseModel):
     """
