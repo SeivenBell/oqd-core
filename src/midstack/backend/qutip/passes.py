@@ -5,6 +5,16 @@ from midstack.backend.qutip.conversion import (
 )
 from midstack.compiler.walk import Post, Pre
 
+########################################################################################
+
+__all__ = [
+    "compiler_analog_circuit_to_qutipIR",
+    "compiler_analog_args_to_qutipIR",
+    "run_qutip_experiment",
+]
+
+########################################################################################
+
 
 def compiler_analog_circuit_to_qutipIR(model, fock_cutoff):
     """

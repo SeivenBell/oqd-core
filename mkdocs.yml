@@ -18,11 +18,9 @@ nav:
   - Get Started:
       - The Stack: index.md
       - Installation: get-started/installation.md
-      - More details: get-started/stack.md
   - Tutorials:
       - Analog: tutorials/analog.md
       - Examples:
-          - Index: examples.md
           - Analog:
               - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
               - Adiabatic state:
@@ -41,11 +39,9 @@ nav:
       - Interfaces:
           - Data Structures: reference/interface-base.md
           - Math Expression: reference/math-interface.md
-          - Digital: reference/digital-interface.md
           - Analog:
-              - Operations: reference/operations-interface.md
+              - Operation: reference/operation-interface.md
               - Operators: reference/operator-interface.md
-          - Atomic: reference/atomic-interface.md
       - Compiler: reference/compiler.md
       - Backends:
           - Task: reference/task-backend.md

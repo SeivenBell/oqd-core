@@ -1,4 +1,4 @@
 from .passes import *
-from .rewrite import *
+from .rule import *
 from .verify import *
 from .utils import *

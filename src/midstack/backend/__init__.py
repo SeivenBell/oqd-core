@@ -1,1 +1,1 @@
-from .qutip.base import QutipBackend
+from .qutip import QutipBackend

@@ -2,7 +2,14 @@ from midstack.compiler.base import PassBase
 
 ########################################################################################
 
+__all__ = [
+    "RewriteRule",
+    "ConversionRule",
+    "PrettyPrint",
+]
 
+
+########################################################################################
 class RewriteRule(PassBase):
     """
     This class represents a rule used to rewrite a type or IR. The result of the same type

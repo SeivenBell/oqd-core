@@ -1,6 +1,11 @@
-from midstack.interface.analog.operator import *
-from midstack.interface.analog.operation import *
-from midstack.backend.task import TaskArgsAnalog, TaskResultAnalog, ComplexFloat
+import numpy as np
+import itertools
+import time
+import qutip as qt
+
+########################################################################################
+
+from midstack.backend.task import TaskResultAnalog
 from midstack.compiler.math.passes import evaluate_math_expr
 from midstack.backend.qutip.interface import (
     QutipExperiment,
@@ -9,14 +14,18 @@ from midstack.backend.qutip.interface import (
     TaskArgsQutip,
     QutipExpectation,
 )
-from midstack.backend.metric import *
-from midstack.backend.task import Task, TaskArgsAnalog
-import qutip as qt
-from midstack.compiler.walk import *
-from midstack.compiler.rule import *
-import numpy as np
-import itertools
-import time
+from midstack.compiler.rule import ConversionRule, RewriteRule
+
+########################################################################################
+
+__all__ = [
+    "entanglement_entropy_vn",
+    "QutipMetricConversion",
+    "QutipBackendCompiler",
+    "QutipExperimentVM",
+]
+
+########################################################################################
 
 
 def entanglement_entropy_vn(t, psi, qreg, qmode, n_qreg, n_qmode):
@@ -46,7 +55,7 @@ class QutipMetricConversion(ConversionRule):
         self._n_qreg = n_qreg
         self._n_qmode = n_qmode
 
-    def map_QutipExpectation(self, model: QutipExpectation, operands):
+    def map_QutipExpectation(self, model, operands):
         for idx, operator in enumerate(model.operator):
             coefficient = evaluate_math_expr(operator[1])
             op_exp = (
@@ -56,7 +65,7 @@ class QutipMetricConversion(ConversionRule):
             )
         return lambda t, psi: qt.expect(op_exp, psi)
 
-    def map_EntanglementEntropyVN(self, model: EntanglementEntropyVN, operands):
+    def map_EntanglementEntropyVN(self, model, operands):
         return lambda t, psi: entanglement_entropy_vn(
             t, psi, model.qreg, model.qmode, self._n_qreg, self._n_qmode
         )
@@ -84,7 +93,7 @@ class QutipExperimentVM(RewriteRule):
         self._fock_cutoff = fock_cutoff
         self._dt = dt
 
-    def map_QutipExperiment(self, model: QutipExperiment):
+    def map_QutipExperiment(self, model):
 
         dims = model.n_qreg * [2] + model.n_qmode * [self._fock_cutoff]
         self.n_qreg = model.n_qreg
@@ -102,7 +111,7 @@ class QutipExperimentVM(RewriteRule):
             }
         )
 
-    def map_QutipMeasurement(self, model: QutipMeasurement):
+    def map_QutipMeasurement(self, model):
         if self._n_shots is None:
             self.results.counts = {}
         else:
@@ -124,7 +133,7 @@ class QutipExperimentVM(RewriteRule):
             self.current_state.full().squeeze(),
         )
 
-    def map_QutipOperation(self, model: QutipOperation):
+    def map_QutipOperation(self, model):
 
         duration = model.duration
         tspan = np.linspace(0, duration, round(duration / self._dt)).tolist()
@@ -171,14 +180,14 @@ class QutipBackendCompiler(ConversionRule):
         super().__init__()
         self._fock_cutoff = fock_cutoff
 
-    def map_AnalogCircuit(self, model: AnalogCircuit, operands):
+    def map_AnalogCircuit(self, model, operands):
         return QutipExperiment(
             instructions=operands["sequence"],
             n_qreg=operands["n_qreg"],
             n_qmode=operands["n_qmode"],
         )
 
-    def map_TaskArgsAnalog(self, model: TaskArgsAnalog, operands):
+    def map_TaskArgsAnalog(self, model, operands):
         return TaskArgsQutip(
             layer=model.layer,
             n_shots=model.n_shots,
@@ -187,52 +196,52 @@ class QutipBackendCompiler(ConversionRule):
             metrics=operands["metrics"],
         )
 
-    def map_Expectation(self, model: Expectation, operands):
+    def map_Expectation(self, model, operands):
         return QutipExpectation(operator=operands["operator"])
 
-    def map_Evolve(self, model: Evolve, operands):
+    def map_Evolve(self, model, operands):
         return QutipOperation(
             hamiltonian=operands["gate"],
             duration=model.duration,
         )
 
-    def map_Measure(self, model: Measure, operands):
+    def map_Measure(self, model, operands):
         return QutipMeasurement()
 
-    def map_AnalogGate(self, model: AnalogGate, operands):
+    def map_AnalogGate(self, model, operands):
         return operands["hamiltonian"]
 
-    def map_OperatorAdd(self, model: OperatorAdd, operands):
+    def map_OperatorAdd(self, model, operands):
         op = operands["op1"]
         op.append(operands["op2"][0])
         return op
 
-    def map_OperatorScalarMul(self, model: OperatorScalarMul, operands):
+    def map_OperatorScalarMul(self, model, operands):
         return [(operands["op"], model.expr)]
 
-    def map_PauliI(self, model: PauliI, operands) -> qt.Qobj:
+    def map_PauliI(self, model, operands):
         return qt.qeye(2)
 
-    def map_PauliX(self, model: PauliX, operands) -> qt.Qobj:
+    def map_PauliX(self, model, operands):
         return qt.sigmax()
 
-    def map_PauliY(self, model: PauliY, operands) -> qt.Qobj:
+    def map_PauliY(self, model, operands):
         return qt.sigmay()
 
-    def map_PauliZ(self, model: PauliZ, operands) -> qt.Qobj:
+    def map_PauliZ(self, model, operands):
         return qt.sigmaz()
 
-    def map_Identity(self, model: Identity, operands) -> qt.Qobj:
+    def map_Identity(self, model, operands):
         return qt.qeye(self._fock_cutoff)
 
-    def map_Creation(self, model: Creation, operands) -> qt.Qobj:
+    def map_Creation(self, model, operands):
         return qt.create(self._fock_cutoff)
 
-    def map_Annihilation(self, model: Annihilation, operands) -> qt.Qobj:
+    def map_Annihilation(self, model, operands):
         return qt.destroy(self._fock_cutoff)
 
-    def map_OperatorMul(self, model: OperatorMul, operands) -> qt.Qobj:
+    def map_OperatorMul(self, model, operands):
         return operands["op1"] * operands["op2"]
 
-    def map_OperatorKron(self, model: OperatorKron, operands) -> qt.Qobj:
+    def map_OperatorKron(self, model, operands):
         return qt.tensor(operands["op1"], operands["op2"])

@@ -1,3 +1,0 @@
-# Utilities
-
-::: midstack.utils

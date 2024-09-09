@@ -393,7 +393,7 @@ class TestCanonicalizationVerificationGatherPauli(
         op = (Y + I) @ A @ X
         self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
 
-    def test_assumtion_nested_addition_pass(self):
+    def test_assumption_nested_addition_pass(self):
         """Assumption double Nested Addition pass"""
         op = (Y + I) @ A @ (Z + I)  # +(I+Z)@C@C@(X+(Z+I)) ##  X@(A*A)@A+I@C@C
         self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule)
@@ -576,7 +576,7 @@ class TestCanonicalizationVerificationSortedOrder(
         op = X @ I @ Z + 2 * X @ I @ Z
         self.assertCanonicalFormErrorRaised(operator=op, rule=self._rule)
 
-    def test_assumtion_pass(self):
+    def test_assumption_pass(self):
         """Hamiltonian needs to be distributed"""
         op = (I + X) @ Z
         self.assertCanonicalFormErrorNotRaised(operator=op, rule=self._rule)

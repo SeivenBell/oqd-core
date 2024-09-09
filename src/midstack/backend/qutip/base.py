@@ -4,9 +4,12 @@ from midstack.backend.qutip.interface import QutipExperiment, TaskArgsQutip
 from midstack.backend.task import Task
 
 ########################################################################################
+
 __all__ = [
     "QutipBackend",
 ]
+
+########################################################################################
 
 
 class QutipBackend(BackendBase):
@@ -17,7 +20,7 @@ class QutipBackend(BackendBase):
     def compile(self, task: Task):
         """
         Method for compiling program of task to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] and converting
-        args of rask to ([`TaskArgsQutip`][midstack.backend.qutip.interface.TaskArgsQutip].
+        args of task to [`TaskArgsQutip`][midstack.backend.qutip.interface.TaskArgsQutip].
 
         Args:
             task (Task): Quantum experiment to compile

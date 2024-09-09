@@ -3,6 +3,16 @@ from midstack.compiler.rule import ConversionRule
 
 ########################################################################################
 
+__all__ = [
+    "Walk",
+    "Pre",
+    "Post",
+    "Level",
+    "In",
+]
+
+########################################################################################
+
 
 class Walk(PassBase):
     def __init__(self, rule: PassBase, *, reverse: bool = False):
