@@ -1,8 +1,6 @@
-
 ## Compilation
 
-We first compile [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] using the ConversionRule [`QutipBackendCompiler`][midstack.backend.qutip.conversion.QutipBackendCompiler]. We also then separately convert the args of Analog layer to a corresponding representation of the args which can be processed by QuTip. The [`compile`][midstack.backend.qutip.base.QutipBackend.compile] functions is used to compile [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] and also used to convert the args.
-
+We first compile [`AnalogCircuit`][midstack.interface.analog.operation.AnalogCircuit] to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] using the ConversionRule [`QutipBackendCompiler`][midstack.backend.qutip.conversion.QutipBackendCompiler]. We also then separately convert the args of Analog layer to a corresponding representation of the args which can be processed by QuTip. The [`compile`][midstack.backend.qutip.base.QutipBackend.compile] functions is used to compile [`AnalogCircuit`][midstack.interface.analog.operation.AnalogCircuit] to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] and also used to convert the args.
 
 ## Simulation
 

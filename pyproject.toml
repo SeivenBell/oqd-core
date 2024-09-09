@@ -17,12 +17,15 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = [
+    "jupyter",
+    "jupyter_contrib_nbextensions",
     "pymdown-extensions",
     "mkdocstrings",
     "mkdocs-material",
     "mkdocstrings-python",
     "mkdocs-same-dir",
-    "mknotebooks",
+    "mkdocs-jupyter",
+    "mdx_truly_sane_lists",
 ]
 test = ["unittest_prettify"]
 

@@ -1,15 +1,18 @@
-We are using the Visitor patter, but have separated the logic (`Rule`) and IR Traversal (`Walk`) for more flexibility. 
+We are using the Visitor patter, but have separated the logic (`Rule`) and IR Traversal (`Walk`) for more flexibility.
 
 ## RewriteRules
 
 Rewrite Rules in compilers are basically used to match and then transform an expression. For example, similifying an expression like `2 * (1 + 3)` to `2 * 1 + 2 * 3` is a form of rewriting the expression. here we demonstrate rewriting with the simple example shown below:
+
 $$
 X@(Y*I)\rightarrow X@Y
 $$
+
 This rewrite modified the AST as shown below. This Rule is an example of [`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra]. Here we basically rewrite the right hand side of the `OperatorKron`.
 
-=== "Original Graph"
-    ```mermaid
+/// tab | Original Graph
+
+```mermaid
     graph TD
     element0("PauliX"):::Pauli
     element1("PauliY"):::Pauli
@@ -25,10 +28,13 @@ This rewrite modified the AST as shown below. This Rule is an example of [`Pauli
     classDef OperatorKron stroke:#A452B3,stroke-width:3px
     classDef OperatorMul stroke:300000,stroke-width:3px
     classDef MathExpr stroke:#100000,stroke-width:3px
-    ```
+```
 
-=== "Transformed Graph after Rewrite"
-    ```mermaid
+///
+
+/// tab | Transformed Graph after Rewrite
+
+```mermaid
     graph TD
     element0("PauliX"):::Pauli
     element1("PauliY"):::Pauli
@@ -41,12 +47,14 @@ This rewrite modified the AST as shown below. This Rule is an example of [`Pauli
     classDef OperatorKron stroke:#A452B3,stroke-width:3px
     classDef OperatorMul stroke:300000,stroke-width:3px
     classDef MathExpr stroke:#100000,stroke-width:3px
+```
 
-    ```
+///
 
 Note that `RewriteRule` does not traverse through the graph. To traverse a graph we use `Walk`.
 
 ## Walk
+
 Walks are just the different ways of traversing graphs. Example for this case. We have several types of `Walk`. I will show the different types using the following the Tree.
 
 ```mermaid
@@ -70,26 +78,42 @@ Walks are just the different ways of traversing graphs. Example for this case. W
     classDef MathExpr stroke:#100000,stroke-width:3px
 
 ```
-=== "Pre"
-    === "Regular"
-        $$ A0\rightarrow B0 \rightarrow C0 \rightarrow C1  \rightarrow B1 \rightarrow C2 \rightarrow C3 $$
-    === "Reverse"
-        $$ A0\rightarrow B1 \rightarrow C3 \rightarrow C2  \rightarrow B0 \rightarrow C1 \rightarrow C0 $$
-=== "Post"
-    === "Regular"
-        $$ C0\rightarrow C1 \rightarrow B0 \rightarrow C2 \rightarrow C3 \rightarrow B1 \rightarrow A0 $$
-    === "Reverse"
-        $$ C3\rightarrow C2 \rightarrow B1 \rightarrow C1 \rightarrow C0 \rightarrow B0 \rightarrow A0 $$
-=== "In"
-    === "Regular"
-        $$ C0\rightarrow B0 \rightarrow C1 \rightarrow A0 \rightarrow C2 \rightarrow B1 \rightarrow C3 $$
-    === "Reverse"
-        $$ C3\rightarrow B1 \rightarrow C2 \rightarrow A0 \rightarrow C1 \rightarrow B0 \rightarrow C0 $$
-=== "Level"
-    === "Regular"
-        $$ A0\rightarrow B0 \rightarrow B1 \rightarrow C0 \rightarrow C1 \rightarrow C2 \rightarrow C3 $$
-    === "Reverse"
-        $$ A0\rightarrow B1 \rightarrow B0 \rightarrow C3 \rightarrow C2 \rightarrow C1 \rightarrow C0 $$
+
+/// tab | Pre
+//// tab | Regular
+$$ A0\rightarrow B0 \rightarrow C0 \rightarrow C1 \rightarrow B1 \rightarrow C2 \rightarrow C3 $$
+////
+//// tab | Reverse
+$$ A0\rightarrow B1 \rightarrow C3 \rightarrow C2 \rightarrow B0 \rightarrow C1 \rightarrow C0 $$
+////
+///
+
+/// tab | Post
+//// tab | Regular
+$$ C0\rightarrow C1 \rightarrow B0 \rightarrow C2 \rightarrow C3 \rightarrow B1 \rightarrow A0 $$
+////
+//// tab | Reverse
+$$ C3\rightarrow C2 \rightarrow B1 \rightarrow C1 \rightarrow C0 \rightarrow B0 \rightarrow A0 $$
+////
+///
+
+/// tab | In
+//// tab | Regular
+$$ C0\rightarrow B0 \rightarrow C1 \rightarrow A0 \rightarrow C2 \rightarrow B1 \rightarrow C3 $$
+////
+//// tab | Reverse
+$$ C3\rightarrow B1 \rightarrow C2 \rightarrow A0 \rightarrow C1 \rightarrow B0 \rightarrow C0 $$
+////
+///
+
+/// tab | Level
+//// tab | Regular
+$$ A0\rightarrow B0 \rightarrow B1 \rightarrow C0 \rightarrow C1 \rightarrow C2 \rightarrow C3 $$
+////
+//// tab | Reverse
+$$ A0\rightarrow B1 \rightarrow B0 \rightarrow C3 \rightarrow C2 \rightarrow C1 \rightarrow C0 $$
+////
+///
 
 ## Conversion Rule
 
@@ -118,7 +142,7 @@ Walks are just the different ways of traversing graphs. Example for this case. W
 
 ```
 
-Recall `Post`  walk the order would be 
+Recall `Post` walk the order would be
 
 $$
 PostWalk: B0\rightarrow C0 \rightarrow C1 \rightarrow B1 \rightarrow A0
@@ -130,9 +154,9 @@ $$
 
 → at $C1$, the converted value of $C1$ is stored
 
-→ at $B1$, the converted value of $B1$ is computed using the converted values of  $C0$ and  $C1$
+→ at $B1$, the converted value of $B1$ is computed using the converted values of $C0$ and $C1$
 
-→ at $A0$, the converted value of $A0$ is computed using the converted values of  $B0$ and  $B1$
+→ at $A0$, the converted value of $A0$ is computed using the converted values of $B0$ and $B1$
 
 ### Why we need Conversion Rule?
 
@@ -140,11 +164,11 @@ Here is a simple illustration
 
 ```python
 # In IR1 we have addition which takes in IR1_Math
->>> IR1add(op1: IR1_Math, 
+>>> IR1add(op1: IR1_Math,
 						op2: IR1_Math)
-				
+
 # In IR2 we have addition which takes in IR2_Math
->>> IR2add(op1: IR2_Math, 
+>>> IR2add(op1: IR2_Math,
 						op2: IR2_Math)
 
 # Say we want to go from IR1add to IR2add
@@ -156,7 +180,7 @@ def map_IR1add(self, model: IR1add):
 
 # Now, this means i need to evaluate the operands of IR1add before
 # putting the result in return IR2add(op1 = model.op1, op2 = model.op2)
-# This is where Conversion pattern comes in. In conversion pattern 
+# This is where Conversion pattern comes in. In conversion pattern
 # we have an additional parameter called operands which pre computes the
 # children nodes. In conversion pattern this can be simple done by:
 
@@ -168,7 +192,6 @@ def map_IR1add(self, model: IR1add, operands):
 ## Passes
 
 In compiler terminology going through the whole IR once is called a pass. Now we can combine passes in functions by calling different passes. For example, in our case, the qutip compilation is done by different passes as shown below
-
 
 ```python
     def compile(self, task: Task):
@@ -195,18 +218,18 @@ In compiler terminology going through the whole IR once is called a pass. Now we
 
         # pass to canonicaliza the operators in the AnalogCircuit
         canonicalized_circuit = analog_operator_canonicalization(task.program)
-        
+
         # This just canonicalizes the operators inside the TaskArgsAnalog
         # i.e. operators for Expectation
         canonicalized_args = analog_operator_canonicalization(
             task.args
         )
-        
-        
-				# another pass which assigns the n_qreg and n_qmode of the 
+
+
+				# another pass which assigns the n_qreg and n_qmode of the
 				# AnalogCircuit IR
         assigned_circuit = assign_analog_circuit_dim(canonicalized_circuit)
-        
+
         # This just verifies that the operators in the args have the same
         # dimension as the operators in the AnalogCircuit
         verify_analog_args_dim(
@@ -214,12 +237,12 @@ In compiler terminology going through the whole IR once is called a pass. Now we
             n_qreg=assigned_circuit.n_qreg,
             n_qmode=assigned_circuit.n_qmode,
         )
-        
+
         # another pass which compiles AnalogCircuit to a QutipExperiment
         converted_circuit = compiler_analog_circuit_to_qutipIR(
             assigned_circuit, fock_cutoff=task.args.fock_cutoff
         )
-        
+
         # This just converts the args so that the operators of the args are
         # converted to qutip objects
         converted_args = compiler_analog_args_to_qutipIR(canonicalized_args)
@@ -229,6 +252,6 @@ In compiler terminology going through the whole IR once is called a pass. Now we
             converted_circuit,
             converted_args,
         )
-	      # then you basically run the experiment using the args as 
+	      # then you basically run the experiment using the args as
 	      # compiler parameters
 ```
