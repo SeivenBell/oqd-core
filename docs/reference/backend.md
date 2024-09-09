@@ -1,3 +1,1 @@
-# Backend
-
 ::: midstack.backend

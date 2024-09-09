@@ -37,16 +37,13 @@ nav:
       - QuTip Simulation: explanation/qutip-simulation.md
   - API Reference:
       - Interfaces:
-          - Data Structures: reference/interface-base.md
-          - Math Expression: reference/math-interface.md
-          - Analog:
-              - Operation: reference/operation-interface.md
-              - Operators: reference/operator-interface.md
+          - Base: reference/interface-base.md
+          - Math: reference/math-interface.md
+          - Analog: reference/analog-interface.md
       - Compiler: reference/compiler.md
       - Backends:
           - Task: reference/task-backend.md
           - Qutip: reference/qutip-backend.md
-      - Utilities: reference/utils.md
 
 theme:
   name: material

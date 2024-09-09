@@ -1,3 +1,1 @@
-# Compiler infrastructure
-
 ::: midstack.compiler

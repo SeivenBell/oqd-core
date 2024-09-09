@@ -1,11 +1,10 @@
-from typing import List, Tuple, Literal, Union, Optional
-from pydantic import ValidationError
+from typing import List, Literal, Union
 from pydantic.types import NonNegativeInt
 
 ########################################################################################
 
 from midstack.interface.base import VisitableBaseModel
-from midstack.interface.analog.operator import *
+from midstack.interface.analog.operator import Operator
 
 ########################################################################################
 
