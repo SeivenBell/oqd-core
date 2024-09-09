@@ -1,4 +1,3 @@
-
 site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
 #site_url: http://0.0.0.0:8000
@@ -19,45 +18,45 @@ extra:
       link: https://github.com/OpenQuantumDesign
       name: Open Quantum Design GitHub
 
-
 nav:
-- Get Started:
-    - The Stack: index.md
-    - Installation: get-started/installation.md
-    - More details: get-started/stack.md
-- Tutorials:
-  - Analog: tutorials/analog.md
-- Examples:
-  - Analog:
-    - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
-    - Adiabatic state:
-        - Linear time-dependence: examples/adiabatic_linear.ipynb
-        - Sigmoid time-dependence: examples/adiabatic_sigmoid.ipynb
-    - Bell state preparation: examples/bell_state.ipynb
-    - GHZ state preparation: examples/ghz_state.ipynb
-    - Ising model: examples/ising_model.ipynb
-    - QAOA: examples/qaoa.ipynb
-- Explanation:
-  - Visitor: technical/explanation/visitor.md
-  - Compilation Flow: technical/explanation/compilation-flow.md
-  - Canonicalization Flow: technical/explanation/canonicalization-flow.md
-  - Analog to Atomic Compiler: technical/explanation/Analog-to-Atomic-compiler.md
-- API Reference:
-  - Interfaces:
-    - Data Structures: technical/reference/interface-base.md
-    - Math Expression: technical/reference/math-interface.md
-    - Digital: technical/reference/digital-interface.md
-    - Analog:
-      - Dissipation: technical/reference/dissipation-interface.md
-      - Operations: technical/reference/operations-interface.md
-      - Operators: technical/reference/operator-interface.md
-    - Atomic: technical/reference/atomic-interface.md
-  - Compiler: technical/reference/compiler.md
-  - Backends:
-    - Task: technical/reference/task-backend.md
-    - Qutip: technical/reference/qutip-backend.md
-  - Utilities: technical/reference/utils.md
-
+  - Get Started:
+      - The Stack: index.md
+      - Installation: get-started/installation.md
+      - More details: get-started/stack.md
+  - Tutorials:
+      - Analog: tutorials/analog.md
+  - Examples:
+      - Index: examples.md
+      - Analog:
+          - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
+          - Adiabatic state:
+              - Linear time-dependence: examples/adiabatic_linear.ipynb
+              - Sigmoid time-dependence: examples/adiabatic_sigmoid.ipynb
+          - Bell state preparation: examples/bell_state.ipynb
+          - GHZ state preparation: examples/ghz_state.ipynb
+          - Ising model: examples/ising_model.ipynb
+          - QAOA: examples/qaoa.ipynb
+  - Explanation:
+      - Visitor: technical/explanation/visitor.md
+      - Compilation Flow: technical/explanation/compilation-flow.md
+      - Canonicalization Flow: technical/explanation/canonicalization-flow.md
+      - Infrastructure: technical/explanation/infrastructure.md
+      - Analog to Atomic Compiler: technical/explanation/Analog-to-Atomic-compiler.md
+      - QuTip Simulation: technical/explanation/qutip-simulation.md
+  - API Reference:
+      - Interfaces:
+          - Data Structures: technical/reference/interface-base.md
+          - Math Expression: technical/reference/math-interface.md
+          - Digital: technical/reference/digital-interface.md
+          - Analog:
+              - Operations: technical/reference/operations-interface.md
+              - Operators: technical/reference/operator-interface.md
+          - Atomic: technical/reference/atomic-interface.md
+      - Compiler: technical/reference/compiler.md
+      - Backends:
+          - Task: technical/reference/task-backend.md
+          - Qutip: technical/reference/qutip-backend.md
+      - Utilities: technical/reference/utils.md
 
 theme:
   name: material
@@ -66,35 +65,35 @@ theme:
   favicon: img/oqd-logo.png
 
   palette:
-  - media: '(prefers-color-scheme: light)'
-    scheme: default
-    primary: teal
-    accent: pink
-    toggle:
-      icon: material/weather-sunny
-      name: Switch to dark mode
-  - media: '(prefers-color-scheme: dark)'
-    scheme: slate
-    primary: teal
-    accent: pink
-    toggle:
-      icon: material/weather-night  
-      name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
 
   features:
-  - search.suggest
-  - search.highlight
-  - content.tabs.link
-  - content.tooltips
-  - content.code.annotate
-  - content.code.copy
-  - content.code.select
-  - navigation.tabs
-  - navigation.tabs.sticky
-  - navigation.sections
-  - navigation.top
-  - navigation.prune
-  - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.tooltips
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.prune
+    - toc.follow
 
 plugins:
   - search:
@@ -102,8 +101,8 @@ plugins:
       execute: false
       timeout: 100
       allow_errors: True
-#      enable_default_jupyter_cell_styling: false
-#      enable_default_pandas_dataframe_styling: false
+  #      enable_default_jupyter_cell_styling: false
+  #      enable_default_pandas_dataframe_styling: false
   - mkdocstrings:
       handlers:
         python:
@@ -126,7 +125,6 @@ plugins:
             - https://pandas.pydata.org/docs/objects.inv
             - https://matplotlib.org/stable/objects.inv
             - https://numpy.org/doc/stable/objects.inv
-
 
 markdown_extensions:
   - toc:
@@ -162,4 +160,8 @@ markdown_extensions:
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.
+
+extra_css:
+  - stylesheets/headers.css
+  - stylesheets/admonitions.css

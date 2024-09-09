@@ -8,7 +8,7 @@
 ### Client <a name="client"></a>
 Clone the repository using the following command :
 ```bash
-git clone https://github.com/OpenQuantumDesign/quantumion
+git clone https://github.com/OpenQuantumDesign/midstack
 ```
 Install with pip :
 ```bash
@@ -37,7 +37,7 @@ The webserver handles queuing jobs with a [Redis](https://redis.io/) cache and [
 #### Docker Compose <a name="docker-compose"></a>
 Clone the repository using the following command :
 ```bash
-git clone https://github.com/OpenQuantumDesign/quantumion
+git clone https://github.com/OpenQuantumDesign/midstack
 ```
 Deploy with docker compose:
 ```bash
@@ -100,7 +100,7 @@ Planned supported hardware backends include:
 
 ## Documentation <a name="documentation"></a>
 
-Documentation is implemented with [MkDocs](https://www.mkdocs.org/) and can be read from the [docs](https://github.com/OpenQuantumDesign/quantumion/tree/main/docs) folder.
+Documentation is implemented with [MkDocs](https://www.mkdocs.org/) and can be read from the [docs](https://github.com/OpenQuantumDesign/midstack/tree/main/docs) folder.
 
 To install the dependencies for documentation, run:
 ```

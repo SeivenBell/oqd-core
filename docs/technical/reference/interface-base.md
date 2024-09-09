@@ -1,3 +1,3 @@
 # Data structures
 
-::: quantumion.interface.base
+::: midstack.interface.base

@@ -1,3 +1,3 @@
 # Compiler infrastructure
 
-::: quantumion.compilerv2
+::: midstack.compiler

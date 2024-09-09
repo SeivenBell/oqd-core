@@ -4,20 +4,15 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "quantumion"
+name = "midstack"
 version = "0.0.0"
 requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.4",
-    "h5py",
-    "requests",
-    "matplotlib",
-    "rich",
     "qutip~=5.0.1",
     "Cython~=3.0.10",
     "filelock~=3.13.4",
-    "networkx",
-    "seaborn",
+    "numpy~=1.0",
 ]
 
 [project.optional-dependencies]
@@ -30,30 +25,7 @@ docs = [
     "mknotebooks",
 ]
 test = ["unittest_prettify"]
-server = [
-    "python-jose[cryptography]",
-    "passlib[bcrypt]",
-    "uvicorn[standard]>=0.23.2",
-    "starlette>=0.27.0",
-    "redis",
-    "rq",
-    "fastapi>=0.104.0",
-    "sqlalchemy",
-    "asyncpg",
-    "python-multipart",
-]
-all = [
-    "python-jose[cryptography]",
-    "passlib[bcrypt]",
-    "uvicorn[standard]>=0.23.2",
-    "starlette>=0.27.0",
-    "redis",
-    "rq",
-    "fastapi>=0.104.0",
-    "sqlalchemy",
-    "asyncpg",
-    "python-multipart",
-]
 
-[tool.setuptools]
-packages = ["quantumion"]
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["midstack"]

@@ -2,8 +2,8 @@ import numpy as np
 import functools
 import operator
 
-from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.operations import *
+from midstack.interface.analog.operator import *
+from midstack.interface.analog.operations import *
 
 
 X, Y, Z, I, A, C, J = (

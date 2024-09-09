@@ -1,3 +1,3 @@
 # Math expression interface
 
-::: quantumion.interface.math
+::: midstack.interface.math

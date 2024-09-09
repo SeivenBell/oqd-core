@@ -1,4 +1,4 @@
 
 # Operator interface
 
-::: quantumion.interface.analog.operator
+::: midstack.interface.analog.operator

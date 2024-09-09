@@ -19,17 +19,17 @@ from rich import print as pprint
 
 import numpy as np
 
-from quantumion.interface.analog.operator import *
-from quantumion.interface.analog.operations import *
-from quantumion.backend.metric import *
-from quantumion.backend.task import Task, TaskArgsAnalog
-from quantumion.backend import QutipBackend
+from midstack.interface.analog.operator import *
+from midstack.interface.analog.operations import *
+from midstack.backend.metric import *
+from midstack.backend.task import Task, TaskArgsAnalog
+from midstack.backend import QutipBackend
 
 from examples.emulation.utils import plot_metrics_counts
 ```
 ///
 
-Then we define the [`AnalogGate`][quantumion.interface.analog.operations.AnalogGate] object
+Then we define the [`AnalogGate`][midstack.interface.analog.operations.AnalogGate] object
 
 ``` py
 """For simplicity we initialize some Operators"""
@@ -41,7 +41,7 @@ H = AnalogGate(
 )
 ```
 
-Then we define the [`AnalogCircuit`][quantumion.interface.analog.operations.AnalogCircuit] object and evolve it according to the hamiltonian defined above
+Then we define the [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] object and evolve it according to the hamiltonian defined above
 
 ``` py
 circuit = AnalogCircuit()
@@ -60,12 +60,12 @@ args = TaskArgsAnalog(
 )
 ```
 
-We can then wrap the [`AnalogCircuit`][quantumion.interface.analog.operations.AnalogCircuit] and the args to a [`Task`][quantumion.backend.task.Task] object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
+We can then wrap the [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] and the args to a [`Task`][midstack.backend.task.Task] object and run using the QuTip backend. Note that there are 2 ways to run and the 2 ways are explained.
 
 ## Running the simulation
-First initialize the [`QutipBackend`][quantumion.backend.qutip.base.QutipBackend] object.
+First initialize the [`QutipBackend`][midstack.backend.qutip.base.QutipBackend] object.
 === "Compile & Simulate"
-    The [`Task`][quantumion.backend.task.Task] can be compiled first to a [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object and then this [`QutipExperiment`][quantumion.backend.qutip.interface.QutipExperiment] object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
+    The [`Task`][midstack.backend.task.Task] can be compiled first to a [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] object and then this [`QutipExperiment`][midstack.backend.qutip.interface.QutipExperiment] object can be run. This is to allow you to see what parameters are used to specify the particular QuTip experiment.
 
     ``` py
     backend = QutipBackend()
@@ -74,7 +74,7 @@ First initialize the [`QutipBackend`][quantumion.backend.qutip.base.QutipBackend
     ```
 
 === "Directly Simulate"
-    The [`Task`][quantumion.backend.task.Task] object can be directly simulated by the `run()` method. 
+    The [`Task`][midstack.backend.task.Task] object can be directly simulated by the `run()` method. 
 
     ``` py
     backend = QutipBackend()
