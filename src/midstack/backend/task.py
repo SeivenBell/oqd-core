@@ -16,6 +16,14 @@ from midstack.backend.metric import Metric
 
 
 class ComplexFloat(BaseModel):
+    """
+    Class representing a complex number
+
+    Attributes:
+        real (float): real part of the complex number.
+        imag (float): imaginary part of the complex number.
+    """
+
     real: float
     imag: float
 
@@ -86,10 +94,10 @@ class TaskResultAnalog(VisitableBaseModel):
 
     Attributes:
         layer (str): the layer of the experiment (analog, atomic)
-        times (list[float]): number of discrete times
-        state List[CastComplexFloat]: Final quantum state after evolution
-        metrics (dict): metrics which have been computed for the experiment. This does not require any Measure instruction in the analog layer.
-        counts dict[str, int]: counts of different states after the experiment. This requires Measure instruction in the analog layer.
+        times (List[float]): number of discrete times
+        state (List[ComplexFloat]): Final quantum state after evolution
+        metrics (Dict): metrics which have been computed for the experiment. This does not require any Measure instruction in the analog layer.
+        counts (Dict[str, int]): counts of different states after the experiment. This requires Measure instruction in the analog layer.
         runtime (float): time taken for the simulation/experiment.
     """
 
