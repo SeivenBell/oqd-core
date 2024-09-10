@@ -6,7 +6,7 @@ import qutip as qt
 ########################################################################################
 
 from midstack.backend.task import TaskResultAnalog
-from midstack.compiler.math.passes import evaluate_math_expr
+from midstack.compiler.math.passes import evaluate_math_expr, simplify_math_expr
 from midstack.backend.qutip.interface import (
     QutipExperiment,
     QutipOperation,
@@ -140,7 +140,7 @@ class QutipExperimentVM(RewriteRule):
 
         qutip_hamiltonian = []
         for op, coeff in model.hamiltonian:
-            qutip_hamiltonian.append([op, evaluate_math_expr(coeff, output_mode="str")])
+            qutip_hamiltonian.append([op, simplify_math_expr(coeff)])
 
         start_runtime = time.time()
         result_qobj = qt.sesolve(

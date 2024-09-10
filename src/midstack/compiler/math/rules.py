@@ -343,7 +343,7 @@ class EvaluateMathExpr(ConversionRule):
         return model.value
 
     def map_MathImag(self, model: MathImag, operands):
-        return complex("1j")  # 1j also works
+        return complex("1j")
 
     def map_MathFunc(self, model: MathFunc, operands):
         return getattr(math, model.func)(operands["expr"])
