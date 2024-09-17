@@ -1,5 +1,5 @@
 from midstack.compiler.walk import Post
-from midstack.compiler.analog.rule.assign import AssignAnalogIRDim
+from midstack.compiler.analog.rewrite.assign import AssignAnalogIRDim
 from midstack.compiler.analog.verify.task import (
     VerifyAnalogArgsDim,
     VerifyAnalogCircuitDim,

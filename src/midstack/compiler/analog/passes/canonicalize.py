@@ -1,6 +1,6 @@
 from midstack.compiler.rewriter import Chain, FixedPoint
 from midstack.compiler.walk import Post, Pre, In
-from midstack.compiler.analog.rule.canonicalize import *
+from midstack.compiler.analog.rewrite.canonicalize import *
 from midstack.compiler.analog.verify.canonicalize import *
 from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
 from midstack.compiler.math.rules import (

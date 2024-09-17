@@ -1,5 +1,5 @@
 from midstack.interface.analog import *
-from midstack.compiler.analog.rule.canonicalize import *
+from midstack.compiler.analog.rewrite.canonicalize import *
 from midstack.compiler.rule import RewriteRule
 from midstack.compiler.walk import Walk, Post, Pre
 from midstack.compiler.rewriter import FixedPoint
