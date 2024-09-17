@@ -1,12 +1,13 @@
 from pydantic import field_validator, model_validator
 from typing import List, Union
 
+from oqd_compiler_infrastructure import VisitableBaseModel
+
 ########################################################################################
 
-from midstack.interface.base import VisitableBaseModel
-from midstack.interface.digital.gate import Gate
-from midstack.interface.digital.register import QuantumRegister, ClassicalRegister
-from midstack.interface.digital.statement import Statement, Measure
+from .gate import Gate
+from .register import QuantumRegister, ClassicalRegister
+from .statement import Statement, Measure
 
 ########################################################################################
 

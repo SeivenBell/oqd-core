@@ -2,6 +2,8 @@ __all__ = [
     "CanonicalFormError",
 ]
 
+########################################################################################
+
 
 class CanonicalFormError(Exception):
     """

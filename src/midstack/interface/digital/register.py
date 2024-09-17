@@ -1,9 +1,7 @@
 from typing import List
 from pydantic import conint, field_validator, ValidationInfo
 
-########################################################################################
-
-from midstack.interface.base import VisitableBaseModel
+from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
 

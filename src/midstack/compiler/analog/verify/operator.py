@@ -1,13 +1,18 @@
 from typing import Union
 
+from oqd_compiler_infrastructure import RewriteRule
+
 ########################################################################################
 
-from midstack.compiler.rule import RewriteRule
-from midstack.interface.analog import *
+from ....interface.analog import *
+
+########################################################################################
 
 __all__ = [
     "VerifyHilberSpaceDim",
 ]
+
+########################################################################################
 
 
 class VerifyHilberSpaceDim(RewriteRule):

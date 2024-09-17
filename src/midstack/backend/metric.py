@@ -1,10 +1,12 @@
 from typing import List, Union
-from midstack.interface.base import VisitableBaseModel
+
 from pydantic.types import NonNegativeInt
+
+from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
 
-from midstack.interface.analog.operator import Operator
+from ..interface.analog.operator import Operator
 
 ########################################################################################
 

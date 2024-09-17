@@ -1,10 +1,11 @@
 from typing import Any, Union
 
+from oqd_compiler_infrastructure import RewriteRule
+
 ########################################################################################
 
-from midstack.interface.analog import AnalogCircuit
-from midstack.compiler.rule import RewriteRule
-from midstack.compiler.analog.passes.analysis import analysis_canonical_hamiltonian_dim
+from ....interface.analog import AnalogCircuit
+from ..passes.analysis import analysis_canonical_hamiltonian_dim
 
 ########################################################################################
 
@@ -21,8 +22,7 @@ class AssignAnalogIRDim(RewriteRule):
     analysis_canonical_hamiltonian_dim and then inserts the dimension in the Analog IR
 
     Args:
-        model (VisitableBaseModel):
-               The rule only modifies [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] in Analog level
+        model (VisitableBaseModel): The rule only modifies [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] in Analog level
 
     Returns:
         model  (VisitableBaseModel):

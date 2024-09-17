@@ -1,5 +1,8 @@
-from midstack.interface.base import TypeReflectBaseModel
-from midstack.interface.math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
+from oqd_compiler_infrastructure import TypeReflectBaseModel
+
+########################################################################################
+
+from ..math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
 
 ########################################################################################
 

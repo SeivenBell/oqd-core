@@ -6,10 +6,7 @@ import numpy as np
 
 import ast
 
-########################################################################################
-
-from midstack.interface.base import TypeReflectBaseModel
-from midstack.compiler import ConversionRule, Post
+from oqd_compiler_infrastructure import TypeReflectBaseModel, ConversionRule
 
 ########################################################################################
 

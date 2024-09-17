@@ -1,10 +1,10 @@
 from typing import Literal, Union
 
+from oqd_compiler_infrastructure import VisitableBaseModel
+
 ########################################################################################
 
-
-from midstack.interface.base import VisitableBaseModel
-from midstack.interface.digital.register import QuantumRegister, ClassicalRegister
+from .register import QuantumRegister, ClassicalRegister
 
 ########################################################################################
 

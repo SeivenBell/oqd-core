@@ -1,12 +1,12 @@
 from typing import Any, Union
 
+from oqd_compiler_infrastructure import ConversionRule, Post
+
 ########################################################################################
 
-from midstack.interface.analog import *
-from midstack.interface.math import MathExpr
-from midstack.compiler.rule import ConversionRule
-from midstack.compiler.walk import Post
-from midstack.compiler.math.rules import PrintMathExpr
+from ...interface.analog import *
+from ...interface.math import MathExpr
+from ..math.rules import PrintMathExpr
 
 ########################################################################################
 

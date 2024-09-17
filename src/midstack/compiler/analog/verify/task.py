@@ -1,12 +1,19 @@
-from midstack.interface.analog import AnalogGate
-from midstack.compiler.rule import RewriteRule
-from midstack.compiler.analog.passes.analysis import analysis_canonical_hamiltonian_dim
-from midstack.backend.metric import Expectation
+from oqd_compiler_infrastructure import RewriteRule
+
+########################################################################################
+
+from ....interface.analog import AnalogGate
+from ..passes.analysis import analysis_canonical_hamiltonian_dim
+from ....backend.metric import Expectation
+
+########################################################################################
 
 __all__ = [
     "VerifyAnalogCircuitDim",
     "VerifyAnalogArgsDim",
 ]
+
+########################################################################################
 
 
 class VerifyAnalogCircuitDim(RewriteRule):

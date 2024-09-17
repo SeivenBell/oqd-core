@@ -1,9 +1,4 @@
-from midstack.interface.analog import *
-from midstack.compiler.analog.analysis import TermIndex
-from midstack.compiler.rule import RewriteRule
-from midstack.compiler.walk import Walk, Post, Pre, In
 import unittest
-from midstack.interface.math import *
 from unittest_prettify.colorize import (
     colorize,
     GREEN,
@@ -11,6 +6,18 @@ from unittest_prettify.colorize import (
     RED,
     MAGENTA,
 )
+
+from oqd_compiler_infrastructure import RewriteRule, Walk, Post, Pre, In
+
+########################################################################################
+
+
+from midstack.interface.analog import *
+from midstack.compiler.analog.analysis import TermIndex
+from midstack.interface.math import *
+
+########################################################################################
+
 
 X, Y, Z, I, A, C, LI = (
     PauliX(),

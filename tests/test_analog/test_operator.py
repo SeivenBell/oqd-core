@@ -1,12 +1,8 @@
-from midstack.interface.analog import *
-from midstack.compiler.analog.utils import PrintOperator
-from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
-from midstack.compiler.walk import Post, Walk, In
-from midstack.compiler.rule import ConversionRule, RewriteRule
 from typing import Union
+
 from rich import print as pprint
+
 import unittest
-from midstack.interface.math import *
 from unittest_prettify.colorize import (
     colorize,
     GREEN,
@@ -14,6 +10,18 @@ from unittest_prettify.colorize import (
     RED,
     MAGENTA,
 )
+
+from oqd_compiler_infrastructure import Post, Walk, In, ConversionRule, RewriteRule
+
+########################################################################################
+
+
+from midstack.interface.analog import *
+from midstack.compiler.analog.utils import PrintOperator
+from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
+from midstack.interface.math import *
+
+########################################################################################
 
 
 def test_function(

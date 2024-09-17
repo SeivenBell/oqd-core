@@ -1,5 +1,6 @@
-from midstack.compiler.rewriter import Chain, FixedPoint
-from midstack.compiler.walk import Post, Pre, In
+from oqd_compiler_infrastructure import Chain, FixedPoint, Post, Pre, In
+
+########################################################################################
 from midstack.compiler.analog.rewrite.canonicalize import *
 from midstack.compiler.analog.verify.canonicalize import *
 from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
@@ -66,7 +67,6 @@ def analog_operator_canonicalization(model):
 
     Args:
         model (VisitableBaseModel):
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseModel):  [`Operator`][midstack.interface.analog.operator.Operator] of Analog level are in canonical form

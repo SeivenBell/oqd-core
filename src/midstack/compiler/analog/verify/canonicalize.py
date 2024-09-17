@@ -1,12 +1,13 @@
 from typing import Union
 
+from oqd_compiler_infrastructure import RewriteRule
+
 ########################################################################################
 
-from midstack.compiler.rule import RewriteRule
-from midstack.interface.math import *
-from midstack.compiler.analog.error import CanonicalFormError
-from midstack.interface.analog import *
-from midstack.compiler.analog.passes.analysis import analysis_term_index
+from ....interface.math import *
+from ....interface.analog import *
+from ..error import CanonicalFormError
+from ..passes.analysis import analysis_term_index
 
 ########################################################################################
 
@@ -30,8 +31,7 @@ class CanVerPauliAlgebra(RewriteRule):
     Checks whether there is any incomplete Pauli Algebra computation
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -62,8 +62,7 @@ class CanVerGatherMathExpr(RewriteRule):
     there is any scalar multiplication within a term)
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -103,8 +102,7 @@ class CanVerOperatorDistribute(RewriteRule):
     Checks for incomplete distribution of Operators
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -169,8 +167,7 @@ class CanVerProperOrder(RewriteRule):
     Please see example for clarification
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -213,8 +210,7 @@ class CanVerPruneIdentity(RewriteRule):
     Checks if there is any ladder Identity present in ladder multiplication
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -239,8 +235,7 @@ class CanVerGatherPauli(RewriteRule):
     Checks whether pauli and ladder have been separated.
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -271,8 +266,7 @@ class CanVerNormalOrder(RewriteRule):
     Checks whether the ladder operations are in normal order
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -307,8 +301,7 @@ class CanVerSortedOrder(RewriteRule):
     Please see example for further clarification
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -344,8 +337,7 @@ class CanVerScaleTerm(RewriteRule):
     Checks whether all terms have a scalar multiplication.
 
     Args:
-        model (VisitableBaseModel):
-               The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged

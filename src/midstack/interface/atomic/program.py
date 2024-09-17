@@ -1,11 +1,12 @@
 # External imports
 from typing import List, Union
 
+from oqd_compiler_infrastructure import TypeReflectBaseModel
+
 ########################################################################################
 
-from midstack.interface.base import TypeReflectBaseModel
-from midstack.interface.atomic.protocol import Protocol
-from midstack.interface.atomic.register import Register
+from .protocol import Protocol
+from .register import Register
 
 ########################################################################################
 

@@ -1,13 +1,16 @@
 from typing import List, Dict, Literal, Tuple, Union
+
 import qutip as qt
+
 from pydantic import ConfigDict
 from pydantic.types import NonNegativeInt
 
+from oqd_compiler_infrastructure import VisitableBaseModel
+
 ########################################################################################
 
-from midstack.interface.base import VisitableBaseModel
-from midstack.interface.math import MathExpr
-from midstack.backend.metric import *
+from ...interface.math import MathExpr
+from ..metric import *
 
 ########################################################################################
 

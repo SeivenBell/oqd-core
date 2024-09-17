@@ -3,18 +3,19 @@ import itertools
 import time
 import qutip as qt
 
+from oqd_compiler_infrastructure import ConversionRule, RewriteRule
+
 ########################################################################################
 
-from midstack.backend.task import TaskResultAnalog
-from midstack.compiler.math.passes import evaluate_math_expr, simplify_math_expr
-from midstack.backend.qutip.interface import (
+from ..task import TaskResultAnalog
+from ...compiler.math.passes import evaluate_math_expr, simplify_math_expr
+from .interface import (
     QutipExperiment,
     QutipOperation,
     QutipMeasurement,
     TaskArgsQutip,
     QutipExpectation,
 )
-from midstack.compiler.rule import ConversionRule, RewriteRule
 
 ########################################################################################
 

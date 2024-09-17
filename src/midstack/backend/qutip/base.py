@@ -1,7 +1,6 @@
-from midstack.backend.base import BackendBase
-from midstack.backend.qutip.interface import QutipExperiment, TaskArgsQutip
-
-from midstack.backend.task import Task
+from ..base import BackendBase
+from .interface import QutipExperiment, TaskArgsQutip
+from ..task import Task
 
 ########################################################################################
 

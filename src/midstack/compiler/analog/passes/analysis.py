@@ -1,5 +1,11 @@
-from midstack.compiler.analog.analysis import TermIndex
-from midstack.compiler.walk import In
+from oqd_compiler_infrastructure import In
+
+########################################################################################
+
+
+from ..analysis import TermIndex
+
+########################################################################################
 
 
 def analysis_term_index(model):

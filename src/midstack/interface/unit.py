@@ -4,10 +4,11 @@ from pydantic import BeforeValidator
 
 import numpy as np
 
+from oqd_compiler_infrastructure import TypeReflectBaseModel
+
 ########################################################################################
 
-from midstack.interface.base import TypeReflectBaseModel
-from midstack.interface.math import CastMathExpr
+from .math import CastMathExpr
 
 ########################################################################################
 

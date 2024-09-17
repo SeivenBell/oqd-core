@@ -1,7 +1,13 @@
-from midstack.interface.analog import *
-from midstack.compiler.walk import In
-from midstack.compiler.rule import RewriteRule
 from typing import Union
+
+from oqd_compiler_infrastructure import RewriteRule
+
+########################################################################################
+
+
+from midstack.interface.analog import *
+
+########################################################################################
 
 
 class TermIndex(RewriteRule):

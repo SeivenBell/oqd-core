@@ -13,6 +13,7 @@ dependencies = [
     "Cython~=3.0.10",
     "filelock~=3.13.4",
     "numpy~=1.0",
+    "oqd_compiler_infrastructure",
 ]
 
 [project.optional-dependencies]

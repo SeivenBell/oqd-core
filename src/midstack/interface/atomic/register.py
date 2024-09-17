@@ -1,9 +1,10 @@
 from typing import List
 
+from oqd_compiler_infrastructure import TypeReflectBaseModel
+
 ########################################################################################
 
-from midstack.interface.base import TypeReflectBaseModel
-from midstack.interface.atomic import Ion
+from .ion import Ion
 
 ########################################################################################
 

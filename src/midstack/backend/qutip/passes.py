@@ -3,7 +3,8 @@ from midstack.backend.qutip.conversion import (
     QutipExperimentVM,
     QutipMetricConversion,
 )
-from midstack.compiler.walk import Post, Pre
+
+from oqd_compiler_infrastructure import Post, Pre
 
 ########################################################################################
 

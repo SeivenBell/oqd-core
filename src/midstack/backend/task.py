@@ -3,14 +3,15 @@ import numpy as np
 from typing import Union, List, Dict, Literal, Annotated
 from pydantic import BaseModel, BeforeValidator
 
+from oqd_compiler_infrastructure import VisitableBaseModel
+
 ########################################################################################
 
-from midstack.interface.base import VisitableBaseModel
-from midstack.interface.analog.operation import AnalogCircuit
-from midstack.interface.digital.circuit import DigitalCircuit
-from midstack.interface.atomic.program import AtomicProgram
+from ..interface.analog.operation import AnalogCircuit
+from ..interface.digital.circuit import DigitalCircuit
+from ..interface.atomic.program import AtomicProgram
 
-from midstack.backend.metric import Metric
+from .metric import Metric
 
 ########################################################################################
 

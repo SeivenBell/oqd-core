@@ -1,16 +1,20 @@
-from midstack.interface.analog import *
-from midstack.compiler.analog.rewrite.canonicalize import *
-from midstack.compiler.rule import RewriteRule
-from midstack.compiler.walk import Walk, Post, Pre
-from midstack.compiler.rewriter import FixedPoint
 import unittest
-from midstack.interface.math import *
 from unittest_prettify.colorize import (
     colorize,
     BLUE,
     RED,
     MAGENTA,
 )
+
+from oqd_compiler_infrastructure import RewriteRule, Walk, Post, Pre, FixedPoint
+
+########################################################################################
+
+from midstack.interface.analog import *
+from midstack.compiler.analog.rewrite.canonicalize import *
+from midstack.interface.math import *
+
+########################################################################################
 
 X, Y, Z, I, A, C, LI = (
     PauliX(),

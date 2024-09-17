@@ -2,10 +2,11 @@ from typing import Union
 
 import math
 
+from oqd_compiler_infrastructure import ConversionRule, RewriteRule
+
 ########################################################################################
 
-from midstack.interface.math import *
-from midstack.compiler.rule import *
+from ...interface.math import *
 
 ########################################################################################
 

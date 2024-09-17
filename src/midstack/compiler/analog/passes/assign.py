@@ -1,6 +1,10 @@
-from midstack.compiler.walk import Post
-from midstack.compiler.analog.rewrite.assign import AssignAnalogIRDim
-from midstack.compiler.analog.verify.task import (
+from oqd_compiler_infrastructure import Post
+
+########################################################################################
+
+
+from ..rewrite.assign import AssignAnalogIRDim
+from ..verify.task import (
     VerifyAnalogArgsDim,
     VerifyAnalogCircuitDim,
 )

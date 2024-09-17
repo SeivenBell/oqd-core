@@ -1,6 +1,8 @@
-from midstack.compiler.walk import Post
-from midstack.compiler.rewriter import Chain
-from midstack.compiler.math.rules import (
+from oqd_compiler_infrastructure import Post, Chain
+
+########################################################################################
+
+from .rules import (
     EvaluateMathExpr,
     SimplifyMathExpr,
     PrintMathExpr,

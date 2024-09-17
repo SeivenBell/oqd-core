@@ -1,11 +1,12 @@
 from typing import Union
 
+from oqd_compiler_infrastructure import RewriteRule
+
 ########################################################################################
 
-from midstack.compiler.rule import RewriteRule
-from midstack.compiler.analog.passes.analysis import analysis_term_index
-from midstack.interface.math import MathNum, MathImag, MathAdd
-from midstack.interface.analog import *
+from ..passes.analysis import analysis_term_index
+from ....interface.math import MathNum, MathImag, MathAdd
+from ....interface.analog import *
 
 ########################################################################################
 
@@ -29,11 +30,10 @@ class OperatorDistribute(RewriteRule):
     RewriteRule which distributes operators of hamiltonians
 
     Args:
-        model ( VisitableBaseModel ):
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+        model (VisitableBaseModel):
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr] (sometimes)
@@ -100,10 +100,10 @@ class GatherMathExpr(RewriteRule):
             The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
-         [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute] (sometimes)
+        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute] (sometimes)
 
     Example:
         (1 * X) @ (2 * Y) => (1 * 2) => (1 * 2) * (X @ Y)
@@ -144,11 +144,11 @@ class GatherPauli(RewriteRule):
     Gathers ladders and paulis so that we have paulis and then ladders
 
     Args:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
             The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
@@ -187,11 +187,10 @@ class PruneIdentity(RewriteRule):
     Removes unnecessary ladder Identities from operators
 
     Args:
-        model ( VisitableBaseModel ):
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+        model (VisitableBaseModel):
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
@@ -217,11 +216,10 @@ class PauliAlgebra(RewriteRule):
     RewriteRule for Pauli algebra operations
 
     Args:
-        model ( VisitableBaseModel ):
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel):
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
@@ -258,11 +256,10 @@ class NormalOrder(RewriteRule):
     Arranges Ladder oeprators in normal order form
 
     Args:
-        model ( VisitableBaseModel ):
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel):
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
@@ -297,11 +294,10 @@ class ProperOrder(RewriteRule):
     Converts expressions to proper order bracketing. Please see example for clarification.
 
     Args:
-        model ( VisitableBaseModel )
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel):
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
@@ -334,11 +330,10 @@ class ScaleTerms(RewriteRule):
     Scales operators to ensure consistency
 
     Args:
-        model ( VisitableBaseModel )
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+        model (VisitableBaseModel):
 
     Returns:
-        model ( VisitableBaseModel ):
+        model (VisitableBaseModel):
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
@@ -389,11 +384,10 @@ class SortedOrder(RewriteRule):
     Please see example for clarification
 
     Args:
-        model ( VisitableBaseModel ):
-               The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel):
 
     Returns:
-        model ( VisitableBaseModel )
+        model (VisitableBaseModel)
 
     Assumptions:
         [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],

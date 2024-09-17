@@ -1,9 +1,7 @@
-from midstack.compiler.math.rules import EvaluateMathExpr
-from midstack.compiler.walk import Post, Walk
-from midstack.compiler.rule import ConversionRule, RewriteRule
-from midstack.interface.math import *
 from typing import Union
+
 from rich import print as pprint
+
 import unittest
 from unittest_prettify.colorize import (
     colorize,
@@ -12,6 +10,15 @@ from unittest_prettify.colorize import (
     RED,
     MAGENTA,
 )
+
+from oqd_compiler_infrastructure import Post, Walk, ConversionRule, RewriteRule
+
+########################################################################################
+
+from midstack.compiler.math.rules import EvaluateMathExpr
+from midstack.interface.math import *
+
+########################################################################################
 
 
 def test_function(

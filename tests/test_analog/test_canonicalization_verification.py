@@ -1,10 +1,4 @@
-from midstack.interface.analog import *
-from midstack.compiler.analog.verify.canonicalize import *
-from midstack.compiler.analog.error import CanonicalFormError
-from midstack.compiler.rule import RewriteRule
-from midstack.compiler.walk import Walk, Post, Pre
 import unittest
-from midstack.interface.math import *
 from unittest_prettify.colorize import (
     colorize,
     GREEN,
@@ -12,6 +6,17 @@ from unittest_prettify.colorize import (
     RED,
     MAGENTA,
 )
+
+from oqd_compiler_infrastructure import RewriteRule, Walk, Post, Pre
+
+########################################################################################
+
+from midstack.interface.analog import *
+from midstack.compiler.analog.verify.canonicalize import *
+from midstack.compiler.analog.error import CanonicalFormError
+from midstack.interface.math import *
+
+########################################################################################
 
 X, Y, Z, I, A, C, LI = (
     PauliX(),
