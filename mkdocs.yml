@@ -13,6 +13,9 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/OpenQuantumDesign
       name: Open Quantum Design GitHub
+    - icon: fontawesome/solid/globe
+      link: https://openquantumdesign.org
+      name: Open Quantum Design Website
 
 nav:
   - Get Started:
@@ -37,11 +40,9 @@ nav:
       - QuTip Simulation: explanation/qutip-simulation.md
   - API Reference:
       - Interfaces:
-          - Base: reference/interface_base.md
           - Math: reference/math_interface.md
           - Analog: reference/analog_interface.md
-      - Compiler:
-          - Infrastructure: reference/compiler_infrastructure.md
+      - Compiler: reference/compiler.md
       - Backends:
           - Task: reference/task_backend.md
           - Qutip: reference/qutip_backend.md

@@ -1,1 +1,0 @@
-::: midstack.interface.base
