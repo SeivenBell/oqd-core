@@ -279,11 +279,3 @@ class UnitfulMathExpr(TypeReflectBaseModel):
 
     def __truediv__(self, other):
         return UnitfulMathExpr(self.expr / other.expr, self.unit / other.unit)
-
-
-########################################################################################
-
-if __name__ == "__main__":
-    from rich import print as pprint
-
-    pass
