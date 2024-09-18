@@ -32,4 +32,4 @@ test = ["unittest_prettify"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["midstack"]
+include = ["midstack*"]
