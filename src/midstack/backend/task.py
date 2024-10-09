@@ -9,7 +9,7 @@ from oqd_compiler_infrastructure import VisitableBaseModel
 
 from ..interface.analog.operation import AnalogCircuit
 from ..interface.digital.circuit import DigitalCircuit
-from ..interface.atomic.program import AtomicProgram
+from ..interface.atomic.circuit import AtomicCircuit
 
 from .metric import Metric
 
@@ -153,7 +153,7 @@ class Task(VisitableBaseModel):
         args (Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]): Arguments for the quantum experiment
     """
 
-    program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
+    program: Union[AnalogCircuit, DigitalCircuit, AtomicCircuit]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
 
 
