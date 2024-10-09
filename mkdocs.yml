@@ -1,33 +1,58 @@
-
 site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
-#site_url: http://0.0.0.0:8000
-repo_name: OpenQuantumDesign/quantumion
-repo_url: https://github.com/OpenQuantumDesign/quantumion
 
-nav:  
-- Get Started:
-  - Welcome to Open Quantum Design: index.md
-  - Installation: get-started/installation.md
-  - Tutorials: get-started/tutorials.md
-  - How-to guides: get-started/how-to-guides.md
-- Explanation:
-  - Visitor: explanation/visitor.md
-  - Compilation flow: explanation/compilation-flow.md
-- Demos:
-  - Analog:
-    - Rabi flopping: demos/Rabi-flopping.md
-    - TFIM: demos/TFIM.md
-- API Reference:
-  - Interfaces:
-    - Digital: reference/digital-interface.md
-    - Analog: reference/analog-interface.md
-    - Atomic: reference/atomic-interface.md
-    - Utilities: reference/utils.md
+repo_name: OpenQuantumDesign/midstack
+repo_url: https://github.com/OpenQuantumDesign/midstack
 
+copyright: Copyright &copy; 2024 Open Quantum Design
 
-use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
+use_directory_urls: true
 
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/OpenQuantumDesign
+      name: Open Quantum Design GitHub
+    - icon: fontawesome/solid/globe
+      link: https://openquantumdesign.org
+      name: Open Quantum Design Website
+
+nav:
+  - Get Started:
+      - The Stack: index.md
+      - Installation: get-started/installation.md
+  - Tutorials:
+      - Analog: tutorials/analog.md
+      - Examples:
+          - Analog:
+              - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
+              - Adiabatic state:
+                  - Linear time-dependence: examples/adiabatic_linear.ipynb
+                  - Sigmoid time-dependence: examples/adiabatic_sigmoid.ipynb
+              - Bell state preparation: examples/bell_state.ipynb
+              - GHZ state preparation: examples/ghz_state.ipynb
+              - Ising model: examples/ising_model.ipynb
+              - QAOA: examples/qaoa.ipynb
+  - Explanation:
+      - Interfaces:
+          - Math: explanation/math_interface.md
+          - Analog: explanation/analog_interface.md
+          - Atomic: explanation/atomic_interface.md
+      - Compilers:
+          - Canonicalization: explanation/canonicalization.md
+          - Analog to Atomic Compiler: explanation/analog_to_atomic.md
+      - Backends:
+          - QuTip Simulation: explanation/qutip-simulation.md
+  - API Reference:
+      - Interface:
+          - Math: reference/math_interface.md
+          - Analog: reference/analog_interface.md
+      - Compiler:
+          - Math: reference/math_compiler.md
+          - Analog:
+              - Canonicalization: reference/analog_canonicalization.md
+      - Backend:
+          - QuTiP: reference/qutip_backend.md
 
 theme:
   name: material
@@ -36,44 +61,44 @@ theme:
   favicon: img/oqd-logo.png
 
   palette:
-  - media: '(prefers-color-scheme: light)'
-    scheme: default
-    primary: teal
-    accent: pink
-    toggle:
-      icon: material/lightbulb
-      name: Switch to dark mode
-  - media: '(prefers-color-scheme: dark)'
-    scheme: slate
-    primary: teal
-    accent: pink
-    toggle:
-      icon: material/lightbulb-outline
-      name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
 
   features:
-  - search.suggest
-  - search.highlight
-  - content.tabs.link
-  - content.tooltips
-  - content.code.annotate
-  - content.code.copy
-  - content.code.select
-  - navigation.tabs
-  - navigation.tabs.sticky
-  - navigation.sections
-  - navigation.top
-  - navigation.prune
-  - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.tooltips
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.prune
+    - toc.follow
 
 plugins:
-  - search:
   - mkdocstrings:
       handlers:
         python:
           options:
             show_source: true
-            show_root_heading: true
+            show_root_heading: false
+            show_root_toc_entry: false
             show_symbol_type_heading: true
             show_symbol_type_toc: true
             show_submodules: true
@@ -83,33 +108,38 @@ plugins:
             show_signature_annotations: true
             signature_crossrefs: true
             separate_signature: false
+            group_by_category: true
+            members_order: "source"
           import:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
-
+            - https://qutip.readthedocs.io/en/qutip-4.7.x/objects.inv
+            - https://pandas.pydata.org/docs/objects.inv
+            - https://matplotlib.org/stable/objects.inv
+            - https://numpy.org/doc/stable/objects.inv
+  - mkdocs-jupyter:
+      ignore_h1_titles: True
 
 markdown_extensions:
+  - attr_list
   - toc:
       permalink: true
-      toc_depth: 4
+      toc_depth: 10
 
-  # for code snippets/syntax highlighting
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.tabbed:
-      alternate_style: true
 
   # for notes/admonitions
-  - admonition
-  - pymdownx.details
   - pymdownx.blocks.admonition
   - pymdownx.blocks.details
+  - pymdownx.blocks.tab:
+      alternate_style: true
+  - pymdownx.blocks.html
 
-  # for flow diagrams
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -119,7 +149,15 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
 
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+      truly_sane: True
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/headers.css
+  - stylesheets/admonitions.css

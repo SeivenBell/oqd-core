@@ -171,4 +171,8 @@ gen/
 /docs/src/notebooks/*
 .scratch/
 _scripts/
-/docs/examples
+.vscode/
+
+# ignore copied examples files when building docs
+docs/examples/
+tests/test.bat
