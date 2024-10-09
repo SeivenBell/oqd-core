@@ -1,25 +1,6 @@
-# Visitor pattern and compilation
+Canonicalization is used to remove redundancy in the representation of a program.
 
-So far we have been working on Canonicalization using Visitor pattern. First let's see how we represent objects in our syntax.
-
-## Abstract Syntax Tree for Operators
-
-We represent `Operator` as trees like:
-/// admonition | Operator
-
-In our language we represent all operators as abstract syntax trees. this the operator
-` PauliX() @ PauliX()`
-would be reprsented as the tree:
-
-```mermaid
-graph TD;
-    A[@] --> B["PauliX()"]
-    A --> C["PauliX()"]
-```
-
-///
-
-In Canonicalization we ensure that for operators:
+Consider the following two Hamiltonians:
 
 $$
 H_{1} = X \otimes I + I \otimes X
@@ -35,28 +16,21 @@ $$
 H_{c} = 1\cdot(I \otimes X) + 1\cdot(X \otimes I)
 $$
 
-These canonicalization steps are done using `Visitors` and `Transformers`. For every kind of canonicalization operation (like for example `distribution`) we define a graph like:
+These canonicalization steps (e.g. distribution) are done by implementing a `RewritesRule` with the corresponding logic.
 
-```mermaid
-stateDiagram-v2
-
-[*] --> verifier: enter
-verifier --> transformer: fail
-transformer --> verifier: done
-verifier --> terminal: pass
-```
-
-Now we describe all the visitors and transformers we have.
-
-## Visitors and Transformers
+## Canonicalization Rules
 
 ### Distribution
 
-This distributes oeprators and an example can be the conversion:
+[`Distribution`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute] distributes the multiplication, scalar multiplication and tensor product of operators over the addition of operators.
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
 
 $$X \otimes (Y + Z) \longrightarrow X \otimes Y + X \otimes Z$$
 
-/// tab | Original Graph
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -76,9 +50,9 @@ $$X \otimes (Y + Z) \longrightarrow X \otimes Y + X \otimes Z$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
     graph TD
@@ -101,14 +75,19 @@ $$X \otimes (Y + Z) \longrightarrow X \otimes Y + X \otimes Z$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
 ///
 
 ### Gather Math Expression
 
-This gathers math expressions of oprators and an example can be the conversion:
+[`GatherMath`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr] centralizes the coefficients of the operators by gathering them.
 
-$$ X \times 3 \times I \longrightarrow 3 \times (X \times Y)$$
-/// tab | Original Graph
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
+
+$$ X \times 3 \times I \longrightarrow 3 \times (X \times I)$$
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -128,9 +107,9 @@ $$ X \times 3 \times I \longrightarrow 3 \times (X \times Y)$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
     graph TD
@@ -150,14 +129,20 @@ $$ X \times 3 \times I \longrightarrow 3 \times (X \times Y)$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
 ///
 
 ### Proper Order
 
-This converts the operator to a proper order like:
+[`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder] takes a chain of OperatorMul or a chain of OperatorAdd and puts the operation order from left to right.
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
 
 $$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
-/// tab | Original Graph
+
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -177,9 +162,9 @@ $$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
     graph TD
@@ -199,14 +184,19 @@ $$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
 ///
 
 ### Pauli Algebra
 
-This converts the operator to a proper order like:
+[`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra] applies the Pauli algebra to simplify the operator.
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
 
 $$ X \times Y + I \times I \longrightarrow iZ + I $$
-/// tab | Original Graph
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -229,9 +219,9 @@ $$ X \times Y + I \times I \longrightarrow iZ + I $$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
     graph TD
@@ -251,14 +241,19 @@ $$ X \times Y + I \times I \longrightarrow iZ + I $$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
 ///
 
 ### Normal Order
 
-This converts the operator to the Normal order form like:
+[`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder] puts the ladder operators into normal order.
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
 
 $$ C \times A + A \times C \longrightarrow C \times A + C \times A + J$$
-/// tab | Original Graph
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -281,9 +276,9 @@ $$ C \times A + A \times C \longrightarrow C \times A + C \times A + J$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
     graph TD
@@ -309,14 +304,19 @@ $$ C \times A + A \times C \longrightarrow C \times A + C \times A + J$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
 ///
 
 ### Prune Identity
 
-This removed unnecessary Identities from the graph. Note that this only affects ladders as identities are already removed from the graph for paulis using pauli algebra.
+[`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity] prunes the unnecessary ladder identities from the graph.
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
 
 $$ C\times A \times J\longrightarrow C \times A$$
-/// tab | Original Graph
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -336,9 +336,9 @@ $$ C\times A \times J\longrightarrow C \times A$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
     graph TD
@@ -355,14 +355,19 @@ $$ C\times A \times J\longrightarrow C \times A$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
 ///
 
 ### Sorted Order
 
-This sorts the terms in addition like:
+[`SortedOrder`][midstack.compiler.analog.rewrite.canonicalize.SortedOrder] sorts the addition terms in operators into a predefined order.
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
 
 $$ X \otimes I + I \otimes X \longrightarrow I \otimes X + X \otimes I$$
-/// tab | Original Graph
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -385,9 +390,9 @@ $$ X \otimes I + I \otimes X \longrightarrow I \otimes X + X \otimes I$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
     graph TD
@@ -410,14 +415,19 @@ $$ X \otimes I + I \otimes X \longrightarrow I \otimes X + X \otimes I$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
 ///
 
 ### Scale Terms
 
-This just scales the terms in the additions for consistency:
+[`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms] introduces scalar multiplication to terms without a coefficient for a more consistent reprensentation.
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
 
 $$ I \otimes X + X \otimes I \longrightarrow 1*(I \otimes X) + 1*(X \otimes I)$$
-/// tab | Original Graph
+//// tab | Original Graph
 
 ```mermaid
     graph TD
@@ -440,9 +450,9 @@ $$ I \otimes X + X \otimes I \longrightarrow 1*(I \otimes X) + 1*(X \otimes I)$$
     classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
-///
+////
 
-/// tab | Transformed Graph
+//// tab | Transformed Graph
 
 ```mermaid
 graph TD
@@ -471,22 +481,11 @@ classDef OperatorMul stroke:#800000,stroke-width:3px
 classDef MathExpr stroke:#800000,stroke-width:3px
 ```
 
+////
+
 ///
 
-## Composition of Visitors
-
-The visitors are composed in a graphical structure. Recall that or every kind of canonicalization operation (like for example `distribution`) we define a graph like:
-
-```mermaid
-stateDiagram-v2
-
-[*] --> verifier: enter
-verifier --> transformer: fail
-transformer --> verifier: done
-verifier --> terminal: pass
-```
-
-Hence, using this, we define the full graphical structure as:
+## Canonicalization Pass
 
 ```mermaid
 stateDiagram-v2

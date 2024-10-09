@@ -7,6 +7,13 @@ from ..analysis import TermIndex
 
 ########################################################################################
 
+__all__ = [
+    "analysis_canonical_hamiltonian_dim",
+    "analysis_term_index",
+]
+
+########################################################################################
+
 
 def analysis_term_index(model):
     """

@@ -6,7 +6,20 @@ from oqd_compiler_infrastructure import ConversionRule, RewriteRule
 
 ########################################################################################
 
-from ...interface.math import *
+from ...interface.math import (
+    MathAdd,
+    MathBinaryOp,
+    MathDiv,
+    MathFunc,
+    MathImag,
+    MathMul,
+    MathNum,
+    MathPow,
+    MathSub,
+    MathTerminal,
+    MathUnaryOp,
+    MathVar,
+)
 
 ########################################################################################
 

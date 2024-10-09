@@ -17,11 +17,16 @@ __all__ = [
 
 ########################################################################################
 
-
 evaluate_math_expr = Post(EvaluateMathExpr())
+"""
+Pass for evaluating math expression
+"""
 
 
 simplify_math_expr = Chain(
     Post(SimplifyMathExpr()),
     Post(PrintMathExpr()),
 )
+"""
+Pass for simplifying math expression
+"""

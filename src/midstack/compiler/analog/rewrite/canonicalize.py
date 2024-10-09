@@ -6,7 +6,23 @@ from oqd_compiler_infrastructure import RewriteRule
 
 from ..passes.analysis import analysis_term_index
 from ....interface.math import MathNum, MathImag, MathAdd
-from ....interface.analog import *
+from ....interface.analog import (
+    Operator,
+    OperatorAdd,
+    OperatorMul,
+    OperatorScalarMul,
+    OperatorSub,
+    OperatorKron,
+    Ladder,
+    Identity,
+    Annihilation,
+    Creation,
+    Pauli,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+)
 
 ########################################################################################
 
