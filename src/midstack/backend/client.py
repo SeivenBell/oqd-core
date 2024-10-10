@@ -1,14 +1,20 @@
-from typing import Literal
-
+from typing import Literal, Optional
+from pydantic import BaseModel, ConfigDict
 import requests
-
-########################################################################################
 
 from midstack.backend.provider import Provider
 from midstack.backend.task import Task
-from midstack.server.model import Job
 
-########################################################################################
+
+class Job(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    job_id: str
+    task: str
+    backend: str
+    status: str
+    result: Optional[str] = None
+    user_id: str
 
 
 class Client:
