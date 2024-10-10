@@ -1,62 +1,51 @@
-
 site_name: Open Quantum Design
 site_description: Open Quantum Design - the world's first open-source quantum computer
-#site_url: http://0.0.0.0:8000
+
 repo_name: OpenQuantumDesign/midstack
 repo_url: https://github.com/OpenQuantumDesign/midstack
 
 copyright: Copyright &copy; 2024 Open Quantum Design
-#docs_dir: .
-#site_dir: ../site
-#index_page: docs/index.md
 
 use_directory_urls: true
-#use_directory_urls: false  # good for opening HTML files directly, but should be 'true' for deployment
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/OpenQuantumDesign
       name: Open Quantum Design GitHub
-
+    - icon: fontawesome/solid/globe
+      link: https://openquantumdesign.org
+      name: Open Quantum Design Website
 
 nav:
-- Get Started:
-    - The Stack: index.md
-    - Installation: get-started/installation.md
-    - More details: get-started/stack.md
-- Tutorials:
-  - Analog: tutorials/analog.md
-- Examples:
-  - Analog:
-    - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
-    - Adiabatic state:
-        - Linear time-dependence: examples/adiabatic_linear.ipynb
-        - Sigmoid time-dependence: examples/adiabatic_sigmoid.ipynb
-    - Bell state preparation: examples/bell_state.ipynb
-    - GHZ state preparation: examples/ghz_state.ipynb
-    - Ising model: examples/ising_model.ipynb
-    - QAOA: examples/qaoa.ipynb
-- Explanation:
-  - Visitor: technical/explanation/visitor.md
-  - Compilation Flow: technical/explanation/compilation-flow.md
-  - Canonicalization Flow: technical/explanation/canonicalization-flow.md
-  - Analog to Atomic Compiler: technical/explanation/Analog-to-Atomic-compiler.md
-- API Reference:
-  - Interfaces:
-    - Data Structures: technical/reference/interface-base.md
-    - Math Expression: technical/reference/math-interface.md
-    - Digital: technical/reference/digital-interface.md
-    - Analog:
-      - Dissipation: technical/reference/dissipation-interface.md
-      - Operations: technical/reference/operations-interface.md
-      - Operators: technical/reference/operator-interface.md
-    - Atomic: technical/reference/atomic-interface.md
-  - Backends:
-    - Task: technical/reference/task-backend.md
-    - Qutip: technical/reference/qutip-backend.md
-  - Utilities: technical/reference/utils.md
-
+  - Get Started:
+      - The Stack: index.md
+      - Installation: get-started/installation.md
+  - Tutorials:
+      - Analog: tutorials/analog.md
+      - Examples:
+          - Analog:
+              - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
+              - Adiabatic state:
+                  - Linear time-dependence: examples/adiabatic_linear.ipynb
+                  - Sigmoid time-dependence: examples/adiabatic_sigmoid.ipynb
+              - Bell state preparation: examples/bell_state.ipynb
+              - GHZ state preparation: examples/ghz_state.ipynb
+              - Ising model: examples/ising_model.ipynb
+              - QAOA: examples/qaoa.ipynb
+  - Explanation:
+      - Infrastructure: explanation/infrastructure.md
+      - Canonicalization: explanation/canonicalization.md
+      - Analog to Atomic Compiler: explanation/Analog-to-Atomic-compiler.md
+      - QuTip Simulation: explanation/qutip-simulation.md
+  - API Reference:
+      - Interfaces:
+          - Math: reference/math_interface.md
+          - Analog: reference/analog_interface.md
+      - Compiler: reference/compiler.md
+      - Backends:
+          - Task: reference/task_backend.md
+          - Qutip: reference/qutip_backend.md
 
 theme:
   name: material
@@ -65,44 +54,37 @@ theme:
   favicon: img/oqd-logo.png
 
   palette:
-  - media: '(prefers-color-scheme: light)'
-    scheme: default
-    primary: teal
-    accent: pink
-    toggle:
-      icon: material/weather-sunny
-      name: Switch to dark mode
-  - media: '(prefers-color-scheme: dark)'
-    scheme: slate
-    primary: teal
-    accent: pink
-    toggle:
-      icon: material/weather-night  
-      name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
 
   features:
-  - search.suggest
-  - search.highlight
-  - content.tabs.link
-  - content.tooltips
-  - content.code.annotate
-  - content.code.copy
-  - content.code.select
-  - navigation.tabs
-  - navigation.tabs.sticky
-  - navigation.sections
-  - navigation.top
-  - navigation.prune
-  - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.tooltips
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.prune
+    - toc.follow
 
 plugins:
-  - search:
-  - mknotebooks:
-      execute: false
-      timeout: 100
-      allow_errors: True
-#      enable_default_jupyter_cell_styling: false
-#      enable_default_pandas_dataframe_styling: false
   - mkdocstrings:
       handlers:
         python:
@@ -118,6 +100,8 @@ plugins:
             show_signature_annotations: true
             signature_crossrefs: true
             separate_signature: false
+            group_by_category: true
+            members_order: "source"
           import:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
@@ -125,30 +109,28 @@ plugins:
             - https://pandas.pydata.org/docs/objects.inv
             - https://matplotlib.org/stable/objects.inv
             - https://numpy.org/doc/stable/objects.inv
-
+  - mkdocs-jupyter:
+      ignore_h1_titles: True
 
 markdown_extensions:
+  - attr_list
   - toc:
       permalink: true
-      toc_depth: 4
+      toc_depth: 10
 
-  # for code snippets/syntax highlighting
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.tabbed:
-      alternate_style: true
 
   # for notes/admonitions
-  - admonition
-  - pymdownx.details
   - pymdownx.blocks.admonition
   - pymdownx.blocks.details
+  - pymdownx.blocks.tab:
+      alternate_style: true
 
-  # for flow diagrams
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -158,7 +140,15 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
 
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+      truly_sane: True
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/headers.css
+  - stylesheets/admonitions.css
