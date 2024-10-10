@@ -47,6 +47,7 @@ nav:
       - Interface:
           - Math: reference/math_interface.md
           - Analog: reference/analog_interface.md
+          - Atomic: reference/atomic_interface.md
       - Compiler:
           - Math: reference/math_compiler.md
           - Analog:

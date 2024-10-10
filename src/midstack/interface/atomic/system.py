@@ -17,14 +17,20 @@ __all__ = [
     "Level",
     "Transition",
     "Ion",
-    "Mode",
+    "Phonon",
     "System",
 ]
 
 ########################################################################################
 
 
-def is_halfint(v: float) -> float:
+def is_halfint(v: float) -> bool:
+    """
+    Function that verifies a number is an integer or half-integer.
+
+    Args:
+        v: Number to verify.
+    """
     if not (v * 2).is_integer():
         raise ValueError()
     return v
@@ -34,14 +40,35 @@ def is_halfint(v: float) -> float:
 
 
 AngularMomentumNumber = Annotated[float, AfterValidator(is_halfint)]
+"""
+A valid positive or negative integer or half-integer for angular momentum.
+"""
 NonNegativeAngularMomentumNumber = Annotated[
     NonNegativeFloat, AfterValidator(is_halfint)
 ]
+"""
+A valid non-negative integer or half-integer for angular momentum.
+"""
 
 # ########################################################################################
 
 
 class Level(TypeReflectBaseModel):
+    """ "
+    Class representing an electronic energy level of an ion.
+
+    Attributes:
+        principal: Principal quantum number.
+        spin: Spin of an electron.
+        orbital: Orbital angular momentum of an electron.
+        nuclear: Nuclear angular momentum.
+        spin_orbital: Angular momentum of the spin-orbital coupling.
+        spin_orbital_nuclear: Angular momentum of the spin-orbital-nuclear coupling.
+        spin_orbital_nuclear_magnetization: Magnetization of the spin-orbital-nuclear coupled angular momentum.
+        energy: Energy of the electronic state.
+
+    """
+
     principal: Optional[NonNegativeInt] = None
     spin: Optional[NonNegativeAngularMomentumNumber] = None
     orbital: Optional[NonNegativeAngularMomentumNumber] = None
@@ -87,30 +114,69 @@ class Level(TypeReflectBaseModel):
 
 
 class Transition(TypeReflectBaseModel):
+    """
+    Class representing a transition between electronic states of an ion.
+
+    Attributes:
+        level1: Energy level 1.
+        level2: Energy level 2.
+        einsteinA: Einstein A coefficient that characterizes the strength of coupling between energy level 1 and 2.
+
+    """
+
     level1: Level
     level2: Level
     einsteinA: float
-    pass
 
 
 class Ion(TypeReflectBaseModel):
+    """
+    Class representing an ion.
+
+    Attributes:
+        mass: Mass of the ion.
+        charge: Charge of the ion.
+        levels: Electronic energy levels of the ion.
+        transitions: Allowed transitions in the ion.
+        position: Spatial position of the ion.
+    """
+
     mass: float
     charge: float
     levels: List[Level]
     transitions: List[Transition]
-    pass
+    position: List[float]
 
 
 ########################################################################################
 
 
-class Mode(TypeReflectBaseModel):
+class Phonon(TypeReflectBaseModel):
+    """
+    Class representing a collective phonon mode of the trapped-ion system.
+
+    Attributes:
+        energy: Quanta of energy for the phonon mode.
+        eigenvector: Profile of the phonon mode in terms of the vibration of the ions.
+
+    """
+
     energy: float
+    eigenvector: List[float]
 
 
 ########################################################################################
 
 
 class System(TypeReflectBaseModel):
+    """
+    Class representing a trapped-ion system.
+
+    Attributes:
+        ions: List of ions in the trapped-ion system.
+        modes: List of collective phonon modes for the trapped-ion system.
+
+    """
+
     ions: List[Ion]
-    modes: List[Mode]
+    modes: List[Phonon]

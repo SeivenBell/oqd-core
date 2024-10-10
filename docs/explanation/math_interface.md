@@ -40,10 +40,10 @@ The terminals of the math interface consist of:
 [`MathNum`][midstack.interface.math.MathNum] represents a number.
 
 <!-- prettier-ignore -->
-/// admonition | Note
+//// admonition | Note
     type: note
 Numbers are considered to belong to the real numbers, i.e. they can be positive or negative floats.
-///
+////
 ///
 
 /// tab | `MathImag`
