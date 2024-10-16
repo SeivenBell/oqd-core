@@ -1,7 +1,5 @@
 from typing import Union
 
-from rich import print as pprint
-
 import unittest
 from unittest_prettify.colorize import (
     colorize,
