@@ -197,7 +197,7 @@ class OperatorScalarMul(Operator):
         expr (MathExpr): [`MathExpr`][midstack.interface.math.MathExpr] to multiply by
     """
 
-    op: Union[*Operator.get_subclasses()]
+    op: Union[Operator.get_subclasses()]
     op: Operator
     expr: CastMathExpr
 
@@ -220,9 +220,9 @@ class OperatorAdd(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[*Operator.get_subclasses()]
+    op1: Union[Operator.get_subclasses()]
     # op2: Operator
-    op2: Union[*Operator.get_subclasses()]
+    op2: Union[Operator.get_subclasses()]
 
 
 class OperatorSub(OperatorBinaryOp):
@@ -235,9 +235,9 @@ class OperatorSub(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[*Operator.get_subclasses()]
+    op1: Union[Operator.get_subclasses()]
     # op2: Operator
-    op2: Union[*Operator.get_subclasses()]
+    op2: Union[Operator.get_subclasses()]
 
 
 class OperatorMul(OperatorBinaryOp):
@@ -250,9 +250,9 @@ class OperatorMul(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[*Operator.get_subclasses()]
+    op1: Union[Operator.get_subclasses()]
     # op2: Operator
-    op2: Union[*Operator.get_subclasses()]
+    op2: Union[Operator.get_subclasses()]
 
 
 class OperatorKron(OperatorBinaryOp):
@@ -265,6 +265,6 @@ class OperatorKron(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[*Operator.get_subclasses()]
+    op1: Union[Operator.get_subclasses()]
     # op2: Operator
-    op2: Union[*Operator.get_subclasses()]
+    op2: Union[Operator.get_subclasses()]

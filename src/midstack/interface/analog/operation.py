@@ -32,13 +32,8 @@ class AnalogGate(TypeReflectBaseModel):
         hamiltonian (Operator): Hamiltonian terms of the gate
     """
 
-    hamiltonian: Union[*Operator.get_subclasses()]
-    # hamiltonian: Annotated[
-    #     Union[*Operator.get_subclasses()],
-    # ]
-    # Field(discriminator="class_"),
-
-    # hamiltonian: Operator
+    hamiltonian: Union[Operator.get_subclasses()]
+    # hamiltonian: Union[*Operator.get_subclasses()]  # only works with Python >=3.11
 
 
 #%%
