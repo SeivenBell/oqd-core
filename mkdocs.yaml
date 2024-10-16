@@ -1,8 +1,7 @@
-site_name: Open Quantum Design
-site_description: Open Quantum Design - the world's first open-source quantum computer
+site_name: OQD Core
 
-repo_name: OpenQuantumDesign/midstack
-repo_url: https://github.com/OpenQuantumDesign/midstack
+repo_name: OpenQuantumDesign/oqd-core
+repo_url: https://github.com/OpenQuantumDesign/oqd-core
 
 copyright: Copyright &copy; 2024 Open Quantum Design
 
@@ -15,29 +14,18 @@ extra:
       name: Open Quantum Design GitHub
     - icon: fontawesome/solid/globe
       link: https://openquantumdesign.org
-      name: Open Quantum Design Website
+      name: Open Quantum Design
 
 nav:
   - Get Started:
       - The Stack: index.md
-      - Installation: get-started/installation.md
-  - Tutorials:
-      - Analog: tutorials/analog.md
-      - Examples:
-          - Analog:
-              - Rabi Flopping: examples/one_qubit_rabi_flopping.ipynb
-              - Adiabatic state:
-                  - Linear time-dependence: examples/adiabatic_linear.ipynb
-                  - Sigmoid time-dependence: examples/adiabatic_sigmoid.ipynb
-              - Bell state preparation: examples/bell_state.ipynb
-              - GHZ state preparation: examples/ghz_state.ipynb
-              - Ising model: examples/ising_model.ipynb
-              - QAOA: examples/qaoa.ipynb
+#      - Installation: get-started/installation.md
+
   - Explanation:
-      - Infrastructure: explanation/infrastructure.md
+#      - Infrastructure: explanation/infrastructure.md
       - Canonicalization: explanation/canonicalization.md
       - Analog to Atomic Compiler: explanation/Analog-to-Atomic-compiler.md
-      - QuTip Simulation: explanation/qutip-simulation.md
+#      - QuTip Simulation: explanation/qutip-simulation.md
   - API Reference:
       - Interfaces:
           - Math: reference/math_interface.md
@@ -45,7 +33,6 @@ nav:
       - Compiler: reference/compiler.md
       - Backends:
           - Task: reference/task_backend.md
-          - Qutip: reference/qutip_backend.md
 
 theme:
   name: material
@@ -88,6 +75,8 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          paths:
+            - ./src
           options:
             show_source: true
             show_root_heading: true
