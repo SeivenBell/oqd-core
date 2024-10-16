@@ -22,17 +22,25 @@ nav:
 #      - Installation: get-started/installation.md
 
   - Explanation:
-#      - Infrastructure: explanation/infrastructure.md
-      - Canonicalization: explanation/canonicalization.md
-      - Analog to Atomic Compiler: explanation/Analog-to-Atomic-compiler.md
-#      - QuTip Simulation: explanation/qutip-simulation.md
-  - API Reference:
       - Interfaces:
+          - Math: explanation/math_interface.md
+          - Analog: explanation/analog_interface.md
+          - Atomic: explanation/atomic_interface.md
+      - Compilers:
+          - Canonicalization: explanation/canonicalization.md
+          - Analog to Atomic Compiler: explanation/analog_to_atomic.md
+      - Backends:
+          - QuTip Simulation: explanation/qutip-simulation.md
+  - API Reference:
+      - Interface:
           - Math: reference/math_interface.md
           - Analog: reference/analog_interface.md
-      - Compiler: reference/compiler.md
-      - Backends:
-          - Task: reference/task_backend.md
+      - Compiler:
+          - Math: reference/math_compiler.md
+          - Analog:
+              - Canonicalization: reference/analog_canonicalization.md
+      - Backend:
+          - QuTiP: reference/qutip_backend.md
 
 theme:
   name: material
@@ -79,7 +87,8 @@ plugins:
             - ./src
           options:
             show_source: true
-            show_root_heading: true
+            show_root_heading: false
+            show_root_toc_entry: false
             show_symbol_type_heading: true
             show_symbol_type_toc: true
             show_submodules: true
@@ -119,6 +128,7 @@ markdown_extensions:
   - pymdownx.blocks.details
   - pymdownx.blocks.tab:
       alternate_style: true
+  - pymdownx.blocks.html
 
   - pymdownx.superfences:
       custom_fences:

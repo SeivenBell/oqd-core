@@ -6,7 +6,7 @@ from unittest_prettify.colorize import (
     MAGENTA,
 )
 
-from oqd_compiler_infrastructure import RewriteRule, Walk, Post, Pre, FixedPoint
+from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre, FixedPoint
 
 ########################################################################################
 
@@ -27,7 +27,7 @@ X, Y, Z, I, A, C, LI = (
 )
 
 
-def test_function(operator: Operator, rule: RewriteRule, walk_method: Walk = Post):
+def test_function(operator: Operator, rule: RewriteRule, walk_method: WalkBase = Post):
     return FixedPoint(walk_method(rule))(operator)
 
 
