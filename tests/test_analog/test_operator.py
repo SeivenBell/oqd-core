@@ -9,7 +9,7 @@ from unittest_prettify.colorize import (
     MAGENTA,
 )
 
-from oqd_compiler_infrastructure import Post, Walk, In, ConversionRule, RewriteRule
+from oqd_compiler_infrastructure import Post, WalkBase, In, ConversionRule, RewriteRule
 
 ########################################################################################
 
@@ -25,7 +25,7 @@ from midstack.interface.math import *
 def test_function(
     operator: Operator,
     rule: Union[ConversionRule, RewriteRule] = PrintOperator(verbose=True),
-    walk_method: Walk = Post,
+    walk_method: WalkBase = Post,
     reverse: bool = False,
 ):
     return walk_method(rule, reverse=reverse)(operator)

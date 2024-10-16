@@ -7,7 +7,7 @@ from unittest_prettify.colorize import (
     MAGENTA,
 )
 
-from oqd_compiler_infrastructure import RewriteRule, Walk, Post, Pre, In
+from oqd_compiler_infrastructure import RewriteRule, Post, Pre, In
 
 ########################################################################################
 
