@@ -1,13 +1,13 @@
 from typing import List, Literal, Union
+from pydantic import Field
+from pydantic.types import Annotated
 from pydantic.types import NonNegativeInt
 
-from oqd_compiler_infrastructure import VisitableBaseModel
+#%%
+from oqd_compiler_infrastructure import VisitableBaseModel, TypeReflectBaseModel
 
-########################################################################################
+from midstack.interface.analog.operator import Operator
 
-from .operator import Operator
-
-########################################################################################
 
 __all__ = [
     "AnalogCircuit",
@@ -20,16 +20,11 @@ __all__ = [
 
 ########################################################################################
 
-
-class AnalogOperation(VisitableBaseModel):
-    """
-    Class representing an analog operation applied to the quantum system
-    """
-
-    pass
+Operator.get_subclasses()
 
 
-class AnalogGate(AnalogOperation):
+#%%
+class AnalogGate(TypeReflectBaseModel):
     """
     Class representing an analog gate composed of Hamiltonian terms and dissipation terms
 
@@ -37,7 +32,22 @@ class AnalogGate(AnalogOperation):
         hamiltonian (Operator): Hamiltonian terms of the gate
     """
 
-    hamiltonian: Operator
+    hamiltonian: Union[*Operator.get_subclasses()]
+    # hamiltonian: Annotated[
+    #     Union[*Operator.get_subclasses()],
+    # ]
+    # Field(discriminator="class_"),
+
+    # hamiltonian: Operator
+
+
+#%%
+class AnalogOperation(VisitableBaseModel):
+    """
+    Class representing an analog operation applied to the quantum system
+    """
+
+    pass
 
 
 class Evolve(AnalogOperation):

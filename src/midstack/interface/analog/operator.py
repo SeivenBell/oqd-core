@@ -1,8 +1,9 @@
+from typing import Union
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 
 ########################################################################################
 
-from ..math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
+from midstack.interface.math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
 
 ########################################################################################
 
@@ -196,6 +197,7 @@ class OperatorScalarMul(Operator):
         expr (MathExpr): [`MathExpr`][midstack.interface.math.MathExpr] to multiply by
     """
 
+    op: Union[*Operator.get_subclasses()]
     op: Operator
     expr: CastMathExpr
 
@@ -217,8 +219,10 @@ class OperatorAdd(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    # op1: Operator
+    op1: Union[*Operator.get_subclasses()]
+    # op2: Operator
+    op2: Union[*Operator.get_subclasses()]
 
 
 class OperatorSub(OperatorBinaryOp):
@@ -230,8 +234,10 @@ class OperatorSub(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    # op1: Operator
+    op1: Union[*Operator.get_subclasses()]
+    # op2: Operator
+    op2: Union[*Operator.get_subclasses()]
 
 
 class OperatorMul(OperatorBinaryOp):
@@ -243,8 +249,10 @@ class OperatorMul(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    # op1: Operator
+    op1: Union[*Operator.get_subclasses()]
+    # op2: Operator
+    op2: Union[*Operator.get_subclasses()]
 
 
 class OperatorKron(OperatorBinaryOp):
@@ -256,5 +264,7 @@ class OperatorKron(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    # op1: Operator
+    op1: Union[*Operator.get_subclasses()]
+    # op2: Operator
+    op2: Union[*Operator.get_subclasses()]
