@@ -7,7 +7,7 @@ from unittest_prettify.colorize import (
     MAGENTA,
 )
 
-from oqd_compiler_infrastructure import RewriteRule, Walk, Post, Pre
+from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre
 
 ########################################################################################
 
@@ -30,7 +30,7 @@ X, Y, Z, I, A, C, LI = (
 
 
 def test_function(
-    operator: Operator, rule: RewriteRule, walk_method: Walk, reverse: bool
+    operator: Operator, rule: RewriteRule, walk_method: WalkBase, reverse: bool
 ):
     walk_method(rule, reverse=reverse)(operator)
 
@@ -41,27 +41,25 @@ class CanonicalFormErrors(unittest.TestCase):
         self,
         operator: Operator,
         rule: RewriteRule,
-        walk_method: Walk = Post,
+        walk_method: WalkBase = Post,
         reverse: bool = False,
     ):
         with self.assertRaises(CanonicalFormError) as context:
             test_function(
                 operator=operator, rule=rule, walk_method=walk_method, reverse=reverse
             )
-        print(context.exception)
 
     def assertCanonicalFormErrorNotRaised(
         self,
         operator,
         rule: RewriteRule,
-        walk_method: Walk = Post,
+        walk_method: WalkBase = Post,
         reverse: bool = False,
     ):
         with self.assertRaises(AssertionError) as context:
             self.assertCanonicalFormErrorRaised(
                 operator=operator, rule=rule, walk_method=walk_method, reverse=reverse
             )
-        print(context.exception)
 
 
 @colorize(color=BLUE)

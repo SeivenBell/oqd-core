@@ -1,2 +1,1 @@
-from .passes import *
-from .rules import *
+from . import passes, rules

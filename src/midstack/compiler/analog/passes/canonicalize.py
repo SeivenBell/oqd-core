@@ -1,10 +1,30 @@
 from oqd_compiler_infrastructure import Chain, FixedPoint, Post, Pre, In
 
 ########################################################################################
-from midstack.compiler.analog.rewrite.canonicalize import *
-from midstack.compiler.analog.verify.canonicalize import *
-from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
-from midstack.compiler.math.rules import (
+from ..rewrite.canonicalize import (
+    OperatorDistribute,
+    GatherMathExpr,
+    PauliAlgebra,
+    NormalOrder,
+    ProperOrder,
+    ScaleTerms,
+    SortedOrder,
+    PruneIdentity,
+    GatherPauli,
+)
+from ..verify import (
+    VerifyHilberSpaceDim,
+    CanVerGatherMathExpr,
+    CanVerGatherPauli,
+    CanVerNormalOrder,
+    CanVerOperatorDistribute,
+    CanVerPauliAlgebra,
+    CanVerProperOrder,
+    CanVerPruneIdentity,
+    CanVerScaleTerm,
+    CanVerSortedOrder,
+)
+from ...math.rules import (
     DistributeMathExpr,
     ProperOrderMathExpr,
     PartitionMathExpr,

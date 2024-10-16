@@ -1,7 +1,5 @@
 from typing import Union
 
-from rich import print as pprint
-
 import unittest
 from unittest_prettify.colorize import (
     colorize,
@@ -11,7 +9,7 @@ from unittest_prettify.colorize import (
     MAGENTA,
 )
 
-from oqd_compiler_infrastructure import Post, Walk, ConversionRule, RewriteRule
+from oqd_compiler_infrastructure import Post, WalkBase, ConversionRule, RewriteRule
 
 ########################################################################################
 
@@ -24,7 +22,7 @@ from midstack.interface.math import *
 def test_function(
     math_str: str,
     rule: Union[ConversionRule, RewriteRule] = EvaluateMathExpr(),
-    walk_method: Walk = Post,
+    walk_method: WalkBase = Post,
 ):
     return walk_method(rule)(MathStr(string=math_str))
 

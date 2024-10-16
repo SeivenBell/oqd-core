@@ -178,6 +178,10 @@ class MathTerminal(MathExpr):
 class MathVar(MathTerminal):
     """
     Class representing a variable in a [`MathExpr`][midstack.interface.math.MathExpr]
+
+    Examples:
+        >>> MathVar("t")
+
     """
 
     name: VarName
