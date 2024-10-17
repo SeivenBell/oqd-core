@@ -382,15 +382,15 @@ class ScaleTerms(RewriteRule):
         if not self.op_add_root:
             self.op_add_root = True
             if not isinstance(model, Union[OperatorAdd, OperatorScalarMul]):
-                return OperatorScalarMul(expr=1, op=model)
+                return OperatorScalarMul(expr=MathNum(value=1), op=model)
 
     def map_OperatorAdd(self, model: OperatorAdd):
         self.op_add_root = True
         op1, op2 = model.op1, model.op2
         if not isinstance(model.op1, Union[OperatorScalarMul, OperatorAdd]):
-            op1 = OperatorScalarMul(expr=1, op=model.op1)
+            op1 = OperatorScalarMul(expr=MathNum(value=1), op=model.op1)
         if not isinstance(model.op2, Union[OperatorScalarMul, OperatorAdd]):
-            op2 = OperatorScalarMul(expr=1, op=model.op2)
+            op2 = OperatorScalarMul(expr=MathNum(value=1), op=model.op2)
         return OperatorAdd(op1=op1, op2=op2)
 
 

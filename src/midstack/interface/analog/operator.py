@@ -91,6 +91,7 @@ class Operator(TypeReflectBaseModel):
             return OperatorScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
+        other = MathExpr.cast(other)
         return self * other
 
     pass
