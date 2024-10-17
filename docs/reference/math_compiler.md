@@ -1,7 +1,7 @@
 ## Passes
 
-::: midstack.compiler.math.passes
+::: core.compiler.math.passes
 
 ## Rules
 
-::: midstack.compiler.math.rules
+::: core.compiler.math.rules

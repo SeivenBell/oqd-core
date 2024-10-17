@@ -39,8 +39,6 @@ nav:
           - Math: reference/math_compiler.md
           - Analog:
               - Canonicalization: reference/analog_canonicalization.md
-      - Backend:
-          - QuTiP: reference/qutip_backend.md
 
 theme:
   name: material
