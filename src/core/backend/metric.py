@@ -6,7 +6,7 @@ from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
 
-from ..interface.analog.operator import Operator
+from ..interface.analog.operator import Operator, OperatorSubtypes
 
 ########################################################################################
 
@@ -20,7 +20,7 @@ __all__ = [
 
 
 class Expectation(VisitableBaseModel):
-    operator: Operator
+    operator: OperatorSubtypes
 
 
 class EntanglementEntropyVN(VisitableBaseModel):

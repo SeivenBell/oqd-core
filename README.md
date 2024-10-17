@@ -49,7 +49,7 @@ from core.interface.analog.operator import *
 from core.interface.analog.operations import *
 from core.backend.metric import *
 from core.backend.task import Task
-from analog_sim.base import TaskArgsAnalogSimulator
+from analog_emulator.base import TaskArgsAnalogSimulator
 from core.backend import QutipBackend
 
 X = PauliX()
