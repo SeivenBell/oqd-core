@@ -28,23 +28,6 @@ __all__ = [
     "MathExprSubtypes",
 ]
 
-MathExprSubtypes = Union[
-    "MathExpr",
-    "MathTerminal",
-    "MathStr",
-    "MathNum",
-    "MathVar",
-    "MathImag",
-    "MathUnaryOp",
-    "MathFunc",
-    "MathBinaryOp",
-    "MathAdd",
-    "MathSub",
-    "MathMul",
-    "MathDiv",
-    "MathPow",
-]
-
 ########################################################################################
 
 
@@ -313,3 +296,21 @@ class MathPow(MathBinaryOp):
 
     expr1: CastMathExpr
     expr2: CastMathExpr
+
+
+MathExprSubtypes = Union[
+    MathExpr,
+    MathTerminal,
+    MathStr,
+    MathNum,
+    MathVar,
+    MathImag,
+    MathUnaryOp,
+    MathFunc,
+    MathBinaryOp,
+    MathAdd,
+    MathSub,
+    MathMul,
+    MathDiv,
+    MathPow,
+]

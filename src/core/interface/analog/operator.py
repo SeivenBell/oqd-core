@@ -1,6 +1,8 @@
 from __future__ import annotations
+import sys
+import inspect
 
-from typing import Union
+from typing import Union, get_type_hints
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 ########################################################################################
 
@@ -30,28 +32,6 @@ __all__ = [
     "OperatorKron",
     #
     "OperatorSubtypes"
-]
-
-OperatorSubtypes = Union[
-    "Operator",
-    "OperatorTerminal",
-    "Pauli",
-    "PauliI",
-    "PauliX",
-    "PauliY",
-    "PauliZ",
-    "PauliPlus",
-    "PauliMinus",
-    "Ladder",
-    "Creation",
-    "Annihilation",
-    "Identity",
-    "OperatorBinaryOp",
-    "OperatorAdd",
-    "OperatorSub",
-    "OperatorMul",
-    "OperatorScalarMul",
-    "OperatorKron",
 ]
 
 
@@ -287,5 +267,37 @@ class OperatorKron(OperatorBinaryOp):
     op2: OperatorSubtypes
 
 
-# for model in Operator.get_subclasses():
-#     model.model_rebuild()
+OperatorSubtypes = Union[
+    OperatorTerminal,
+    Pauli,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+    PauliPlus,
+    PauliMinus,
+    Ladder,
+    Creation,
+    Annihilation,
+    Identity,
+    OperatorBinaryOp,
+    OperatorAdd,
+    OperatorSub,
+    OperatorMul,
+    OperatorScalarMul,
+    OperatorKron,
+]
+
+# # update forward refs for all OperatorSubclasses
+# current_module = sys.modules[__name__]
+# for class_name in OperatorSubtypes.__args__:
+#     cls = getattr(current_module, class_name, None)
+#     if cls:
+#         cls.update_forward_refs()
+
+# current_module = sys.modules[__name__]
+#
+# # Loop through all classes defined in this module
+# for name, obj in inspect.getmembers(current_module, inspect.isclass):
+#     if hasattr(obj, "update_forward_refs"):
+#         obj.update_forward_refs()
