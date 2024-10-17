@@ -271,15 +271,3 @@ class TestHilbertSpaceDimVerification(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-#
-# #%%
-# X @ X
-# X * X
-# X @ (X * X + X)
-#
-# #%%
-# 2 * X
-# 2 * (X+X)
-
-
-#%%

@@ -87,10 +87,10 @@ class Operator(TypeReflectBaseModel):
         if isinstance(other, Operator):
             return OperatorMul(op1=self, op2=other)
         else:
+            other = MathExpr.cast(other)
             return OperatorScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
-        other = MathExpr.cast(other)
         return self * other
 
     pass
@@ -222,12 +222,8 @@ class OperatorScalarMul(Operator):
         expr (MathExpr): [`MathExpr`][midstack.interface.math.MathExpr] to multiply by
     """
 
-    # op: Union[Operator.get_subclasses()]
     op: OperatorSubtypes
-    # op: Operator
-    # expr: CastMathExpr
     expr: MathExprSubtypes
-    # expr: Union[MathExpr.get_subclasses()]
 
 
 class OperatorBinaryOp(Operator):
@@ -247,11 +243,7 @@ class OperatorAdd(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    # op1: Operator
-    # op1: Union[Operator.get_subclasses()]
     op1: OperatorSubtypes
-    # op2: Operator
-    # op2: Union[Operator.get_subclasses()]
     op2: OperatorSubtypes
 
 
@@ -264,11 +256,7 @@ class OperatorSub(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    # op1: Operator
-    # op1: Union[Operator.get_subclasses()]
     op1: OperatorSubtypes
-    # op2: Operator
-    # op2: Union[Operator.get_subclasses()]
     op2: OperatorSubtypes
 
 
@@ -281,11 +269,7 @@ class OperatorMul(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    # op1: Operator
-    # op1: Union[Operator.get_subclasses()]
     op1: OperatorSubtypes
-    # op2: Operator
-    # op2: Union[Operator.get_subclasses()]
     op2: OperatorSubtypes
 
 
@@ -298,11 +282,7 @@ class OperatorKron(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    # op1: Operator
-    # op1: Union[Operator.get_subclasses()]
     op1: OperatorSubtypes
-    # op2: Operator
-    # op2: Union[Operator.get_subclasses()]
     op2: OperatorSubtypes
 
 
