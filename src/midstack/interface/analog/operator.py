@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from rich.pretty import pprint
 from typing import Union
 from oqd_compiler_infrastructure import TypeReflectBaseModel
-
 ########################################################################################
 
 from midstack.interface.math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
@@ -8,6 +10,28 @@ from midstack.interface.math import CastMathExpr, MathExpr, MathImag, MathNum, M
 ########################################################################################
 
 __all__ = [
+    "Operator",
+    "OperatorTerminal",
+    "Pauli",
+    "PauliI",
+    "PauliX",
+    "PauliY",
+    "PauliZ",
+    "PauliPlus",
+    "PauliMinus",
+    "Ladder",
+    "Creation",
+    "Annihilation",
+    "Identity",
+    "OperatorBinaryOp",
+    "OperatorAdd",
+    "OperatorSub",
+    "OperatorMul",
+    "OperatorScalarMul",
+    "OperatorKron",
+]
+
+OperatorSubtypes = Union[
     "Operator",
     "OperatorTerminal",
     "Pauli",
@@ -59,13 +83,18 @@ class Operator(TypeReflectBaseModel):
         return OperatorKron(op1=self, op2=other)
 
     def __mul__(self, other):
+        print("mu")
         if isinstance(other, Operator):
+            print("operator",  self, other)
             return OperatorMul(op1=self, op2=other)
         else:
+            print("not operator", self, other)
             return OperatorScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
+        print("rmul", other, type(other))
         other = MathExpr.cast(other)
+        print(other)
         return self * other
 
     pass
@@ -197,9 +226,11 @@ class OperatorScalarMul(Operator):
         expr (MathExpr): [`MathExpr`][midstack.interface.math.MathExpr] to multiply by
     """
 
-    op: Union[Operator.get_subclasses()]
-    op: Operator
-    expr: CastMathExpr
+    # op: Union[Operator.get_subclasses()]
+    op: OperatorSubtypes
+    # op: Operator
+    # expr: CastMathExpr
+    expr: Union[MathExpr.get_subclasses()]
 
 
 class OperatorBinaryOp(Operator):
@@ -220,9 +251,11 @@ class OperatorAdd(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[Operator.get_subclasses()]
+    # op1: Union[Operator.get_subclasses()]
+    op1: OperatorSubtypes
     # op2: Operator
-    op2: Union[Operator.get_subclasses()]
+    # op2: Union[Operator.get_subclasses()]
+    op2: OperatorSubtypes
 
 
 class OperatorSub(OperatorBinaryOp):
@@ -235,9 +268,11 @@ class OperatorSub(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[Operator.get_subclasses()]
+    # op1: Union[Operator.get_subclasses()]
+    op1: OperatorSubtypes
     # op2: Operator
-    op2: Union[Operator.get_subclasses()]
+    # op2: Union[Operator.get_subclasses()]
+    op2: OperatorSubtypes
 
 
 class OperatorMul(OperatorBinaryOp):
@@ -250,9 +285,11 @@ class OperatorMul(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[Operator.get_subclasses()]
+    # op1: Union[Operator.get_subclasses()]
+    op1: OperatorSubtypes
     # op2: Operator
-    op2: Union[Operator.get_subclasses()]
+    # op2: Union[Operator.get_subclasses()]
+    op2: OperatorSubtypes
 
 
 class OperatorKron(OperatorBinaryOp):
@@ -265,6 +302,17 @@ class OperatorKron(OperatorBinaryOp):
     """
 
     # op1: Operator
-    op1: Union[Operator.get_subclasses()]
+    # op1: Union[Operator.get_subclasses()]
+    op1: OperatorSubtypes
     # op2: Operator
-    op2: Union[Operator.get_subclasses()]
+    # op2: Union[Operator.get_subclasses()]
+    op2: OperatorSubtypes
+
+
+pprint(OperatorScalarMul.model_json_schema())
+
+for model in Operator.get_subclasses():
+    print(model)
+    model.model_rebuild()
+
+pprint(OperatorScalarMul.model_json_schema())
