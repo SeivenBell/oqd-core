@@ -1,1 +1,1 @@
-from . import analog, atomic, digital, math
+from midstack.interface import analog, atomic, digital, math

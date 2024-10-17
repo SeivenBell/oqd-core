@@ -1,22 +1,22 @@
-from dataclasses import dataclass, field
-import numpy as np
-from typing import Union, List, Dict, Literal, Annotated
 from pydantic import BaseModel, BeforeValidator
+from dataclasses import dataclass, field
+from typing import List, Union, Literal, Dict, Annotated
+
+import numpy as np
 
 ########################################################################################
 
 from midstack.interface.analog.operation import AnalogCircuit
 from midstack.interface.digital.circuit import DigitalCircuit
 from midstack.interface.atomic.program import AtomicProgram
-
 from midstack.backend.metric import Metric
 
-from oqd_compiler_infrastructure import VisitableBaseModel
+from oqd_compiler_infrastructure import TypeReflectBaseModel
 
 ########################################################################################
 
 
-class ComplexFloat(BaseModel):
+class ComplexFloat(TypeReflectBaseModel):
     """
     Class representing a complex number
 
@@ -70,6 +70,17 @@ CastComplexFloat = Annotated[ComplexFloat, BeforeValidator(ComplexFloat.cast)]
 ########################################################################################
 
 
+class TaskArgsBase(TypeReflectBaseModel):
+    layer: Literal["digital", "analog", "atomic"]
+
+
+class TaskResultsBase(TypeReflectBaseModel):
+    layer: Literal["digital", "analog", "atomic"]
+
+
+########################################################################################
+
+
 @dataclass
 class DataAnalog:
     times: np.array = field(default_factory=lambda: np.empty(0))
@@ -78,10 +89,7 @@ class DataAnalog:
     shots: np.array = field(default_factory=lambda: np.empty(0))
 
 
-########################################################################################sss
-
-
-class TaskArgsAnalog(VisitableBaseModel):
+class TaskArgsAnalog(TaskArgsBase):
     layer: Literal["analog"] = "analog"
     n_shots: Union[int, None] = 10
     fock_cutoff: int = 4
@@ -89,7 +97,7 @@ class TaskArgsAnalog(VisitableBaseModel):
     metrics: Dict[str, Metric] = {}
 
 
-class TaskResultAnalog(VisitableBaseModel):
+class TaskResultAnalog(TaskResultsBase):
     """
     Contains the results of a simulation/actual experiment.
 
@@ -110,9 +118,7 @@ class TaskResultAnalog(VisitableBaseModel):
     runtime: float = None
 
 
-########################################################################################
-
-
+# todo: uncomment when Digital layer is further developed.
 class TaskArgsDigital(BaseModel):
     layer: Literal["digital"] = "digital"
     repetitions: int = 10
@@ -122,11 +128,12 @@ class TaskResultDigital(BaseModel):
     layer: Literal["digital"] = "digital"
     counts: dict[str, int] = {}
     state: List[CastComplexFloat] = []
-
+#
 
 ########################################################################################
 
 
+# todo: move to TriCal package
 class TaskArgsAtomic(BaseModel):
     layer: Literal["atomic"] = "atomic"
     n_shots: int = 10
@@ -144,19 +151,19 @@ class TaskResultAtomic(BaseModel):
 ########################################################################################
 
 
-class Task(VisitableBaseModel):
+class Task(TypeReflectBaseModel):
     """
     Class representing a task to run a quantum experiment with some arguments
 
     Attributes:
         program (Union[AnalogCircuit, DigitalCircuit, AtomicProgram]): Quantum experiment to run
-        args (Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]): Arguments for the quantum experiment
+        args (Union[analog_sim.base.TaskArgsAnalogSimulator, TaskArgsDigital, TaskArgsAtomic]): Arguments for the quantum experiment
     """
 
     program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
 
 
-TaskResult = Union[TaskResultAnalog, TaskResultAnalog, TaskResultDigital]
+TaskResult = Union[TaskResultAnalog, TaskResultAtomic, TaskResultDigital]
 
 ########################################################################################

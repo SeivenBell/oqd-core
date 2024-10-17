@@ -1,12 +1,38 @@
-from oqd_compiler_infrastructure import TypeReflectBaseModel
+from __future__ import annotations
 
+from typing import Union
+from oqd_compiler_infrastructure import TypeReflectBaseModel
 ########################################################################################
 
-from ..math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
+from midstack.interface.math import *
 
 ########################################################################################
 
 __all__ = [
+    "Operator",
+    "OperatorTerminal",
+    "Pauli",
+    "PauliI",
+    "PauliX",
+    "PauliY",
+    "PauliZ",
+    "PauliPlus",
+    "PauliMinus",
+    "Ladder",
+    "Creation",
+    "Annihilation",
+    "Identity",
+    "OperatorBinaryOp",
+    "OperatorAdd",
+    "OperatorSub",
+    "OperatorMul",
+    "OperatorScalarMul",
+    "OperatorKron",
+    #
+    "OperatorSubtypes"
+]
+
+OperatorSubtypes = Union[
     "Operator",
     "OperatorTerminal",
     "Pauli",
@@ -61,6 +87,7 @@ class Operator(TypeReflectBaseModel):
         if isinstance(other, Operator):
             return OperatorMul(op1=self, op2=other)
         else:
+            other = MathExpr.cast(other)
             return OperatorScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
@@ -196,8 +223,8 @@ class OperatorScalarMul(Operator):
         expr (MathExpr): [`MathExpr`][midstack.interface.math.MathExpr] to multiply by
     """
 
-    op: Operator
-    expr: CastMathExpr
+    op: OperatorSubtypes
+    expr: MathExprSubtypes
 
 
 class OperatorBinaryOp(Operator):
@@ -217,8 +244,8 @@ class OperatorAdd(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
 
 
 class OperatorSub(OperatorBinaryOp):
@@ -230,8 +257,8 @@ class OperatorSub(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
 
 
 class OperatorMul(OperatorBinaryOp):
@@ -243,8 +270,8 @@ class OperatorMul(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
 
 
 class OperatorKron(OperatorBinaryOp):
@@ -256,5 +283,9 @@ class OperatorKron(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
+
+
+# for model in Operator.get_subclasses():
+#     model.model_rebuild()
