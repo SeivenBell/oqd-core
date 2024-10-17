@@ -4,7 +4,7 @@ from typing import Union
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 ########################################################################################
 
-from midstack.interface.math import *
+from core.interface.math import *
 
 ########################################################################################
 

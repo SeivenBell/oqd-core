@@ -10,9 +10,9 @@ from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre, FixedP
 
 ########################################################################################
 
-from midstack.interface.analog import *
-from midstack.compiler.analog.rewrite.canonicalize import *
-from midstack.interface.math import *
+from core.interface.analog import *
+from core.compiler.analog.rewrite.canonicalize import *
+from core.interface.math import *
 
 ########################################################################################
 

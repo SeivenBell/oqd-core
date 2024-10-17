@@ -11,10 +11,10 @@ from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre
 
 ########################################################################################
 
-from midstack.interface.analog import *
-from midstack.compiler.analog.verify.canonicalize import *
-from midstack.compiler.analog.error import CanonicalFormError
-from midstack.interface.math import *
+from core.interface.analog import *
+from core.compiler.analog.verify.canonicalize import *
+from core.compiler.analog.error import CanonicalFormError
+from core.interface.math import *
 
 ########################################################################################
 

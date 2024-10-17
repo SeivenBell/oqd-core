@@ -92,7 +92,7 @@ class DigitalCircuit(VisitableBaseModel):
 
 
 if __name__ == "__main__":
-    from midstack.interface.digital.gate import H, CNOT
+    from core.interface.digital.gate import H, CNOT
 
     qreg = QuantumRegister(id="q", reg=4)
     creg = ClassicalRegister(id="c", reg=2)

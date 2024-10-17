@@ -4,9 +4,9 @@ from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
 
-from ..passes.analysis import analysis_term_index
-from ....interface.math import MathNum, MathImag, MathAdd
-from ....interface.analog import (
+from core.compiler.analog.passes.analysis import analysis_term_index
+from core.interface.math import MathNum, MathImag, MathAdd
+from core.interface.analog import (
     Operator,
     OperatorAdd,
     OperatorMul,
