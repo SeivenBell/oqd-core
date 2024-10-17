@@ -6,7 +6,7 @@ from pydantic.types import NonNegativeInt
 #%%
 from oqd_compiler_infrastructure import VisitableBaseModel, TypeReflectBaseModel
 
-from midstack.interface.analog.operator import Operator, OperatorSubtypes
+from core.interface.analog.operator import Operator, OperatorSubtypes
 
 
 __all__ = [

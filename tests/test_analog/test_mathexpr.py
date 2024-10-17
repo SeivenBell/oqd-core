@@ -13,8 +13,8 @@ from oqd_compiler_infrastructure import Post, WalkBase, ConversionRule, RewriteR
 
 ########################################################################################
 
-from midstack.compiler.math.rules import EvaluateMathExpr
-from midstack.interface.math import *
+from core.compiler.math.rules import EvaluateMathExpr
+from core.interface.math import *
 
 ########################################################################################
 

@@ -1,6 +1,6 @@
-from midstack.interface.analog.operator import OperatorSubtypes
+from core.interface.analog.operator import OperatorSubtypes
 
-from midstack.interface.analog.operator import (
+from core.interface.analog.operator import (
     Operator,
     OperatorTerminal,
     Pauli,
@@ -22,7 +22,7 @@ from midstack.interface.analog.operator import (
     OperatorKron,
 )
 
-from midstack.interface.analog.operation import (
+from core.interface.analog.operation import (
     AnalogCircuit,
     AnalogGate,
     AnalogOperation,

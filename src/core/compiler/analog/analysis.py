@@ -5,7 +5,7 @@ from oqd_compiler_infrastructure import RewriteRule
 ########################################################################################
 
 
-from midstack.interface.analog import *
+from core.interface.analog import *
 
 ########################################################################################
 

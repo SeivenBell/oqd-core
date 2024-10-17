@@ -13,10 +13,10 @@ from oqd_compiler_infrastructure import Post, WalkBase, In, ConversionRule, Rewr
 
 ########################################################################################
 
-from midstack.interface.analog import *
-from midstack.interface.math import *
-from midstack.compiler.analog.utils import PrintOperator
-from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
+from core.interface.analog import *
+from core.interface.math import *
+from core.compiler.analog.utils import PrintOperator
+from core.compiler.analog.verify.operator import VerifyHilberSpaceDim
 
 ########################################################################################
 

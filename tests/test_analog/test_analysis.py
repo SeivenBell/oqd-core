@@ -12,9 +12,9 @@ from oqd_compiler_infrastructure import RewriteRule, Post, Pre, In
 ########################################################################################
 
 
-from midstack.interface.analog import *
-from midstack.compiler.analog.analysis import TermIndex
-from midstack.interface.math import *
+from core.interface.analog import *
+from core.compiler.analog.analysis import TermIndex
+from core.interface.math import *
 
 ########################################################################################
 

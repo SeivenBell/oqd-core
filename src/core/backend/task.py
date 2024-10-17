@@ -6,10 +6,10 @@ import numpy as np
 
 ########################################################################################
 
-from midstack.interface.analog.operation import AnalogCircuit
-from midstack.interface.digital.circuit import DigitalCircuit
-from midstack.interface.atomic.program import AtomicProgram
-from midstack.backend.metric import Metric
+from core.interface.analog.operation import AnalogCircuit
+from core.interface.digital.circuit import DigitalCircuit
+from core.interface.atomic.program import AtomicProgram
+from core.backend.metric import Metric
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 
