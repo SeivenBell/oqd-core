@@ -13,11 +13,10 @@ from oqd_compiler_infrastructure import Post, WalkBase, In, ConversionRule, Rewr
 
 ########################################################################################
 
-
 from midstack.interface.analog import *
+from midstack.interface.math import *
 from midstack.compiler.analog.utils import PrintOperator
 from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
-from midstack.interface.math import *
 
 ########################################################################################
 
@@ -272,14 +271,15 @@ class TestHilbertSpaceDimVerification(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
+#
+# #%%
+# X @ X
+# X * X
+# X @ (X * X + X)
+#
+# #%%
+# 2 * X
+# 2 * (X+X)
 
-#%%
-X @ X
-X * X
-X @ (X * X + X)
-
-#%%
-2 * X
-2 * (X+X)
 
 #%%

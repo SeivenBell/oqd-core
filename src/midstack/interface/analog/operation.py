@@ -6,7 +6,7 @@ from pydantic.types import NonNegativeInt
 #%%
 from oqd_compiler_infrastructure import VisitableBaseModel, TypeReflectBaseModel
 
-from midstack.interface.analog.operator import Operator
+from midstack.interface.analog.operator import Operator, OperatorSubtypes
 
 
 __all__ = [
@@ -20,10 +20,7 @@ __all__ = [
 
 ########################################################################################
 
-Operator.get_subclasses()
 
-
-#%%
 class AnalogGate(TypeReflectBaseModel):
     """
     Class representing an analog gate composed of Hamiltonian terms and dissipation terms
@@ -32,7 +29,8 @@ class AnalogGate(TypeReflectBaseModel):
         hamiltonian (Operator): Hamiltonian terms of the gate
     """
 
-    hamiltonian: Union[Operator.get_subclasses()]
+    # hamiltonian: Union[Operator.get_subclasses()]
+    hamiltonian: OperatorSubtypes
     # hamiltonian: Union[*Operator.get_subclasses()]  # only works with Python >=3.11
 
 

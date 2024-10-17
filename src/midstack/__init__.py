@@ -1,1 +1,1 @@
-from . import interface, compiler, backend
+from midstack import interface, compiler, backend

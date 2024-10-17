@@ -1,16 +1,34 @@
-from typing import Union, Literal, Annotated, Any
-
-from pydantic import AfterValidator, BeforeValidator
-
-import numpy as np
+from __future__ import annotations
 
 import ast
+import numpy as np
+from typing import Union, Literal, Annotated, Any
+from pydantic import AfterValidator, BeforeValidator
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel, ConversionRule
 
 ########################################################################################
 
 __all__ = [
+    "MathExpr",
+    "MathTerminal",
+    "MathStr",
+    "MathNum",
+    "MathVar",
+    "MathImag",
+    "MathUnaryOp",
+    "MathFunc",
+    "MathBinaryOp",
+    "MathAdd",
+    "MathSub",
+    "MathMul",
+    "MathDiv",
+    "MathPow",
+    #
+    "MathExprSubtypes",
+]
+
+MathExprSubtypes = Union[
     "MathExpr",
     "MathTerminal",
     "MathStr",

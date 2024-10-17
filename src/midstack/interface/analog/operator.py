@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from rich.pretty import pprint
 from typing import Union
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 ########################################################################################
 
-from midstack.interface.math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
+from midstack.interface.math import *
 
 ########################################################################################
 
@@ -29,6 +28,8 @@ __all__ = [
     "OperatorMul",
     "OperatorScalarMul",
     "OperatorKron",
+    #
+    "OperatorSubtypes"
 ]
 
 OperatorSubtypes = Union[
@@ -83,18 +84,13 @@ class Operator(TypeReflectBaseModel):
         return OperatorKron(op1=self, op2=other)
 
     def __mul__(self, other):
-        print("mu")
         if isinstance(other, Operator):
-            print("operator",  self, other)
             return OperatorMul(op1=self, op2=other)
         else:
-            print("not operator", self, other)
             return OperatorScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
-        print("rmul", other, type(other))
         other = MathExpr.cast(other)
-        print(other)
         return self * other
 
     pass
@@ -230,7 +226,8 @@ class OperatorScalarMul(Operator):
     op: OperatorSubtypes
     # op: Operator
     # expr: CastMathExpr
-    expr: Union[MathExpr.get_subclasses()]
+    expr: MathExprSubtypes
+    # expr: Union[MathExpr.get_subclasses()]
 
 
 class OperatorBinaryOp(Operator):
@@ -309,10 +306,5 @@ class OperatorKron(OperatorBinaryOp):
     op2: OperatorSubtypes
 
 
-pprint(OperatorScalarMul.model_json_schema())
-
 for model in Operator.get_subclasses():
-    print(model)
     model.model_rebuild()
-
-pprint(OperatorScalarMul.model_json_schema())
