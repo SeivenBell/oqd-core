@@ -17,7 +17,7 @@ from pydantic import Field
 from pydantic.types import Annotated
 from pydantic.types import NonNegativeInt
 
-#%%
+# %%
 from oqd_compiler_infrastructure import VisitableBaseModel, TypeReflectBaseModel
 
 from core.interface.analog.operator import Operator, OperatorSubtypes
@@ -48,7 +48,7 @@ class AnalogGate(TypeReflectBaseModel):
     # hamiltonian: Union[*Operator.get_subclasses()]  # only works with Python >=3.11
 
 
-#%%
+# %%
 class AnalogOperation(VisitableBaseModel):
     """
     Class representing an analog operation applied to the quantum system

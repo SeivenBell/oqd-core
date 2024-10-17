@@ -18,6 +18,7 @@ import inspect
 
 from typing import Union, get_type_hints
 from oqd_compiler_infrastructure import TypeReflectBaseModel
+
 ########################################################################################
 
 from core.interface.math import *
@@ -45,7 +46,7 @@ __all__ = [
     "OperatorScalarMul",
     "OperatorKron",
     #
-    "OperatorSubtypes"
+    "OperatorSubtypes",
 ]
 
 

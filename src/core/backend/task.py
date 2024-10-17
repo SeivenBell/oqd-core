@@ -142,6 +142,8 @@ class TaskResultDigital(BaseModel):
     layer: Literal["digital"] = "digital"
     counts: dict[str, int] = {}
     state: List[CastComplexFloat] = []
+
+
 #
 
 ########################################################################################
