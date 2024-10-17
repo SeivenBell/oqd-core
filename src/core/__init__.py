@@ -1,1 +1,1 @@
-from core import interface, compiler, backend
+from . import interface, compiler, backend

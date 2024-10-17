@@ -1,1 +1,1 @@
-from core.interface import analog, atomic, digital, math
+from . import analog, atomic, digital, math
