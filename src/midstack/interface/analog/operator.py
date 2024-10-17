@@ -306,5 +306,5 @@ class OperatorKron(OperatorBinaryOp):
     op2: OperatorSubtypes
 
 
-for model in Operator.get_subclasses():
-    model.model_rebuild()
+# for model in Operator.get_subclasses():
+#     model.model_rebuild()
