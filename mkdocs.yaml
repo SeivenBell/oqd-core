@@ -29,8 +29,6 @@ nav:
       - Compilers:
           - Canonicalization: explanation/canonicalization.md
           - Analog to Atomic Compiler: explanation/analog_to_atomic.md
-      - Backends:
-          - QuTip Simulation: explanation/qutip-simulation.md
   - API Reference:
       - Interface:
           - Math: reference/math_interface.md
