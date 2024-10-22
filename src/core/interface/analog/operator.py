@@ -1,8 +1,27 @@
+# Copyright 2024 Open Quantum Design
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import annotations
+import sys
+import inspect
+
+from typing import Union, get_type_hints
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 
 ########################################################################################
 
-from ..math import CastMathExpr, MathExpr, MathImag, MathNum, MathMul
+from core.interface.math import *
 
 ########################################################################################
 
@@ -26,6 +45,8 @@ __all__ = [
     "OperatorMul",
     "OperatorScalarMul",
     "OperatorKron",
+    #
+    "OperatorSubtypes",
 ]
 
 
@@ -61,6 +82,7 @@ class Operator(TypeReflectBaseModel):
         if isinstance(other, Operator):
             return OperatorMul(op1=self, op2=other)
         else:
+            other = MathExpr.cast(other)
             return OperatorScalarMul(op=self, expr=other)
 
     def __rmul__(self, other):
@@ -196,8 +218,8 @@ class OperatorScalarMul(Operator):
         expr (MathExpr): [`MathExpr`][midstack.interface.math.MathExpr] to multiply by
     """
 
-    op: Operator
-    expr: CastMathExpr
+    op: OperatorSubtypes
+    expr: MathExprSubtypes
 
 
 class OperatorBinaryOp(Operator):
@@ -217,8 +239,8 @@ class OperatorAdd(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
 
 
 class OperatorSub(OperatorBinaryOp):
@@ -230,8 +252,8 @@ class OperatorSub(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
 
 
 class OperatorMul(OperatorBinaryOp):
@@ -243,8 +265,8 @@ class OperatorMul(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
 
 
 class OperatorKron(OperatorBinaryOp):
@@ -256,5 +278,41 @@ class OperatorKron(OperatorBinaryOp):
         op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
     """
 
-    op1: Operator
-    op2: Operator
+    op1: OperatorSubtypes
+    op2: OperatorSubtypes
+
+
+OperatorSubtypes = Union[
+    OperatorTerminal,
+    Pauli,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+    PauliPlus,
+    PauliMinus,
+    Ladder,
+    Creation,
+    Annihilation,
+    Identity,
+    OperatorBinaryOp,
+    OperatorAdd,
+    OperatorSub,
+    OperatorMul,
+    OperatorScalarMul,
+    OperatorKron,
+]
+
+# # update forward refs for all OperatorSubclasses
+# current_module = sys.modules[__name__]
+# for class_name in OperatorSubtypes.__args__:
+#     cls = getattr(current_module, class_name, None)
+#     if cls:
+#         cls.update_forward_refs()
+
+# current_module = sys.modules[__name__]
+#
+# # Loop through all classes defined in this module
+# for name, obj in inspect.getmembers(current_module, inspect.isclass):
+#     if hasattr(obj, "update_forward_refs"):
+#         obj.update_forward_refs()

@@ -1,6 +1,18 @@
-from typing import Union
+# Copyright 2024 Open Quantum Design
 
-from rich import print as pprint
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from typing import Union
 
 import unittest
 from unittest_prettify.colorize import (
@@ -11,12 +23,12 @@ from unittest_prettify.colorize import (
     MAGENTA,
 )
 
-from oqd_compiler_infrastructure import Post, Walk, ConversionRule, RewriteRule
+from oqd_compiler_infrastructure import Post, WalkBase, ConversionRule, RewriteRule
 
 ########################################################################################
 
-from midstack.compiler.math.rules import EvaluateMathExpr
-from midstack.interface.math import *
+from core.compiler.math.rules import EvaluateMathExpr
+from core.interface.math import *
 
 ########################################################################################
 
@@ -24,7 +36,7 @@ from midstack.interface.math import *
 def test_function(
     math_str: str,
     rule: Union[ConversionRule, RewriteRule] = EvaluateMathExpr(),
-    walk_method: Walk = Post,
+    walk_method: WalkBase = Post,
 ):
     return walk_method(rule)(MathStr(string=math_str))
 

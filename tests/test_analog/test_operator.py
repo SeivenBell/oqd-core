@@ -1,6 +1,18 @@
-from typing import Union
+# Copyright 2024 Open Quantum Design
 
-from rich import print as pprint
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from typing import Union
 
 import unittest
 from unittest_prettify.colorize import (
@@ -11,15 +23,14 @@ from unittest_prettify.colorize import (
     MAGENTA,
 )
 
-from oqd_compiler_infrastructure import Post, Walk, In, ConversionRule, RewriteRule
+from oqd_compiler_infrastructure import Post, WalkBase, In, ConversionRule, RewriteRule
 
 ########################################################################################
 
-
-from midstack.interface.analog import *
-from midstack.compiler.analog.utils import PrintOperator
-from midstack.compiler.analog.verify.operator import VerifyHilberSpaceDim
-from midstack.interface.math import *
+from core.interface.analog import *
+from core.interface.math import *
+from core.compiler.analog.utils import PrintOperator
+from core.compiler.analog.verify.operator import VerifyHilberSpaceDim
 
 ########################################################################################
 
@@ -27,7 +38,7 @@ from midstack.interface.math import *
 def test_function(
     operator: Operator,
     rule: Union[ConversionRule, RewriteRule] = PrintOperator(verbose=True),
-    walk_method: Walk = Post,
+    walk_method: WalkBase = Post,
     reverse: bool = False,
 ):
     return walk_method(rule, reverse=reverse)(operator)
@@ -269,9 +280,6 @@ class TestHilbertSpaceDimVerification(unittest.TestCase):
             reverse=self._reverse,
         )
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 if __name__ == "__main__":
     unittest.main()

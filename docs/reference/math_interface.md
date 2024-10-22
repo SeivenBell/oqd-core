@@ -1,1 +1,1 @@
-::: midstack.interface.math
+::: core.interface.math

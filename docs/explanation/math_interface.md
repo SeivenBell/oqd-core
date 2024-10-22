@@ -1,6 +1,6 @@
 The math interface is utilized to specify arbitrary profiles for operands of the instructions in other interfaces.
 
-The abstract syntax tree of the math interface is implemented by [`MathExpr`][midstack.interface.math.MathExpr].
+The abstract syntax tree of the math interface is implemented by [`MathExpr`][core.interface.math.MathExpr].
 
 Consider the following math expression:
 
@@ -8,7 +8,7 @@ $$
 10 \sin^2(\omega t + \phi)
 $$
 
-The corresponding [`MathExpr`][midstack.interface.math.MathExpr] has the following structure:
+The corresponding [`MathExpr`][core.interface.math.MathExpr] has the following structure:
 
 ```mermaid
     graph TD
@@ -37,21 +37,21 @@ The corresponding [`MathExpr`][midstack.interface.math.MathExpr] has the followi
 The terminals of the math interface consist of:
 
 /// tab | `MathNum`
-[`MathNum`][midstack.interface.math.MathNum] represents a number.
+[`MathNum`][core.interface.math.MathNum] represents a number.
 
 <!-- prettier-ignore -->
-//// admonition | Note
+/// admonition | Note
     type: note
 Numbers are considered to belong to the real numbers, i.e. they can be positive or negative floats.
-////
+///
 ///
 
 /// tab | `MathImag`
-[`MathImag`][midstack.interface.math.MathImag] represents the imaginary unit.
+[`MathImag`][core.interface.math.MathImag] represents the imaginary unit.
 ///
 
 /// tab | `MathVar`
-[`MathVar`][midstack.interface.math.MathVar] represents a protected named variable to be substituted during compile time or runtime.
+[`MathVar`][core.interface.math.MathVar] represents a protected named variable to be substituted during compile time or runtime.
 ///
 
 ## Operators
@@ -64,7 +64,7 @@ The compatible operators for the math interface consist of:
 ![](https://img.shields.io/badge/binary-blue)
 ////
 
-[`MathAdd`][midstack.interface.math.MathAdd] represents an addition of two expressions.
+[`MathAdd`][core.interface.math.MathAdd] represents an addition of two expressions.
 ///
 
 /// tab | `MathMul`
@@ -73,7 +73,7 @@ The compatible operators for the math interface consist of:
 ![](https://img.shields.io/badge/binary-blue)
 ////
 
-[`MathMul`][midstack.interface.math.MathMul] represents an multiplication of two expressions.
+[`MathMul`][core.interface.math.MathMul] represents an multiplication of two expressions.
 ///
 
 /// tab | `MathPow`
@@ -82,7 +82,7 @@ The compatible operators for the math interface consist of:
 ![](https://img.shields.io/badge/binary-blue)
 ////
 
-[`MathPow`][midstack.interface.math.MathPow] represents an exponentiation of an expression with the other expression.
+[`MathPow`][core.interface.math.MathPow] represents an exponentiation of an expression with the other expression.
 ///
 
 /// tab | `MathSub`
@@ -91,7 +91,7 @@ The compatible operators for the math interface consist of:
 ![](https://img.shields.io/badge/binary-blue)
 ////
 
-[`MathSub`][midstack.interface.math.MathSub] represents an subtraction of two expressions.
+[`MathSub`][core.interface.math.MathSub] represents an subtraction of two expressions.
 ///
 
 /// tab | `MathDiv`
@@ -100,7 +100,7 @@ The compatible operators for the math interface consist of:
 ![](https://img.shields.io/badge/binary-blue)
 ////
 
-[`MathDiv`][midstack.interface.math.MathDiv] represents an division of two expressions.
+[`MathDiv`][core.interface.math.MathDiv] represents an division of two expressions.
 ///
 
 /// tab | `MathFunc`
@@ -109,7 +109,7 @@ The compatible operators for the math interface consist of:
 ![](https://img.shields.io/badge/unary-red)
 ////
 
-[`MathFunc`][midstack.interface.math.MathFunc] represents the application of a named function on an expression.
+[`MathFunc`][core.interface.math.MathFunc] represents the application of a named function on an expression.
 
 The compatible named functions include:
 

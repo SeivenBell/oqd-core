@@ -1,0 +1,72 @@
+# Copyright 2024 Open Quantum Design
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from oqd_compiler_infrastructure import Post
+
+########################################################################################
+
+
+from ..rewrite.assign import AssignAnalogIRDim
+from ..verify.task import (
+    VerifyAnalogArgsDim,
+    VerifyAnalogCircuitDim,
+)
+
+########################################################################################
+
+__all__ = [
+    "assign_analog_circuit_dim",
+    "verify_analog_args_dim",
+]
+
+########################################################################################
+
+
+def assign_analog_circuit_dim(model):
+    """
+    This pass assigns n_qreg and n_qmode in the analog circuit and then verifies the assignment
+
+    Args:
+        model (AnalogCircuit): n_qreg and n_qmode fields of [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] are not assigned
+
+    Returns:
+        model (AnalogCircuit): n_qreg and n_qmode fields of [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] are assigned
+
+    Assumptions:
+        All [`Operator`][midstack.interface.analog.operator.Operator] inside [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] must be canonicalized
+    """
+    assigned_model = Post(AssignAnalogIRDim())(model)
+    Post(
+        VerifyAnalogCircuitDim(
+            n_qreg=assigned_model.n_qreg, n_qmode=assigned_model.n_qmode
+        )
+    )(assigned_model)
+    return assigned_model
+
+
+def verify_analog_args_dim(model, n_qreg, n_qmode):
+    """
+    This pass checks whether the assigned n_qreg and n_qmode in AnalogCircuit match the n_qreg and n_qmode
+    in any Operators (like the Operator inside Expectation) in TaskArgsAnalog
+
+    Args:
+        model (TaskArgsAnalog):
+
+    Returns:
+        model (TaskArgsAnalog):
+
+    Assumptions:
+        All  [`Operator`][midstack.interface.analog.operator.Operator] inside TaskArgsAnalog must be canonicalized
+    """
+    Post(VerifyAnalogArgsDim(n_qreg=n_qreg, n_qmode=n_qmode))(model)

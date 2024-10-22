@@ -9,13 +9,13 @@ First install the [oqd_compiler_infrastructure](https://github.com/OpenQuantumDe
 To install via `pip`,
 
 ```bash
-pip install git+https://github.com/OpenQuantumDesign/midstack.git
+pip install git+https://github.com/OpenQuantumDesign/oqd-core.git
 ```
 
 To clone the repository locally:
 
 ```bash
-git clone https://github.com/OpenQuantumDesign/midstack
+git clone https://github.com/OpenQuantumDesign/oqd-core.git
 ```
 
 Install the folder locally with `pip` and add to the

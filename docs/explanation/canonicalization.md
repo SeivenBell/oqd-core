@@ -22,7 +22,7 @@ These canonicalization steps (e.g. distribution) are done by implementing a `Rew
 
 ### Distribution
 
-[`Distribution`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute] distributes the multiplication, scalar multiplication and tensor product of operators over the addition of operators.
+[`Distribution`][core.compiler.analog.rewrite.canonicalize.OperatorDistribute] distributes the multiplication, scalar multiplication and tensor product of operators over the addition of operators.
 
 <!-- prettier-ignore -->
 /// admonition | Example
@@ -80,7 +80,7 @@ $$X \otimes (Y + Z) \longrightarrow X \otimes Y + X \otimes Z$$
 
 ### Gather Math Expression
 
-[`GatherMath`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr] centralizes the coefficients of the operators by gathering them.
+[`GatherMath`][core.compiler.analog.rewrite.canonicalize.GatherMathExpr] centralizes the coefficients of the operators by gathering them.
 
 <!-- prettier-ignore -->
 /// admonition | Example
@@ -134,7 +134,7 @@ $$ X \times 3 \times I \longrightarrow 3 \times (X \times I)$$
 
 ### Proper Order
 
-[`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder] takes a chain of OperatorMul or a chain of OperatorAdd and puts the operation order from left to right.
+[`ProperOrder`][core.compiler.analog.rewrite.canonicalize.ProperOrder] takes a chain of OperatorMul or a chain of OperatorAdd and puts the operation order from left to right.
 
 <!-- prettier-ignore -->
 /// admonition | Example
@@ -189,7 +189,7 @@ $$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
 
 ### Pauli Algebra
 
-[`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra] applies the Pauli algebra to simplify the operator.
+[`PauliAlgebra`][core.compiler.analog.rewrite.canonicalize.PauliAlgebra] applies the Pauli algebra to simplify the operator.
 
 <!-- prettier-ignore -->
 /// admonition | Example
@@ -246,7 +246,7 @@ $$ X \times Y + I \times I \longrightarrow iZ + I $$
 
 ### Normal Order
 
-[`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder] puts the ladder operators into normal order.
+[`NormalOrder`][core.compiler.analog.rewrite.canonicalize.NormalOrder] puts the ladder operators into normal order.
 
 <!-- prettier-ignore -->
 /// admonition | Example
@@ -309,7 +309,7 @@ $$ C \times A + A \times C \longrightarrow C \times A + C \times A + J$$
 
 ### Prune Identity
 
-[`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity] prunes the unnecessary ladder identities from the graph.
+[`PruneIdentity`][core.compiler.analog.rewrite.canonicalize.PruneIdentity] prunes the unnecessary ladder identities from the graph.
 
 <!-- prettier-ignore -->
 /// admonition | Example
@@ -360,7 +360,7 @@ $$ C\times A \times J\longrightarrow C \times A$$
 
 ### Sorted Order
 
-[`SortedOrder`][midstack.compiler.analog.rewrite.canonicalize.SortedOrder] sorts the addition terms in operators into a predefined order.
+[`SortedOrder`][core.compiler.analog.rewrite.canonicalize.SortedOrder] sorts the addition terms in operators into a predefined order.
 
 <!-- prettier-ignore -->
 /// admonition | Example
@@ -420,7 +420,7 @@ $$ X \otimes I + I \otimes X \longrightarrow I \otimes X + X \otimes I$$
 
 ### Scale Terms
 
-[`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms] introduces scalar multiplication to terms without a coefficient for a more consistent reprensentation.
+[`ScaleTerms`][core.compiler.analog.rewrite.canonicalize.ScaleTerms] introduces scalar multiplication to terms without a coefficient for a more consistent reprensentation.
 
 <!-- prettier-ignore -->
 /// admonition | Example
