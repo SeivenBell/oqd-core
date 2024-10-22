@@ -18,11 +18,13 @@ from typing import List, Union, Literal, Dict, Annotated
 
 import numpy as np
 
+from oqd_compiler_infrastructure import VisitableBaseModel
+
 ########################################################################################
 
 from core.interface.analog.operation import AnalogCircuit
 from core.interface.digital.circuit import DigitalCircuit
-from core.interface.atomic.program import AtomicProgram
+from core.interface.atomic.circuit import AtomicCircuit
 from core.backend.metric import Metric
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
@@ -172,11 +174,11 @@ class Task(TypeReflectBaseModel):
     Class representing a task to run a quantum experiment with some arguments
 
     Attributes:
-        program (Union[AnalogCircuit, DigitalCircuit, AtomicProgram]): Quantum experiment to run
+        program (Union[AnalogCircuit, DigitalCircuit, AtomicCircuit]): Quantum experiment to run
         args (Union[analog_sim.base.TaskArgsAnalogSimulator, TaskArgsDigital, TaskArgsAtomic]): Arguments for the quantum experiment
     """
 
-    program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
+    program: Union[AnalogCircuit, DigitalCircuit, AtomicCircuit]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
 
 

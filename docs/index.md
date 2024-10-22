@@ -6,7 +6,8 @@
     </h2>
 </div>
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+![versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)
+[![CI](https://github.com/OpenQuantumDesign/oqd-core/actions/workflows/CI.yml/badge.svg)](https://github.com/OpenQuantumDesign/oqd-core/actions/workflows/CI.yml)
 
 <!-- prettier-ignore -->
 /// admonition | Note
@@ -16,11 +17,12 @@ This documentation is still under development, we welcome contributions! © Open
 ///
 
 ## The Stack
+
 ```mermaid
 graph LR
-    
-    
-    
-    
+
+
+
+
 
 ```
