@@ -44,8 +44,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install git+ssh://git@github.com/OpenQuantumDesign/compiler_infrastructure
           pip install .[test]
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
       - name: Run unittest
         run: |
           bash tests/test.sh
