@@ -103,27 +103,3 @@ class DigitalCircuit(VisitableBaseModel):
                 qasm_str += op.qasm
 
         return qasm_str
-
-
-if __name__ == "__main__":
-<<<<<<<< HEAD:src/midstack/interface/digital/circuit.py
-    from midstack.interface.digital.gate import H, CNOT
-========
-    from core.interface.digital.gate import H, CNOT
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/interface/digital/circuit.py
-
-    qreg = QuantumRegister(id="q", reg=4)
-    creg = ClassicalRegister(id="c", reg=2)
-
-    circ = DigitalCircuit(qreg=qreg, creg=creg)
-    print(circ)
-
-    circ.add(H(qreg=qreg[0]))
-    circ.add(CNOT(qreg=qreg[0:2]))
-    circ.add(Measure())
-
-    print(circ.sequence)
-    # # # measure = Measure(qregs=qreg, cregs=cbits)
-    # # # print(measure)
-    # #
-    print(circ.qasm)

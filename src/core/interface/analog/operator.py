@@ -45,7 +45,6 @@ __all__ = [
     "OperatorMul",
     "OperatorScalarMul",
     "OperatorKron",
-    #
     "OperatorSubtypes",
 ]
 

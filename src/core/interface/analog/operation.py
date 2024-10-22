@@ -1,13 +1,3 @@
-<<<<<<<< HEAD:src/midstack/interface/analog/operation.py
-from typing import List, Literal, Union
-from pydantic.types import NonNegativeInt
-
-from oqd_compiler_infrastructure import VisitableBaseModel
-
-########################################################################################
-
-from .operator import Operator
-========
 # Copyright 2024 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +21,6 @@ from pydantic.types import NonNegativeInt
 from oqd_compiler_infrastructure import VisitableBaseModel, TypeReflectBaseModel
 
 from core.interface.analog.operator import Operator, OperatorSubtypes
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/interface/analog/operation.py
 
 
 __all__ = [
@@ -44,17 +33,6 @@ __all__ = [
 
 
 ########################################################################################
-<<<<<<<< HEAD:src/midstack/interface/analog/operation.py
-
-
-class AnalogOperation(VisitableBaseModel):
-    """
-    Class representing an analog operation applied to the quantum system
-    """
-
-    pass
-========
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/interface/analog/operation.py
 
 
 class AnalogGate(TypeReflectBaseModel):
@@ -65,12 +43,7 @@ class AnalogGate(TypeReflectBaseModel):
         hamiltonian (Operator): Hamiltonian terms of the gate
     """
 
-<<<<<<<< HEAD:src/midstack/interface/analog/operation.py
-    hamiltonian: Operator
-========
-    # hamiltonian: Union[Operator.get_subclasses()]
     hamiltonian: OperatorSubtypes
-    # hamiltonian: Union[*Operator.get_subclasses()]  # only works with Python >=3.11
 
 
 # %%
@@ -80,7 +53,6 @@ class AnalogOperation(VisitableBaseModel):
     """
 
     pass
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/interface/analog/operation.py
 
 
 class Evolve(AnalogOperation):

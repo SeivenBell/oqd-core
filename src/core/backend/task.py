@@ -22,29 +22,17 @@ from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
 
-<<<<<<<< HEAD:src/midstack/backend/task.py
-from ..interface.analog.operation import AnalogCircuit
-from ..interface.digital.circuit import DigitalCircuit
-from ..interface.atomic.circuit import AtomicCircuit
-
-from .metric import Metric
-========
 from core.interface.analog.operation import AnalogCircuit
 from core.interface.digital.circuit import DigitalCircuit
-from core.interface.atomic.program import AtomicProgram
+from core.interface.atomic.circuit import AtomicCircuit
 from core.backend.metric import Metric
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/backend/task.py
 
 ########################################################################################
 
 
-<<<<<<<< HEAD:src/midstack/backend/task.py
-class ComplexFloat(BaseModel):
-========
 class ComplexFloat(TypeReflectBaseModel):
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/backend/task.py
     """
     Class representing a complex number
 
@@ -125,11 +113,7 @@ class TaskArgsAnalog(TaskArgsBase):
     metrics: Dict[str, Metric] = {}
 
 
-<<<<<<<< HEAD:src/midstack/backend/task.py
-class TaskResultAnalog(VisitableBaseModel):
-========
 class TaskResultAnalog(TaskResultsBase):
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/backend/task.py
     """
     Contains the results of a simulation/actual experiment.
 
@@ -185,27 +169,16 @@ class TaskResultAtomic(BaseModel):
 ########################################################################################
 
 
-<<<<<<<< HEAD:src/midstack/backend/task.py
-class Task(VisitableBaseModel):
-========
 class Task(TypeReflectBaseModel):
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/backend/task.py
     """
     Class representing a task to run a quantum experiment with some arguments
 
     Attributes:
-        program (Union[AnalogCircuit, DigitalCircuit, AtomicProgram]): Quantum experiment to run
-<<<<<<<< HEAD:src/midstack/backend/task.py
-        args (Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]): Arguments for the quantum experiment
-    """
-
-    program: Union[AnalogCircuit, DigitalCircuit, AtomicCircuit]
-========
+        program (Union[AnalogCircuit, DigitalCircuit, AtomicCircuit]): Quantum experiment to run
         args (Union[analog_sim.base.TaskArgsAnalogSimulator, TaskArgsDigital, TaskArgsAtomic]): Arguments for the quantum experiment
     """
 
-    program: Union[AnalogCircuit, DigitalCircuit, AtomicProgram]
->>>>>>>> fd963eed02b0d3a70a3973c1abc6cf305d891aa6:src/core/backend/task.py
+    program: Union[AnalogCircuit, DigitalCircuit, AtomicCircuit]
     args: Union[TaskArgsAnalog, TaskArgsDigital, TaskArgsAtomic]
 
 
