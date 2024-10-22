@@ -11,27 +11,41 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-#          python-version: "3.10"
-          python-version: "3.11"
-          cache: "pip"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install git+ssh://git@github.com/OpenQuantumDesign/compiler_infrastructure
-          pip install .[test]
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
-      - name: Run unittest
-        run: |
-          bash tests/test.sh
+build:
+  strategy:
+    fail-fast: false
+    matrix:
+      version:
+        - "3.8"
+        - "3.9"
+        - "3.10"
+        - "3.11"
+        - "3.12"
+      os:
+        - ubuntu-latest
+        - windows-latest
+      arch:
+        - x64
+  name: Python ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+  runs-on: ${{ matrix.os }}
+  steps:
+    - uses: actions/checkout@v4
+    - uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        #          python-version: "3.10"
+        python-version: ${{ matrix.version }}
+        cache: "pip"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install git+ssh://git@github.com/OpenQuantumDesign/compiler_infrastructure
+        pip install .[test]
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
+    - name: Run unittest
+      run: |
+        bash tests/test.sh
