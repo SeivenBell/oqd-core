@@ -24,9 +24,9 @@ from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre, FixedP
 
 ########################################################################################
 
-from core.interface.analog import *
-from core.compiler.analog.rewrite.canonicalize import *
-from core.interface.math import *
+from oqd_core.interface.analog import *
+from oqd_core.compiler.analog.rewrite.canonicalize import *
+from oqd_core.interface.math import *
 
 ########################################################################################
 

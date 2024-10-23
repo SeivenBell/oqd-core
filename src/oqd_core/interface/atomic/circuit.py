@@ -18,8 +18,8 @@ from oqd_compiler_infrastructure import TypeReflectBaseModel
 
 ########################################################################################
 
-from .system import System
-from .protocol import Protocol
+from oqd_core.interface.atomic.system import System
+from oqd_core.interface.atomic.protocol import Protocol
 
 ########################################################################################
 

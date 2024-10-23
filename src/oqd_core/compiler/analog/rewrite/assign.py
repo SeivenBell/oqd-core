@@ -18,8 +18,8 @@ from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
 
-from ....interface.analog import AnalogCircuit
-from ..passes.analysis import analysis_canonical_hamiltonian_dim
+from oqd_core.interface.analog import AnalogCircuit
+from oqd_core.compiler.analog.passes.analysis import analysis_canonical_hamiltonian_dim
 
 ########################################################################################
 

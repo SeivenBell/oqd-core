@@ -27,10 +27,10 @@ from oqd_compiler_infrastructure import Post, WalkBase, In, ConversionRule, Rewr
 
 ########################################################################################
 
-from core.interface.analog import *
-from core.interface.math import *
-from core.compiler.analog.utils import PrintOperator
-from core.compiler.analog.verify.operator import VerifyHilberSpaceDim
+from oqd_core.interface.analog import *
+from oqd_core.interface.math import *
+from oqd_core.compiler.analog.utils import PrintOperator
+from oqd_core.compiler.analog.verify.operator import VerifyHilberSpaceDim
 
 ########################################################################################
 

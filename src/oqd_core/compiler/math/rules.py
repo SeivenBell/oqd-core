@@ -20,7 +20,7 @@ from oqd_compiler_infrastructure import ConversionRule, RewriteRule
 
 ########################################################################################
 
-from ...interface.math import (
+from oqd_core.interface.math import (
     MathAdd,
     MathBinaryOp,
     MathDiv,

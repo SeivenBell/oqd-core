@@ -19,7 +19,7 @@ from oqd_compiler_infrastructure import RewriteRule
 ########################################################################################
 
 
-from core.interface.analog import *
+from oqd_core.interface.analog import *
 
 ########################################################################################
 

@@ -16,7 +16,7 @@ from oqd_compiler_infrastructure import Post, Chain
 
 ########################################################################################
 
-from .rules import (
+from oqd_core.compiler.math.rules import (
     EvaluateMathExpr,
     SimplifyMathExpr,
     PrintMathExpr,

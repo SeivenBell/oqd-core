@@ -22,10 +22,10 @@ from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
 
-from core.interface.analog.operation import AnalogCircuit
-from core.interface.digital.circuit import DigitalCircuit
-from core.interface.atomic.circuit import AtomicCircuit
-from core.backend.metric import Metric
+from oqd_core.interface.analog.operation import AnalogCircuit
+from oqd_core.interface.digital.circuit import DigitalCircuit
+from oqd_core.interface.atomic.circuit import AtomicCircuit
+from oqd_core.backend.metric import Metric
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 

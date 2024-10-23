@@ -26,9 +26,9 @@ from oqd_compiler_infrastructure import RewriteRule, Post, Pre, In
 ########################################################################################
 
 
-from core.interface.analog import *
-from core.compiler.analog.analysis import TermIndex
-from core.interface.math import *
+from oqd_core.interface.analog import *
+from oqd_core.compiler.analog.analysis import TermIndex
+from oqd_core.interface.math import *
 
 ########################################################################################
 

@@ -25,10 +25,10 @@ from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre
 
 ########################################################################################
 
-from core.interface.analog import *
-from core.compiler.analog.verify.canonicalize import *
-from core.compiler.analog.error import CanonicalFormError
-from core.interface.math import *
+from oqd_core.interface.analog import *
+from oqd_core.compiler.analog.verify.canonicalize import *
+from oqd_core.compiler.analog.error import CanonicalFormError
+from oqd_core.interface.math import *
 
 ########################################################################################
 

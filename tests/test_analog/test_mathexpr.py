@@ -27,8 +27,8 @@ from oqd_compiler_infrastructure import Post, WalkBase, ConversionRule, RewriteR
 
 ########################################################################################
 
-from core.compiler.math.rules import EvaluateMathExpr
-from core.interface.math import *
+from oqd_core.compiler.math.rules import EvaluateMathExpr
+from oqd_core.interface.math import *
 
 ########################################################################################
 

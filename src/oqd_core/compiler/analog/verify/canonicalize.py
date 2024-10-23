@@ -18,10 +18,10 @@ from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
 
-from ....interface.math import *
-from ....interface.analog import *
-from ..error import CanonicalFormError
-from ..passes.analysis import analysis_term_index
+from oqd_core.interface.math import *
+from oqd_core.interface.analog import *
+from oqd_core.compiler.analog.error import CanonicalFormError
+from oqd_core.compiler.analog.passes.analysis import analysis_term_index
 
 ########################################################################################
 

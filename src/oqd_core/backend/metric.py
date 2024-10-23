@@ -20,7 +20,7 @@ from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
 
-from ..interface.analog.operator import Operator, OperatorSubtypes
+from oqd_core.interface.analog.operator import OperatorSubtypes
 
 ########################################################################################
 

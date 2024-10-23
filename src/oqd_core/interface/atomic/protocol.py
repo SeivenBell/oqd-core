@@ -20,8 +20,8 @@ from oqd_compiler_infrastructure import TypeReflectBaseModel
 
 ########################################################################################
 
-from .system import Transition
-from ..math import CastMathExpr
+from oqd_core.interface.atomic.system import Transition
+from oqd_core.interface.math import CastMathExpr
 
 ########################################################################################
 

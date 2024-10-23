@@ -16,9 +16,9 @@ from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
 
-from ....interface.analog import AnalogGate
-from ..passes.analysis import analysis_canonical_hamiltonian_dim
-from ....backend.metric import Expectation
+from oqd_core.interface.analog import AnalogGate
+from oqd_core.compiler.analog.passes.analysis import analysis_canonical_hamiltonian_dim
+from oqd_core.backend.metric import Expectation
 
 ########################################################################################
 

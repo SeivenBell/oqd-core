@@ -21,7 +21,7 @@ from oqd_compiler_infrastructure import TypeReflectBaseModel
 
 ########################################################################################
 
-from core.interface.math import *
+from oqd_core.interface.math import *
 
 ########################################################################################
 

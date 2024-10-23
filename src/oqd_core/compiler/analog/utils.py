@@ -18,9 +18,9 @@ from oqd_compiler_infrastructure import ConversionRule, Post
 
 ########################################################################################
 
-from ...interface.analog import *
-from ...interface.math import MathExpr
-from ..math.rules import PrintMathExpr
+from oqd_core.interface.analog import *
+from oqd_core.interface.math import MathExpr
+from oqd_core.compiler.math.rules import PrintMathExpr
 
 ########################################################################################
 

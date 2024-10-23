@@ -18,9 +18,9 @@ from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
 
-from core.compiler.analog.passes.analysis import analysis_term_index
-from core.interface.math import MathNum, MathImag, MathAdd
-from core.interface.analog import (
+from oqd_core.compiler.analog.passes.analysis import analysis_term_index
+from oqd_core.interface.math import MathNum, MathImag, MathAdd
+from oqd_core.interface.analog import (
     Operator,
     OperatorAdd,
     OperatorMul,

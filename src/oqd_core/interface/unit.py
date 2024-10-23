@@ -22,7 +22,7 @@ from oqd_compiler_infrastructure import TypeReflectBaseModel
 
 ########################################################################################
 
-from .math import CastMathExpr
+from oqd_core.interface.math import CastMathExpr
 
 ########################################################################################
 

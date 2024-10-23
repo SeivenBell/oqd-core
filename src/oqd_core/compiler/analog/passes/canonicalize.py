@@ -15,7 +15,7 @@
 from oqd_compiler_infrastructure import Chain, FixedPoint, Post, Pre, In
 
 ########################################################################################
-from ..rewrite.canonicalize import (
+from oqd_core.compiler.analog.rewrite.canonicalize import (
     OperatorDistribute,
     GatherMathExpr,
     PauliAlgebra,
@@ -26,7 +26,7 @@ from ..rewrite.canonicalize import (
     PruneIdentity,
     GatherPauli,
 )
-from ..verify import (
+from oqd_core.compiler.analog.verify import (
     VerifyHilberSpaceDim,
     CanVerGatherMathExpr,
     CanVerGatherPauli,
@@ -38,7 +38,7 @@ from ..verify import (
     CanVerScaleTerm,
     CanVerSortedOrder,
 )
-from ...math.rules import (
+from oqd_core.compiler.math.rules import (
     DistributeMathExpr,
     ProperOrderMathExpr,
     PartitionMathExpr,

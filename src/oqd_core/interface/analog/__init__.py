@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.interface.analog.operator import OperatorSubtypes
+from oqd_core.interface.analog.operator import OperatorSubtypes
 
-from core.interface.analog.operator import (
+from oqd_core.interface.analog.operator import (
     Operator,
     OperatorTerminal,
     Pauli,
@@ -36,7 +36,7 @@ from core.interface.analog.operator import (
     OperatorKron,
 )
 
-from core.interface.analog.operation import (
+from oqd_core.interface.analog.operation import (
     AnalogCircuit,
     AnalogGate,
     AnalogOperation,
