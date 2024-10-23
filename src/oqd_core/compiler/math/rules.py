@@ -232,7 +232,7 @@ class PartitionMathExpr(RewriteRule):
 
     Assumptions:
         [`DistributeMathExpr`][oqd_core.compiler.math.rules.DistributeMathExpr],
-        [`ProperOrderMathExpr`][midstack.compiler.math.rules.ProperOrderMathExpr]
+        [`ProperOrderMathExpr`][oqd_core.compiler.math.rules.ProperOrderMathExpr]
 
     Example:
         - MathStr(string = '1 + 1j + 2') => MathStr(string = '1 + 2 + 1j')
@@ -279,16 +279,16 @@ class PartitionMathExpr(RewriteRule):
 
 class ProperOrderMathExpr(RewriteRule):
     """
-    This rearranges bracketing of [`MathExpr`][midstack.interface.math.MathExpr] objects.
+    This rearranges bracketing of [`MathExpr`][oqd_core.interface.math.MathExpr] objects.
 
     Args:
-        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+        model (MathExpr): The rule only acts on [`MathExpr`][oqd_core.interface.math.MathExpr] objects.
 
     Returns:
         model (MathExpr):
 
     Assumptions:
-        [`DistributeMathExpr`][midstack.compiler.math.rules.DistributeMathExpr]
+        [`DistributeMathExpr`][oqd_core.compiler.math.rules.DistributeMathExpr]
 
     Example:
         - MathStr(string = '2 * (3 * 5)') => MathStr(string = '(2 * 3) * 5')

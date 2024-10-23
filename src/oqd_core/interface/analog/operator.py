@@ -270,11 +270,11 @@ class OperatorMul(OperatorBinaryOp):
 
 class OperatorKron(OperatorBinaryOp):
     """
-    Class representing the tensor product of [`Operators`][midstack.interface.analog.operator.Operator]
+    Class representing the tensor product of [`Operators`][oqd_core.interface.analog.operator.Operator]
 
     Attributes:
-        op1 (Operator): Left hand side [`Operator`][midstack.interface.analog.operator.Operator]
-        op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
+        op1 (Operator): Left hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
+        op2 (Operator): Right hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
     """
 
     op1: OperatorSubtypes

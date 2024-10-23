@@ -1,10 +1,10 @@
 The atomic interface expresses quantum information experiments in terms of light-matter interactions.
 
-## System <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.system.System] </div>
+## System <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.system.System] </div>
 
 The system describes the properties of the trapped-ion quantum device.
 
-### Ion <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.system.Ion] </div>
+### Ion <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.system.Ion] </div>
 
 An ion is described by its set of electronic energy levels. Each energy level has its associated quantum numbers:
 
@@ -25,7 +25,7 @@ Manipulating the qubit states involves driving transitions between the qubit sta
 /// admonition | Example
     type: example
 
-Definiition of an [`Ion`][midstack.interface.atomic.system.Ion] for $^{171}\mathrm{Yb}^+$:
+Definiition of an [`Ion`][oqd_core.interface.atomic.system.Ion] for $^{171}\mathrm{Yb}^+$:
 
 ```python
 
@@ -91,7 +91,7 @@ Yb171 = Ion(
 
 ///
 
-### Phonon <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.system.Phonon] </div>
+### Phonon <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.system.Phonon] </div>
 
 In the trapped-ion system the system exhibits collective phonon modes, which are bosonic degrees of freedom.
 
@@ -134,19 +134,19 @@ The system is further described by a list of experimental parameters that requir
 - Laser lock frequency
 - etc.
 
-These parameters will in the future be included in the [`System`][midstack.interface.atomic.system.System].
+These parameters will in the future be included in the [`System`][oqd_core.interface.atomic.system.System].
 
-The [`System`][midstack.interface.atomic.system.System] will be retrieved from a calibration database to determine the current state of the system and the status of all calibrations required to run quantum experiments.
+The [`System`][oqd_core.interface.atomic.system.System] will be retrieved from a calibration database to determine the current state of the system and the status of all calibrations required to run quantum experiments.
 
 ///
 
-## Pulse Program <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.protocol.Protocol] </div>
+## Pulse Program <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.protocol.Protocol] </div>
 
-The pulse program for a quantum experiment is described by a [`Protocol`][midstack.interface.atomic.protocol.Protocol]. The protocol defines the list of optical channels in the experiment and the real-time scheduling of pulses of the optical channels in order to perform the quantum experiment.
+The pulse program for a quantum experiment is described by a [`Protocol`][oqd_core.interface.atomic.protocol.Protocol]. The protocol defines the list of optical channels in the experiment and the real-time scheduling of pulses of the optical channels in order to perform the quantum experiment.
 
-### Optical Channel <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.protocol.Beam] </div>
+### Optical Channel <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.protocol.Beam] </div>
 
-An optical channel is described by a [`Beam`][midstack.interface.atomic.protocol.Beam] with the following parameters:
+An optical channel is described by a [`Beam`][oqd_core.interface.atomic.protocol.Beam] with the following parameters:
 
 - Transition of the ion for which to reference the Beam to.
 - Rabi frequency to drive the referenced transition with.
@@ -187,7 +187,7 @@ The following parameters may be specified with the [math interface](#explanation
 - Phase
   ///
 
-### Pulse <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.protocol.Pulse] </div>
+### Pulse <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.protocol.Pulse] </div>
 
 A pulse turns on an optical channel for a duration of time.
 
@@ -208,12 +208,12 @@ microwave_pulse = Pulse(
 
 ### Composition of Protocols
 
-The pulse program for a quantum experiment is usually more complex than a pulse of a single beam. This is handled with [`SequentialProtocol`][midstack.interface.atomic.protocol.SequentialProtocol] and [`ParallelProtocol`][midstack.interface.atomic.protocol.ParallelProtocol].
+The pulse program for a quantum experiment is usually more complex than a pulse of a single beam. This is handled with [`SequentialProtocol`][oqd_core.interface.atomic.protocol.SequentialProtocol] and [`ParallelProtocol`][oqd_core.interface.atomic.protocol.ParallelProtocol].
 
 /// tab | `SequentialProtocol`
 
 //// html | div[style='float: right']
-[![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.protocol.SequentialProtocol]
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.protocol.SequentialProtocol]
 ////
 
 Sequential protocol applies a set of pulses or subprotocols sequentially in time.
@@ -259,7 +259,7 @@ protocol = SequentialProtocol(
 /// tab | `ParallelProtocol`
 
 //// html | div[style='float: right']
-[![](https://img.shields.io/badge/Implementation-7C4DFF)][midstack.interface.atomic.protocol.ParallelProtocol]
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.atomic.protocol.ParallelProtocol]
 ////
 
 Sequential protocol applies a set of pulses or subprotocols parallel in time.

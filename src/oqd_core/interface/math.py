@@ -266,7 +266,7 @@ class MathSub(MathBinaryOp):
 
     Attributes:
         expr1 (MathExpr): Left hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
-        expr2 (MathExpr): Right hand side [`MathExpr`][midstack.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
     """
 
     expr1: CastMathExpr
@@ -275,11 +275,11 @@ class MathSub(MathBinaryOp):
 
 class MathMul(MathBinaryOp):
     """
-    Class representing the multiplication of [`MathExprs`][midstack.interface.math.MathExpr]
+    Class representing the multiplication of [`MathExprs`][oqd_core.interface.math.MathExpr]
 
     Attributes:
-        expr1 (MathExpr): Left hand side [`MathExpr`][midstack.interface.math.MathExpr]
-        expr2 (MathExpr): Right hand side [`MathExpr`][midstack.interface.math.MathExpr]
+        expr1 (MathExpr): Left hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
     """
 
     expr1: CastMathExpr
@@ -288,11 +288,11 @@ class MathMul(MathBinaryOp):
 
 class MathDiv(MathBinaryOp):
     """
-    Class representing the division of [`MathExprs`][midstack.interface.math.MathExpr]
+    Class representing the division of [`MathExprs`][oqd_core.interface.math.MathExpr]
 
     Attributes:
-        expr1 (MathExpr): Left hand side [`MathExpr`][midstack.interface.math.MathExpr]
-        expr2 (MathExpr): Right hand side [`MathExpr`][midstack.interface.math.MathExpr]
+        expr1 (MathExpr): Left hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
     """
 
     expr1: CastMathExpr
@@ -301,11 +301,11 @@ class MathDiv(MathBinaryOp):
 
 class MathPow(MathBinaryOp):
     """
-    Class representing the exponentiation of [`MathExprs`][midstack.interface.math.MathExpr]
+    Class representing the exponentiation of [`MathExprs`][oqd_core.interface.math.MathExpr]
 
     Attributes:
-        expr1 (MathExpr): Left hand side [`MathExpr`][midstack.interface.math.MathExpr]
-        expr2 (MathExpr): Right hand side [`MathExpr`][midstack.interface.math.MathExpr]
+        expr1 (MathExpr): Left hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
+        expr2 (MathExpr): Right hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
     """
 
     expr1: CastMathExpr

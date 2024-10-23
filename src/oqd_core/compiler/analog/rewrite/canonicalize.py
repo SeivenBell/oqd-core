@@ -223,11 +223,11 @@ class PruneIdentity(RewriteRule):
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
-        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
-        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][oqd_core.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][oqd_core.compiler.analog.rewrite.canonicalize.NormalOrder]
 
     Example:
         A*J => A
@@ -252,9 +252,9 @@ class PauliAlgebra(RewriteRule):
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder]
 
     Example:
         X*Y => iZ
@@ -292,10 +292,10 @@ class NormalOrder(RewriteRule):
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
-        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][oqd_core.compiler.analog.rewrite.canonicalize.GatherPauli]
 
     Example:
         A*C => C*A + J
@@ -330,8 +330,8 @@ class ProperOrder(RewriteRule):
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute]
 
     Example:
         X @ (Y @ Z) =>  (X @ Y) @ Z
@@ -366,16 +366,16 @@ class ScaleTerms(RewriteRule):
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
-        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
-        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder],
-        [`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][oqd_core.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][oqd_core.compiler.analog.rewrite.canonicalize.NormalOrder],
+        [`PruneIdentity`][oqd_core.compiler.analog.rewrite.canonicalize.PruneIdentity]
 
     Note:
-        - Requires [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr] right after application of [`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms]  for Post walk
-        - [`SortedOrder`][midstack.compiler.analog.rewrite.canonicalize.SortedOrder] and  [`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms] can be run in either order
+        - Requires [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr] right after application of [`ScaleTerms`][oqd_core.compiler.analog.rewrite.canonicalize.ScaleTerms]  for Post walk
+        - [`SortedOrder`][oqd_core.compiler.analog.rewrite.canonicalize.SortedOrder] and  [`ScaleTerms`][oqd_core.compiler.analog.rewrite.canonicalize.ScaleTerms] can be run in either order
 
     Example:
         X + Y + 2*Z => 1*X + 1*Y + 2*Z
@@ -420,15 +420,15 @@ class SortedOrder(RewriteRule):
         model (VisitableBaseModel)
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
-        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
-        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder],
-        [`PruneIdentity`][midstack.compiler.analog.rewrite.canonicalize.PruneIdentity]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][oqd_core.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][oqd_core.compiler.analog.rewrite.canonicalize.NormalOrder],
+        [`PruneIdentity`][oqd_core.compiler.analog.rewrite.canonicalize.PruneIdentity]
 
     Note:
-        - [`SortedOrder`][midstack.compiler.analog.rewrite.canonicalize.SortedOrder] and  [`ScaleTerms`][midstack.compiler.analog.rewrite.canonicalize.ScaleTerms] can be run in either order
+        - [`SortedOrder`][oqd_core.compiler.analog.rewrite.canonicalize.SortedOrder] and  [`ScaleTerms`][oqd_core.compiler.analog.rewrite.canonicalize.ScaleTerms] can be run in either order
 
     Example:
         (X@Y) + (X@I) => (X@I) + (X@Y)
