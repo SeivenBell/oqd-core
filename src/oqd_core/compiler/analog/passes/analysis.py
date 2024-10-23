@@ -50,12 +50,12 @@ def analysis_term_index(model):
 
 def analysis_canonical_hamiltonian_dim(model):
     """
-    This pass computes the dimension of a canonicalized [`Operator`][midstack.interface.analog.operator.Operator] and returns the dimension
+    This pass computes the dimension of a canonicalized [`Operator`][oqd_core.interface.analog.operator.Operator] and returns the dimension
     as a tuple (n_qreg, n_qmode), where n_qreg is for number of quantum registers
     and n_qmode is for number of quantum modes.
 
     Args:
-        model (Operator): [`Operator`][midstack.interface.analog.operator.Operator] of Analog level
+        model (Operator): [`Operator`][oqd_core.interface.analog.operator.Operator] of Analog level
 
     Returns:
         tupe(int,int)

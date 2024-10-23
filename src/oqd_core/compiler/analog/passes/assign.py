@@ -38,13 +38,13 @@ def assign_analog_circuit_dim(model):
     This pass assigns n_qreg and n_qmode in the analog circuit and then verifies the assignment
 
     Args:
-        model (AnalogCircuit): n_qreg and n_qmode fields of [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] are not assigned
+        model (AnalogCircuit): n_qreg and n_qmode fields of [`AnalogCircuit`][oqd_core.interface.analog.operations.AnalogCircuit] are not assigned
 
     Returns:
-        model (AnalogCircuit): n_qreg and n_qmode fields of [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] are assigned
+        model (AnalogCircuit): n_qreg and n_qmode fields of [`AnalogCircuit`][oqd_core.interface.analog.operations.AnalogCircuit] are assigned
 
     Assumptions:
-        All [`Operator`][midstack.interface.analog.operator.Operator] inside [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] must be canonicalized
+        All [`Operator`][oqd_core.interface.analog.operator.Operator] inside [`AnalogCircuit`][oqd_core.interface.analog.operations.AnalogCircuit] must be canonicalized
     """
     assigned_model = Post(AssignAnalogIRDim())(model)
     Post(
@@ -67,6 +67,6 @@ def verify_analog_args_dim(model, n_qreg, n_qmode):
         model (TaskArgsAnalog):
 
     Assumptions:
-        All  [`Operator`][midstack.interface.analog.operator.Operator] inside TaskArgsAnalog must be canonicalized
+        All  [`Operator`][oqd_core.interface.analog.operator.Operator] inside TaskArgsAnalog must be canonicalized
     """
     Post(VerifyAnalogArgsDim(n_qreg=n_qreg, n_qmode=n_qmode))(model)

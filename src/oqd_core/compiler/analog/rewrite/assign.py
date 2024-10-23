@@ -36,13 +36,13 @@ class AssignAnalogIRDim(RewriteRule):
     analysis_canonical_hamiltonian_dim and then inserts the dimension in the Analog IR
 
     Args:
-        model (VisitableBaseModel): The rule only modifies [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] in Analog level
+        model (VisitableBaseModel): The rule only modifies [`AnalogCircuit`][oqd_core.interface.analog.operations.AnalogCircuit] in Analog level
 
     Returns:
         model  (VisitableBaseModel):
 
     Assumptions:
-        - All [`Operator`][midstack.interface.analog.operator.Operator] inside  [`AnalogCircuit`][midstack.interface.analog.operations.AnalogCircuit] must be in canonical form
+        - All [`Operator`][oqd_core.interface.analog.operator.Operator] inside  [`AnalogCircuit`][oqd_core.interface.analog.operations.AnalogCircuit] must be in canonical form
     """
 
     def __init__(self):

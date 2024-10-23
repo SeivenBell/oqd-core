@@ -45,15 +45,15 @@ class CanVerPauliAlgebra(RewriteRule):
     Checks whether there is any incomplete Pauli Algebra computation
 
     Args:
-        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder]
 
     Example:
         - X@(Y*Z) => fail
@@ -76,14 +76,14 @@ class CanVerGatherMathExpr(RewriteRule):
     there is any scalar multiplication within a term)
 
     Args:
-        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
 
     Assumptions:
         OperatorDistribute
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute]
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute]
 
     Example:
         - X@(1*Z) => fail
@@ -116,7 +116,7 @@ class CanVerOperatorDistribute(RewriteRule):
     Checks for incomplete distribution of Operators
 
     Args:
-        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -181,7 +181,7 @@ class CanVerProperOrder(RewriteRule):
     Please see example for clarification
 
     Args:
-        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
@@ -224,14 +224,14 @@ class CanVerPruneIdentity(RewriteRule):
     Checks if there is any ladder Identity present in ladder multiplication
 
     Args:
-        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
 
     Assumptions:
         OperatorDistribute
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute]
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute]
 
     Example:
         - A*J*C => fail
@@ -249,13 +249,13 @@ class CanVerGatherPauli(RewriteRule):
     Checks whether pauli and ladder have been separated.
 
     Args:
-        model (VisitableBaseModel): The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+        model (VisitableBaseModel): The rule only verifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseMode): unchanged
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
         [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
         [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
         [`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra]

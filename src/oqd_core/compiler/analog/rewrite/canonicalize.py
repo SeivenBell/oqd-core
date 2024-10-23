@@ -66,7 +66,7 @@ class OperatorDistribute(RewriteRule):
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr] (sometimes)
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr] (sometimes)
 
     Example:
         X@(Y+Z) => X@Y + X@Z
@@ -123,17 +123,17 @@ class OperatorDistribute(RewriteRule):
 
 class GatherMathExpr(RewriteRule):
     """
-    Gathers the math expressions of  [`Operator`][midstack.interface.analog.operator.Operator] so that we have math_expr * ( [`Operator`][midstack.interface.analog.operator.Operator] without scalar multiplication)
+    Gathers the math expressions of  [`Operator`][oqd_core.interface.analog.operator.Operator] so that we have math_expr * ( [`Operator`][oqd_core.interface.analog.operator.Operator] without scalar multiplication)
 
     Args:
         model (VisitableBaseModel):
-            The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level.
+            The rule only modifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level.
 
     Returns:
         model (VisitableBaseModel):
 
     Assumptions:
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute] (sometimes)
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute] (sometimes)
 
     Example:
         (1 * X) @ (2 * Y) => (1 * 2) => (1 * 2) * (X @ Y)
@@ -175,16 +175,16 @@ class GatherPauli(RewriteRule):
 
     Args:
         model (VisitableBaseModel):
-            The rule only modifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+            The rule only modifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder]
-        [`Operator`][midstack.interface.analog.operator.Operator]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder]
+        [`Operator`][oqd_core.interface.analog.operator.Operator]
 
     Example:
         X@A@Y => X@Y@A

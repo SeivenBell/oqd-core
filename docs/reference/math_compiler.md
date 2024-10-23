@@ -1,7 +1,7 @@
 ## Passes
 
-::: core.compiler.math.passes
+::: oqd_core.compiler.math.passes
 
 ## Rules
 
-::: core.compiler.math.rules
+::: oqd_core.compiler.math.rules

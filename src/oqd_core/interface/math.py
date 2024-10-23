@@ -184,7 +184,7 @@ def MathStr(*, string):
 
 class MathTerminal(MathExpr):
     """
-    Class representing a terminal in the [`MathExpr`][midstack.interface.math.MathExpr] abstract syntax tree (AST)
+    Class representing a terminal in the [`MathExpr`][oqd_core.interface.math.MathExpr] abstract syntax tree (AST)
     """
 
     pass
@@ -192,7 +192,7 @@ class MathTerminal(MathExpr):
 
 class MathVar(MathTerminal):
     """
-    Class representing a variable in a [`MathExpr`][midstack.interface.math.MathExpr]
+    Class representing a variable in a [`MathExpr`][oqd_core.interface.math.MathExpr]
 
     Examples:
         >>> MathVar("t")
@@ -204,7 +204,7 @@ class MathVar(MathTerminal):
 
 class MathNum(MathTerminal):
     """
-    Class representing a number in a [`MathExpr`][midstack.interface.math.MathExpr]
+    Class representing a number in a [`MathExpr`][oqd_core.interface.math.MathExpr]
     """
 
     value: Union[int, float]
@@ -212,7 +212,7 @@ class MathNum(MathTerminal):
 
 class MathImag(MathTerminal):
     """
-    Class representing the imaginary unit in a [`MathExpr`][midstack.interface.math.MathExpr] abstract syntax tree (AST)
+    Class representing the imaginary unit in a [`MathExpr`][oqd_core.interface.math.MathExpr] abstract syntax tree (AST)
     """
 
     pass
@@ -220,7 +220,7 @@ class MathImag(MathTerminal):
 
 class MathUnaryOp(MathExpr):
     """
-    Class representing a unary operations on a [`MathExpr`][midstack.interface.math.MathExpr] abstract syntax tree (AST)
+    Class representing a unary operations on a [`MathExpr`][oqd_core.interface.math.MathExpr] abstract syntax tree (AST)
     """
 
     pass
@@ -228,7 +228,7 @@ class MathUnaryOp(MathExpr):
 
 class MathFunc(MathUnaryOp):
     """
-    Class representing a named function applied to a [`MathExpr`][midstack.interface.math.MathExpr] abstract syntax tree (AST)
+    Class representing a named function applied to a [`MathExpr`][oqd_core.interface.math.MathExpr] abstract syntax tree (AST)
 
     Attributes:
         func (Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]): Named function to apply
@@ -241,7 +241,7 @@ class MathFunc(MathUnaryOp):
 
 class MathBinaryOp(MathExpr):
     """
-    Class representing binary operations on [`MathExprs`][midstack.interface.math.MathExpr] abstract syntax tree (AST)
+    Class representing binary operations on [`MathExprs`][oqd_core.interface.math.MathExpr] abstract syntax tree (AST)
     """
 
     pass
@@ -249,11 +249,11 @@ class MathBinaryOp(MathExpr):
 
 class MathAdd(MathBinaryOp):
     """
-    Class representing the addition of [`MathExprs`][midstack.interface.analog.operator.Operator]
+    Class representing the addition of [`MathExprs`][oqd_core.interface.analog.operator.Operator]
 
     Attributes:
-        expr1 (MathExpr): Left hand side [`MathExpr`][midstack.interface.analog.operator.Operator]
-        expr2 (MathExpr): Right hand side [`MathExpr`][midstack.interface.analog.operator.Operator]
+        expr1 (MathExpr): Left hand side [`MathExpr`][oqd_core.interface.analog.operator.Operator]
+        expr2 (MathExpr): Right hand side [`MathExpr`][oqd_core.interface.analog.operator.Operator]
     """
 
     expr1: CastMathExpr
@@ -262,10 +262,10 @@ class MathAdd(MathBinaryOp):
 
 class MathSub(MathBinaryOp):
     """
-    Class representing the subtraction of [`MathExprs`][midstack.interface.math.MathExpr]
+    Class representing the subtraction of [`MathExprs`][oqd_core.interface.math.MathExpr]
 
     Attributes:
-        expr1 (MathExpr): Left hand side [`MathExpr`][midstack.interface.math.MathExpr]
+        expr1 (MathExpr): Left hand side [`MathExpr`][oqd_core.interface.math.MathExpr]
         expr2 (MathExpr): Right hand side [`MathExpr`][midstack.interface.math.MathExpr]
     """
 

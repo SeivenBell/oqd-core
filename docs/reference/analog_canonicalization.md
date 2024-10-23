@@ -1,7 +1,7 @@
 ## Passes
 
 <!-- prettier-ignore -->
-::: core.compiler.analog.passes.canonicalize
+::: oqd_core.compiler.analog.passes.canonicalize
     options:
         heading_level: 3
         members: ["analog_operator_canonicalization"]
@@ -9,7 +9,7 @@
 ## Rewrite Rules
 
 <!-- prettier-ignore -->
-::: core.compiler.analog.rewrite.canonicalize
+::: oqd_core.compiler.analog.rewrite.canonicalize
     options:
         heading_level: 3
         members: [
@@ -27,7 +27,7 @@
 ## Verification Rules
 
 <!-- prettier-ignore -->
-::: core.compiler.analog.verify.canonicalize
+::: oqd_core.compiler.analog.verify.canonicalize
     options:
         heading_level: 3
         members: [

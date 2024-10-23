@@ -35,16 +35,16 @@ class VerifyHilberSpaceDim(RewriteRule):
 
     Args:
         model (VisitableBaseModel):
-            The rule only verifies [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+            The rule only verifies [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseModel): unchanged
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
-        [`PauliAlgebra`][midstack.compiler.analog.rewrite.canonicalize.PauliAlgebra]
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`PauliAlgebra`][oqd_core.compiler.analog.rewrite.canonicalize.PauliAlgebra]
 
     Example:
         - X@A + Y@Z => fail

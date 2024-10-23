@@ -1,1 +1,1 @@
-::: core.interface.math
+::: oqd_core.interface.math

@@ -96,7 +96,7 @@ class Operator(TypeReflectBaseModel):
 
 class OperatorTerminal(Operator):
     """
-    Class representing a terminal in the [`Operator`][midstack.interface.analog.operator.Operator] abstract syntax tree (AST)
+    Class representing a terminal in the [`Operator`][oqd_core.interface.analog.operator.Operator] abstract syntax tree (AST)
     """
 
     pass
@@ -209,12 +209,12 @@ class Identity(Ladder):
 
 class OperatorScalarMul(Operator):
     """
-    Class representing scalar multiplication of an [`Operator`][midstack.interface.analog.operator.Operator] and a
-    [`MathExpr`][midstack.interface.math.MathExpr]
+    Class representing scalar multiplication of an [`Operator`][oqd_core.interface.analog.operator.Operator] and a
+    [`MathExpr`][oqd_core.interface.math.MathExpr]
 
     Attributes:
-        op (Operator): [`Operator`][midstack.interface.analog.operator.Operator] to multiply
-        expr (MathExpr): [`MathExpr`][midstack.interface.math.MathExpr] to multiply by
+        op (Operator): [`Operator`][oqd_core.interface.analog.operator.Operator] to multiply
+        expr (MathExpr): [`MathExpr`][oqd_core.interface.math.MathExpr] to multiply by
     """
 
     op: OperatorSubtypes
@@ -223,7 +223,7 @@ class OperatorScalarMul(Operator):
 
 class OperatorBinaryOp(Operator):
     """
-    Class representing binary operations on [`Operators`][midstack.interface.analog.operator.Operator]
+    Class representing binary operations on [`Operators`][oqd_core.interface.analog.operator.Operator]
     """
 
     pass
@@ -231,11 +231,11 @@ class OperatorBinaryOp(Operator):
 
 class OperatorAdd(OperatorBinaryOp):
     """
-    Class representing the addition of [`Operators`][midstack.interface.analog.operator.Operator]
+    Class representing the addition of [`Operators`][oqd_core.interface.analog.operator.Operator]
 
     Attributes:
-        op1 (Operator): Left hand side [`Operator`][midstack.interface.analog.operator.Operator]
-        op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
+        op1 (Operator): Left hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
+        op2 (Operator): Right hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
     """
 
     op1: OperatorSubtypes
@@ -244,11 +244,11 @@ class OperatorAdd(OperatorBinaryOp):
 
 class OperatorSub(OperatorBinaryOp):
     """
-    Class representing the subtraction of [`Operators`][midstack.interface.analog.operator.Operator]
+    Class representing the subtraction of [`Operators`][oqd_core.interface.analog.operator.Operator]
 
     Attributes:
-        op1 (Operator): Left hand side [`Operator`][midstack.interface.analog.operator.Operator]
-        op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
+        op1 (Operator): Left hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
+        op2 (Operator): Right hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
     """
 
     op1: OperatorSubtypes
@@ -257,11 +257,11 @@ class OperatorSub(OperatorBinaryOp):
 
 class OperatorMul(OperatorBinaryOp):
     """
-    Class representing the multiplication of [`Operators`][midstack.interface.analog.operator.Operator]
+    Class representing the multiplication of [`Operators`][oqd_core.interface.analog.operator.Operator]
 
     Attributes:
-        op1 (Operator): Left hand side [`Operator`][midstack.interface.analog.operator.Operator]
-        op2 (Operator): Right hand side [`Operator`][midstack.interface.analog.operator.Operator]
+        op1 (Operator): Left hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
+        op2 (Operator): Right hand side [`Operator`][oqd_core.interface.analog.operator.Operator]
     """
 
     op1: OperatorSubtypes

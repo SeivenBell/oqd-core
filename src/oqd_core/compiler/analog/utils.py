@@ -37,7 +37,7 @@ class PrintOperator(ConversionRule):
     verbosity can be set through the verbose attribute
 
     Args:
-        model (Operator): [`Operator`][midstack.interface.analog.operator.Operator] of Analog level
+        model (Operator): [`Operator`][oqd_core.interface.analog.operator.Operator] of Analog level
 
     Returns:
         string (str):

@@ -1,12 +1,12 @@
 ## Introduction
 
-We have a sample compiler for Analog to Atomic levels for the single qubit Rabi Flopping for hamiltonians of the form
+We have a sample compiler for Analog to Atomic levels for the single qubit Rabi Flopping for Hamiltonians of the form
 
 $$
 H = A(t)\sigma_{x} + B(t)\sigma_{y}
 $$
 
-where coefficients $A$ and $B$ can be time dependent or time independent.
+where coefficients $A$ and $B$ can be time-dependent or time-independent.
 
 ## Mathematics
 
@@ -440,7 +440,7 @@ AtomicCircuit(
 
 `Protocol` can be `SequentialProtocol` or `ParallelProtocol`. Here we only have one evolve statement and thus this is a `ParallelProcol`. In the case when we have multiple `Evolve` statements, we will have something like `SequentialProtocol`(`ParallelProcol_1`, `ParallelProcol_2`, ...).
 
-`ParallelProtocol` contains sequence of `Pulse` and `Pulse` comprises of one `Beam` object and the `duration` the beam is applied for. Rebi frequency and Phase of the Beam are computed on the fly using the Math described above.
+`ParallelProtocol` contains sequence of `Pulse` and `Pulse` comprises one `Beam` object and the `duration` the beam is applied for. Rebi frequency and Phase of the Beam are computed on the fly using the Math described above.
 ////
 
 ```py

@@ -31,17 +31,17 @@ class TermIndex(RewriteRule):
 
     Args:
         model (VisitableBaseModel):
-            The rule only analyses [`Operator`][midstack.interface.analog.operator.Operator] in Analog level
+            The rule only analyses [`Operator`][oqd_core.interface.analog.operator.Operator] in Analog level
 
     Returns:
         model (VisitableBaseModel):
 
     Assumptions:
-        [`GatherMathExpr`][midstack.compiler.analog.rewrite.canonicalize.GatherMathExpr],
-        [`OperatorDistribute`][midstack.compiler.analog.rewrite.canonicalize.OperatorDistribute],
-        [`ProperOrder`][midstack.compiler.analog.rewrite.canonicalize.ProperOrder],
-        [`GatherPauli`][midstack.compiler.analog.rewrite.canonicalize.GatherPauli],
-        [`NormalOrder`][midstack.compiler.analog.rewrite.canonicalize.NormalOrder],
+        [`GatherMathExpr`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr],
+        [`OperatorDistribute`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute],
+        [`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder],
+        [`GatherPauli`][oqd_core.compiler.analog.rewrite.canonicalize.GatherPauli],
+        [`NormalOrder`][oqd_core.compiler.analog.rewrite.canonicalize.NormalOrder],
 
     Example:
         - X@Y@Z => TermIndex is [[1,2,3]]

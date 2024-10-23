@@ -52,10 +52,10 @@ __all__ = [
 
 class PrintMathExpr(ConversionRule):
     """
-    This prints [`MathExpr`][midstack.interface.math.MathExpr] objects. Verbosity level can be given as an attribute.
+    This prints [`MathExpr`][oqd_core.interface.math.MathExpr] objects. Verbosity level can be given as an attribute.
 
     Args:
-        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+        model (MathExpr): The rule only acts on [`MathExpr`][oqd_core.interface.math.MathExpr] objects.
 
     Returns:
         string (str):
@@ -179,10 +179,10 @@ class PrintMathExpr(ConversionRule):
 
 class DistributeMathExpr(RewriteRule):
     """
-    This distributes [`MathExpr`][midstack.interface.math.MathExpr] objects.
+    This distributes [`MathExpr`][oqd_core.interface.math.MathExpr] objects.
 
     Args:
-        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+        model (MathExpr): The rule only acts on [`MathExpr`][oqd_core.interface.math.MathExpr] objects.
 
     Returns:
         model (MathExpr):
@@ -222,16 +222,16 @@ class DistributeMathExpr(RewriteRule):
 
 class PartitionMathExpr(RewriteRule):
     """
-    This separates real and complex portions of [`MathExpr`][midstack.interface.math.MathExpr] objects.
+    This separates real and complex portions of [`MathExpr`][oqd_core.interface.math.MathExpr] objects.
 
     Args:
-        model (MathExpr): The rule only acts on [`MathExpr`][midstack.interface.math.MathExpr] objects.
+        model (MathExpr): The rule only acts on [`MathExpr`][oqd_core.interface.math.MathExpr] objects.
 
     Returns:
         model (MathExpr):
 
     Assumptions:
-        [`DistributeMathExpr`][midstack.compiler.math.rules.DistributeMathExpr],
+        [`DistributeMathExpr`][oqd_core.compiler.math.rules.DistributeMathExpr],
         [`ProperOrderMathExpr`][midstack.compiler.math.rules.ProperOrderMathExpr]
 
     Example:

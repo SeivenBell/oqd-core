@@ -1,1 +1,1 @@
-::: midstack.interface.atomic
+::: oqd_core.interface.atomic

@@ -103,15 +103,15 @@ def analog_operator_canonicalization(model):
         model (VisitableBaseModel):
 
     Returns:
-        model (VisitableBaseModel):  [`Operator`][midstack.interface.analog.operator.Operator] of Analog level are in canonical form
+        model (VisitableBaseModel):  [`Operator`][oqd_core.interface.analog.operator.Operator] of Analog level are in canonical form
 
     Assumptions:
         None
 
     Example:
         - for model = X@(Y + Z), output is 1*(X@Y) + 1 * (X@Z)
-        - for model = [`AnalogGate`][midstack.interface.analog.operations.AnalogGate](hamiltonian = (A * J)@X), output is
-            [`AnalogGate`][midstack.interface.analog.operations.AnalogGate](hamiltonian = 1 * (X@A))
+        - for model = [`AnalogGate`][oqd_core.interface.analog.operations.AnalogGate](hamiltonian = (A * J)@X), output is
+            [`AnalogGate`][oqd_core.interface.analog.operations.AnalogGate](hamiltonian = 1 * (X@A))
             (where A = Annhiliation(), J = Identity() [Ladder])
     """
     return Chain(
