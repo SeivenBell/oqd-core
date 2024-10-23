@@ -6,8 +6,7 @@
     </h2>
 </div>
 
-![versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)
-[![CI](https://github.com/OpenQuantumDesign/oqd-core/actions/workflows/CI.yml/badge.svg)](https://github.com/OpenQuantumDesign/oqd-core/actions/workflows/CI.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 <!-- prettier-ignore -->
 /// admonition | Note
@@ -16,13 +15,3 @@ Welcome to Open Quantum Design.
 This documentation is still under development, we welcome contributions! © Open Quantum Design
 ///
 
-## The Stack
-
-```mermaid
-graph LR
-
-
-
-
-
-```

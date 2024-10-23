@@ -19,20 +19,24 @@ extra:
 nav:
   - Get Started:
       - The Stack: index.md
-#      - Installation: get-started/installation.md
+      - Installation: get-started/installation.md
 
   - Explanation:
       - Interfaces:
-          - Math: explanation/math_interface.md
           - Analog: explanation/analog_interface.md
           - Atomic: explanation/atomic_interface.md
+          - Math: explanation/math_interface.md
+
       - Compilers:
           - Canonicalization: explanation/canonicalization.md
           - Analog to Atomic Compiler: explanation/analog_to_atomic.md
+
   - API Reference:
       - Interface:
-          - Math: reference/math_interface.md
           - Analog: reference/analog_interface.md
+          - Atomic: reference/atomic_interface.md
+          - Math: reference/math_interface.md
+
       - Compiler:
           - Math: reference/math_compiler.md
           - Analog:
