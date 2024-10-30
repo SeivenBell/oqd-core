@@ -29,6 +29,7 @@ __all__ = [
     "AnalogOperation",
     "Evolve",
     "Measure",
+    "Initialize",
 ]
 
 

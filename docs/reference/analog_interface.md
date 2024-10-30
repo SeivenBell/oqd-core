@@ -10,6 +10,7 @@
             "AnalogOperation",
             "Evolve",
             "Measure",
+            "Initialize",
         ]
 
 ## Operators
