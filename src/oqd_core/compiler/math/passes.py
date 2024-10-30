@@ -37,10 +37,7 @@ Pass for evaluating math expression
 """
 
 
-simplify_math_expr = Chain(
-    Post(SimplifyMathExpr()),
-    Post(PrintMathExpr()),
-)
+simplify_math_expr = Post(SimplifyMathExpr())
 """
 Pass for simplifying math expression
 """
