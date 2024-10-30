@@ -297,3 +297,6 @@ OperatorSubtypes = Union[
     OperatorScalarMul,
     OperatorKron,
 ]
+"""
+Alias for the union of concrete Operator subtypes
+"""

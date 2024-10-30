@@ -38,7 +38,6 @@ __all__ = [
     "MathMul",
     "MathDiv",
     "MathPow",
-    #
     "MathExprSubtypes",
 ]
 
@@ -312,6 +311,8 @@ class MathPow(MathBinaryOp):
     expr2: CastMathExpr
 
 
+########################################################################################
+
 MathExprSubtypes = Union[
     MathNum,
     MathVar,
@@ -323,3 +324,6 @@ MathExprSubtypes = Union[
     MathDiv,
     MathPow,
 ]
+"""
+Alias for the union of concrete MathExpr subtypes
+"""
