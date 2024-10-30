@@ -38,33 +38,13 @@ The basis of operators for the bosonic degree of freedom are the ladder operator
 
 The basis operators can be combined with the operations:
 
-/// tab | Addition
+- Addition <div style="float:right"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorAdd] </div>
 
-//// html | div[style='float: right']
-[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorAdd]
-////
-///
+- Multiplication <div style="float:right"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorMul] </div>
 
-/// tab | Multiplication
+- Tensor Product <div style="float:right"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorKron] </div>
 
-//// html | div[style='float: right']
-[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorMul]
-////
-///
-
-/// tab | Tensor Product
-
-//// html | div[style='float: right']
-[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorKron]
-////
-///
-
-/// tab | Scalar Multiplication
-
-//// html | div[style='float: right']
-[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorScalarMul]
-////
-///
+- Scalar Multiplication <div style="float:right"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operator.OperatorScalarMul] </div>
 
 ## Hamiltonian
 
@@ -91,7 +71,7 @@ H = PauliPlus() @ Annihilation() + PauliMinus() @ Creation()
 
 ///
 
-## Analog Gate
+## Analog Gate <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operation.AnalogGate] </div>
 
 The [AnalogGate][oqd_core.interface.analog.operation.AnalogGate] wraps the Hamiltonian.
 
@@ -105,7 +85,7 @@ gate = AnalogGate(hamiltonian=H)
 The purpose of the [AnalogGate][oqd_core.interface.analog.operation.AnalogGate] is to accomodate dissipation during the time evolution in the future.
 ///
 
-## Analog Circuit
+## Analog Circuit <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.analog.operation.AnalogCircuit] </div>
 
 The [AnalogCircuit][oqd_core.interface.analog.operation.AnalogCircuit] is the top level structure that describes a quantum experiment at the analog layer.
 
