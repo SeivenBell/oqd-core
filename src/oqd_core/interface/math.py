@@ -313,15 +313,10 @@ class MathPow(MathBinaryOp):
 
 
 MathExprSubtypes = Union[
-    MathExpr,
-    MathTerminal,
-    MathStr,
     MathNum,
     MathVar,
     MathImag,
-    MathUnaryOp,
     MathFunc,
-    MathBinaryOp,
     MathAdd,
     MathSub,
     MathMul,
