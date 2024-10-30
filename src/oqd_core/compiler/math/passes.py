@@ -27,6 +27,7 @@ from oqd_core.compiler.math.rules import (
 __all__ = [
     "evaluate_math_expr",
     "simplify_math_expr",
+    "print_math_expr",
 ]
 
 ########################################################################################
@@ -40,4 +41,9 @@ Pass for evaluating math expression
 simplify_math_expr = Post(SimplifyMathExpr())
 """
 Pass for simplifying math expression
+"""
+
+print_math_expr = Post(PrintMathExpr())
+"""
+Pass for printing math expression
 """
