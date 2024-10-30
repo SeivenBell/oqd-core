@@ -1,4 +1,4 @@
-Canonicalization is used to remove redundancy in the representation of a program.
+Canonicalization is used to remove redundancy in the representation.
 
 Consider the following two Hamiltonians:
 
@@ -16,11 +16,11 @@ $$
 H_{c} = 1\cdot(I \otimes X) + 1\cdot(X \otimes I)
 $$
 
-These canonicalization steps (e.g. distribution) are done by implementing a `RewritesRule` with the corresponding logic.
+These canonicalization steps (e.g. distribution) are done by implementing a `RewriteRule` with the corresponding logic.
 
 ## Canonicalization Rules
 
-### Distribution
+### Distribution <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.OperatorDistribute] </div>
 
 [`Distribution`][oqd_core.compiler.analog.rewrite.canonicalize.OperatorDistribute] distributes the multiplication, scalar multiplication and tensor product of operators over the addition of operators.
 
@@ -78,7 +78,7 @@ $$X \otimes (Y + Z) \longrightarrow X \otimes Y + X \otimes Z$$
 ////
 ///
 
-### Gather Math Expression
+### Gather Math Expression <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.GatherMathExpr] </div>
 
 [`GatherMath`][oqd_core.compiler.analog.rewrite.canonicalize.GatherMathExpr] centralizes the coefficients of the operators by gathering them.
 
@@ -132,15 +132,15 @@ $$ X \times 3 \times I \longrightarrow 3 \times (X \times I)$$
 ////
 ///
 
-### Proper Order
+### Proper Order <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.ProperOrder] </div>
 
-[`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder] takes a chain of OperatorMul or a chain of OperatorAdd and puts the operation order from left to right.
+[`ProperOrder`][oqd_core.compiler.analog.rewrite.canonicalize.ProperOrder] uses the associative property to convert a chain of [`OperatorAdd`][oqd_core.interface.analog.operator.OperatorAdd] or a chain of [`OperatorMul`][oqd_core.interface.analog.operator.OperatorMul] and reorder the operation order from left to right.
 
 <!-- prettier-ignore -->
 /// admonition | Example
     type: example
 
-$$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
+$$ X \otimes (Y + Z) \longrightarrow (X + Y) + Z $$
 
 //// tab | Original Graph
 
@@ -149,9 +149,9 @@ $$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
     element0("PauliX"):::Pauli
     element1("PauliY"):::Pauli
     element2("PauliZ"):::Pauli
-    element3("OperatorKron"):::OperatorKron
+    element3("OperatorAdd"):::OperatorAdd
     element3 --> element1 & element2
-    element4("OperatorKron"):::OperatorKron
+    element4("OperatorAdd"):::OperatorAdd
     element4 --> element0 & element3
     classDef Pauli stroke:#800000,stroke-width:3px
     classDef Ladder stroke:#800000,stroke-width:3px
@@ -170,10 +170,10 @@ $$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
     graph TD
     element0("PauliX"):::Pauli
     element1("PauliY"):::Pauli
-    element2("OperatorKron"):::OperatorKron
+    element2("OperatorAdd"):::OperatorAdd
     element2 --> element0 & element1
     element3("PauliZ"):::Pauli
-    element4("OperatorKron"):::OperatorKron
+    element4("OperatorAdd"):::OperatorAdd
     element4 --> element2 & element3
     classDef Pauli stroke:#800000,stroke-width:3px
     classDef Ladder stroke:#800000,stroke-width:3px
@@ -187,7 +187,7 @@ $$ X \otimes (Y \otimes Z) \longrightarrow (X \otimes Y) \otimes Z $$
 ////
 ///
 
-### Pauli Algebra
+### Pauli Algebra <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.PauliAlgebra] </div>
 
 [`PauliAlgebra`][oqd_core.compiler.analog.rewrite.canonicalize.PauliAlgebra] applies the Pauli algebra to simplify the operator.
 
@@ -244,7 +244,7 @@ $$ X \times Y + I \times I \longrightarrow iZ + I $$
 ////
 ///
 
-### Normal Order
+### Normal Order <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.NormalOrder] </div>
 
 [`NormalOrder`][oqd_core.compiler.analog.rewrite.canonicalize.NormalOrder] puts the ladder operators into normal order.
 
@@ -307,7 +307,7 @@ $$ C \times A + A \times C \longrightarrow C \times A + C \times A + J$$
 ////
 ///
 
-### Prune Identity
+### Prune Identity <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.PruneIdentity] </div>
 
 [`PruneIdentity`][oqd_core.compiler.analog.rewrite.canonicalize.PruneIdentity] prunes the unnecessary ladder identities from the graph.
 
@@ -358,7 +358,7 @@ $$ C\times A \times J\longrightarrow C \times A$$
 ////
 ///
 
-### Sorted Order
+### Sorted Order <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.SortedOrder] </div>
 
 [`SortedOrder`][oqd_core.compiler.analog.rewrite.canonicalize.SortedOrder] sorts the addition terms in operators into a predefined order.
 
@@ -418,7 +418,7 @@ $$ X \otimes I + I \otimes X \longrightarrow I \otimes X + X \otimes I$$
 ////
 ///
 
-### Scale Terms
+### Scale Terms <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.rewrite.ScaleTerms] </div>
 
 [`ScaleTerms`][oqd_core.compiler.analog.rewrite.canonicalize.ScaleTerms] introduces scalar multiplication to terms without a coefficient for a more consistent reprensentation.
 
@@ -485,65 +485,20 @@ classDef MathExpr stroke:#800000,stroke-width:3px
 
 ///
 
-## Canonicalization Pass
+## Canonicalization Pass <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.compiler.analog.passes.canonicalize.analog_operator_canonicalization] </div>
 
 ```mermaid
 stateDiagram-v2
 
-[*] --> hspace
-hspace --> DistributionPass: done
-DistributionPass --> properorder: done
-properorder --> PauliAlgebraPass: done
-PauliAlgebraPass --> gatherpauli: done
-gatherpauli --> NormalOrderVerifier: done
-NormalOrderVerifier --> NormalOrderPass: fail
-NormalOrderPass --> NormalOrderVerifier: done
-NormalOrderVerifier --> pruneidentity: pass
-pruneidentity --> distribute_subtraction: done
-distribute_subtraction --> sortedorder: done
-sortedorder --> scaleterms: done
-scaleterms --> terminal: done
+[*] --> distribution_pass: done
+distribution_pass --> ProperOrder: done
+ProperOrder --> pauli_algebra_pass: done
+pauli_algebra_pass --> GatherPauli: done
+GatherPauli --> VerifyHilbertSpaceDim: done
+VerifyHilbertSpaceDim --> normal_order_pass: done
+normal_order_pass --> PruneIdentity: pass
+PruneIdentity --> scale_terms_pass: done
+scale_terms_pass --> SortedOrder: done
+SortedOrder --> math_canonicalization_pass: done
+math_canonicalization_pass --> end: done
 ```
-
-The subgraphs defined above are:
-/// tab | DistributionPass
-
-```mermaid
-stateDiagram-v2
-
-    [*] --> distribute
-    distribute --> gathermathexpr: done
-    gathermathexpr --> distribution_verifier: done
-    distribution_verifier --> distribute: fail
-    distribution_verifier --> terminal: pass
-```
-
-///
-/// tab | PauliAlgebraPass
-
-```mermaid
-stateDiagram-v2
-
-    [*] --> paulialgebra
-    paulialgebra --> gathermathexpr: done
-    gathermathexpr --> paulialgebra_verifier: done
-    paulialgebra_verifier --> paulialgebra: fail
-    paulialgebra_verifier --> terminal: pass
-```
-
-///
-/// tab | NormalOrderPass
-
-```mermaid
-stateDiagram-v2
-
-    [*] --> normalorder
-    normalorder --> distribute: done
-    distribute --> gathermathexpr: done
-    gathermathexpr --> properorder: done
-    properorder --> normalorder_verifier: done
-    normalorder_verifier --> normalorder: fail
-    normalorder_verifier --> terminal: pass
-```
-
-///
