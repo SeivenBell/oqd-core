@@ -281,37 +281,19 @@ class OperatorKron(OperatorBinaryOp):
     op2: OperatorSubtypes
 
 
+########################################################################################
+
 OperatorSubtypes = Union[
-    OperatorTerminal,
-    Pauli,
     PauliI,
     PauliX,
     PauliY,
     PauliZ,
-    PauliPlus,
-    PauliMinus,
-    Ladder,
     Creation,
     Annihilation,
     Identity,
-    OperatorBinaryOp,
     OperatorAdd,
     OperatorSub,
     OperatorMul,
     OperatorScalarMul,
     OperatorKron,
 ]
-
-# # update forward refs for all OperatorSubclasses
-# current_module = sys.modules[__name__]
-# for class_name in OperatorSubtypes.__args__:
-#     cls = getattr(current_module, class_name, None)
-#     if cls:
-#         cls.update_forward_refs()
-
-# current_module = sys.modules[__name__]
-#
-# # Loop through all classes defined in this module
-# for name, obj in inspect.getmembers(current_module, inspect.isclass):
-#     if hasattr(obj, "update_forward_refs"):
-#         obj.update_forward_refs()
