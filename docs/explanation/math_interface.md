@@ -1,42 +1,19 @@
-The math interface is utilized to specify arbitrary profiles for operands of the instructions in other interfaces.
+The math interface is utilized to specify arbitrary profiles for operands in other interfaces.
 
-The abstract syntax tree of the math interface is implemented by [`MathExpr`][oqd_core.interface.math.MathExpr].
+## Math Expression <div style="float:right;"> [![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathExpr] </div>
 
-Consider the following math expression:
+[MathExpr][oqd_core.interface.math.MathExpr] represents a mathematical expression.
 
-$$
-10 \sin^2(\omega t + \phi)
-$$
+## Primitives
 
-The corresponding [`MathExpr`][oqd_core.interface.math.MathExpr] has the following structure:
-
-```mermaid
-    graph TD
-    element0("10")
-    element1("$$\omega$$")
-    element2("$$t$$")
-    element3("$$\phi$$")
-    element9("2")
-
-    element4("*")
-    element5("+")
-    element6("sin")
-    element7("*")
-    element8("^")
-
-    element7 --> element0 & element8
-    element8 --> element6
-    element8 -- exponent --> element9
-    element6 --> element5
-    element5 --> element4 & element3
-    element4 --> element1 & element2
-```
-
-## Terminals
-
-The terminals of the math interface consist of:
+The primitives of the math interface consist of:
 
 /// tab | `MathNum`
+
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathNum]
+////
+
 [`MathNum`][oqd_core.interface.math.MathNum] represents a number.
 
 <!-- prettier-ignore -->
@@ -47,10 +24,20 @@ Numbers are considered to belong to the real numbers, i.e. they can be positive 
 ///
 
 /// tab | `MathImag`
+
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathImag]
+////
+
 [`MathImag`][oqd_core.interface.math.MathImag] represents the imaginary unit.
 ///
 
 /// tab | `MathVar`
+
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathVar]
+////
+
 [`MathVar`][oqd_core.interface.math.MathVar] represents a protected named variable to be substituted during compile time or runtime.
 ///
 
@@ -60,8 +47,8 @@ The compatible operators for the math interface consist of:
 
 /// tab | `MathAdd`
 
-//// html | div
-![](https://img.shields.io/badge/binary-blue)
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathAdd]
 ////
 
 [`MathAdd`][oqd_core.interface.math.MathAdd] represents an addition of two expressions.
@@ -69,8 +56,8 @@ The compatible operators for the math interface consist of:
 
 /// tab | `MathMul`
 
-//// html | div
-![](https://img.shields.io/badge/binary-blue)
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathMul]
 ////
 
 [`MathMul`][oqd_core.interface.math.MathMul] represents an multiplication of two expressions.
@@ -78,8 +65,8 @@ The compatible operators for the math interface consist of:
 
 /// tab | `MathPow`
 
-//// html | div
-![](https://img.shields.io/badge/binary-blue)
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathPow]
 ////
 
 [`MathPow`][oqd_core.interface.math.MathPow] represents an exponentiation of an expression with the other expression.
@@ -87,8 +74,8 @@ The compatible operators for the math interface consist of:
 
 /// tab | `MathSub`
 
-//// html | div
-![](https://img.shields.io/badge/binary-blue)
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathSub]
 ////
 
 [`MathSub`][oqd_core.interface.math.MathSub] represents an subtraction of two expressions.
@@ -96,8 +83,8 @@ The compatible operators for the math interface consist of:
 
 /// tab | `MathDiv`
 
-//// html | div
-![](https://img.shields.io/badge/binary-blue)
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathDiv]
 ////
 
 [`MathDiv`][oqd_core.interface.math.MathDiv] represents an division of two expressions.
@@ -105,8 +92,8 @@ The compatible operators for the math interface consist of:
 
 /// tab | `MathFunc`
 
-//// html | div
-![](https://img.shields.io/badge/unary-red)
+//// html | div[style='float: right']
+[![](https://img.shields.io/badge/Implementation-7C4DFF)][oqd_core.interface.math.MathFunc]
 ////
 
 [`MathFunc`][oqd_core.interface.math.MathFunc] represents the application of a named function on an expression.
@@ -117,5 +104,27 @@ The compatible named functions include:
 - hyperbolic trigonometric (`sinh`, `cosh`, `tanh`)
 - exponential (`exp`)
 - logarithm (`log`)
+
+///
+
+## Usage
+
+<!-- prettier-ignore -->
+/// admonition | Example
+    type: example
+
+$$
+10 \sin^2(\omega t + \phi)
+$$
+
+```py
+expr = (
+    10
+    * MathFunc(
+        func="sin", expr=MathVar(name="omega") * MathVar(name="t") + MathVar(name="phi")
+    )
+    ** 2
+)
+```
 
 ///

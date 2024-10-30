@@ -73,7 +73,8 @@ normal_order_chain = Chain(
 )
 
 scale_terms_chain = Chain(
-    FixedPoint(Pre(ScaleTerms())), FixedPoint(Post(GatherMathExpr()))
+    FixedPoint(Pre(ScaleTerms())),
+    FixedPoint(Post(GatherMathExpr())),
 )
 
 math_chain = Chain(
