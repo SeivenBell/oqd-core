@@ -29,7 +29,6 @@ nav:
 
       - Compilers:
           - Canonicalization: explanation/canonicalization.md
-          - Analog to Atomic Compiler: explanation/analog_to_atomic.md
 
   - API Reference:
       - Interface:
