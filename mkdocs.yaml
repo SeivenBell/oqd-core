@@ -20,6 +20,7 @@ nav:
   - Get Started:
       - The Stack: index.md
       - Installation: get-started/installation.md
+      - Acknowledgement: get-started/acknowledgement.md
 
   - Explanation:
       - Interfaces:
