@@ -4,7 +4,9 @@
 ::: oqd_core.compiler.analog.passes.canonicalize
     options:
         heading_level: 3
-        members: ["analog_operator_canonicalization"]
+        members: [
+            "analog_operator_canonicalization",
+        ]
 
 ## Rewrite Rules
 

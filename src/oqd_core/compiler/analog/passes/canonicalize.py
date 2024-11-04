@@ -114,6 +114,9 @@ def analog_operator_canonicalization(model):
         - for model = [`AnalogGate`][oqd_core.interface.analog.operations.AnalogGate](hamiltonian = (A * J)@X), output is
             [`AnalogGate`][oqd_core.interface.analog.operations.AnalogGate](hamiltonian = 1 * (X@A))
             (where A = Annhiliation(), J = Identity() [Ladder])
+
+    Acknowledgement:
+        This code was inspired by [Liang.jl](https://github.com/Roger-luo/Liang.jl/blob/main/src/canonicalize/entry.jl#L8).
     """
     return Chain(
         FixedPoint(dist_chain),
