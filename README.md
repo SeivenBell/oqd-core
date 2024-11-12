@@ -1,35 +1,29 @@
-# ![Open Quantum Design](docs/img/oqd-logo-text.png)
+# ![Open Quantum Design](https://raw.githubusercontent.com/OpenQuantumDesign/oqd-compiler-infrastructure/main/docs/img/oqd-logo-text.png)
 
 <h2 align="center">
-    Program the world's first open-source, full-stack quantum computer.
+    Open Quantum Design: Core
 </h2>
 
-![Python](https://img.shields.io/badge/Python-3.10_|_3.11_|_3.12-blue)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
-## What's here
 
-- [Quick Start](#quickstart) <br/>
-- [Installation](#installation) <br/>
-- [The Stack](#stack) <br/>
-- [Documentation](#documentation) <br/>
+[![doc](https://img.shields.io/badge/documentation-lightblue)](https://docs.openquantumdesign.org/open-quantum-design-core)
+[![PyPI Version](https://img.shields.io/pypi/v/oqd-core)](https://pypi.org/project/oqd-core)
+[![CI](https://github.com/OpenQuantumDesign/oqd-core/actions/workflows/pytest.yml/badge.svg)](https://github.com/OpenQuantumDesign/oqd-core/actions/workflows/pytest.yml)![versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
+[![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## Quick start
 
 ## Installation <a name="installation"></a>
 
-First install the OQD compiler infrastructure with:
-
 ```bash
-pip install git+https://github.com/OpenQuantumDesign/compiler_infrastructure.git
+pip install oqd-core
 ```
-
-then:
+or through `git`,
 
 ```bash
 pip install git+https://github.com/OpenQuantumDesign/oqd-core.git
 ```
 
-Or clone the repository locally and install with:
+To develop, clone the repository locally:
 
 ```bash
 git clone https://github.com/OpenQuantumDesign/oqd-core
@@ -37,18 +31,12 @@ pip install .
 ```
 
 ## Getting Started <a name="Getting Started"></a>
-
-To get started you can run one of the example scripts provided. For example, to run the 3 qubit GHz state protocol you can run:
-
+Please see the [documentation](https:docs.openquantumdesign.org) for tutorials, examples, and API reference.
+Below is a simple example of an analog quantum program, in which a single qubit evolves under 
+a $\sigma_X$ Hamiltonian for 10 units of time and is then measured.
 ```python
-import matplotlib.pyplot as plt
-
 from oqd_core.interface.analog.operator import *
-from oqd_core.interface.analog.operations import *
-from oqd_core.backend.metric import *
-from oqd_core.backend.task import Task
-from oqd_analog_emulator.base import TaskArgsAnalogSimulator
-from oqd_core.backend import QutipBackend
+from oqd_core.interface.analog.operation import *
 
 X = PauliX()
 Z = PauliZ()
@@ -57,51 +45,12 @@ Hx = AnalogGate(hamiltonian=X)
 
 circuit = AnalogCircuit()
 circuit.evolve(duration=10, gate=Hx)
-
-args = TaskArgsAnalogSimulator(
-  n_shots=100,
-  fock_cutoff=4,
-  metrics={"Z": Expectation(operator=Z)},
-  dt=1e-3,
-)
-
-task = Task(program=circuit, args=args)
-
-backend = QutipBackend()
-experiment = backend.compile(task=task)
-results = backend.run(experiment=experiment)
-
-plt.plot(results.times, results.metrics["Z"], label=f"$\\langle Z \\rangle$")
+circuit.measure()
 ```
-
-### Intermediate representations <a name="intermediate-representations"></a>
-
-Expressed with [Pydantic](https://docs.pydantic.dev/latest/).
-
-#### Software <a name="software"></a>
-
-Planned supported software backends include:
-
-- Digital Circuit
-  - [Tensor Circuit](https://github.com/tencent-quantum-lab/tensorcircuit)
-  - [Yao](https://yaoquantum.org/)
-- Analog Circuit
-  - [Qutip](https://qutip.org/)
-  - [QuantumOptics.jl](https://docs.qojulia.org/search/?q=calcium)
-- Trapped-ion Physics Simulator
-  - [IonSim.jl](https://www.ionsim.org/)
-
-#### Hardware <a name="hardware"></a>
-
-Planned supported hardware backends include:
-
-- [Quantum Information with Trapped-ions (QITI Lab)](https://qiti.iqc.uwaterloo.ca/publications/) Blade Trap $\left( ^{171}\mathrm{Yb}^+ \right)$
-- [QuantumIon](https://tqt.uwaterloo.ca/project-details/quantumion-an-open-access-quantum-computing-platform/) $\left( ^{138}\mathrm{Ba}^+ \right)$
 
 ## Documentation <a name="documentation"></a>
 
-Documentation is implemented with [MkDocs](https://www.mkdocs.org/) and can be read from the [docs](https://github.com/OpenQuantumDesign/oqd-core/tree/main/docs) folder.
-
+Documentation is implemented with [MkDocs](https://www.mkdocs.org/).
 To install the dependencies for documentation, run:
 
 ```
@@ -114,8 +63,6 @@ To deploy the documentation server locally:
 cp -r examples/ docs/examples/
 mkdocs serve
 ```
-
-After deployment, the documentation can be accessed from http://127.0.0.1:8000
 
 ### Where in the stack
 ```mermaid
