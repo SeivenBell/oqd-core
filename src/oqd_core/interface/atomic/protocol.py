@@ -54,7 +54,7 @@ class Beam(TypeReflectBaseModel):
     rabi: CastMathExpr
     detuning: CastMathExpr
     phase: CastMathExpr
-    polarization: conlist(float, max_length=2, min_length=2)
+    polarization: conlist(float, max_length=3, min_length=3)
     wavevector: conlist(float, max_length=3, min_length=3)
     target: int
 
