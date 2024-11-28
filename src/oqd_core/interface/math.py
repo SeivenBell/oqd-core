@@ -124,7 +124,23 @@ def is_varname(value: str) -> str:
 
 VarName = Annotated[str, AfterValidator(is_varname)]
 CastMathExpr = Annotated[MathExpr, BeforeValidator(MathExpr.cast)]
-Functions = Literal["sin", "cos", "tan", "exp", "log", "sinh", "cosh", "tanh"]
+Functions = Literal[
+    "sin",
+    "cos",
+    "tan",
+    "exp",
+    "log",
+    "sinh",
+    "cosh",
+    "tanh",
+    "atan",
+    "acos",
+    "asin",
+    "atanh",
+    "asinh",
+    "acosh",
+    "heaviside",
+]
 
 
 ########################################################################################
