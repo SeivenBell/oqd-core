@@ -16,3 +16,17 @@ from .gate import Gate, H, CNOT
 from .register import QuantumBit, ClassicalBit, QuantumRegister, ClassicalRegister
 from .statement import Statement, Measure, Barrier
 from .circuit import DigitalCircuit
+
+__all__ = [
+    "Gate",
+    "H",
+    "CNOT",
+    "QuantumBit",
+    "ClassicalBit",
+    "QuantumRegister",
+    "ClassicalRegister",
+    "Statement",
+    "Measure",
+    "Barrier",
+    "DigitalCircuit",
+]

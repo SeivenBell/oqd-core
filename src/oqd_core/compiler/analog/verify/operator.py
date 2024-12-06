@@ -98,7 +98,7 @@ class VerifyHilberSpaceDim(RewriteRule):
             if isinstance(model.op2.op, Union[OperatorTerminal, OperatorMul]):
                 new = self._get_dim(model.op2.op)
 
-        if self._term_dim == None:
+        if self._term_dim is None:
             self._term_dim = new
         else:
             assert self._term_dim == new, "Incorrect Hilbert space dimension"
