@@ -1,0 +1,11 @@
+[
+    {
+        "include": [
+            "**/*.py"
+        ],
+        "exclude": [
+            "docs/**"
+        ],
+        "license": "./copyright.txt"
+    }
+]
