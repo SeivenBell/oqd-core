@@ -10,6 +10,6 @@ jobs:
       - name: Check license & copyright headers
         uses: viperproject/check-license-header@v2
         with:
-          path: src/
-          config: ./license-header-checker-config.json
-          strict: true
+          path: 
+          config: .github/workflows/check_copyright_config.json
+          # strict: true

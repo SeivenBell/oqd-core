@@ -1,11 +1,13 @@
 [
     {
         "include": [
-            "**/*.py"
+            "src/**",
+            "tests/**"
         ],
         "exclude": [
-            "docs/**"
+            "docs/**",
+            "**/*.ini"
         ],
-        "license": "./copyright.txt"
+        "license": ".github/workflows/copyright.txt"
     }
 ]
