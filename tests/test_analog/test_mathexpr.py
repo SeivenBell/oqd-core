@@ -20,7 +20,7 @@ from oqd_compiler_infrastructure import Post, WalkBase, ConversionRule, RewriteR
 ########################################################################################
 
 from oqd_core.compiler.math.rules import EvaluateMathExpr
-from oqd_core.interface.math import *
+from oqd_core.interface.math import MathStr
 import pytest
 
 ########################################################################################
@@ -33,19 +33,23 @@ def evaluate_math_expr(
 ):
     return walk_method(rule)(MathStr(string=math_str))
 
-@pytest.mark.parametrize("math_str, expected", [
-    ("3+5", 8),
-    ("3.02+5.01", 8.03),
-    ("3-5", -2),
-    ("-3.02+5.01", 1.99),
-    ("3*5", 15),
-    ("15/2", 7.5),
-    ("3**2.01", 9.10),
-    ("sin(0.25)", 0.2474),
-    ("tan(0.205)", 0.208),
-    ("2*3 + 5*(1j)", 6 + 5j),
-    ("1+2*3 + 9 - 0.1 + 7*(2+3*5+(10/3))", 158.233),
-    ("sin(exp(2))", 0.894),
-])
+
+@pytest.mark.parametrize(
+    "math_str, expected",
+    [
+        ("3+5", 8),
+        ("3.02+5.01", 8.03),
+        ("3-5", -2),
+        ("-3.02+5.01", 1.99),
+        ("3*5", 15),
+        ("15/2", 7.5),
+        ("3**2.01", 9.10),
+        ("sin(0.25)", 0.2474),
+        ("tan(0.205)", 0.208),
+        ("2*3 + 5*(1j)", 6 + 5j),
+        ("1+2*3 + 9 - 0.1 + 7*(2+3*5+(10/3))", 158.233),
+        ("sin(exp(2))", 0.894),
+    ],
+)
 def test_math_expressions(math_str, expected):
     assert pytest.approx(evaluate_math_expr(math_str), 0.001) == expected

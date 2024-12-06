@@ -14,9 +14,28 @@
 
 import pytest
 from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre, FixedPoint
-from oqd_core.interface.analog import *
-from oqd_core.compiler.analog.rewrite.canonicalize import *
-from oqd_core.interface.math import *
+from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Operator,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+)
+from oqd_core.compiler.analog.rewrite.canonicalize import (
+    GatherMathExpr,
+    GatherPauli,
+    NormalOrder,
+    OperatorDistribute,
+    PauliAlgebra,
+    ProperOrder,
+    PruneIdentity,
+    ScaleTerms,
+    SortedOrder,
+)
+from oqd_core.interface.math import MathStr
 
 X, Y, Z, I, A, C, LI = (
     PauliX(),
@@ -29,7 +48,9 @@ X, Y, Z, I, A, C, LI = (
 )
 
 
-def canonicalize_operator(operator: Operator, rule: RewriteRule, walk_method: WalkBase = Post):
+def canonicalize_operator(
+    operator: Operator, rule: RewriteRule, walk_method: WalkBase = Post
+):
     return FixedPoint(walk_method(rule))(operator)
 
 
@@ -70,10 +91,9 @@ def test_gather_math_expr_complicated(gather_math_expr_rule):
 
 
 def test_gather_math_expr_no_effect(gather_math_expr_rule):
-    op = X @ ((2 * X + 3 * Y))
-    expected = X @ ((2 * X + 3 * Y))
+    op = X @ (2 * X + 3 * Y)
+    expected = X @ (2 * X + 3 * Y)
     assert canonicalize_operator(operator=op, rule=gather_math_expr_rule) == expected
-
 
 
 @pytest.fixture
@@ -91,7 +111,6 @@ def test_proper_order_complicated(proper_order_rule):
     op = X @ (Y @ Z) + 3 * (Z @ (Y @ I))
     expected = (X @ Y) @ Z + 3 * ((Z @ Y) @ I)
     assert canonicalize_operator(operator=op, rule=proper_order_rule) == expected
-
 
 
 @pytest.fixture
@@ -118,7 +137,9 @@ def test_nested_multiplications_complicated(pauli_algebra_rule):
     """Complicated Nested Multiplication test fails as we need GatherMathExpr after PauliAlgebra"""
     op = Z * X * X * Y * Y * Z * I
     expected = I + Z
-    assert canonicalize_operator(operator=op, rule=pauli_algebra_rule) == expected  # check fails
+    assert (
+        canonicalize_operator(operator=op, rule=pauli_algebra_rule) == expected
+    )  # check fails
 
 
 @pytest.fixture
@@ -132,12 +153,12 @@ def test_simple_pauli_gather(pauli_gather_rule):
     expected = X @ Y @ A
     assert canonicalize_operator(operator=op, rule=pauli_gather_rule) == expected
 
+
 def test_complicated_pauli_gather(pauli_gather_rule):
     """Complicated test"""
     op = X @ A @ Y + (A * A * C) @ Y @ Z + X @ Y @ Z
     expected = X @ Y @ A + Y @ Z @ (A * A * C) + X @ Y @ Z
     assert canonicalize_operator(operator=op, rule=pauli_gather_rule) == expected
-
 
 
 @pytest.fixture
@@ -215,17 +236,26 @@ def test_sorted_order_ladder(sorted_order_rule):
 def scale_terms_rule():
     return ScaleTerms()
 
+
 def test_scale_terms_simple(scale_terms_rule):
     """Simple test"""
     op = X @ (Y @ Z) + (Z @ (Y @ I))
     expected = MathStr(string="1") * (X @ (Y @ Z)) + MathStr(string="1") * (Z @ (Y @ I))
-    assert canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre) == expected
+    assert (
+        canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre)
+        == expected
+    )
+
 
 def test_scale_terms_single_term(scale_terms_rule):
     """Single term sorted order"""
     op = X @ (Y @ Z)
     expected = MathStr(string="1") * (X @ (Y @ Z))
-    assert canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre) == expected
+    assert (
+        canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre)
+        == expected
+    )
+
 
 def test_scale_terms_terminals(scale_terms_rule):
     """Terminal term sorted order"""
@@ -236,4 +266,7 @@ def test_scale_terms_terminals(scale_terms_rule):
         + MathStr(string="1") * Z
         + MathStr(string="1") * I
     )
-    assert canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre) == expected
+    assert (
+        canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre)
+        == expected
+    )

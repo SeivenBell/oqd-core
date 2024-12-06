@@ -21,17 +21,35 @@
 #     MAGENTA,
 # )
 
-#%%
-import pytest 
+# %%
+import pytest
 
 from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre
 
 ########################################################################################
 
-from oqd_core.interface.analog import *
-from oqd_core.compiler.analog.verify.canonicalize import *
+from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Operator,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+)
+from oqd_core.compiler.analog.verify.canonicalize import (
+    CanVerGatherMathExpr,
+    CanVerGatherPauli,
+    CanVerNormalOrder,
+    CanVerOperatorDistribute,
+    CanVerPauliAlgebra,
+    CanVerProperOrder,
+    CanVerPruneIdentity,
+    CanVerScaleTerm,
+    CanVerSortedOrder,
+)
 from oqd_core.compiler.analog.error import CanonicalFormError
-from oqd_core.interface.math import *
 
 ########################################################################################
 
@@ -45,21 +63,34 @@ X, Y, Z, I, A, C, LI = (
     Identity(),
 )
 
-def apply_pass(operator: Operator, rule: RewriteRule, walk_method: WalkBase, reverse: bool):
+
+def apply_pass(
+    operator: Operator, rule: RewriteRule, walk_method: WalkBase, reverse: bool
+):
     walk_method(rule, reverse=reverse)(operator)
 
 
 class CanonicalFormErrors:
-    def assert_canonical_form_error_raised(self, operator, rule, walk_method=Post, reverse=False):
+    def assert_canonical_form_error_raised(
+        self, operator, rule, walk_method=Post, reverse=False
+    ):
         with pytest.raises(CanonicalFormError):
-            apply_pass(operator=operator, rule=rule, walk_method=walk_method, reverse=reverse)
+            apply_pass(
+                operator=operator, rule=rule, walk_method=walk_method, reverse=reverse
+            )
 
-    def assert_canonical_form_error_not_raised(self, operator, rule, walk_method=Post, reverse=False):
+    def assert_canonical_form_error_not_raised(
+        self, operator, rule, walk_method=Post, reverse=False
+    ):
         # Simply call the function and ensure it does not raise CanonicalFormError
         try:
-            apply_pass(operator=operator, rule=rule, walk_method=walk_method, reverse=reverse)
+            apply_pass(
+                operator=operator, rule=rule, walk_method=walk_method, reverse=reverse
+            )
         except CanonicalFormError:
-            pytest.fail(f"Unexpected CanonicalFormError was raised for operator {operator}")
+            pytest.fail(
+                f"Unexpected CanonicalFormError was raised for operator {operator}"
+            )
 
 
 class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors):
@@ -116,7 +147,7 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors):
             1 * (I @ (A * A))
             + 3 * (X @ (A * A))
             + 7 * (Y @ (A * A))
-            + (Z @ ((A * A * A * A * A * A * C * A * C * C * C)))
+            + (Z @ (A * A * A * A * A * A * C * A * C * C * C))
             + 7 * (Z @ (A * C))
         )
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)

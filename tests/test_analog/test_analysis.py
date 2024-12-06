@@ -13,9 +13,17 @@
 # limitations under the License.
 
 from oqd_compiler_infrastructure import RewriteRule, Post, Pre, In
-from oqd_core.interface.analog import *
+from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Operator,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+)
 from oqd_core.compiler.analog.analysis import TermIndex
-from oqd_core.interface.math import *
 
 X, Y, Z, I, A, C, LI = (
     PauliX(),

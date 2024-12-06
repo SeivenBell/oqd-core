@@ -18,7 +18,15 @@ from oqd_compiler_infrastructure import ConversionRule, Post
 
 ########################################################################################
 
-from oqd_core.interface.analog import *
+from oqd_core.interface.analog import (
+    OperatorAdd,
+    OperatorBinaryOp,
+    OperatorKron,
+    OperatorMul,
+    OperatorScalarMul,
+    OperatorSub,
+    OperatorTerminal,
+)
 from oqd_core.interface.math import MathExpr
 from oqd_core.compiler.math.rules import PrintMathExpr
 

@@ -19,8 +19,17 @@ from oqd_compiler_infrastructure import Post, WalkBase, In, ConversionRule, Rewr
 
 ########################################################################################
 
-from oqd_core.interface.analog import *
-from oqd_core.interface.math import *
+from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Operator,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+)
+from oqd_core.interface.math import MathStr
 from oqd_core.compiler.analog.utils import PrintOperator
 from oqd_core.compiler.analog.verify.operator import VerifyHilberSpaceDim
 
@@ -280,7 +289,6 @@ class TestComplexFinalStringVerbosePrintOp:
         operator = PauliX() * 2j * (PauliI() + 8j * PauliY())
         actual = "((0.0 + (1j * 2.0)) * PauliX()) * (PauliI() + ((0.0 + (1j * 8.0)) * PauliY()))"
         assert apply_pass(operator=operator, rule=self._rule) == actual
-
 
 
 class TestHilbertSpaceDimVerification:

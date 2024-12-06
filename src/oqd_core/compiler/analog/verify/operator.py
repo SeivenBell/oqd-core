@@ -18,7 +18,14 @@ from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
 
-from oqd_core.interface.analog import *
+from oqd_core.interface.analog import (
+    Ladder,
+    OperatorAdd,
+    OperatorMul,
+    OperatorScalarMul,
+    OperatorTerminal,
+    Pauli,
+)
 
 ########################################################################################
 
