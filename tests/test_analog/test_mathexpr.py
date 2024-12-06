@@ -21,7 +21,6 @@ from oqd_compiler_infrastructure import Post, WalkBase, ConversionRule, RewriteR
 
 from oqd_core.compiler.math.rules import EvaluateMathExpr
 from oqd_core.interface.math import MathStr
-import pytest
 
 ########################################################################################
 

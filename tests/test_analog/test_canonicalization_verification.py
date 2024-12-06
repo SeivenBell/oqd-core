@@ -53,7 +53,7 @@ from oqd_core.compiler.analog.error import CanonicalFormError
 
 ########################################################################################
 
-X, Y, Z, I, A, C, LI = (
+X, Y, Z, PI, A, C, LI = (
     PauliX(),
     PauliY(),
     PauliZ(),
@@ -126,7 +126,7 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors):
     def test_pauli_nested_pass(self):
         """Simple pass with nested pauli"""
         op = (
-            1 * (I @ (A * A))
+            1 * (PI @ (A * A))
             + 3 * (X @ (A * A))
             + 7 * (Y @ (A * A))
             + (Z @ (A * A))
@@ -144,7 +144,7 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors):
     def test_complex_nested_pass(self):
         """Complicated pass with nested pauli and ladder"""
         op = (
-            1 * (I @ (A * A))
+            1 * (PI @ (A * A))
             + 3 * (X @ (A * A))
             + 7 * (Y @ (A * A))
             + (Z @ (A * A * A * A * A * A * C * A * C * C * C))
@@ -155,7 +155,7 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors):
     def test_complex_nested_fail(self):
         """Complicated fail with nested pauli and ladder"""
         op = (
-            1 * (I @ A * A)
+            1 * (PI @ A * A)
             + 3 * (X @ A * A)
             + 7 * (Y @ A * A)
             + (Z @ (A * A * A * A * A * A * C + A * C * C * C))
@@ -205,12 +205,12 @@ class TestCanonicalizationVerificationOperatorDistribute(CanonicalFormErrors):
         op = (2 * (X @ C)) * (Y @ LI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
-    def test_multiplication_OperatorScalarMul_distribution_v3(self):
+    def test_multiplication_OperatorScalarMul_distribution_v4(self):
         """Multiplication of OperatorScalarMul should just as op cannot be further simplified by distribution (needs MathExpr) v3"""
         op = (2 * (X @ C)) * (2 * (Y @ LI))
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
-    def test_multiplication_OperatorScalarMul_distribution_v4(self):
+    def test_multiplication_OperatorScalarMul_distribution_v5(self):
         """Multiplication of OperatorScalarMul should just as op cannot be further simplified by distribution (needs MathExpr) v4"""
         op = (Y @ LI) * (2 * (X @ C)) * (Y @ LI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
@@ -298,22 +298,22 @@ class TestCanonicalizationVerificationProperOrder(CanonicalFormErrors):
 
     def test_nested_paulis_fail_v1(self):
         """Nested structure with nested addition not in proper order"""
-        op = I + (X + (2 * Y) + Z)
+        op = PI + (X + (2 * Y) + Z)
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_nested_paulis_pass_v2(self):
         """Nested structure with nested addition in proper order"""
-        op = (I + X) + ((2 * Y) + Z)
+        op = (PI + X) + ((2 * Y) + Z)
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_nested_paulis_pass_with_brackets(self):
         """Nested structure with nested addition in proper order with brackets"""
-        op = ((I + X) + (2 * Y)) + Z
+        op = ((PI + X) + (2 * Y)) + Z
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_nested_paulis_pass_without_brackets(self):
         """Nested structure with nested addition in proper order with brackets (i.e. using Python default)"""
-        op = I + X + (2 * Y) + Z
+        op = PI + X + (2 * Y) + Z
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_nested_tensor_prod_paulis_multiplication_fail(self):
@@ -344,14 +344,14 @@ class TestCanonicalizationVerificationPauliAlgebra(CanonicalFormErrors):
 
     def test_nested_pass(self):
         """Simple nested Pauli test pass"""
-        op = I @ I @ X @ (X - Z) @ (A * A) + Z @ (X @ (X @ (X + Z))) @ (
+        op = PI @ PI @ X @ (X - Z) @ (A * A) + Z @ (X @ (X @ (X + Z))) @ (
             A * C * A * C * C
         )
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_nested_fail(self):
         """Simple nested Pauli test fail because of X * I"""
-        op = I @ I @ X @ (X - Z) @ (A * A) + Z @ (X @ (X @ ((X * I) + Z))) @ (
+        op = PI @ PI @ X @ (X - Z) @ (A * A) + Z @ (X @ (X @ ((X * PI) + Z))) @ (
             A * C * A * C * C
         )
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
@@ -379,42 +379,42 @@ class TestCanonicalizationVerificationGatherPauli(CanonicalFormErrors):
 
     def test_simple_fail(self):
         """Simple fail"""
-        op = X @ X @ Y @ (A * C * LI) @ A @ I
+        op = X @ X @ Y @ (A * C * LI) @ A @ PI
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_complicated_addition_pass(self):
         """Complicated Addition pass"""
-        op = X @ X @ Y @ (A * C * LI) @ A + I @ I @ I @ I @ C @ C
+        op = X @ X @ Y @ (A * C * LI) @ A + PI @ PI @ PI @ PI @ C @ C
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_simple_adddition_fail(self):
         """Simple Addition fail"""
-        op = X @ X @ Y @ (A * C * LI) @ A @ I + I @ I @ I @ I @ C @ C
+        op = X @ X @ Y @ (A * C * LI) @ A @ PI + PI @ PI @ PI @ PI @ C @ C
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_simple_addition_pass(self):
         """Simple Addition pass"""
-        op = X @ (A * A) @ A + I @ C @ C
+        op = X @ (A * A) @ A + PI @ C @ C
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_assumption_addition_pass(self):
         """Assumption Single Nested Addition pass"""
-        op = (Y + I) @ A @ X
+        op = (Y + PI) @ A @ X
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_assumption_nested_addition_pass(self):
         """Assumption double Nested Addition pass"""
-        op = (Y + I) @ A @ (Z + I)
+        op = (Y + PI) @ A @ (Z + PI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_assumption_simple_nested_addition_pass(self):
         """Error not found when Ladder @ PauliAddition"""
-        op = A @ (Z + I)
+        op = A @ (Z + PI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_assumption_simple_nested_subtraction_pass(self):
         """Error not found when Ladder @ PauliSubtraction"""
-        op = A @ (Z + I)
+        op = A @ (Z + PI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_ladder_prod_fail(self):
@@ -455,32 +455,32 @@ class TestCanonicalizationVerificationNormalOrder(CanonicalFormErrors):
 
     def test_simple_addition_pass(self):
         """Simple pass with addition"""
-        op = X @ X @ Y @ (C * A) @ A + I @ I @ I @ C @ C
+        op = X @ X @ Y @ (C * A) @ A + PI @ PI @ PI @ C @ C
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_simple_addition_fail(self):
         """Simple fail with addition"""
-        op = X @ X @ Y @ (C * A * C) @ A + I @ I @ I @ C @ C
+        op = X @ X @ Y @ (C * A * C) @ A + PI @ PI @ PI @ C @ C
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_simple_starting_with_ladder_pass_v1(self):
         """Starting with ladder pass  v1"""
-        op = (C * A) @ (Z + I)
+        op = (C * A) @ (Z + PI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_simple_starting_with_ladder_fail_v1(self):
         """Starting with ladder fail  v1"""
-        op = (C * A * C) @ (Z + I)
+        op = (C * A * C) @ (Z + PI)
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_simple_starting_with_single_ladder_pass_v1(self):
         """Starting with single ladder pass  v1"""
-        op = C @ (Z + I)
+        op = C @ (Z + PI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_simple_starting_with_single_ladder_tensors(self):
         """Starting with ladder pass  v1"""
-        op = C @ A @ C @ LI @ A @ C @ (Z + I) @ X @ Y
+        op = C @ A @ C @ LI @ A @ C @ (Z + PI) @ X @ Y
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_assumption_only_ladder_addition_without_distribution(self):
@@ -542,32 +542,32 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors):
 
     def test_simple_fail_2_terms(self):
         """Simple fail with 2 terms"""
-        op = X + I
+        op = X + PI
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_simple_fail(self):
         """Simple Fail"""
-        op = X + (4 * Y) + I
+        op = X + (4 * Y) + PI
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_nested_pass(self):
         """Nested Pass"""
-        op = (X @ Y + (2 * (3j) * (X @ Z))) + (Y @ I) + (Z @ I)
+        op = (X @ Y + (2 * (3j) * (X @ Z))) + (Y @ PI) + (Z @ PI)
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_nested_fail(self):
         """Nested fail because of I@Y. This tests if it works with OperatorScalarMul"""
-        op = (X @ Y + (2 * (3j) * (I @ Y))) + (Y @ I) + (Z @ I)
+        op = (X @ Y + (2 * (3j) * (PI @ Y))) + (Y @ PI) + (Z @ PI)
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_simple_fail_identical_operators(self):
         """Fail with identical operators"""
-        op = X @ I @ Z + 2 * X @ I @ Z
+        op = X @ PI @ Z + 2 * X @ PI @ Z
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_assumption_pass(self):
         """Hamiltonian needs to be distributed"""
-        op = (I + X) @ Z
+        op = (PI + X) @ Z
         self.assert_canonical_form_error_not_raised(operator=op, rule=self.rule)
 
     def test_simple_pass_ladder(self):
@@ -597,7 +597,7 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors):
 
     def test_simple_fail_ladder_pauli(self):
         """Simple fail ladder-pauli 3 terms: Pauli's are given precedence in order of importance"""
-        op = X @ (C * A) + I @ (C * A * A * A) + Z @ (C * C * A * A)
+        op = X @ (C * A) + PI @ (C * A * A * A) + Z @ (C * C * A * A)
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_scalar_mul_pass(self):
@@ -627,7 +627,7 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors):
 
     def test_scalar_mul_fail_duplicate_more_terms(self):
         """Error Not raised with duplicates with more terms"""
-        op = I @ X + X @ X + X @ Y + X @ Z + Y @ X + Y @ Y + Y @ Z + I @ X
+        op = PI @ X + X @ X + X @ Y + X @ Z + Y @ X + Y @ Y + Y @ Z + PI @ X
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
     def test_scalar_mul_fail_duplicate_complex(self):
@@ -641,7 +641,7 @@ class TestCanonicalizationVerificationSortedOrder(CanonicalFormErrors):
 
     def test_nested_fail_duplicate(self):
         """Nested fail due to duplicate operators"""
-        op = (X @ Y + (2 * (3j) * (X @ Y))) + (Y @ I) + (Z @ I)
+        op = (X @ Y + (2 * (3j) * (X @ Y))) + (Y @ PI) + (Z @ PI)
         self.assert_canonical_form_error_raised(operator=op, rule=self.rule)
 
 
@@ -653,14 +653,14 @@ class TestCanonicalizationVerificationScaleTerms(CanonicalFormErrors):
 
     def test_simple_addition_pass(self):
         """Addition pass"""
-        op = 2 * (X @ Z) + 3 * (Y @ I) + 2 * (Z @ Z)
+        op = 2 * (X @ Z) + 3 * (Y @ PI) + 2 * (Z @ Z)
         self.assert_canonical_form_error_not_raised(
             operator=op, rule=self.rule, walk_method=self.walk_method
         )
 
     def test_simple_addition_fail(self):
         """Addition fail"""
-        op = 2 * (X @ Z) + (Y @ I) + 2 * (Z @ Z)
+        op = 2 * (X @ Z) + (Y @ PI) + 2 * (Z @ Z)
         self.assert_canonical_form_error_raised(
             operator=op, rule=self.rule, walk_method=self.walk_method
         )
@@ -687,14 +687,14 @@ class TestCanonicalizationVerificationScaleTerms(CanonicalFormErrors):
             + 2 * (Y @ Z)
             + 1 * A
             + 1 * (C * C)
-            + 1 * I
+            + 1 * PI
             + 1 * Z
         )
         self.assert_canonical_form_error_not_raised(
             operator=op, rule=self.rule, walk_method=self.walk_method
         )
 
-    def test_simple_addition_fail(self):
+    def test_complicated_addition_fail(self):
         """Complicated addition fail"""
         op = (
             2 * (X @ Z @ Z @ (C * A))
@@ -702,7 +702,7 @@ class TestCanonicalizationVerificationScaleTerms(CanonicalFormErrors):
             + 2 * (Y @ Z)
             + 1 * A
             + 1 * (C * C)
-            + 1 * I
+            + 1 * PI
             + 1 * Z
         )
         self.assert_canonical_form_error_raised(

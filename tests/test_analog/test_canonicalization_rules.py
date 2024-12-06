@@ -37,7 +37,7 @@ from oqd_core.compiler.analog.rewrite.canonicalize import (
 )
 from oqd_core.interface.math import MathStr
 
-X, Y, Z, I, A, C, LI = (
+X, Y, Z, PI, A, C, LI = (
     PauliX(),
     PauliY(),
     PauliZ(),
@@ -66,8 +66,8 @@ def test_operator_distribute_simple(operator_distribute_rule):
 
 
 def test_operator_distribute_no_effect(operator_distribute_rule):
-    op = 2 * (X @ Y) * (3 * (I @ I))
-    expected = 2 * (X @ Y) * (3 * (I @ I))
+    op = 2 * (X @ Y) * (3 * (PI @ PI))
+    expected = 2 * (X @ Y) * (3 * (PI @ PI))
     assert canonicalize_operator(operator=op, rule=operator_distribute_rule) == expected
 
 
@@ -83,8 +83,8 @@ def test_gather_math_expr_simple(gather_math_expr_rule):
 
 
 def test_gather_math_expr_complicated(gather_math_expr_rule):
-    op = X @ (3 * Y * (3 * Z)) @ (10 * I) + (2 * X) @ Z @ (5 * Y)
-    expected = (MathStr(string="3*3*10")) * ((X @ (Y * Z)) @ I) + MathStr(
+    op = X @ (3 * Y * (3 * Z)) @ (10 * PI) + (2 * X) @ Z @ (5 * Y)
+    expected = (MathStr(string="3*3*10")) * ((X @ (Y * Z)) @ PI) + MathStr(
         string="2*5"
     ) * (X @ Z @ Y)
     assert canonicalize_operator(operator=op, rule=gather_math_expr_rule) == expected
@@ -102,14 +102,14 @@ def proper_order_rule():
 
 
 def test_proper_order_simple(proper_order_rule):
-    op = X @ (Y @ (I @ Z))
-    expected = ((X @ Y) @ I) @ Z
+    op = X @ (Y @ (PI @ Z))
+    expected = ((X @ Y) @ PI) @ Z
     assert canonicalize_operator(operator=op, rule=proper_order_rule) == expected
 
 
 def test_proper_order_complicated(proper_order_rule):
-    op = X @ (Y @ Z) + 3 * (Z @ (Y @ I))
-    expected = (X @ Y) @ Z + 3 * ((Z @ Y) @ I)
+    op = X @ (Y @ Z) + 3 * (Z @ (Y @ PI))
+    expected = (X @ Y) @ Z + 3 * ((Z @ Y) @ PI)
     assert canonicalize_operator(operator=op, rule=proper_order_rule) == expected
 
 
@@ -120,23 +120,23 @@ def pauli_algebra_rule():
 
 def test_simple_pauli(pauli_algebra_rule):
     """Simple test"""
-    op = X * X + Y * Y + Z * I
-    expected = I + I + Z
+    op = X * X + Y * Y + Z * PI
+    expected = PI + PI + Z
     assert canonicalize_operator(operator=op, rule=pauli_algebra_rule) == expected
 
 
 def test_nested_multiplications(pauli_algebra_rule):
     """Nested Multiplication test"""
-    op = X * X + Y * Y * Z * I
-    expected = I + Z
+    op = X * X + Y * Y * Z * PI
+    expected = PI + Z
     assert canonicalize_operator(operator=op, rule=pauli_algebra_rule) == expected
 
 
 @pytest.mark.xfail(strict=True)
 def test_nested_multiplications_complicated(pauli_algebra_rule):
     """Complicated Nested Multiplication test fails as we need GatherMathExpr after PauliAlgebra"""
-    op = Z * X * X * Y * Y * Z * I
-    expected = I + Z
+    op = Z * X * X * Y * Y * Z * PI
+    expected = PI + Z
     assert (
         canonicalize_operator(operator=op, rule=pauli_algebra_rule) == expected
     )  # check fails
@@ -213,15 +213,15 @@ def sorted_order_rule():
 
 def test_sorted_order_simple(sorted_order_rule):
     """Simple Test"""
-    op = X @ Y + X @ Z + I @ Z
-    expected = I @ Z + X @ Y + X @ Z
+    op = X @ Y + X @ Z + PI @ Z
+    expected = PI @ Z + X @ Y + X @ Z
     assert canonicalize_operator(operator=op, rule=sorted_order_rule) == expected
 
 
 def test_sorted_order_terminals(sorted_order_rule):
     """Simple Test with terminals"""
-    op = X + Z + Y + I
-    expected = I + X + Y + Z
+    op = X + Z + Y + PI
+    expected = PI + X + Y + Z
     assert canonicalize_operator(operator=op, rule=sorted_order_rule) == expected
 
 
@@ -239,8 +239,8 @@ def scale_terms_rule():
 
 def test_scale_terms_simple(scale_terms_rule):
     """Simple test"""
-    op = X @ (Y @ Z) + (Z @ (Y @ I))
-    expected = MathStr(string="1") * (X @ (Y @ Z)) + MathStr(string="1") * (Z @ (Y @ I))
+    op = X @ (Y @ Z) + (Z @ (Y @ PI))
+    expected = MathStr(string="1") * (X @ (Y @ Z)) + MathStr(string="1") * (Z @ (Y @ PI))
     assert (
         canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre)
         == expected
@@ -259,12 +259,12 @@ def test_scale_terms_single_term(scale_terms_rule):
 
 def test_scale_terms_terminals(scale_terms_rule):
     """Terminal term sorted order"""
-    op = X + Y + Z + I
+    op = X + Y + Z + PI
     expected = (
         MathStr(string="1") * X
         + MathStr(string="1") * Y
         + MathStr(string="1") * Z
-        + MathStr(string="1") * I
+        + MathStr(string="1") * PI
     )
     assert (
         canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre)

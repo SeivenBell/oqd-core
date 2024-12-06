@@ -36,7 +36,7 @@ from oqd_core.compiler.analog.verify.operator import VerifyHilberSpaceDim
 ########################################################################################
 
 
-X, Y, Z, I, A, C, LI = (
+X, Y, Z, PI, A, C, LI = (
     PauliX(),
     PauliY(),
     PauliZ(),
@@ -209,7 +209,7 @@ class TestHilbertSpaceDimVerification:
 
     def test_simple_addition_fail(self):
         """Addition fail"""
-        op = 2 * (X @ Z @ Z) + 3 * (Y @ I) + 2 * (Z @ Z)
+        op = 2 * (X @ Z @ Z) + 3 * (Y @ PI) + 2 * (Z @ Z)
         with pytest.raises(AssertionError):
             apply_pass(
                 operator=op,
@@ -241,7 +241,7 @@ class TestHilbertSpaceDimVerification:
 
     def test_simple_addition_fail_ladder(self):
         """Addition fail with ladder"""
-        op = 2 * (X @ Z @ A) + 3 * (Y @ I @ C) + 2 * (Z @ Z @ (C * C * I) @ A)
+        op = 2 * (X @ Z @ A) + 3 * (Y @ PI @ C) + 2 * (Z @ Z @ (C * C * PI) @ A)
         with pytest.raises(AssertionError):
             apply_pass(
                 operator=op,
@@ -254,99 +254,9 @@ class TestHilbertSpaceDimVerification:
         """Addition pass with ladder"""
         op = (
             2 * (X @ Z @ A)
-            + (Y @ I @ C)
-            + 2 * (Z @ Z @ (C * C * I))
-            + (Y @ I @ (C * A * A * C * LI))
-        )
-        apply_pass(
-            operator=op,
-            rule=self._rule,
-            walk_method=self._walk_method,
-            reverse=self._reverse,
-        )
-
-
-class TestComplexFinalStringVerbosePrintOp:
-    """Testing the final string produced with the actual for complex number expressions"""
-
-    def setup_method(self):
-        self._rule = PrintOperator(verbose=True)
-
-    def test_pauli_left_img_V(self):
-        """Testing Pauli with left img with verbose print"""
-        operator = 2j * PauliX()
-        actual = "(0.0 + (1j * 2.0)) * PauliX()"
-        assert apply_pass(operator=operator, rule=self._rule) == actual
-
-    def test_pauli_right_img_V(self):
-        """Testing Pauli with right img  with verbose print"""
-        operator = PauliX() * 2j
-        actual = "(0.0 + (1j * 2.0)) * PauliX()"
-        assert apply_pass(operator=operator, rule=self._rule) == actual
-
-    def test_pauli_nested_img_V(self):
-        """Testing Pauli with nested img with verbose print"""
-        operator = PauliX() * 2j * (PauliI() + 8j * PauliY())
-        actual = "((0.0 + (1j * 2.0)) * PauliX()) * (PauliI() + ((0.0 + (1j * 8.0)) * PauliY()))"
-        assert apply_pass(operator=operator, rule=self._rule) == actual
-
-
-class TestHilbertSpaceDimVerification:
-    def setup_method(self):
-        self._rule = VerifyHilberSpaceDim()
-        self._walk_method = In
-        self._reverse = True
-
-    def test_simple_addition_fail(self):
-        """Addition fail"""
-        op = 2 * (X @ Z @ Z) + 3 * (Y @ I) + 2 * (Z @ Z)
-        with pytest.raises(AssertionError):
-            apply_pass(
-                operator=op,
-                rule=self._rule,
-                walk_method=self._walk_method,
-                reverse=self._reverse,
-            )
-
-    def test_simple_addition_pass_single(self):
-        """Addition pass single"""
-        op = 2 * X + 3 * Y + Z + Y  # + 2 * (Z @ Z)
-        apply_pass(
-            operator=op,
-            rule=self._rule,
-            walk_method=self._walk_method,
-            reverse=self._reverse,
-        )
-
-    def test_simple_addition_fail_single_with_ladder(self):
-        """Addition fail single term with ladder"""
-        op = 2 * X + Y + A + Z + Y  # + 2 * (Z @ Z)
-        with pytest.raises(AssertionError):
-            apply_pass(
-                operator=op,
-                rule=self._rule,
-                walk_method=self._walk_method,
-                reverse=self._reverse,
-            )
-
-    def test_simple_addition_fail_ladder(self):
-        """Addition fail with ladder"""
-        op = 2 * (X @ Z @ A) + 3 * (Y @ I @ C) + 2 * (Z @ Z @ (C * C * I) @ A)
-        with pytest.raises(AssertionError):
-            apply_pass(
-                operator=op,
-                rule=self._rule,
-                walk_method=self._walk_method,
-                reverse=self._reverse,
-            )
-
-    def test_simple_addition_pass_ladder(self):
-        """Addition pass with ladder"""
-        op = (
-            2 * (X @ Z @ A)
-            + (Y @ I @ C)
-            + 2 * (Z @ Z @ (C * C * I))
-            + (Y @ I @ (C * A * A * C * LI))
+            + (Y @ PI @ C)
+            + 2 * (Z @ Z @ (C * C * PI))
+            + (Y @ PI @ (C * A * A * C * LI))
         )
         apply_pass(
             operator=op,

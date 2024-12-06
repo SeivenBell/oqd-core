@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from oqd_compiler_infrastructure import RewriteRule, Post, Pre, In
+from oqd_compiler_infrastructure import In
 from oqd_core.interface.analog import (
     Annihilation,
     Creation,
@@ -25,7 +25,7 @@ from oqd_core.interface.analog import (
 )
 from oqd_core.compiler.analog.analysis import TermIndex
 
-X, Y, Z, I, A, C, LI = (
+X, Y, Z, PI, A, C, LI = (
     PauliX(),
     PauliY(),
     PauliZ(),
@@ -44,7 +44,7 @@ def compute_term_index(operator: Operator):
 
 def test_simple_single_term_pauli():
     """Simple test single term pauli"""
-    op = X + Y + Z + I
+    op = X + Y + Z + PI
     expected = [[1], [2], [3], [0]]
     assert compute_term_index(operator=op) == expected
 
@@ -65,7 +65,7 @@ def test_kron_add():
 
 def test_kron_single():
     """Simple kron single term"""
-    op = X @ Y @ Z @ I
+    op = X @ Y @ Z @ PI
     expected = [[1, 2, 3, 0]]
     assert compute_term_index(operator=op) == expected
 
@@ -79,14 +79,14 @@ def test_kron_single_ladder():
 
 def test_kron_single_complicated():
     """Complicated kron single term"""
-    op = X @ Y @ X @ X @ (A * C * A) @ I @ C
+    op = X @ Y @ X @ X @ (A * C * A) @ PI @ C
     expected = [[1, 2, 1, 1, (3, 1), 0, (1, 1)]]
     assert compute_term_index(operator=op) == expected
 
 
 def test_kron_add_complicated():
     """Complicated kron add"""
-    op = X @ Y @ (C * LI * A * C) + X @ X + (A * C * A) @ I @ C + Y + Z
+    op = X @ Y @ (C * LI * A * C) + X @ X + (A * C * A) @ PI @ C + Y + Z
     expected = [[1, 2, (3, 2)], [1, 1], [(3, 1), 0, (1, 1)], [2], [3]]
     assert compute_term_index(operator=op) == expected
 
