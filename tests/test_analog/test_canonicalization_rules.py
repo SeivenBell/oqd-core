@@ -240,7 +240,9 @@ def scale_terms_rule():
 def test_scale_terms_simple(scale_terms_rule):
     """Simple test"""
     op = X @ (Y @ Z) + (Z @ (Y @ PI))
-    expected = MathStr(string="1") * (X @ (Y @ Z)) + MathStr(string="1") * (Z @ (Y @ PI))
+    expected = MathStr(string="1") * (X @ (Y @ Z)) + MathStr(string="1") * (
+        Z @ (Y @ PI)
+    )
     assert (
         canonicalize_operator(operator=op, rule=scale_terms_rule, walk_method=Pre)
         == expected
