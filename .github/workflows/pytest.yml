@@ -18,9 +18,9 @@ jobs:
       matrix:
         version:
           - "3.10"
-          # - "3.11"
-          # - "3.12"
-        os: ["ubuntu-latest", ] #"windows-latest", "macos-latest"]
+          - "3.11"
+          - "3.12"
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         arch:
           - x64
     name: Test ${{ matrix.version }} on ${{ matrix.os }} (${{ matrix.arch }})
@@ -31,12 +31,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.version }}
-          cache: "pip"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
-        # with:
-          # enable-cache: true
+        with:
+          enable-cache: true
 
       - name: Install the project
         run: uv pip install .[test] --system
