@@ -51,6 +51,8 @@ class MathExpr(TypeReflectBaseModel):
 
     @classmethod
     def cast(cls, value: Any):
+        if isinstance(value, dict):
+            return value
         if isinstance(value, MathExpr):
             return value
         if isinstance(value, (int, float)):
@@ -123,7 +125,6 @@ def is_varname(value: str) -> str:
 
 
 VarName = Annotated[str, AfterValidator(is_varname)]
-CastMathExpr = Annotated[MathExpr, BeforeValidator(MathExpr.cast)]
 Functions = Literal[
     "sin",
     "cos",
@@ -343,3 +344,5 @@ MathExprSubtypes = Union[
 """
 Alias for the union of concrete MathExpr subtypes
 """
+
+CastMathExpr = Annotated[MathExprSubtypes, BeforeValidator(MathExpr.cast)]
