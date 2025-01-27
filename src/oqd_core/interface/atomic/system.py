@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
+from typing import List, Optional, Literal
 from typing_extensions import Annotated
 from pydantic import (
     NonNegativeInt,
@@ -138,6 +138,7 @@ class Transition(TypeReflectBaseModel):
     level1: Level
     level2: Level
     einsteinA: float
+    multipole: Literal["E1", "E2", "M1"]
 
 
 class Ion(TypeReflectBaseModel):
