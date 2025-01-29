@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from pydantic import conlist
 
@@ -52,7 +52,7 @@ class Beam(TypeReflectBaseModel):
         target: Index of the target ion of the beam.
     """
 
-    transition: Union[str, Transition]
+    transition: Union[str, Tuple[str, int], Transition]
     rabi: CastMathExpr
     detuning: CastMathExpr
     phase: CastMathExpr

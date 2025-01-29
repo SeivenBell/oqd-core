@@ -16,14 +16,29 @@ from oqd_compiler_infrastructure import RewriteRule, Pre, Chain
 
 ########################################################################################
 
+from ...interface.atomic import Level, Transition
+
+########################################################################################
+
 
 class UnrollLevelLabel(RewriteRule):
     def map_Ion(self, model):
         self.ion_levels = {level.label: level for level in model.levels}
 
     def map_Transition(self, model):
-        level1 = self.ion_levels[model.level1]
-        level2 = self.ion_levels[model.level2]
+        if isinstance(model.level1, Level) and isinstance(model.level2, Level):
+            return
+
+        level1 = (
+            self.ion_levels[model.level1]
+            if isinstance(model.level1, str)
+            else model.level1
+        )
+        level2 = (
+            self.ion_levels[model.level2]
+            if isinstance(model.level2, str)
+            else model.level2
+        )
         return model.__class__(
             label=model.label,
             level1=level1,
@@ -41,7 +56,17 @@ class UnrollTransitionLabel(RewriteRule):
         ]
 
     def map_Beam(self, model):
-        transition = self.ions_transitions[model.target][model.transition]
+        if isinstance(model.transition, Transition):
+            return
+
+        if isinstance(model.transition, str):
+            transition_label = model.transition
+            reference_ion = model.target
+        else:
+            transition_label = model.transition[0]
+            reference_ion = model.transition[1]
+
+        transition = self.ions_transitions[reference_ion][transition_label]
         return model.__class__(
             transition=transition,
             rabi=model.rabi,
@@ -57,89 +82,3 @@ unroll_label_pass = Chain(
     Pre(UnrollLevelLabel()),
     Pre(UnrollTransitionLabel()),
 )
-
-########################################################################################
-
-if __name__ == "__main__":
-    import numpy as np
-
-    from oqd_compiler_infrastructure import PrettyPrint, Post
-
-    from oqd_core.interface.atomic import (
-        AtomicCircuit,
-        SequentialProtocol,
-        Pulse,
-        Beam,
-        System,
-        Ion,
-        Level,
-        Transition,
-    )
-
-    downstate = Level(
-        label="q0",
-        principal=6,
-        spin=1 / 2,
-        orbital=0,
-        nuclear=1 / 2,
-        spin_orbital=1 / 2,
-        spin_orbital_nuclear=0,
-        spin_orbital_nuclear_magnetization=0,
-        energy=2 * np.pi * 0,
-    )
-    estate = Level(
-        label="e0",
-        principal=5,
-        spin=1 / 2,
-        orbital=1,
-        nuclear=1 / 2,
-        spin_orbital=1 / 2,
-        spin_orbital_nuclear=1,
-        spin_orbital_nuclear_magnetization=-1,
-        energy=2 * np.pi * 100,
-    )
-
-    transitions = [
-        Transition(
-            label="q0->e0",
-            level1="q0",
-            level2="e0",
-            einsteinA=1,
-            multipole="E1",
-        ),
-    ]
-
-    ion = Ion(
-        mass=171,
-        charge=1,
-        position=[0, 0, 0],
-        levels=[downstate, estate],
-        transitions=transitions,
-    )
-
-    system = System(
-        ions=[
-            ion,
-        ],
-        modes=[],
-    )
-
-    beam = Beam(
-        transition="q0->e0",
-        rabi=2 * np.pi * 1,
-        detuning=0,
-        phase=0,
-        polarization=[1, 0, 0],
-        wavevector=[0, 1, 0],
-        target=0,
-    )
-
-    protocol = SequentialProtocol(
-        sequence=[
-            Pulse(beam=beam, duration=1),
-        ]
-    )
-
-    atomic_circuit = AtomicCircuit(system=system, protocol=protocol)
-
-    print(Post(PrettyPrint())(unroll_label_pass(atomic_circuit)))
