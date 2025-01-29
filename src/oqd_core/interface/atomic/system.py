@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Literal
-from typing_extensions import Annotated
+from typing import List, Literal, Union, Annotated
+
 from pydantic import NonNegativeInt, AfterValidator, NonNegativeFloat
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
@@ -135,8 +135,8 @@ class Transition(TypeReflectBaseModel):
     """
 
     label: str
-    level1: str
-    level2: str
+    level1: Union[str, Level]
+    level2: Union[str, Level]
     einsteinA: float
     multipole: Literal["E1", "E2", "M1"]
 

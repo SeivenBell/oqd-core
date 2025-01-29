@@ -52,7 +52,7 @@ class Beam(TypeReflectBaseModel):
         target: Index of the target ion of the beam.
     """
 
-    transition: str
+    transition: Union[str, Transition]
     rabi: CastMathExpr
     detuning: CastMathExpr
     phase: CastMathExpr
