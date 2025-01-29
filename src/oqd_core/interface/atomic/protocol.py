@@ -43,7 +43,7 @@ class Beam(TypeReflectBaseModel):
     Class representing a referenced optical channel/beam for the trapped-ion device.
 
     Attributes:
-        transition: Transition that the optical channel/beam is referenced to.
+        transition: Label for the Transition that the optical channel/beam is referenced to.
         rabi: Rabi frequency of the referenced transition driven by the beam.
         detuning: Detuning away from the referenced transition.
         phase: Phase relative to the ion's clock.
@@ -52,7 +52,7 @@ class Beam(TypeReflectBaseModel):
         target: Index of the target ion of the beam.
     """
 
-    transition: Transition
+    transition: str
     rabi: CastMathExpr
     detuning: CastMathExpr
     phase: CastMathExpr
