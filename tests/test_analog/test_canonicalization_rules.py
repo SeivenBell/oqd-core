@@ -13,17 +13,8 @@
 # limitations under the License.
 
 import pytest
-from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre, FixedPoint
-from oqd_core.interface.analog import (
-    Annihilation,
-    Creation,
-    Identity,
-    Operator,
-    PauliI,
-    PauliX,
-    PauliY,
-    PauliZ,
-)
+from oqd_compiler_infrastructure import FixedPoint, Post, Pre, RewriteRule, WalkBase
+
 from oqd_core.compiler.analog.rewrite.canonicalize import (
     GatherMathExpr,
     GatherPauli,
@@ -34,6 +25,16 @@ from oqd_core.compiler.analog.rewrite.canonicalize import (
     PruneIdentity,
     ScaleTerms,
     SortedOrder,
+)
+from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Operator,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
 )
 from oqd_core.interface.math import MathStr
 

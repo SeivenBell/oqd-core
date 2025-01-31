@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import passes, rewrite, verify, utils
+from . import passes, rewrite, utils, verify
 
 __all__ = ["passes", "rewrite", "verify", "utils"]

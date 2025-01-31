@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from typing import List
-from pydantic import conint, field_validator, ValidationInfo
 
 from oqd_compiler_infrastructure import VisitableBaseModel
+from pydantic import ValidationInfo, conint, field_validator
 
 ########################################################################################
 

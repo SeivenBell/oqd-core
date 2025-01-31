@@ -17,7 +17,6 @@ from typing import Union
 from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
-
 from oqd_core.interface.analog import (
     Ladder,
     OperatorAdd,

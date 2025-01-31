@@ -12,30 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from oqd_core.interface.analog.operator import OperatorSubtypes
-
-from oqd_core.interface.analog.operator import (
-    Operator,
-    OperatorTerminal,
-    Pauli,
-    PauliI,
-    PauliX,
-    PauliY,
-    PauliZ,
-    PauliPlus,
-    PauliMinus,
-    Ladder,
-    Creation,
-    Annihilation,
-    Identity,
-    OperatorBinaryOp,
-    OperatorAdd,
-    OperatorSub,
-    OperatorMul,
-    OperatorScalarMul,
-    OperatorKron,
-)
-
 from oqd_core.interface.analog.operation import (
     AnalogCircuit,
     AnalogGate,
@@ -43,7 +19,28 @@ from oqd_core.interface.analog.operation import (
     Evolve,
     Measure,
 )
-
+from oqd_core.interface.analog.operator import (
+    Annihilation,
+    Creation,
+    Identity,
+    Ladder,
+    Operator,
+    OperatorAdd,
+    OperatorBinaryOp,
+    OperatorKron,
+    OperatorMul,
+    OperatorScalarMul,
+    OperatorSub,
+    OperatorSubtypes,
+    OperatorTerminal,
+    Pauli,
+    PauliI,
+    PauliMinus,
+    PauliPlus,
+    PauliX,
+    PauliY,
+    PauliZ,
+)
 
 __all__ = [
     "OperatorSubtypes",

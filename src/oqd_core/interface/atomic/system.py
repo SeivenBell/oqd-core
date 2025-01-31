@@ -13,14 +13,14 @@
 # limitations under the License.
 
 from typing import List, Optional
-from typing_extensions import Annotated
-from pydantic import (
-    NonNegativeInt,
-    AfterValidator,
-    NonNegativeFloat,
-)
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
+from pydantic import (
+    AfterValidator,
+    NonNegativeFloat,
+    NonNegativeInt,
+)
+from typing_extensions import Annotated
 
 ########################################################################################
 

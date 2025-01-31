@@ -13,21 +13,21 @@
 # limitations under the License.
 
 from .canonicalize import (
-    CanVerPauliAlgebra,
     CanVerGatherMathExpr,
-    CanVerOperatorDistribute,
-    CanVerProperOrder,
-    CanVerPruneIdentity,
     CanVerGatherPauli,
     CanVerNormalOrder,
-    CanVerSortedOrder,
+    CanVerOperatorDistribute,
+    CanVerPauliAlgebra,
+    CanVerProperOrder,
+    CanVerPruneIdentity,
     CanVerScaleTerm,
-)
-from .task import (
-    VerifyAnalogCircuitDim,
-    VerifyAnalogArgsDim,
+    CanVerSortedOrder,
 )
 from .operator import VerifyHilberSpaceDim
+from .task import (
+    VerifyAnalogArgsDim,
+    VerifyAnalogCircuitDim,
+)
 
 __all__ = [
     "CanVerPauliAlgebra",

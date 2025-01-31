@@ -12,16 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Union, Annotated
-
-from pydantic import BeforeValidator
+from typing import Annotated, Union
 
 import numpy as np
-
 from oqd_compiler_infrastructure import TypeReflectBaseModel
+from pydantic import BeforeValidator
 
 ########################################################################################
-
 from oqd_core.interface.math import CastMathExpr
 
 ########################################################################################

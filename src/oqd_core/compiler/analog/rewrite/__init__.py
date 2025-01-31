@@ -14,13 +14,13 @@
 
 from .assign import AssignAnalogIRDim
 from .canonicalize import (
-    OperatorDistribute,
     GatherMathExpr,
     GatherPauli,
-    PruneIdentity,
-    PauliAlgebra,
     NormalOrder,
+    OperatorDistribute,
+    PauliAlgebra,
     ProperOrder,
+    PruneIdentity,
     ScaleTerms,
     SortedOrder,
 )

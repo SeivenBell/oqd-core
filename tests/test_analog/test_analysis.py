@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from oqd_compiler_infrastructure import In
+
+from oqd_core.compiler.analog.analysis import TermIndex
 from oqd_core.interface.analog import (
     Annihilation,
     Creation,
@@ -23,7 +25,6 @@ from oqd_core.interface.analog import (
     PauliY,
     PauliZ,
 )
-from oqd_core.compiler.analog.analysis import TermIndex
 
 X, Y, Z, PI, A, C, LI = (
     PauliX(),

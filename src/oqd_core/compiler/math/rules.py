@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Union
-
 import math
+from typing import Union
 
 from oqd_compiler_infrastructure import ConversionRule, RewriteRule
 
 ########################################################################################
-
 from oqd_core.interface.math import (
     MathAdd,
     MathBinaryOp,

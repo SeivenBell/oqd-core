@@ -15,8 +15,6 @@
 from oqd_compiler_infrastructure import Post
 
 ########################################################################################
-
-
 from oqd_core.compiler.analog.rewrite.assign import AssignAnalogIRDim
 from oqd_core.compiler.analog.verify.task import (
     VerifyAnalogArgsDim,

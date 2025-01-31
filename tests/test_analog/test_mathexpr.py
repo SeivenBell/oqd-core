@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from typing import Union
 
-from oqd_compiler_infrastructure import Post, WalkBase, ConversionRule, RewriteRule
+import pytest
+from oqd_compiler_infrastructure import ConversionRule, Post, RewriteRule, WalkBase
 
 ########################################################################################
-
 from oqd_core.compiler.math.rules import EvaluateMathExpr
 from oqd_core.interface.math import MathStr
 

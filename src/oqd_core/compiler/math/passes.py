@@ -15,11 +15,10 @@
 from oqd_compiler_infrastructure import Post
 
 ########################################################################################
-
 from oqd_core.compiler.math.rules import (
     EvaluateMathExpr,
-    SimplifyMathExpr,
     PrintMathExpr,
+    SimplifyMathExpr,
 )
 
 ########################################################################################

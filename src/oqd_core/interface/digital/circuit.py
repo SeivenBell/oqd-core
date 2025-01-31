@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic import field_validator, model_validator
 from typing import List, Union
 
 from oqd_compiler_infrastructure import VisitableBaseModel
+from pydantic import field_validator, model_validator
 
 ########################################################################################
-
 from .gate import Gate
-from .register import QuantumRegister, ClassicalRegister
+from .register import ClassicalRegister, QuantumRegister
 from .statement import Statement
 
 ########################################################################################

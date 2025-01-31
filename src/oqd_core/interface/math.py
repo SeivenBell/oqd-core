@@ -15,11 +15,11 @@
 from __future__ import annotations
 
 import ast
-import numpy as np
-from typing import Union, Literal, Annotated, Any
-from pydantic import AfterValidator, BeforeValidator
+from typing import Annotated, Any, Literal, Union
 
-from oqd_compiler_infrastructure import TypeReflectBaseModel, ConversionRule
+import numpy as np
+from oqd_compiler_infrastructure import ConversionRule, TypeReflectBaseModel
+from pydantic import AfterValidator, BeforeValidator
 
 ########################################################################################
 

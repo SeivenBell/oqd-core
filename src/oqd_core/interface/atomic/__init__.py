@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .system import System, Ion, Phonon, Level, Transition
-from .protocol import Beam, Pulse, Protocol, ParallelProtocol, SequentialProtocol
 from .circuit import AtomicCircuit
+from .protocol import Beam, ParallelProtocol, Protocol, Pulse, SequentialProtocol
+from .system import Ion, Level, Phonon, System, Transition
 
 __all__ = [
     "System",

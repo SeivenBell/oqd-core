@@ -15,8 +15,9 @@
 
 from oqd_compiler_infrastructure import ConversionRule, Post
 
-########################################################################################
+from oqd_core.compiler.math.rules import PrintMathExpr
 
+########################################################################################
 from oqd_core.interface.analog import (
     OperatorAdd,
     OperatorBinaryOp,
@@ -27,7 +28,6 @@ from oqd_core.interface.analog import (
     OperatorTerminal,
 )
 from oqd_core.interface.math import MathExpr
-from oqd_core.compiler.math.rules import PrintMathExpr
 
 ########################################################################################
 

@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
-
 from .register import (
-    QuantumRegister,
+    ClassicalBit,
     ClassicalRegister,
     QuantumBit,
-    ClassicalBit,
+    QuantumRegister,
 )
 
 ########################################################################################

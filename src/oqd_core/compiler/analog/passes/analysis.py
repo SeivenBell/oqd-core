@@ -15,7 +15,6 @@
 from oqd_compiler_infrastructure import In
 
 ########################################################################################
-
 from oqd_core.compiler.analog.analysis import TermIndex
 
 ########################################################################################

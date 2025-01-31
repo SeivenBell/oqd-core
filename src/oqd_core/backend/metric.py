@@ -14,12 +14,10 @@
 
 from typing import List, Union
 
+from oqd_compiler_infrastructure import VisitableBaseModel
 from pydantic.types import NonNegativeInt
 
-from oqd_compiler_infrastructure import VisitableBaseModel
-
 ########################################################################################
-
 from oqd_core.interface.analog.operator import OperatorSubtypes
 
 ########################################################################################

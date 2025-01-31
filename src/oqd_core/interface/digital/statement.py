@@ -17,8 +17,7 @@ from typing import Literal, Union
 from oqd_compiler_infrastructure import VisitableBaseModel
 
 ########################################################################################
-
-from .register import QuantumRegister, ClassicalRegister
+from .register import ClassicalRegister, QuantumRegister
 
 ########################################################################################
 

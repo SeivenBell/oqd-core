@@ -14,12 +14,10 @@
 
 from typing import List, Union
 
+from oqd_compiler_infrastructure import TypeReflectBaseModel
 from pydantic import conlist
 
-from oqd_compiler_infrastructure import TypeReflectBaseModel
-
 ########################################################################################
-
 from oqd_core.interface.atomic.system import Transition
 from oqd_core.interface.math import CastMathExpr
 

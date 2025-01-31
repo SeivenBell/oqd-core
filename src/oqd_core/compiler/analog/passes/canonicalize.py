@@ -12,22 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from oqd_compiler_infrastructure import Chain, FixedPoint, Post, Pre, In
+from oqd_compiler_infrastructure import Chain, FixedPoint, In, Post, Pre
 
 ########################################################################################
 from oqd_core.compiler.analog.rewrite.canonicalize import (
-    OperatorDistribute,
     GatherMathExpr,
-    PauliAlgebra,
+    GatherPauli,
     NormalOrder,
+    OperatorDistribute,
+    PauliAlgebra,
     ProperOrder,
+    PruneIdentity,
     ScaleTerms,
     SortedOrder,
-    PruneIdentity,
-    GatherPauli,
 )
 from oqd_core.compiler.analog.verify import (
-    VerifyHilberSpaceDim,
     CanVerGatherMathExpr,
     CanVerGatherPauli,
     CanVerNormalOrder,
@@ -37,11 +36,12 @@ from oqd_core.compiler.analog.verify import (
     CanVerPruneIdentity,
     CanVerScaleTerm,
     CanVerSortedOrder,
+    VerifyHilberSpaceDim,
 )
 from oqd_core.compiler.math.rules import (
     DistributeMathExpr,
-    ProperOrderMathExpr,
     PartitionMathExpr,
+    ProperOrderMathExpr,
 )
 
 ########################################################################################

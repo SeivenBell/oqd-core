@@ -16,8 +16,10 @@ from typing import Union
 
 from oqd_compiler_infrastructure import RewriteRule
 
-########################################################################################
+from oqd_core.compiler.analog.error import CanonicalFormError
+from oqd_core.compiler.analog.passes.analysis import analysis_term_index
 
+########################################################################################
 from oqd_core.interface.analog import (
     Annihilation,
     Creation,
@@ -31,8 +33,6 @@ from oqd_core.interface.analog import (
     OperatorTerminal,
     Pauli,
 )
-from oqd_core.compiler.analog.error import CanonicalFormError
-from oqd_core.compiler.analog.passes.analysis import analysis_term_index
 
 ########################################################################################
 

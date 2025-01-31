@@ -17,26 +17,25 @@ from typing import Union
 from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
-
 from oqd_core.compiler.analog.passes.analysis import analysis_term_index
-from oqd_core.interface.math import MathNum, MathImag, MathAdd
 from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Ladder,
     Operator,
     OperatorAdd,
+    OperatorKron,
     OperatorMul,
     OperatorScalarMul,
     OperatorSub,
-    OperatorKron,
-    Ladder,
-    Identity,
-    Annihilation,
-    Creation,
     Pauli,
     PauliI,
     PauliX,
     PauliY,
     PauliZ,
 )
+from oqd_core.interface.math import MathAdd, MathImag, MathNum
 
 ########################################################################################
 
