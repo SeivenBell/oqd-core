@@ -51,9 +51,9 @@ class VerifyAnalogCircuitDim(RewriteRule):
         self._dim: tuple = (n_qreg, n_qmode)
 
     def map_AnalogGate(self, model: AnalogGate):
-        assert self._dim == analysis_canonical_hamiltonian_dim(
-            model.hamiltonian
-        ), "Inconsistent Hilbert space dimension between Analog Gates"
+        assert self._dim == analysis_canonical_hamiltonian_dim(model.hamiltonian), (
+            "Inconsistent Hilbert space dimension between Analog Gates"
+        )
 
 
 class VerifyAnalogArgsDim(RewriteRule):
@@ -77,6 +77,6 @@ class VerifyAnalogArgsDim(RewriteRule):
         self._dim: tuple = (n_qreg, n_qmode)
 
     def map_Expectation(self, model: Expectation):
-        assert self._dim == analysis_canonical_hamiltonian_dim(
-            model.operator
-        ), "Inconsistent Hilbert space dimension in Expectation metric"
+        assert self._dim == analysis_canonical_hamiltonian_dim(model.operator), (
+            "Inconsistent Hilbert space dimension in Expectation metric"
+        )
