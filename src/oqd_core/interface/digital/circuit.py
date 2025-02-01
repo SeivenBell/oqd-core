@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pydantic import field_validator, model_validator, ConfigDict
 from typing import List, Union
 
 from oqd_compiler_infrastructure import VisitableBaseModel
@@ -32,14 +33,13 @@ __all__ = [
 
 
 class DigitalCircuit(VisitableBaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     qreg: List[QuantumRegister] = []
     creg: List[ClassicalRegister] = []
 
     declarations: List = []
     sequence: List[Union[Gate, Statement]] = []
-
-    class Config:
-        extra = "forbid"
 
     @field_validator("creg", mode="before")
     @classmethod

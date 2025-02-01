@@ -19,6 +19,7 @@ from oqd_core.interface.atomic.protocol import Protocol
 
 ########################################################################################
 from oqd_core.interface.atomic.system import System
+from oqd_core.interface.atomic.protocol import ProtocolSubTypes
 
 ########################################################################################
 
@@ -40,4 +41,4 @@ class AtomicCircuit(TypeReflectBaseModel):
     """
 
     system: System
-    protocol: Protocol
+    protocol: ProtocolSubTypes

@@ -8,8 +8,16 @@ name = "oqd-core"
 version = "0.1.0"
 requires-python = ">=3.10"
 readme = "README.md"
-license = {text = "Apache 2.0"}
-keywords = ["quantum", "computing", "analog", "digital", "compiler", "transpilation", "atomic",]
+license = { text = "Apache 2.0" }
+keywords = [
+  "quantum",
+  "computing",
+  "analog",
+  "digital",
+  "compiler",
+  "transpilation",
+  "atomic",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
 
@@ -33,11 +41,11 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = [
-    "pymdown-extensions",
-    "mkdocstrings",
-    "mkdocs-material",
-    "mkdocstrings-python",
-    "mdx_truly_sane_lists",
+  "pymdown-extensions",
+  "mkdocstrings",
+  "mkdocs-material",
+  "mkdocstrings-python",
+  "mdx_truly_sane_lists",
 ]
 test = ["pytest"]
 
