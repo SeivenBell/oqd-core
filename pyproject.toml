@@ -48,16 +48,12 @@ docs = [
   "mkdocstrings-python",
   "mdx_truly_sane_lists",
 ]
-test = ["pytest"]
+tests = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["oqd_core*"]
 
-[dependency-groups]
-dev = [
-    "pytest>=8.3.4",
-]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I"]
