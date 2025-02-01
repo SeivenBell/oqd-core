@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 from typing import List, Union
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
@@ -87,7 +89,7 @@ class ParallelProtocol(Protocol):
         sequence: List of pulses or subprotocols to compose together in a parallel fashion.
     """
 
-    sequence: List[Union[Pulse, Protocol]]
+    sequence: List[Union[Pulse, ProtocolSubTypes]]
 
 
 class SequentialProtocol(Protocol):
@@ -98,4 +100,7 @@ class SequentialProtocol(Protocol):
         sequence: List of pulses or subprotocols to compose together in a sequntial fashion.
     """
 
-    sequence: List[Union[Pulse, Protocol]]
+    sequence: List[Union[Pulse, ProtocolSubTypes]]
+
+
+ProtocolSubTypes = Union[SequentialProtocol, ParallelProtocol]
