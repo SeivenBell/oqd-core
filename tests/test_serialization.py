@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 import pytest
 
-import numpy as np
-
-########################################################################################
-from oqd_core.interface.math import MathStr
-
 from oqd_core.interface.analog import (
+    AnalogCircuit,
+    AnalogGate,
     Annihilation,
     Creation,
     Identity,
@@ -27,23 +25,22 @@ from oqd_core.interface.analog import (
     PauliX,
     PauliY,
     PauliZ,
-    AnalogCircuit,
-    AnalogGate,
 )
-
 from oqd_core.interface.atomic import (
     AtomicCircuit,
-    ParallelProtocol,
-    SequentialProtocol,
-    Pulse,
     Beam,
-    System,
     Ion,
     Level,
-    Transition,
+    ParallelProtocol,
     Phonon,
+    Pulse,
+    SequentialProtocol,
+    System,
+    Transition,
 )
 
+########################################################################################
+from oqd_core.interface.math import MathStr
 
 ########################################################################################
 

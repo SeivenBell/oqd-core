@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic import field_validator, model_validator, ConfigDict
 from typing import List, Union
 
 from oqd_compiler_infrastructure import VisitableBaseModel
-from pydantic import field_validator, model_validator
+from pydantic import ConfigDict, field_validator, model_validator
 
 ########################################################################################
 from .gate import Gate
