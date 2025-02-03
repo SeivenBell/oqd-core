@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .analysis import analysis_canonical_hamiltonian_dim, analysis_term_index
 from .assign import assign_analog_circuit_dim, verify_analog_args_dim
 from .canonicalize import analog_operator_canonicalization
-from .analysis import analysis_canonical_hamiltonian_dim, analysis_term_index
 
 __all__ = [
     "assign_analog_circuit_dim",

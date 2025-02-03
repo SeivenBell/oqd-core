@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +13,14 @@
 # limitations under the License.
 
 from typing import List, Optional
-from typing_extensions import Annotated
-from pydantic import (
-    NonNegativeInt,
-    AfterValidator,
-    NonNegativeFloat,
-)
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
+from pydantic import (
+    AfterValidator,
+    NonNegativeFloat,
+    NonNegativeInt,
+)
+from typing_extensions import Annotated
 
 ########################################################################################
 

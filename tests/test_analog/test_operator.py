@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,14 @@
 # limitations under the License.
 
 from typing import Union
-import pytest
 
-from oqd_compiler_infrastructure import Post, WalkBase, In, ConversionRule, RewriteRule
+import pytest
+from oqd_compiler_infrastructure import ConversionRule, In, Post, RewriteRule, WalkBase
+
+from oqd_core.compiler.analog.utils import PrintOperator
+from oqd_core.compiler.analog.verify.operator import VerifyHilberSpaceDim
 
 ########################################################################################
-
 from oqd_core.interface.analog import (
     Annihilation,
     Creation,
@@ -30,8 +32,6 @@ from oqd_core.interface.analog import (
     PauliZ,
 )
 from oqd_core.interface.math import MathStr
-from oqd_core.compiler.analog.utils import PrintOperator
-from oqd_core.compiler.analog.verify.operator import VerifyHilberSpaceDim
 
 ########################################################################################
 

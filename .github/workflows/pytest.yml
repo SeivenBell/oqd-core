@@ -20,6 +20,8 @@ jobs:
           - "3.10"
           - "3.11"
           - "3.12"
+          - "3.13"
+
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         arch:
           - x64
@@ -38,7 +40,7 @@ jobs:
           # enable-cache: true
 
       - name: Install the project
-        run: uv pip install .[test] --system
+        run: uv pip install .[tests] --system
 
       - name: Run tests
         run: uv run pytest tests

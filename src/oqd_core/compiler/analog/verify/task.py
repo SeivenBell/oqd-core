@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
 
 from oqd_compiler_infrastructure import RewriteRule
 
-########################################################################################
-
-from oqd_core.interface.analog import AnalogGate
-from oqd_core.compiler.analog.passes.analysis import analysis_canonical_hamiltonian_dim
 from oqd_core.backend.metric import Expectation
+from oqd_core.compiler.analog.passes.analysis import analysis_canonical_hamiltonian_dim
+
+########################################################################################
+from oqd_core.interface.analog import AnalogGate
 
 ########################################################################################
 
@@ -51,9 +51,9 @@ class VerifyAnalogCircuitDim(RewriteRule):
         self._dim: tuple = (n_qreg, n_qmode)
 
     def map_AnalogGate(self, model: AnalogGate):
-        assert self._dim == analysis_canonical_hamiltonian_dim(
-            model.hamiltonian
-        ), "Inconsistent Hilbert space dimension between Analog Gates"
+        assert self._dim == analysis_canonical_hamiltonian_dim(model.hamiltonian), (
+            "Inconsistent Hilbert space dimension between Analog Gates"
+        )
 
 
 class VerifyAnalogArgsDim(RewriteRule):
@@ -77,6 +77,6 @@ class VerifyAnalogArgsDim(RewriteRule):
         self._dim: tuple = (n_qreg, n_qmode)
 
     def map_Expectation(self, model: Expectation):
-        assert self._dim == analysis_canonical_hamiltonian_dim(
-            model.operator
-        ), "Inconsistent Hilbert space dimension in Expectation metric"
+        assert self._dim == analysis_canonical_hamiltonian_dim(model.operator), (
+            "Inconsistent Hilbert space dimension in Expectation metric"
+        )

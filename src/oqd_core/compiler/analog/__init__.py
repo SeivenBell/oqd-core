@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import passes, rewrite, verify, utils
+from . import passes, rewrite, utils, verify
 
 __all__ = ["passes", "rewrite", "verify", "utils"]
