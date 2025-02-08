@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,12 @@
 # limitations under the License.
 
 from typing import List, Literal, Union
-from pydantic.types import NonNegativeInt
 
 # %%
-from oqd_compiler_infrastructure import VisitableBaseModel, TypeReflectBaseModel
+from oqd_compiler_infrastructure import TypeReflectBaseModel, VisitableBaseModel
+from pydantic.types import NonNegativeInt
 
 from oqd_core.interface.analog.operator import OperatorSubtypes
-
 
 __all__ = [
     "AnalogCircuit",

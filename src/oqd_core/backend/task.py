@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,21 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic import BaseModel, BeforeValidator
 from dataclasses import dataclass, field
-from typing import List, Union, Literal, Dict, Annotated
+from typing import Annotated, Dict, List, Literal, Union
 
 import numpy as np
+from oqd_compiler_infrastructure import TypeReflectBaseModel
+from pydantic import BaseModel, BeforeValidator
 
-
-########################################################################################
-
-from oqd_core.interface.analog.operation import AnalogCircuit
-from oqd_core.interface.digital.circuit import DigitalCircuit
-from oqd_core.interface.atomic.circuit import AtomicCircuit
 from oqd_core.backend.metric import Metric
 
-from oqd_compiler_infrastructure import TypeReflectBaseModel
+########################################################################################
+from oqd_core.interface.analog.operation import AnalogCircuit
+from oqd_core.interface.atomic.circuit import AtomicCircuit
+from oqd_core.interface.digital.circuit import DigitalCircuit
 
 ########################################################################################
 

@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,21 +13,21 @@
 # limitations under the License.
 
 from .canonicalize import (
-    CanVerPauliAlgebra,
     CanVerGatherMathExpr,
-    CanVerOperatorDistribute,
-    CanVerProperOrder,
-    CanVerPruneIdentity,
     CanVerGatherPauli,
     CanVerNormalOrder,
-    CanVerSortedOrder,
+    CanVerOperatorDistribute,
+    CanVerPauliAlgebra,
+    CanVerProperOrder,
+    CanVerPruneIdentity,
     CanVerScaleTerm,
-)
-from .task import (
-    VerifyAnalogCircuitDim,
-    VerifyAnalogArgsDim,
+    CanVerSortedOrder,
 )
 from .operator import VerifyHilberSpaceDim
+from .task import (
+    VerifyAnalogArgsDim,
+    VerifyAnalogCircuitDim,
+)
 
 __all__ = [
     "CanVerPauliAlgebra",

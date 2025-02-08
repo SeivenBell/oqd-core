@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,21 +15,9 @@
 
 # %%
 import pytest
+from oqd_compiler_infrastructure import Post, Pre, RewriteRule, WalkBase
 
-from oqd_compiler_infrastructure import RewriteRule, WalkBase, Post, Pre
-
-########################################################################################
-
-from oqd_core.interface.analog import (
-    Annihilation,
-    Creation,
-    Identity,
-    Operator,
-    PauliI,
-    PauliX,
-    PauliY,
-    PauliZ,
-)
+from oqd_core.compiler.analog.error import CanonicalFormError
 from oqd_core.compiler.analog.verify.canonicalize import (
     CanVerGatherMathExpr,
     CanVerGatherPauli,
@@ -41,7 +29,18 @@ from oqd_core.compiler.analog.verify.canonicalize import (
     CanVerScaleTerm,
     CanVerSortedOrder,
 )
-from oqd_core.compiler.analog.error import CanonicalFormError
+
+########################################################################################
+from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Operator,
+    PauliI,
+    PauliX,
+    PauliY,
+    PauliZ,
+)
 
 ########################################################################################
 

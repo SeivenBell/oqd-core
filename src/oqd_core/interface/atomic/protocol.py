@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@ from __future__ import annotations
 
 from typing import List, Union, Tuple
 
+from oqd_compiler_infrastructure import TypeReflectBaseModel
 from pydantic import conlist
 
-from oqd_compiler_infrastructure import TypeReflectBaseModel
-
 ########################################################################################
-
 from oqd_core.interface.atomic.system import Transition
 from oqd_core.interface.math import CastMathExpr
 

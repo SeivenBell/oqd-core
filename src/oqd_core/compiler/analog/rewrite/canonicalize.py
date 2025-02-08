@@ -1,4 +1,4 @@
-# Copyright 2024 Open Quantum Design
+# Copyright 2024-2025 Open Quantum Design
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,26 +17,25 @@ from typing import Union
 from oqd_compiler_infrastructure import RewriteRule
 
 ########################################################################################
-
 from oqd_core.compiler.analog.passes.analysis import analysis_term_index
-from oqd_core.interface.math import MathNum, MathImag, MathAdd
 from oqd_core.interface.analog import (
+    Annihilation,
+    Creation,
+    Identity,
+    Ladder,
     Operator,
     OperatorAdd,
+    OperatorKron,
     OperatorMul,
     OperatorScalarMul,
     OperatorSub,
-    OperatorKron,
-    Ladder,
-    Identity,
-    Annihilation,
-    Creation,
     Pauli,
     PauliI,
     PauliX,
     PauliY,
     PauliZ,
 )
+from oqd_core.interface.math import MathAdd, MathImag, MathNum
 
 ########################################################################################
 
