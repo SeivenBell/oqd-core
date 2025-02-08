@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Literal, Union, Annotated
-
-from pydantic import NonNegativeInt, AfterValidator, NonNegativeFloat
+from typing import Annotated, List, Literal, Union
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 from pydantic import (
@@ -22,7 +20,6 @@ from pydantic import (
     NonNegativeFloat,
     NonNegativeInt,
 )
-from typing_extensions import Annotated
 
 ########################################################################################
 
