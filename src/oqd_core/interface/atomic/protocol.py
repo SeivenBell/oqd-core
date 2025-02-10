@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import List, Union, Tuple
+from typing import List, Tuple, Union
 
 from oqd_compiler_infrastructure import TypeReflectBaseModel
 from pydantic import conlist

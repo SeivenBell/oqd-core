@@ -14,20 +14,19 @@
 
 import numpy as np
 
-########################################################################################
+from oqd_core.compiler.atomic.canonicalize import unroll_label_pass
 
+########################################################################################
 from oqd_core.interface.atomic import (
     AtomicCircuit,
-    SequentialProtocol,
-    Pulse,
     Beam,
-    System,
     Ion,
     Level,
+    Pulse,
+    SequentialProtocol,
+    System,
     Transition,
 )
-
-from oqd_core.compiler.atomic.canonicalize import unroll_label_pass
 
 ########################################################################################
 

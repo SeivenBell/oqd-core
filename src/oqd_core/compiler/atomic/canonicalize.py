@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from oqd_compiler_infrastructure import RewriteRule, Pre, Chain
+from oqd_compiler_infrastructure import Chain, Pre, RewriteRule
 
 ########################################################################################
-
-from ...interface.atomic import Level, Transition
+from oqd_core.interface.atomic import Level, Transition
 
 ########################################################################################
 
