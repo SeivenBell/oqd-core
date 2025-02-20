@@ -31,7 +31,7 @@ pip install .
 ```
 
 ## Getting Started <a name="Getting Started"></a>
-Please see the [documentation](https:docs.openquantumdesign.org) for tutorials, examples, and API reference.
+Please see the [documentation](https://docs.openquantumdesign.org) for tutorials, examples, and API reference.
 Below is a simple example of an analog quantum program, in which a single qubit evolves under 
 a $\sigma_X$ Hamiltonian for 10 units of time and is then measured.
 ```python
