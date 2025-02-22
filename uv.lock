@@ -482,6 +482,9 @@ requires-dist = [
     { name = "qutip", specifier = ">=5.1.1" },
 ]
 
+[package.metadata.requires-dev]
+dev = []
+
 [[package]]
 name = "packaging"
 version = "24.2"
