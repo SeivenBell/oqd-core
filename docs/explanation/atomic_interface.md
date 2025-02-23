@@ -30,6 +30,7 @@ Definiition of an [`Ion`][oqd_core.interface.atomic.system.Ion] for $^{171}\math
 ```python
 
 downstate = Level(
+    label="q0",
     principal=6,
     spin=1/2,
     orbital=0,
@@ -40,6 +41,7 @@ downstate = Level(
     energy=0,
 )
 upstate = Level(
+    label="q1",
     principal=6,
     spin=1/2,
     orbital=0,
@@ -50,6 +52,7 @@ upstate = Level(
     energy=2*pi*12.643e9,
 )
 estate = Level(
+    label="e0",
     principal=5,
     spin=1/2,
     orbital=1,
@@ -71,18 +74,21 @@ Yb171 = Ion(
     ],
     transitions=[
         Transition(
+            label="q0->q1",
             level1=downstate,
             level2=upstate,
             einsteinA=...,
         ),
         Transition(
+            label="q0->e0",
             level1=downstate,
             level2=estate,
             einsteinA=...,
         ),
         Transition(
-            level1=estate,
-            level2=upstate,
+            label="q1->e0",
+            level1=upstate,
+            level2=estate,
             einsteinA=...,
         ),
     ],
