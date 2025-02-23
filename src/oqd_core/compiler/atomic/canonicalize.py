@@ -21,6 +21,10 @@ from oqd_core.interface.atomic import Level, Transition
 
 
 class UnrollLevelLabel(RewriteRule):
+    """
+    Unrolls the [`Level`][oqd_core.interface.atomic.system.Level] labels present in [`Transitions`][oqd_core.interface.atomic.system.Transition].
+    """
+
     def map_Ion(self, model):
         self.ion_levels = {level.label: level for level in model.levels}
 
@@ -48,6 +52,10 @@ class UnrollLevelLabel(RewriteRule):
 
 
 class UnrollTransitionLabel(RewriteRule):
+    """
+    Unrolls the [`Transition`][oqd_core.interface.atomic.system.Transition] labels present in [`Beams`][oqd_core.interface.atomic.protocol.Beam].
+    """
+
     def map_System(self, model):
         self.ions_transitions = [
             {transition.label: transition for transition in ion.transitions}

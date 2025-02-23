@@ -41,7 +41,7 @@ class Beam(TypeReflectBaseModel):
     Class representing a referenced optical channel/beam for the trapped-ion device.
 
     Attributes:
-        transition: Label for the Transition that the optical channel/beam is referenced to.
+        transition: [`Transition`][oqd_core.interface.atomic.system.Transition], or it's label, that the optical channel/beam is referenced to.
         rabi: Rabi frequency of the referenced transition driven by the beam.
         detuning: Detuning away from the referenced transition.
         phase: Phase relative to the ion's clock.

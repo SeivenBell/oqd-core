@@ -41,6 +41,8 @@ nav:
           - Math: reference/math_compiler.md
           - Analog:
               - Canonicalization: reference/analog_canonicalization.md
+          - Atomic:
+              - Canonicalization: reference/atomic_canonicalization.md
 
 theme:
   name: material
