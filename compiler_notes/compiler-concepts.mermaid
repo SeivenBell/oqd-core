@@ -1,0 +1,33 @@
+flowchart TD
+    subgraph AST["Abstract Syntax Tree"]
+        Node1["Binary Op"] --> Node2["Literal(1)"]
+        Node1 --> Node3["Literal(2)"]
+    end
+
+    subgraph Visitor["Visitor Pattern"]
+        Visit["visit()"] --> VisitBinary["visitBinary()"]
+        Visit --> VisitLiteral["visitLiteral()"]
+    end
+
+    subgraph Walker["Tree Walker"]
+        Walk["walk()"] --> PreVisit["Pre-visit"]
+        Walk --> PostVisit["Post-visit"]
+    end
+
+    subgraph Rules["Rewrite Rules"]
+        Rule1["Pattern Matching"]
+        Rule2["Transformation"]
+        Rule1 --> Rule2
+    end
+
+    subgraph Pass["Compiler Pass"]
+        Pass1["Input IR"] --> Rules
+        Rules --> Pass2["Output IR"]
+    end
+
+    AST --> Walk
+    Walk --> Visit
+    Rules --> AST
+
+    classDef concept fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    class Node1,Node2,Node3,Visit,VisitBinary,VisitLiteral,Walk,PreVisit,PostVisit,Rule1,Rule2,Pass1,Pass2 concept
