@@ -91,11 +91,17 @@ Statement = Union[Measure, Evolve, Initialize]
 
 class AnalogCircuit(AnalogOperation):
     """
-    Class representing a quantum information experiment represented in terms of analog operations.
-
-    Attributes:
-        sequence (List[Union[Measure, Evolve, Initialize]]): Sequence of statements, including initialize, evolve, measure
-
+    Class representing a quantum information experiment using analog operations.
+        sequence (List[Statement]): Sequence of statements, including initialize, evolve, and measure.
+        n_qreg (Union[NonNegativeInt, None]): Number of quantum registers.
+        n_qmode (Union[NonNegativeInt, None]): Number of quantum modes.
+    Methods:
+        evolve(gate: AnalogGate, duration: float):
+            Adds an evolve operation to the sequence with the specified gate and duration.
+        initialize():
+            Adds an initialize operation to the sequence.
+        measure():
+            Adds a measure operation to the sequence.
     """
 
     sequence: List[Statement] = []
@@ -111,3 +117,11 @@ class AnalogCircuit(AnalogOperation):
 
     def measure(self):
         self.sequence.append(Measure())
+        
+    """
+    Class representing a quantum information experiment represented in terms of analog operations.
+
+    Attributes:
+        sequence (List[Union[Measure, Evolve, Initialize]]): Sequence of statements, including initialize, evolve, measure
+
+    """
