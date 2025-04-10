@@ -1,0 +1,31 @@
+=== Test: XXY_Gate ===
+Status: PASS
+
+Analyzing circuit: sequence=[Evolve(key='evolve', duration=1.0, gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY'))))] n_qreg=3 n_qmode=None
+Circuit n_qreg: 3, n_qmode: None
+Processing Evolve: key='evolve' duration=1.0 gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY')))
+  Gate in Evolve: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY'))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY'))
+Processing AnalogGate: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY'))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY'))
+Processing OperatorKron directly: class_='OperatorKron' op1=PauliX(class_='PauliX') op2=PauliX(class_='PauliX')
+  Found XX gate with coefficient 1.0
+  Current gate: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY'))
+  XX gates before: []
+  Adding gate to xx_gates: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY'))
+  XX gates after: [AnalogGate(class_='AnalogGate', hamiltonian=OperatorKron(class_='OperatorKron', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=PauliY(class_='PauliY')))]
+  XX weights after: [1.0]
+Processing OperatorKron directly: class_='OperatorKron' op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')) op2=PauliY(class_='PauliY')
+  Found non-XX components
+Found PauliY - not compatible with XX-only
+Analysis details:
+  Total gates in circuit: 1
+  XX gates found: 1
+  Non-XX components found: True
+Analysis results:
+  Compatible: False
+  XX gates found: 1
+  XX weights: [1.0]
+  Found non-XX gates: True
+  Has time dependence: False
+  Has ladder operators: False

@@ -1,0 +1,44 @@
+=== Test: Weighted_XX_Gate ===
+Status: PASS
+
+Analyzing circuit: sequence=[Evolve(key='evolve', duration=1.0, gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))))] n_qreg=2 n_qmode=None
+Circuit n_qreg: 2, n_qmode: None
+Processing Evolve: key='evolve' duration=1.0 gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0)))
+  Gate in Evolve: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))
+Processing AnalogGate: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))
+Processing OperatorKron directly: class_='OperatorKron' op1=PauliX(class_='PauliX') op2=PauliX(class_='PauliX')
+  Found XX gate with coefficient 1.0
+  Current gate: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))
+  XX gates before: []
+  Adding gate to xx_gates: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))
+  XX gates after: [AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0)))]
+  XX weights after: [1.0]
+Processing OperatorScalarMul
+  Coefficient type: MathNum
+  Operator type: OperatorKron
+  Setting current_coefficient to: 2.0
+  Found XX gate with coefficient 2.0
+  Current gate: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0))
+  XX gates before: [AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0)))]
+  Updating weight for gate 0 from 1.0 to 2.0
+  XX gates after: [AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathNum(class_='MathNum', value=2.0)))]
+  XX weights after: [2.0]
+Analysis details:
+  Total gates in circuit: 1
+  XX gates found: 1
+  Non-XX components found: False
+Creating Jij matrix of size 2x2
+Coupling terms: [((0, 1), 2.0)]
+Analysis results:
+  Compatible: True
+  XX gates found: 1
+  XX weights: [2.0]
+  Found non-XX gates: False
+  Has time dependence: False
+  Has ladder operators: False
+  Jij matrix shape: (2, 2)
+  Jij matrix:
+[[0. 2.]
+ [2. 0.]]

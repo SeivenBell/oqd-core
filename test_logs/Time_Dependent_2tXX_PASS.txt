@@ -1,0 +1,32 @@
+=== Test: Time_Dependent_2tXX ===
+Status: PASS
+
+Analyzing circuit: sequence=[Evolve(key='evolve', duration=1.0, gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t')))))] n_qreg=2 n_qmode=None
+Circuit n_qreg: 2, n_qmode: None
+Processing Evolve: key='evolve' duration=1.0 gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t'))))
+  Gate in Evolve: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t')))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t')))
+Processing AnalogGate: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t')))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t')))
+Processing OperatorKron directly: class_='OperatorKron' op1=PauliX(class_='PauliX') op2=PauliX(class_='PauliX')
+  Found XX gate with coefficient 1.0
+  Current gate: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t')))
+  XX gates before: []
+  Adding gate to xx_gates: class_='AnalogGate' hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t')))
+  XX gates after: [AnalogGate(class_='AnalogGate', hamiltonian=OperatorScalarMul(class_='OperatorScalarMul', op=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), expr=MathMul(class_='MathMul', expr1=MathNum(class_='MathNum', value=2.0), expr2=MathVar(class_='MathVar', name='t'))))]
+  XX weights after: [1.0]
+Processing OperatorScalarMul
+  Coefficient type: MathMul
+  Operator type: OperatorKron
+  Found time-dependent coefficient - not compatible
+Analysis details:
+  Total gates in circuit: 1
+  XX gates found: 1
+  Non-XX components found: True
+Analysis results:
+  Compatible: False
+  XX gates found: 1
+  XX weights: [1.0]
+  Found non-XX gates: True
+  Has time dependence: True
+  Has ladder operators: False

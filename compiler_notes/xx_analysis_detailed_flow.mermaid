@@ -1,0 +1,48 @@
+flowchart TD
+    Start[Circuit Input] --> Init[Initialize XXGateAnalyzer]
+    Init --> |Sets|Vars[Initialize Variables:<br/>xx_gates=[]<br/>xx_weights=[]<br/>is_compatible=True<br/>current_coefficient=1.0]
+
+    subgraph Gate_Processing
+        Evolve[map_Evolve] --> |Sets|CurrentGate[current_gate = model.gate]
+        
+        AnalogGate[map_AnalogGate] --> |Sets|CurrentGate
+    end
+
+    subgraph Operator_Checks
+        LadderCheck{map_Ladder<br/>Is Ladder Operator?} --> |Yes|MarkInvalid[Set:<br/>has_ladder_operators=True<br/>is_compatible=False]
+        
+        KronCheck{map_OperatorKron<br/>Already Processed?} --> |No|XXCheck{Is XX Gate?}
+        XXCheck --> |Yes|StoreXX[Store Gate:<br/>xx_gates.append<br/>xx_weights.append]
+        XXCheck --> |No|PureCheck{Is Pure XX?}
+        PureCheck --> |No|MarkNonXX[Set found_non_xx_gate=True]
+
+        MulCheck{map_OperatorScalarMul<br/>Already Processed?} --> |No|TimeCheck{Is Time Dependent?}
+        TimeCheck --> |Yes|MarkTime[Set:<br/>has_time_dependence=True<br/>found_non_xx_gate=True]
+        TimeCheck --> |No|CoeffProcess[Process Coefficient:<br/>Set current_coefficient]
+        CoeffProcess --> KronProcess[Process Underlying<br/>OperatorKron]
+    end
+
+    subgraph Results_Generation
+        FinalCheck{Is Compatible?} --> |Yes|JijMatrix[Create Jij Matrix]
+        FinalCheck --> |No|NullMatrix[Return None]
+        
+        JijMatrix --> ReturnResults[Return:<br/>is_compatible<br/>xx_gates<br/>xx_weights<br/>jij_matrix]
+        NullMatrix --> ReturnResults
+    end
+
+    %% Data flow connections
+    CurrentGate --> KronCheck
+    CurrentGate --> MulCheck
+    StoreXX --> FinalCheck
+    MarkInvalid --> FinalCheck
+    MarkNonXX --> FinalCheck
+    MarkTime --> FinalCheck
+    KronProcess --> XXCheck
+
+    classDef process fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef decision fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef data fill:#ffa,stroke:#333,stroke-width:2px;
+    
+    class Init,StoreXX,MarkInvalid,MarkNonXX,MarkTime,CoeffProcess,KronProcess process;
+    class LadderCheck,KronCheck,XXCheck,PureCheck,TimeCheck,FinalCheck decision;
+    class Vars,CurrentGate,ReturnResults data;

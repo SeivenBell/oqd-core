@@ -1,0 +1,24 @@
+=== Test: XY_Gate ===
+Status: PASS
+
+Analyzing circuit: sequence=[Evolve(key='evolve', duration=1.0, gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliY(class_='PauliY'))))] n_qreg=2 n_qmode=None
+Circuit n_qreg: 2, n_qmode: None
+Processing Evolve: key='evolve' duration=1.0 gate=AnalogGate(class_='AnalogGate', hamiltonian=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliY(class_='PauliY')))
+  Gate in Evolve: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliY(class_='PauliY'))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliY(class_='PauliY'))
+Processing AnalogGate: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliY(class_='PauliY'))
+  Setting current_gate to: class_='AnalogGate' hamiltonian=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliY(class_='PauliY'))
+Processing OperatorKron directly: class_='OperatorKron' op1=PauliX(class_='PauliX') op2=PauliY(class_='PauliY')
+  Found non-XX components
+Found PauliY - not compatible with XX-only
+Analysis details:
+  Total gates in circuit: 1
+  XX gates found: 0
+  Non-XX components found: True
+Analysis results:
+  Compatible: False
+  XX gates found: 0
+  XX weights: []
+  Found non-XX gates: True
+  Has time dependence: False
+  Has ladder operators: False

@@ -1,0 +1,329 @@
+========== test session starts ==========
+platform linux -- Python 3.13.2, pytest-8.3.5, pluggy-1.5.0 -- /home/seiven/.local/share/mise/installs/python/3.13.2/bin/python
+cachedir: .pytest_cache
+rootdir: /home/seiven/Documents/Github/oqd-core
+configfile: pyproject.toml
+collecting ... collected 226 items
+
+tests/test_analog/test_analysis.py::test_simple_single_term_pauli PASSED [  0%]
+tests/test_analog/test_analysis.py::test_simple_single_term_ladder PASSED [  0%]
+tests/test_analog/test_analysis.py::test_kron_add PASSED [  1%]
+tests/test_analog/test_analysis.py::test_kron_single PASSED [  1%]
+tests/test_analog/test_analysis.py::test_kron_single_ladder PASSED [  2%]
+tests/test_analog/test_analysis.py::test_kron_single_complicated PASSED [  2%]
+tests/test_analog/test_analysis.py::test_kron_add_complicated PASSED [  3%]
+tests/test_analog/test_analysis.py::test_kron_add_complicated_with_scalar PASSED [  3%]
+tests/test_analog/test_canonicalization_rules.py::test_operator_distribute_simple PASSED [  3%]
+tests/test_analog/test_canonicalization_rules.py::test_operator_distribute_no_effect PASSED [  4%]
+tests/test_analog/test_canonicalization_rules.py::test_gather_math_expr_simple PASSED [  4%]
+tests/test_analog/test_canonicalization_rules.py::test_gather_math_expr_complicated PASSED [  5%]
+tests/test_analog/test_canonicalization_rules.py::test_gather_math_expr_no_effect PASSED [  5%]
+tests/test_analog/test_canonicalization_rules.py::test_proper_order_simple PASSED [  6%]
+tests/test_analog/test_canonicalization_rules.py::test_proper_order_complicated PASSED [  6%]
+tests/test_analog/test_canonicalization_rules.py::test_simple_pauli PASSED [  7%]
+tests/test_analog/test_canonicalization_rules.py::test_nested_multiplications PASSED [  7%]
+tests/test_analog/test_canonicalization_rules.py::test_nested_multiplications_complicated XFAIL [  7%]
+tests/test_analog/test_canonicalization_rules.py::test_simple_pauli_gather PASSED [  8%]
+tests/test_analog/test_canonicalization_rules.py::test_complicated_pauli_gather PASSED [  8%]
+tests/test_analog/test_canonicalization_rules.py::test_normal_order_simple PASSED [  9%]
+tests/test_analog/test_canonicalization_rules.py::test_normal_order_simple_fail PASSED [  9%]
+tests/test_analog/test_canonicalization_rules.py::test_normal_order_inside_pauli PASSED [ 10%]
+tests/test_analog/test_canonicalization_rules.py::test_prune_identity_simple PASSED [ 10%]
+tests/test_analog/test_canonicalization_rules.py::test_prune_identity_simple_nested PASSED [ 11%]
+tests/test_analog/test_canonicalization_rules.py::test_sorted_order_simple PASSED [ 11%]
+tests/test_analog/test_canonicalization_rules.py::test_sorted_order_terminals PASSED [ 11%]
+tests/test_analog/test_canonicalization_rules.py::test_sorted_order_ladder PASSED [ 12%]
+tests/test_analog/test_canonicalization_rules.py::test_scale_terms_simple PASSED [ 12%]
+tests/test_analog/test_canonicalization_rules.py::test_scale_terms_single_term PASSED [ 13%]
+tests/test_analog/test_canonicalization_rules.py::test_scale_terms_terminals PASSED [ 13%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_pauli_simple_fail PASSED [ 14%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_pauli_ladder_simple_fail PASSED [ 14%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_pauli_simple_pass PASSED [ 15%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_pauli_ladder_simple_pass PASSED [ 15%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_pauli_nested_fail PASSED [ 15%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_pauli_nested_pass PASSED [ 16%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_nested_multiplication_pass PASSED [ 16%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_complex_nested_pass PASSED [ 17%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_complex_nested_fail PASSED [ 17%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_complex_pauli_fail PASSED [ 18%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_addition_pauli_scalar_multiple_simple PASSED [ 18%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_addition_pauli_scalar_multiple_nested PASSED [ 19%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_subtraction_pauli PASSED [ 19%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_multiplication_OperatorKron_distribution PASSED [ 19%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_multiplication_OperatorScalarMul_distribution_v1 PASSED [ 20%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_multiplication_OperatorScalarMul_distribution_v2 PASSED [ 20%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_multiplication_OperatorScalarMul_distribution_v3 PASSED [ 21%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_multiplication_OperatorScalarMul_distribution_v4 PASSED [ 21%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_multiplication_OperatorScalarMul_distribution_v5 PASSED [ 22%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationOperatorDistribute::test_multiplication_OperatorScalarMul_distribution_pass PASSED [ 22%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_pauli_simple_pass PASSED [ 23%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_pauli_simple_fail PASSED [ 23%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_pauli_simple_fail_one_term PASSED [ 23%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_pauli_complicated_pass PASSED [ 24%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_pauli_complicated_fail PASSED [ 24%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_addition_pauli_scalar_multiple_nested_fail PASSED [ 25%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_pauli_nested_ops_fail PASSED [ 25%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherMathExpr::test_pauli_ladder_nested_ops_pass PASSED [ 26%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_simple_pauli_pass PASSED [ 26%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_simple_pauli_fail PASSED [ 26%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_simple_pauli_with_other_ops_pass PASSED [ 27%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_simple_pauli_with_other_ops_fail PASSED [ 27%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_nested_paulis_fail_v1 PASSED [ 28%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_nested_paulis_pass_v2 PASSED [ 28%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_nested_paulis_pass_with_brackets PASSED [ 29%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_nested_paulis_pass_without_brackets PASSED [ 29%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_nested_tensor_prod_paulis_multiplication_fail PASSED [ 30%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationProperOrder::test_nested_tensor_prod_paulis_multiplication_pass PASSED [ 30%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPauliAlgebra::test_simple_pass PASSED [ 30%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPauliAlgebra::test_simple_fail PASSED [ 31%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPauliAlgebra::test_nested_pass PASSED [ 31%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPauliAlgebra::test_nested_fail PASSED [ 32%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPauliAlgebra::test_assumption_pass PASSED [ 32%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPauliAlgebra::test_assumption_pass_v2 PASSED [ 33%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_simple_pass PASSED [ 33%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_simple_fail PASSED [ 34%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_complicated_addition_pass PASSED [ 34%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_simple_adddition_fail PASSED [ 34%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_simple_addition_pass PASSED [ 35%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_assumption_addition_pass PASSED [ 35%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_assumption_nested_addition_pass PASSED [ 36%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_assumption_simple_nested_addition_pass PASSED [ 36%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_assumption_simple_nested_subtraction_pass PASSED [ 37%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_ladder_prod_fail PASSED [ 37%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationGatherPauli::test_ladder_prod_pass PASSED [ 38%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_pass PASSED [ 38%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_fail PASSED [ 38%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_pass_only_ladders PASSED [ 39%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_fail_only_ladders PASSED [ 39%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_addition_pass PASSED [ 40%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_addition_fail PASSED [ 40%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_starting_with_ladder_pass_v1 PASSED [ 41%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_starting_with_ladder_fail_v1 PASSED [ 41%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_starting_with_single_ladder_pass_v1 PASSED [ 42%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_simple_starting_with_single_ladder_tensors PASSED [ 42%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_assumption_only_ladder_addition_without_distribution PASSED [ 42%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_assumption_only_ladder_addition_with_distribution PASSED [ 43%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_terminal_ladder_normal_order PASSED [ 43%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationNormalOrder::test_just_terminal_ladder_normal_order PASSED [ 44%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPruneIdentity::test_simple_pass PASSED [ 44%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPruneIdentity::test_simple_addition_pass PASSED [ 45%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPruneIdentity::test_simple_fail PASSED [ 45%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationPruneIdentity::test_show_proper_order_not_needed PASSED [ 46%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_pass PASSED [ 46%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_fail_2_terms PASSED [ 46%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_fail PASSED [ 47%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_nested_pass PASSED [ 47%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_nested_fail PASSED [ 48%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_fail_identical_operators PASSED [ 48%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_assumption_pass PASSED [ 49%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_pass_ladder PASSED [ 49%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_fail_ladder PASSED [ 50%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_pass_ladder_3_terms PASSED [ 50%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_fail_ladder_3_terms PASSED [ 50%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_pass_ladder_pauli PASSED [ 51%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_simple_fail_ladder_pauli PASSED [ 51%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_scalar_mul_pass PASSED [ 52%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_scalar_mul_fail PASSED [ 52%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_scalar_mul_pass_with_ladder PASSED [ 53%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_scalar_mul_fail_with_ladder PASSED [ 53%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_scalar_mul_fail_duplicate PASSED [ 53%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_scalar_mul_fail_duplicate_more_terms PASSED [ 54%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_scalar_mul_fail_duplicate_complex PASSED [ 54%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationSortedOrder::test_nested_fail_duplicate PASSED [ 55%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationScaleTerms::test_simple_addition_pass PASSED [ 55%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationScaleTerms::test_simple_addition_fail PASSED [ 56%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationScaleTerms::test_single_pass PASSED [ 56%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationScaleTerms::test_single_fail PASSED [ 57%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationScaleTerms::test_complicated_addition_pass PASSED [ 57%]
+tests/test_analog/test_canonicalization_verification.py::TestCanonicalizationVerificationScaleTerms::test_complicated_addition_fail PASSED [ 57%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[3+5-8] PASSED [ 58%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[3.02+5.01-8.03] PASSED [ 58%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[3-5--2] PASSED [ 59%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[-3.02+5.01-1.99] PASSED [ 59%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[3*5-15] PASSED [ 60%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[15/2-7.5] PASSED [ 60%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[3**2.01-9.1] PASSED [ 61%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[sin(0.25)-0.2474] PASSED [ 61%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[tan(0.205)-0.208] PASSED [ 61%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[2*3 + 5*(1j)-(6+5j)] PASSED [ 62%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[1+2*3 + 9 - 0.1 + 7*(2+3*5+(10/3))-158.233] PASSED [ 62%]
+tests/test_analog/test_mathexpr.py::test_math_expressions[sin(exp(2))-0.894] PASSED [ 63%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_add_V PASSED [ 63%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_operator_multiply_V PASSED [ 64%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_left_multiplication_V PASSED [ 64%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_left_multiple_multiplication_V PASSED [ 65%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_right_multiplication_V PASSED [ 65%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_right_multiple_multiplication_V PASSED [ 65%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_multiplication_with_addition_V PASSED [ 66%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_multiplication_nested_l1_V PASSED [ 66%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_multiplication_nested_l2_V PASSED [ 67%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_scalar_string_nested_float_combination_V PASSED [ 67%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_kron_with_addition_V PASSED [ 68%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_string_left_multiplication_V PASSED [ 68%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_string_right_multiplication_V PASSED [ 69%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_string_left_right_multiplication_V PASSED [ 69%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_string_left_right_multiplication_nested_V PASSED [ 69%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_minus_string_V PASSED [ 70%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_multiple_minus_V PASSED [ 70%]
+tests/test_analog/test_operator.py::TestRealFinalStringVerbosePrintOp::test_pauli_multiple_minus_nested_V SKIPPED [ 71%]
+tests/test_analog/test_operator.py::TestComplexFinalStringVerbosePrintOp::test_pauli_left_img_V PASSED [ 71%]
+tests/test_analog/test_operator.py::TestComplexFinalStringVerbosePrintOp::test_pauli_right_img_V PASSED [ 72%]
+tests/test_analog/test_operator.py::TestComplexFinalStringVerbosePrintOp::test_pauli_nested_img_V PASSED [ 72%]
+tests/test_analog/test_operator.py::TestHilbertSpaceDimVerification::test_simple_addition_fail PASSED [ 73%]
+tests/test_analog/test_operator.py::TestHilbertSpaceDimVerification::test_simple_addition_pass_single PASSED [ 73%]
+tests/test_analog/test_operator.py::TestHilbertSpaceDimVerification::test_simple_addition_fail_single_with_ladder PASSED [ 73%]
+tests/test_analog/test_operator.py::TestHilbertSpaceDimVerification::test_simple_addition_fail_ladder PASSED [ 74%]
+tests/test_analog/test_operator.py::TestHilbertSpaceDimVerification::test_simple_addition_pass_ladder PASSED [ 74%]
+tests/test_analog/test_xx_analysis.py::test_pauli_combinations[hamiltonian0-XX_Gate-True-expected_weights0] PASSED [ 75%]
+tests/test_analog/test_xx_analysis.py::test_pauli_combinations[hamiltonian1-Weighted_XX_Gate-True-expected_weights1] PASSED [ 75%]
+tests/test_analog/test_xx_analysis.py::test_pauli_combinations[hamiltonian2-XY_Gate-False-None] PASSED [ 76%]
+tests/test_analog/test_xx_analysis.py::test_pauli_combinations[hamiltonian3-XZ_Gate-False-None] PASSED [ 76%]
+tests/test_analog/test_xx_analysis.py::test_pauli_combinations[hamiltonian4-YY_Gate-False-None] PASSED [ 76%]
+tests/test_analog/test_xx_analysis.py::test_pauli_combinations[hamiltonian5-ZZ_Gate-False-None] PASSED [ 77%]
+tests/test_analog/test_xx_analysis.py::test_pauli_combinations[hamiltonian6-II_Gate-False-None] PASSED [ 77%]
+tests/test_analog/test_xx_analysis.py::test_3qubit_combinations[hamiltonian0-XXX_Gate] PASSED [ 78%]
+tests/test_analog/test_xx_analysis.py::test_3qubit_combinations[hamiltonian1-XXY_Gate] PASSED [ 78%]
+tests/test_analog/test_xx_analysis.py::test_3qubit_combinations[hamiltonian2-XYZ_Gate] PASSED [ 79%]
+tests/test_analog/test_xx_analysis.py::test_time_dependent[hamiltonian0-Time_Dependent_XX] PASSED [ 79%]
+tests/test_analog/test_xx_analysis.py::test_time_dependent[hamiltonian1-Time_Dependent_2tXX] PASSED [ 80%]
+tests/test_analog/test_xx_analysis.py::test_complex_circuits[hamiltonians0-Multiple_XX_Gates-True] FAILED [ 80%]
+tests/test_analog/test_xx_analysis.py::test_complex_circuits[hamiltonians1-Mixed_XX_YY_Gates-False] PASSED [ 80%]
+tests/test_analog/test_xx_analysis.py::test_complex_circuits[hamiltonians2-Mixed_XX_XXX_Gates-False] PASSED [ 81%]
+tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian0-XX_plus_II-False] FAILED [ 81%]
+tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian1-XX_plus_XX-True] PASSED [ 82%]
+tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian2-XX_plus_II-False] FAILED [ 82%]
+tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian3-XX_plus_XX-True] PASSED [ 83%]
+tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian4-XX_plus_YY-False] PASSED [ 83%]
+tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian5-XX_plus_YZ-False] PASSED [ 84%]
+tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian6-XX_plus_ZZ-False] PASSED [ 84%]
+tests/test_analog/test_xx_analysis.py::test_with_ladder_operators PASSED [ 84%]
+tests/test_serialization.py::test_serialize_deserialize[model0] PASSED [ 85%]
+tests/test_serialization.py::test_serialize_deserialize[model1] PASSED [ 85%]
+tests/test_serialization.py::test_serialize_deserialize[model2] PASSED [ 86%]
+tests/test_serialization.py::test_serialize_deserialize[model3] PASSED [ 86%]
+tests/test_serialization.py::test_serialize_deserialize[model4] PASSED [ 87%]
+tests/test_serialization.py::test_serialize_deserialize[model5] PASSED [ 87%]
+tests/test_serialization.py::test_serialize_deserialize[model6] PASSED [ 88%]
+tests/test_serialization.py::test_serialize_deserialize[model7] PASSED [ 88%]
+tests/test_serialization.py::test_serialize_deserialize[model8] PASSED [ 88%]
+tests/test_serialization.py::test_serialize_deserialize[model9] PASSED [ 89%]
+tests/test_serialization.py::test_serialize_deserialize[model10] PASSED [ 89%]
+tests/test_serialization.py::test_serialize_deserialize[model11] PASSED [ 90%]
+tests/test_serialization.py::test_serialize_deserialize[model12] PASSED [ 90%]
+tests/test_serialization.py::test_serialize_deserialize[model13] PASSED [ 91%]
+tests/test_serialization.py::test_serialize_deserialize[model14] PASSED [ 91%]
+tests/test_serialization.py::test_serialize_deserialize[model15] PASSED [ 92%]
+tests/test_serialization.py::test_serialize_deserialize[model16] PASSED [ 92%]
+tests/test_serialization.py::test_serialize_deserialize[model17] PASSED [ 92%]
+tests/test_serialization.py::test_serialize_deserialize[model18] PASSED [ 93%]
+tests/test_serialization.py::test_serialize_deserialize[model19] PASSED [ 93%]
+tests/test_serialization.py::test_serialize_deserialize[model20] PASSED [ 94%]
+tests/test_serialization.py::test_serialize_deserialize[model21] PASSED [ 94%]
+tests/test_serialization.py::test_serialize_deserialize[model22] PASSED [ 95%]
+tests/test_serialization.py::test_serialize_deserialize[model23] PASSED [ 95%]
+tests/test_serialization.py::test_serialize_deserialize[model24] PASSED [ 96%]
+tests/test_serialization.py::test_serialize_deserialize[model25] PASSED [ 96%]
+tests/test_serialization.py::test_serialize_deserialize[model26] PASSED [ 96%]
+tests/test_serialization.py::test_serialize_deserialize[model27] PASSED [ 97%]
+tests/test_serialization.py::test_serialize_deserialize[model28] PASSED [ 97%]
+tests/test_serialization.py::test_serialize_deserialize[model29] PASSED [ 98%]
+tests/test_serialization.py::test_serialize_deserialize[model30] PASSED [ 98%]
+tests/test_serialization.py::test_serialize_deserialize[model31] PASSED [ 99%]
+tests/test_serialization.py::test_serialize_deserialize[model32] PASSED [ 99%]
+tests/test_serialization.py::test_serialize_deserialize[model33] PASSED [100%]
+
+=============== FAILURES ================
+_ test_complex_circuits[hamiltonians0-Multiple_XX_Gates-True] _
+
+hamiltonians = [OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX'))]
+name = 'Multiple_XX_Gates'
+expected_compatible = True
+
+    @pytest.mark.parametrize("hamiltonians,name,expected_compatible", [
+        ([X @ X, X @ X], "Multiple_XX_Gates", True),
+        ([X @ X, Y @ Y], "Mixed_XX_YY_Gates", False),
+        ([X @ X, X @ X @ X], "Mixed_XX_XXX_Gates", False),
+    ])
+    def test_complex_circuits(hamiltonians, name, expected_compatible):
+        """Test more complex circuit structures"""
+        # Create circuit
+        circuit = create_test_circuit(hamiltonians)
+        circuit.n_qreg = 3 if any(isinstance(h, (X @ X @ X).__class__) for h in hamiltonians) else 2
+    
+        # Analyze with output capture
+        result, output = capture_output(analyze_xx_gates, circuit, verbose=True)
+        is_compatible, xx_gates, xx_weights, jij_matrix = result
+    
+        # Check compatibility
+>       assert is_compatible == expected_compatible, f"Expected compatibility {expected_compatible}, got {is_compatible}"
+E       AssertionError: Expected compatibility True, got False
+E       assert False == True
+
+tests/test_analog/test_xx_analysis.py:160: AssertionError
+_ test_multiple_xx_combinations[hamiltonian0-XX_plus_II-False] _
+
+hamiltonian = OperatorAdd(class_='OperatorAdd', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=OperatorKron(class_='OperatorKron', op1=PauliI(class_='PauliI'), op2=PauliI(class_='PauliI')))
+name = 'XX_plus_II'
+expected_compatible = False
+
+    @pytest.mark.parametrize("hamiltonian,name,expected_compatible", [
+        (X @ X + I @ I, "XX_plus_II", False),  # Not pure XX
+        (X @ X + X @ X, "XX_plus_XX", True),   # Can be simplified to 2 * (X @ X)
+        (X @ X + I @ I, "XX_plus_II", False),  # Not pure XX
+        (X @ X + X @ X, "XX_plus_XX", True),   # Can be simplified to 2 * (X @ X)
+        (X @ X + Y @ Y, "XX_plus_YY", False),  # Mixed terms
+        (X @ X + Y @ Z, "XX_plus_YZ", False),  # Mixed terms
+        (X @ X + Z @ Z, "XX_plus_ZZ", False),  # Mixed terms
+    ])
+    def test_multiple_xx_combinations(hamiltonian, name, expected_compatible):
+        """Test circuits with multiple XX gate combinations."""
+        # Create circuit
+        circuit = create_test_circuit([hamiltonian])
+        circuit.n_qreg = 2
+    
+        # Analyze with output capture
+        result, output = capture_output(analyze_xx_gates, circuit, verbose=True)
+        is_compatible, xx_gates, xx_weights, jij_matrix = result
+    
+        # Check compatibility
+>       assert is_compatible == expected_compatible, f"Expected compatibility {expected_compatible}, got {is_compatible}"
+E       AssertionError: Expected compatibility False, got True
+E       assert True == False
+
+tests/test_analog/test_xx_analysis.py:191: AssertionError
+_ test_multiple_xx_combinations[hamiltonian2-XX_plus_II-False] _
+
+hamiltonian = OperatorAdd(class_='OperatorAdd', op1=OperatorKron(class_='OperatorKron', op1=PauliX(class_='PauliX'), op2=PauliX(class_='PauliX')), op2=OperatorKron(class_='OperatorKron', op1=PauliI(class_='PauliI'), op2=PauliI(class_='PauliI')))
+name = 'XX_plus_II'
+expected_compatible = False
+
+    @pytest.mark.parametrize("hamiltonian,name,expected_compatible", [
+        (X @ X + I @ I, "XX_plus_II", False),  # Not pure XX
+        (X @ X + X @ X, "XX_plus_XX", True),   # Can be simplified to 2 * (X @ X)
+        (X @ X + I @ I, "XX_plus_II", False),  # Not pure XX
+        (X @ X + X @ X, "XX_plus_XX", True),   # Can be simplified to 2 * (X @ X)
+        (X @ X + Y @ Y, "XX_plus_YY", False),  # Mixed terms
+        (X @ X + Y @ Z, "XX_plus_YZ", False),  # Mixed terms
+        (X @ X + Z @ Z, "XX_plus_ZZ", False),  # Mixed terms
+    ])
+    def test_multiple_xx_combinations(hamiltonian, name, expected_compatible):
+        """Test circuits with multiple XX gate combinations."""
+        # Create circuit
+        circuit = create_test_circuit([hamiltonian])
+        circuit.n_qreg = 2
+    
+        # Analyze with output capture
+        result, output = capture_output(analyze_xx_gates, circuit, verbose=True)
+        is_compatible, xx_gates, xx_weights, jij_matrix = result
+    
+        # Check compatibility
+>       assert is_compatible == expected_compatible, f"Expected compatibility {expected_compatible}, got {is_compatible}"
+E       AssertionError: Expected compatibility False, got True
+E       assert True == False
+
+tests/test_analog/test_xx_analysis.py:191: AssertionError
+======== short test summary info ========
+FAILED tests/test_analog/test_xx_analysis.py::test_complex_circuits[hamiltonians0-Multiple_XX_Gates-True]
+FAILED tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian0-XX_plus_II-False]
+FAILED tests/test_analog/test_xx_analysis.py::test_multiple_xx_combinations[hamiltonian2-XX_plus_II-False]
+= 3 failed, 221 passed, 1 skipped, 1 xfailed in 0.31s =
